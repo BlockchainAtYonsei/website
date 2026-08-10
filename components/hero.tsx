@@ -19,6 +19,7 @@ const NAV_LINKS: {
   { label: "About", href: "#about" },
   { label: "Activities", href: "#activities" },
   { label: "History", href: "#history" },
+  { label: "Partners", href: "#partners" },
   { label: "Research", href: "/research" },
   { label: "Contact", dialog: true },
 ];

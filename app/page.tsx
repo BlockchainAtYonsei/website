@@ -2,6 +2,7 @@ import Link from "next/link";
 import Hero from "@/components/hero";
 import ApplyTrigger from "@/components/apply-modal";
 import BlurText from "@/components/blur-text";
+import Partners from "@/components/partners";
 import SiteFooter from "@/components/site-footer";
 import {
   ArrowUpRight,
@@ -245,6 +246,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <Partners />
 
       {/* CTA */}
       <section id="apply" className="relative overflow-hidden bg-ink py-28 md:py-40">
