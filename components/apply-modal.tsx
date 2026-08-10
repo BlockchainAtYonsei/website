@@ -5,9 +5,10 @@ import Modal from "./modal";
 import SocialLinks from "./social-links";
 
 /* Recruiting notice. Update these two numbers when a cycle opens or closes —
-   when 19기 opens, swap the body for the application link. */
-const CLOSED_COHORT = "18기";
-const NEXT_COHORT = "19기";
+   when 19기 opens, swap the body for the application link. The Organization
+   page reads them too, so both places move together. */
+export const CLOSED_COHORT = "18기";
+export const NEXT_COHORT = "19기";
 
 export function ApplyModal({
   open,
