@@ -1,5 +1,6 @@
 import Hero from "@/components/hero";
 import BlurText from "@/components/blur-text";
+import Partners from "@/components/partners";
 import { ArrowUpRight } from "@/components/icons";
 
 const PILLARS = [{ title: "Research" }, { title: "Build" }, { title: "Network" }];
@@ -210,6 +211,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <Partners />
 
       {/* CTA */}
       <section id="apply" className="relative overflow-hidden bg-ink py-28 md:py-40">
