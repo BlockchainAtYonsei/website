@@ -9,6 +9,7 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "About", href: "#about" },
   { label: "Activities", href: "#activities" },
   { label: "History", href: "#history" },
+  { label: "Partners", href: "#partners" },
   { label: "Research", href: "#research" },
   {
     label: "Contact",
