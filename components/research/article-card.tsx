@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CoverArt from "./cover-art";
+import { authorName } from "@/lib/authors";
 import { formatDate, readingMinutes, type Article } from "@/lib/research";
 
 export function ArticleMeta({
@@ -48,17 +49,22 @@ export function FeaturedCard({ article }: { article: Article }) {
               Featured
             </span>
           </div>
-          <h2 className="font-heading text-3xl leading-[1.05] tracking-[-1px] break-keep text-white italic transition-colors group-hover:text-bay-100 md:text-4xl lg:text-5xl">
+          {/* h3, not h2 — the index labels this card with a "최신 리서치" h2, so
+              the article title nests under it the same way grid cards nest
+              under "All research" */}
+          <h3 className="font-heading text-3xl leading-[1.05] tracking-[-1px] break-keep text-white italic transition-colors group-hover:text-bay-100 md:text-4xl lg:text-5xl">
             {article.title}
-          </h2>
+          </h3>
           <p className="font-body mt-5 max-w-xl leading-relaxed font-light break-keep text-slate-400">
             {article.dek}
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <ArticleMeta article={article} />
+          {/* plain text, not a link — the whole card is already an anchor and
+              anchors don't nest; the byline links live on the article page */}
           <span className="font-body text-xs font-light text-slate-500">
-            {article.author}
+            {authorName(article.author)}
           </span>
         </div>
       </div>

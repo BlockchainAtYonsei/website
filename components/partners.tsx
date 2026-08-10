@@ -62,7 +62,7 @@ export default function Partners() {
         </p>
         <BlurText
           justify="start"
-          text="Building alongside"
+          text="Building with BAY"
           className="font-heading text-5xl leading-[0.9] tracking-[-3px] text-white italic md:text-6xl"
         />
         <p className="font-body mt-8 max-w-2xl leading-relaxed font-light text-slate-400">

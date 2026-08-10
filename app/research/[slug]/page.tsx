@@ -6,6 +6,7 @@ import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
 import CoverArt from "@/components/research/cover-art";
 import Toc from "@/components/research/toc";
+import { authorMark, authorName } from "@/lib/authors";
 import {
   ARTICLES,
   formatDate,
@@ -73,19 +74,26 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
             {article.dek}
           </p>
 
-          <div className="mt-9 flex items-center gap-3.5 border-t border-white/8 pt-7">
-            <span
-              aria-hidden
-              className="font-display flex h-10 w-10 items-center justify-center rounded-full bg-bay-500/20 text-xs font-bold tracking-wide text-bay-200"
+          <div className="mt-9 border-t border-white/8 pt-7">
+            <Link
+              href={`/research/author/${article.author}`}
+              className="group inline-flex items-center gap-3.5"
             >
-              BAY
-            </span>
-            <div>
-              <p className="font-body text-sm text-white">{article.author}</p>
-              <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
-                {readingMinutes(article)} min read
-              </p>
-            </div>
+              <span
+                aria-hidden
+                className="font-display flex h-10 w-10 items-center justify-center rounded-full bg-bay-500/20 text-xs font-bold tracking-wide text-bay-200 transition-transform duration-300 group-hover:scale-105"
+              >
+                {authorMark(article.author)}
+              </span>
+              <span>
+                <span className="font-body block text-sm text-white transition-colors group-hover:text-bay-100">
+                  {authorName(article.author)}
+                </span>
+                <span className="font-mono block text-[10px] tracking-[0.18em] text-white/40 uppercase">
+                  {readingMinutes(article)} min read
+                </span>
+              </span>
+            </Link>
           </div>
         </header>
 

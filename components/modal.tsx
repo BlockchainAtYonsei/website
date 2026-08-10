@@ -7,7 +7,12 @@ import { CloseIcon } from "./icons";
 
 /* Shared dialog shell: backdrop, panel, Escape, scroll lock, focus handling.
    Both the contact and apply overlays need identical behaviour, so it lives
-   here rather than being written twice. */
+   here rather than being written twice.
+
+   The backdrop is deliberately inert. Closing on a stray click outside would
+   throw away a half-typed inquiry, so the close button is the only pointer
+   route out. Escape still works — it is a deliberate keystroke, not a slip,
+   and keyboard users have no other way to dismiss the dialog. */
 export default function Modal({
   open,
   onClose,
@@ -66,7 +71,6 @@ export default function Modal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={onClose}
         >
           <motion.div
             ref={panelRef}
@@ -79,7 +83,6 @@ export default function Modal({
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 16, filter: "blur(8px)" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"

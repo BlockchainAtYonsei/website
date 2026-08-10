@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { CLOSED_COHORT, NEXT_COHORT } from "@/lib/cohort";
 import Modal from "./modal";
 import SocialLinks from "./social-links";
 
-/* Recruiting notice. Update these two numbers when a cycle opens or closes —
-   when 19기 opens, swap the body for the application link. */
-const CLOSED_COHORT = "18기";
-const NEXT_COHORT = "19기";
+/* Recruiting notice — when 19기 opens, swap the body for the application link.
+   The cohort numbers themselves live in lib/cohort so the Organization page
+   can read them without crossing the client boundary. */
 
 export function ApplyModal({
   open,

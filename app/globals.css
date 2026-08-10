@@ -83,6 +83,21 @@ body {
   );
 }
 
+/* The frosted look cannot carry legibility on its own: the build strips the
+   unprefixed backdrop-filter and keeps only -webkit-backdrop-filter, which
+   current Chrome no longer implements, so the panel renders as a 1% white tint
+   over whatever it covers. On phones the menu opens across body copy, where
+   that is unreadable — give it a real background there.
+
+   Specificity 0,2,0 so it beats the .liquid-glass-strong background above; a
+   Tailwind bg-* utility would not, since utilities are layered and these rules
+   are not. */
+@media (width < 48rem) {
+  .liquid-glass-strong.menu-panel {
+    background: rgba(10, 16, 31, 0.97);
+  }
+}
+
 .liquid-glass-strong::before {
   background: linear-gradient(
     180deg,

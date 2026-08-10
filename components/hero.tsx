@@ -16,13 +16,16 @@ const NAV_LINKS: {
   external?: boolean;
   dialog?: true;
 }[] = [
-  { label: "About", href: "#about" },
-  { label: "Activities", href: "#activities" },
-  { label: "History", href: "#history" },
-  { label: "Partners", href: "#partners" },
+  { label: "Organization", href: "/organization" },
   { label: "Research", href: "/research" },
   { label: "Contact", dialog: true },
 ];
+
+/* Shared look for every entry in the menu, Apply included — it carries no
+   display utility so each call site picks block or flex without the two
+   fighting over stylesheet order. */
+const NAV_ITEM =
+  "font-body rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white";
 
 const HIDDEN = { filter: "blur(10px)", opacity: 0, y: 20 };
 const VISIBLE = { filter: "blur(0px)", opacity: 1, y: 0 };
@@ -63,7 +66,10 @@ export default function Hero() {
       {/* bottom scrim so overlay text stays readable */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink to-transparent" />
 
-      <header className="fixed inset-x-0 top-4 z-50 flex items-center justify-end px-6 lg:px-12">
+      {/* Absolute on phones so the button stays parked at the top of the hero.
+          Fixed, it rode the scroll and the open panel landed on top of body
+          copy. From md up there is room beside the text, so it keeps following. */}
+      <header className="absolute inset-x-0 top-4 z-50 flex items-center justify-end px-6 md:fixed lg:px-12">
         <div className="relative flex items-center gap-3">
           <button
             type="button"
@@ -98,10 +104,9 @@ export default function Hero() {
                   exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
-                  <div className="liquid-glass-strong rounded-[1.25rem] p-2">
+                  <div className="liquid-glass-strong menu-panel rounded-[1.25rem] p-2">
                     {NAV_LINKS.map((link) => {
-                      const cls =
-                        "font-body block rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white";
+                      const cls = `${NAV_ITEM} block`;
                       if (link.dialog) {
                         return (
                           <button
@@ -148,7 +153,7 @@ export default function Hero() {
                         setMenuOpen(false);
                         setApplyOpen(true);
                       }}
-                      className="font-body mt-1 flex w-full cursor-pointer items-center justify-between rounded-[0.9rem] bg-white px-4 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
+                      className={`${NAV_ITEM} flex w-full cursor-pointer items-center justify-between`}
                     >
                       Apply
                       <ArrowUpRight className="h-4 w-4" />
