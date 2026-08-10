@@ -25,13 +25,14 @@ export type Article = {
   tag: string;
   accent: Accent;
   date: string; // ISO
-  author: string;
+  author: string; // author slug — resolved through lib/authors.ts
   featured?: boolean;
   body: Block[];
 };
 
 /* Placeholder editorial content — replace with real BAY research.
-   Author is the club entity rather than individual names until bylines are set. */
+   Bylines are mock: articles are spread across research-team members so the
+   author pages have something to show. Reassign as real pieces land. */
 export const ARTICLES: Article[] = [
   {
     slug: "restaking-risk-surface",
@@ -40,7 +41,7 @@ export const ARTICLES: Article[] = [
     tag: "Infra",
     accent: "indigo",
     date: "2026-07-28",
-    author: "BAY Research",
+    author: "yerim-bae",
     featured: true,
     body: [
       {
@@ -131,7 +132,7 @@ export const ARTICLES: Article[] = [
     tag: "ZK",
     accent: "violet",
     date: "2026-06-14",
-    author: "BAY Research",
+    author: "jaehwan-lee",
     body: [
       {
         t: "p",
@@ -186,7 +187,7 @@ export const ARTICLES: Article[] = [
     tag: "DeFi",
     accent: "blue",
     date: "2026-05-02",
-    author: "BAY Research",
+    author: "jehee-noh",
     body: [
       {
         t: "p",
@@ -239,7 +240,7 @@ export const ARTICLES: Article[] = [
     tag: "Governance",
     accent: "teal",
     date: "2026-03-19",
-    author: "BAY Research",
+    author: "jaeseo-kim",
     body: [
       {
         t: "p",
@@ -280,7 +281,7 @@ export const ARTICLES: Article[] = [
     tag: "Market",
     accent: "blue",
     date: "2026-01-27",
-    author: "BAY Research",
+    author: "sanghyeon-kwon",
     body: [
       {
         t: "p",
@@ -317,7 +318,7 @@ export const ARTICLES: Article[] = [
     tag: "Infra",
     accent: "indigo",
     date: "2025-11-08",
-    author: "BAY Research",
+    author: "sanghyeon-kwon",
     body: [
       {
         t: "p",

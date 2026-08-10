@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function OrgHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-ink/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center px-6">
         <Link href="/" className="group flex items-center gap-3" aria-label="BAY 홈">
           <Image
             src="/logo.png"
@@ -25,15 +25,6 @@ export default function OrgHeader() {
             </span>
           </span>
         </Link>
-
-        <nav>
-          <Link
-            href="/research"
-            className="font-body text-xs font-light text-slate-400 transition-colors hover:text-bay-300"
-          >
-            Research
-          </Link>
-        </nav>
       </div>
     </header>
   );

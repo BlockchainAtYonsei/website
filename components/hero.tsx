@@ -66,7 +66,10 @@ export default function Hero() {
       {/* bottom scrim so overlay text stays readable */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-ink to-transparent" />
 
-      <header className="fixed inset-x-0 top-4 z-50 flex items-center justify-end px-6 lg:px-12">
+      {/* Absolute on phones so the button stays parked at the top of the hero.
+          Fixed, it rode the scroll and the open panel landed on top of body
+          copy. From md up there is room beside the text, so it keeps following. */}
+      <header className="absolute inset-x-0 top-4 z-50 flex items-center justify-end px-6 md:fixed lg:px-12">
         <div className="relative flex items-center gap-3">
           <button
             type="button"
@@ -101,7 +104,7 @@ export default function Hero() {
                   exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
-                  <div className="liquid-glass-strong rounded-[1.25rem] p-2">
+                  <div className="liquid-glass-strong menu-panel rounded-[1.25rem] p-2">
                     {NAV_LINKS.map((link) => {
                       const cls = `${NAV_ITEM} block`;
                       if (link.dialog) {

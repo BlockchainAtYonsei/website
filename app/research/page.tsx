@@ -22,16 +22,11 @@ export default function ResearchIndex() {
         <div className="relative mx-auto max-w-6xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
           {/* the masthead wordmark is the title — an h1 here would just say it
               twice, so the page heading exists for screen readers only and the
-              lead paragraph carries the space visually */}
+              section heading below labels the featured piece */}
           <h1 className="sr-only">BAY Research</h1>
-          <p className="font-body mb-5 text-sm font-light text-white/80">
-            {"// Published irregularly, argued carefully"}
-          </p>
-          <p className="font-body max-w-2xl text-lg leading-relaxed font-light break-keep text-slate-300 md:text-xl">
-            프로토콜의 설계를 뜯어보고, 숫자가 무엇을 감추는지 확인합니다.
-            BAY 리서치는 전망 대신{" "}
-            <span className="text-white">구조</span>를 다룹니다.
-          </p>
+          <h2 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+            최신 리서치
+          </h2>
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import {
+  GitHubIcon,
   InstagramIcon,
   LinkedInIcon,
   MediumIcon,
@@ -19,6 +20,7 @@ export const SOCIALS: {
     Icon: LinkedInIcon,
   },
   { label: "Medium", href: "https://medium.com/yonseiblockchainlab", Icon: MediumIcon },
+  { label: "GitHub", href: "https://github.com/BlockchainAtYonsei", Icon: GitHubIcon },
   {
     label: "Instagram",
     href: "https://www.instagram.com/blockchain_at_yonsei/",
