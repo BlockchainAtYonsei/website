@@ -1,21 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { ApplyModal } from "./apply-modal";
 import BayScene from "./bay-scene";
+import ContactModal from "./contact-modal";
 import { ArrowUpRight, CloseIcon, MenuIcon } from "./icons";
 
-const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
+/* Contact has no href — it opens the dialog instead of navigating anywhere,
+   so it is rendered as a button. */
+const NAV_LINKS: {
+  label: string;
+  href?: string;
+  external?: boolean;
+  dialog?: true;
+}[] = [
   { label: "About", href: "#about" },
   { label: "Activities", href: "#activities" },
   { label: "History", href: "#history" },
   { label: "Partners", href: "#partners" },
-  { label: "Research", href: "#research" },
-  {
-    label: "Contact",
-    href: "https://linktr.ee/blockchainatyonsei",
-    external: true,
-  },
+  { label: "Research", href: "/research" },
+  { label: "Contact", dialog: true },
 ];
 
 const HIDDEN = { filter: "blur(10px)", opacity: 0, y: 20 };
@@ -24,6 +30,8 @@ const VISIBLE = { filter: "blur(0px)", opacity: 1, y: 0 };
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [applyOpen, setApplyOpen] = useState(false);
   // ?snap=1 jumps straight to the assembled state (screenshots, OG capture)
   const [snap, setSnap] = useState(false);
   useEffect(() => {
@@ -91,26 +99,60 @@ export default function Hero() {
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 >
                   <div className="liquid-glass-strong rounded-[1.25rem] p-2">
-                    {NAV_LINKS.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target={link.external ? "_blank" : undefined}
-                        rel={link.external ? "noreferrer" : undefined}
-                        onClick={() => setMenuOpen(false)}
-                        className="font-body block rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white"
-                      >
-                        {link.label}
-                      </a>
-                    ))}
-                    <a
-                      href="#apply"
-                      onClick={() => setMenuOpen(false)}
-                      className="font-body mt-1 flex items-center justify-between rounded-[0.9rem] bg-white px-4 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
+                    {NAV_LINKS.map((link) => {
+                      const cls =
+                        "font-body block rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white";
+                      if (link.dialog) {
+                        return (
+                          <button
+                            key={link.label}
+                            type="button"
+                            onClick={() => {
+                              setMenuOpen(false);
+                              setContactOpen(true);
+                            }}
+                            className={`${cls} w-full cursor-pointer text-left`}
+                          >
+                            {link.label}
+                          </button>
+                        );
+                      }
+                      // route links go through Link so the research section is a
+                      // client transition, not a full reload; hashes stay <a>
+                      const href = link.href ?? "#";
+                      return href.startsWith("/") ? (
+                        <Link
+                          key={link.label}
+                          href={href}
+                          onClick={() => setMenuOpen(false)}
+                          className={cls}
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          key={link.label}
+                          href={href}
+                          target={link.external ? "_blank" : undefined}
+                          rel={link.external ? "noreferrer" : undefined}
+                          onClick={() => setMenuOpen(false)}
+                          className={cls}
+                        >
+                          {link.label}
+                        </a>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setApplyOpen(true);
+                      }}
+                      className="font-body mt-1 flex w-full cursor-pointer items-center justify-between rounded-[0.9rem] bg-white px-4 py-2.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02]"
                     >
                       Apply
                       <ArrowUpRight className="h-4 w-4" />
-                    </a>
+                    </button>
                   </div>
                 </motion.nav>
               </>
@@ -118,6 +160,11 @@ export default function Hero() {
           </AnimatePresence>
         </div>
       </header>
+
+      {/* both dialogs live outside the menu's AnimatePresence — inside it they
+          would unmount the moment the menu closes on click */}
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <ApplyModal open={applyOpen} onClose={() => setApplyOpen(false)} />
 
       <div className="absolute inset-x-0 bottom-[12%] z-10 flex flex-col items-center gap-5 px-6 text-center">
         <motion.h1
