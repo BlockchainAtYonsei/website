@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-display: var(--font-sg), "Space Grotesk", sans-serif;
+  --font-heading: var(--font-is), "Instrument Serif", serif;
+  --font-body: var(--font-bar), var(--font-nkr), "Barlow", "Noto Sans KR", sans-serif;
+  --font-mono: var(--font-ipm), "IBM Plex Mono", monospace;
+
+  --color-ink: #0a101f;
+  --color-bay-100: #e3ecff;
+  --color-bay-200: #cddcff;
+  --color-bay-300: #9db9ff;
+  --color-bay-400: #5f8bff;
+  --color-bay-500: #2f6bff;
+  --color-bay-600: #1c4fe0;
+  --color-bay-700: #143aa8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+}
+
+/* ---- liquid glass ---- */
+
+/* :where() keeps specificity at 0 so positioning utilities (fixed/absolute)
+   on the same element still win over this default */
+:where(.liquid-glass, .liquid-glass-strong) {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass,
+.liquid-glass-strong {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+}
+
+.liquid-glass {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.liquid-glass-strong {
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  box-shadow:
+    4px 4px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.liquid-glass::before,
+.liquid-glass-strong::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.liquid-glass::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+}
+
+.liquid-glass-strong::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.2) 80%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.35;
+  }
+}
+
+.animate-scroll-hint {
+  animation: scroll-hint 2.2s ease-in-out infinite;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(95, 139, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(95, 139, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
