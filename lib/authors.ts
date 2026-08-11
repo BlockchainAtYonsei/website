@@ -2,8 +2,8 @@ import { ARTICLES, type Article } from "./research";
 
 /* Author registry. Articles carry an author slug, so a byline is one entry
    here plus one field there — renames and social-link changes touch one file.
-   Individual members go here as real bylines land; until then the club entity
-   is the only author. */
+   People only: the club entity was dropped once every piece had a named
+   writer, so a byline always points at a person. */
 
 /* Icon rendering happens in components (icons are React elements); data stays
    plain so this module can be imported anywhere. Labels outside this union
@@ -22,8 +22,6 @@ export type Author = {
   name: string;
   role: string;
   bio: string;
-  /* avatar monogram — defaults to the first character of the name */
-  mark?: string;
   socials: { label: SocialLabel; href: string }[];
 };
 
@@ -38,26 +36,6 @@ const mockSocials = (): Author["socials"] => [
 ];
 
 export const AUTHORS: Author[] = [
-  {
-    slug: "bay-research",
-    name: "BAY Research",
-    role: "Blockchain at Yonsei",
-    bio: "연세대학교 블록체인 학회 BAY의 리서치 팀. 프로토콜의 설계를 뜯어보고, 숫자가 무엇을 감추는지 확인합니다.",
-    mark: "BAY",
-    socials: [
-      { label: "X", href: "https://x.com/BlockchainatYU" },
-      { label: "Telegram", href: "https://t.me/blockchain_at_yonsei" },
-      {
-        label: "LinkedIn",
-        href: "https://kr.linkedin.com/company/blockchain-at-yonsei",
-      },
-      { label: "Medium", href: "https://medium.com/yonseiblockchainlab" },
-      {
-        label: "Instagram",
-        href: "https://www.instagram.com/blockchain_at_yonsei/",
-      },
-    ],
-  },
   {
     slug: "yerim-bae",
     name: "배예림",
@@ -153,11 +131,6 @@ export function getAuthor(slug: string): Author | undefined {
    missing degrades to visible text instead of a crash. */
 export function authorName(slug: string): string {
   return getAuthor(slug)?.name ?? slug;
-}
-
-export function authorMark(slug: string): string {
-  const author = getAuthor(slug);
-  return author?.mark ?? author?.name.charAt(0) ?? slug.charAt(0);
 }
 
 export function getArticlesByAuthor(slug: string): Article[] {

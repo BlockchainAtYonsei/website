@@ -6,7 +6,7 @@ export default function ResearchNotFound() {
       <p className="font-mono mb-6 text-[10px] tracking-[0.18em] text-bay-300/70 uppercase">
         404
       </p>
-      <h1 className="font-heading text-4xl tracking-[-1px] break-keep text-white italic md:text-5xl">
+      <h1 className="font-heading text-4xl tracking-[-1px] break-keep text-white md:text-5xl">
         찾는 글이 없습니다.
       </h1>
       <p className="font-body mt-5 max-w-md leading-relaxed font-light break-keep text-slate-400">

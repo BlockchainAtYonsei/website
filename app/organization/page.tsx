@@ -1,14 +1,29 @@
-import OrgChart, { type Member, type Team } from "@/components/org-chart";
+import OrgChart, {
+  type Member,
+  type Officer,
+  type Team,
+} from "@/components/org-chart";
 import { CLOSED_COHORT, cohortWordmark } from "@/lib/cohort";
 
 /* Roster data. Names and cohorts only — the source sheet also carries phone
    numbers, emails and majors, and none of that belongs on a public page.
-   Per-person `links` feed the profile dialog; add keys from the Links type
-   (github / linkedin / x / instagram / website) as people hand them in. */
+   Per-person `links` feed the profile dialog, and officers show their set as
+   icons on the card itself; add keys from the Links type (github / linkedin /
+   telegram / x / instagram / website) as people hand them in. Store share
+   URLs stripped of their utm_* tracking tail. */
 const byName = (a: Member, b: Member) => a.name.localeCompare(b.name, "ko");
 
-const EXEC = [
-  { role: "학회장", name: "구예모", cohort: "16기" },
+const EXEC: Officer[] = [
+  {
+    role: "학회장",
+    name: "구예모",
+    cohort: "16기",
+    links: {
+      linkedin: "https://www.linkedin.com/in/yemo-koo-407a02352",
+      telegram: "https://t.me/yemokooo",
+      x: "https://x.com/yemokoo2001",
+    },
+  },
   { role: "부학회장", name: "이재근", cohort: "16기" },
 ];
 
@@ -21,20 +36,47 @@ const TEAMS: Team[] = [
       role: "홍보부장",
       name: "권상현",
       cohort: "17기",
-      links: { github: "https://github.com/0xSHKWON" },
+      links: {
+        github: "https://github.com/0xSHKWON",
+        linkedin: "https://www.linkedin.com/in/sanghyeon-kwon-31623438a",
+        telegram: "https://t.me/perfect_attendance",
+        x: "https://x.com/httpskshcokr",
+        medium: "https://medium.com/@kwonsanghyeon3245",
+        website: "https://shkwon.com",
+      },
     },
     team: "홍보",
     weight: 1,
     members: [],
   },
   {
-    lead: { role: "온보딩팀장", name: "이주호", cohort: "17기" },
+    lead: {
+      role: "온보딩팀장",
+      name: "이주호",
+      cohort: "17기",
+      links: {
+        github: "https://github.com/lejuho",
+        linkedin: "https://www.linkedin.com/in/juho-lee-a85a40263",
+        telegram: "https://t.me/givmetwo",
+        x: "https://x.com/juholee__",
+      },
+    },
     team: "온보딩",
     weight: 1,
     members: [],
   },
   {
-    lead: { role: "개발팀장", name: "이호재", cohort: "17기" },
+    lead: {
+      role: "개발팀장",
+      name: "이호재",
+      cohort: "17기",
+      links: {
+        github: "https://github.com/ghwo336",
+        linkedin: "https://www.linkedin.com/in/hojae-lee-99400a368",
+        telegram: "https://t.me/ghwo336",
+        x: "https://x.com/ihojae212644",
+      },
+    },
     team: "개발팀",
     weight: 2.6,
     members: [

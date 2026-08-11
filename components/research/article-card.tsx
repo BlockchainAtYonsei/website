@@ -52,7 +52,7 @@ export function FeaturedCard({ article }: { article: Article }) {
           {/* h3, not h2 — the index labels this card with a "최신 리서치" h2, so
               the article title nests under it the same way grid cards nest
               under "All research" */}
-          <h3 className="font-heading text-3xl leading-[1.05] tracking-[-1px] break-keep text-white italic transition-colors group-hover:text-bay-100 md:text-4xl lg:text-5xl">
+          <h3 className="font-heading text-3xl leading-[1.12] tracking-[-1px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-4xl lg:text-5xl">
             {article.title}
           </h3>
           <p className="font-body mt-5 max-w-xl leading-relaxed font-light break-keep text-slate-400">
@@ -87,7 +87,7 @@ export default function ArticleCard({ article }: { article: Article }) {
         <div className="mb-4">
           <TagChip label={article.tag} />
         </div>
-        <h3 className="font-heading text-2xl leading-[1.1] tracking-[-0.5px] break-keep text-white italic transition-colors group-hover:text-bay-100 md:text-[1.75rem]">
+        <h3 className="font-heading text-2xl leading-[1.1] tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-[1.75rem]">
           {article.title}
         </h3>
         <p className="font-body mt-3 line-clamp-3 text-sm leading-relaxed font-light break-keep text-slate-400">

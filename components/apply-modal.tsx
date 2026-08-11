@@ -23,7 +23,7 @@ export function ApplyModal({
       </p>
       <h2
         id="apply-modal-title"
-        className="font-heading text-3xl leading-[1.15] tracking-[-1px] break-keep text-white italic md:text-4xl"
+        className="font-heading text-3xl leading-[1.15] tracking-[-1px] break-keep text-white md:text-4xl"
       >
         {CLOSED_COHORT} 모집이 마감되었습니다.
       </h2>

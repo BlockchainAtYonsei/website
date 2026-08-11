@@ -56,7 +56,7 @@ export default function CoverArt({
       <span
         /* sized so the longest tag still fits a 3-up card — a mark cropped
            mid-word reads as a bug, not as a crop */
-        className={`font-heading absolute -bottom-[0.22em] left-4 leading-none text-white/[0.10] italic select-none ${
+        className={`font-heading absolute -bottom-[0.22em] left-4 leading-none text-white/[0.10] select-none ${
           large ? "text-[7rem] md:text-[11rem]" : "text-[3.25rem] md:text-[4rem]"
         }`}
       >

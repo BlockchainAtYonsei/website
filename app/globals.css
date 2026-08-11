@@ -1,10 +1,18 @@
 @import "tailwindcss";
+@import "./pretendard.css";
 
 @theme inline {
-  --font-display: var(--font-sg), "Space Grotesk", sans-serif;
-  --font-heading: var(--font-is), "Instrument Serif", serif;
-  --font-body: var(--font-bar), var(--font-nkr), "Barlow", "Noto Sans KR", sans-serif;
-  --font-mono: var(--font-ipm), "IBM Plex Mono", monospace;
+  /* One typeface, four roles. The names are kept so components don't have to
+     change and so a distinct face can be reintroduced for any single role by
+     editing one line here. Pretendard covers Latin and hangul alike, so there
+     is no per-script fallback to arrange. */
+  --font-sans:
+    "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  --font-display: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-mono: var(--font-sans);
 
   --color-ink: #0a101f;
   --color-bay-100: #e3ecff;
@@ -138,11 +146,26 @@ body {
   }
 }
 
+/* second row runs the other way, so the two tracks never read as one block */
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 .animate-marquee {
   animation: marquee 90s linear infinite;
 }
 
-.marquee-mask:hover .animate-marquee {
+.animate-marquee-reverse {
+  animation: marquee-reverse 76s linear infinite;
+}
+
+.marquee-mask:hover .animate-marquee,
+.marquee-mask:hover .animate-marquee-reverse {
   animation-play-state: paused;
 }
 
@@ -164,9 +187,67 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-marquee-reverse {
     animation: none;
   }
+}
+
+/* Each item carries its partner's brand colour in --brand; everything below
+   derives from that one variable so a colour swap is a one-line edit.
+
+   Rest state is monochrome and dimmed — the strip reads as one quiet
+   typographic band. Hover wakes a single partner: the mark regains its brand
+   colours and casts them as a glow, the wordmark comes up to full white. */
+.partner-item {
+  transition: transform 0.35s ease;
+}
+
+.partner-item:hover {
+  transform: translateY(-2px);
+}
+
+.partner-name {
+  color: rgba(255, 255, 255, 0.38);
+  transition: color 0.35s ease;
+}
+
+.partner-item:hover .partner-name {
+  color: #fff;
+}
+
+/* White backing keeps dark-on-transparent marks (Ethereum, XRP, NEAR) legible
+   on the ink background. Brand colours stay on at rest — the dimmed wordmark
+   is what keeps the band quiet; hover just turns the volume up. */
+.partner-mark {
+  background: rgba(255, 255, 255, 0.92);
+  padding: 3px;
+  box-shadow: 0 0 10px color-mix(in oklab, var(--brand) 22%, transparent);
+  transition: box-shadow 0.35s ease;
+}
+
+.partner-item:hover .partner-mark {
+  background: #fff;
+  box-shadow: 0 0 24px color-mix(in oklab, var(--brand) 65%, transparent);
+}
+
+/* Mixed towards ink so a pale brand colour still reads on the white tile. */
+.partner-monogram {
+  color: color-mix(in oklab, var(--brand) 75%, #0a101f);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.partner-hairline {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.09) 18%,
+    rgba(255, 255, 255, 0.09) 82%,
+    transparent
+  );
 }
 
 .bg-grid {

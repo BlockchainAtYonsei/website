@@ -1,41 +1,8 @@
 import type { Metadata } from "next";
-import {
-  Space_Grotesk,
-  Noto_Sans_KR,
-  IBM_Plex_Mono,
-  Instrument_Serif,
-  Barlow,
-} from "next/font/google";
+/* Pretendard is the only typeface on the site — Latin and hangul, display
+   through mono. Its @font-face rules are self-hosted in ./pretendard.css,
+   which globals.css imports, so there is no next/font wiring left here. */
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-sg",
-});
-
-const notoSansKr = Noto_Sans_KR({
-  subsets: ["latin"],
-  variable: "--font-nkr",
-});
-
-const plexMono = IBM_Plex_Mono({
-  weight: ["400", "500"],
-  subsets: ["latin"],
-  variable: "--font-ipm",
-});
-
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-is",
-});
-
-const barlow = Barlow({
-  weight: ["300", "400", "500", "600"],
-  subsets: ["latin"],
-  variable: "--font-bar",
-});
 
 export const metadata: Metadata = {
   title: "BAY — Blockchain at Yonsei",
@@ -53,10 +20,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="ko"
-      className={`${spaceGrotesk.variable} ${notoSansKr.variable} ${plexMono.variable} ${instrumentSerif.variable} ${barlow.variable}`}
-    >
+    <html lang="ko">
       <body className="bg-ink font-body text-slate-200 antialiased">
         {children}
         {/* film grain — kills gradient banding, adds texture everywhere */}

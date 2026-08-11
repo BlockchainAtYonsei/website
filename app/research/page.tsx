@@ -24,7 +24,7 @@ export default function ResearchIndex() {
               twice, so the page heading exists for screen readers only and the
               section heading below labels the featured piece */}
           <h1 className="sr-only">BAY Research</h1>
-          <h2 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+          <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
             최신 리서치
           </h2>
         </div>
@@ -38,7 +38,7 @@ export default function ResearchIndex() {
       {/* Archive */}
       <section className="mx-auto max-w-6xl px-6 pb-24 md:pb-32">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+          <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
             All research
           </h2>
           <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
@@ -55,7 +55,7 @@ export default function ResearchIndex() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="liquid-glass flex flex-col items-start justify-between gap-8 rounded-[1.5rem] px-8 py-12 md:flex-row md:items-center md:px-12">
             <div>
-              <h2 className="font-heading text-3xl tracking-[-1px] break-keep text-white italic md:text-4xl">
+              <h2 className="font-heading text-3xl tracking-[-1px] break-keep text-white md:text-4xl">
                 새 리서치를 먼저 받아보세요
               </h2>
               <p className="font-body mt-3 max-w-md text-sm leading-relaxed font-light break-keep text-slate-400">
