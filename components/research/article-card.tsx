@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Avatar from "./avatar";
 import CoverArt from "./cover-art";
 import { formatDate, type Article } from "@/lib/research";
 
@@ -64,17 +65,14 @@ export function FeaturedCard({ article }: { article: Article }) {
               anchors don't nest; the byline links live on the article page */}
           <span className="flex items-center gap-2.5">
             <span className="flex -space-x-1.5">
-              {article.authors
-                .filter((a) => a.avatarUrl)
-                .slice(0, 3)
-                .map((a) => (
-                  <img
-                    key={a.slug}
-                    src={a.avatarUrl!}
-                    alt=""
-                    className="h-6 w-6 rounded-full border border-ink object-cover"
-                  />
-                ))}
+              {article.authors.slice(0, 3).map((a) => (
+                <Avatar
+                  key={a.slug}
+                  name={a.name}
+                  src={a.avatarUrl}
+                  className="h-6 w-6 border border-ink text-[10px]"
+                />
+              ))}
             </span>
             <span className="font-body text-xs font-light text-slate-500">
               {article.authors.map((a) => a.name).join(" · ")}

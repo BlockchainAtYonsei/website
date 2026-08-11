@@ -11,6 +11,7 @@ import {
   XIcon,
 } from "@/components/icons";
 import ArticleCard from "@/components/research/article-card";
+import Avatar from "@/components/research/avatar";
 import { getAuthor, getAuthors, type SocialLabel } from "@/lib/authors";
 
 const SOCIAL_ICONS: Record<
@@ -76,13 +77,11 @@ export default async function AuthorPage(
       {/* Profile */}
       <header className="mt-10 md:mt-12">
         <div className="flex items-center gap-6">
-          {author.avatarUrl && (
-            <img
-              src={author.avatarUrl}
-              alt=""
-              className="h-20 w-20 shrink-0 rounded-full object-cover md:h-24 md:w-24"
-            />
-          )}
+          <Avatar
+            name={author.name}
+            src={author.avatarUrl}
+            className="h-20 w-20 shrink-0 text-3xl md:h-24 md:w-24 md:text-4xl"
+          />
           <div>
             <h1 className="font-body text-4xl leading-[1.05] font-semibold tracking-[-0.02em] break-keep text-white md:text-5xl">
               {author.name}

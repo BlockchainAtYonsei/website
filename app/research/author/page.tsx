@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Avatar from "@/components/research/avatar";
 import { getAuthors } from "@/lib/authors";
 
 export const metadata: Metadata = {
@@ -43,13 +44,11 @@ export default async function AuthorsPage() {
               className="liquid-glass group flex flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:-translate-y-1"
             >
               <div className="flex items-center gap-3.5">
-                {author.avatarUrl && (
-                  <img
-                    src={author.avatarUrl}
-                    alt=""
-                    className="h-11 w-11 shrink-0 rounded-full object-cover"
-                  />
-                )}
+                <Avatar
+                  name={author.name}
+                  src={author.avatarUrl}
+                  className="h-11 w-11 shrink-0 text-base"
+                />
                 <div>
                   <span className="font-body block text-base font-medium text-white transition-colors group-hover:text-bay-100">
                     {author.name}

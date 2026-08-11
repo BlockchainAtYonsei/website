@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight } from "@/components/icons";
 import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
+import Avatar from "@/components/research/avatar";
 import CoverArt from "@/components/research/cover-art";
 import Toc from "@/components/research/toc";
 import { formatDate, getArticle, getArticles, getToc } from "@/lib/research";
@@ -80,15 +81,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
                 href={`/research/author/${a.slug}`}
                 className="group inline-flex items-center gap-3"
               >
-                {/* plain img — avatars come from our own bucket and don't
-                    need the next/image remote allowlist dance */}
-                {a.avatarUrl && (
-                  <img
-                    src={a.avatarUrl}
-                    alt=""
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                )}
+                <Avatar name={a.name} src={a.avatarUrl} className="h-9 w-9 text-sm" />
                 <span className="font-body text-sm text-white transition-colors group-hover:text-bay-100">
                   {a.name}
                 </span>
