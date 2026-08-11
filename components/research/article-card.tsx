@@ -1,8 +1,11 @@
 import Link from "next/link";
+import Avatar from "./avatar";
 import CoverArt from "./cover-art";
-import { authorName } from "@/lib/authors";
-import { formatDate, readingMinutes, type Article } from "@/lib/research";
+import { formatDate, type Article } from "@/lib/research";
 
+/* The card's bottom line, identical on every card: date bottom-left, view
+   count bottom-right. Callers pin it with mt-auto so short and long deks
+   land the meta on the same y across a row. */
 export function ArticleMeta({
   article,
   className = "",
@@ -12,11 +15,12 @@ export function ArticleMeta({
 }) {
   return (
     <div
-      className={`font-mono flex items-center gap-3 text-[10px] tracking-[0.18em] text-bay-300/70 uppercase ${className}`}
+      className={`font-mono flex items-center justify-between gap-3 text-[10px] tracking-[0.18em] text-bay-300/70 uppercase ${className}`}
     >
       <span>{formatDate(article.date)}</span>
-      <span className="h-px w-4 bg-bay-300/30" />
-      <span>{readingMinutes(article)} min read</span>
+      <span className="text-white/40">
+        {article.views.toLocaleString("en-US")} views
+      </span>
     </div>
   );
 }
@@ -59,13 +63,25 @@ export function FeaturedCard({ article }: { article: Article }) {
             {article.dek}
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <ArticleMeta article={article} />
+        <div>
           {/* plain text, not a link — the whole card is already an anchor and
               anchors don't nest; the byline links live on the article page */}
-          <span className="font-body text-xs font-light text-slate-500">
-            {authorName(article.author)}
+          <span className="flex items-center gap-2.5">
+            <span className="flex -space-x-1.5">
+              {article.authors.slice(0, 3).map((a) => (
+                <Avatar
+                  key={a.slug}
+                  name={a.name}
+                  src={a.avatarUrl}
+                  className="h-6 w-6 border border-ink text-[10px]"
+                />
+              ))}
+            </span>
+            <span className="font-body text-xs font-light text-slate-500">
+              {article.authors.map((a) => a.name).join(" · ")}
+            </span>
           </span>
+          <ArticleMeta article={article} className="mt-5 border-t border-white/8 pt-5" />
         </div>
       </div>
     </Link>
@@ -93,7 +109,7 @@ export default function ArticleCard({ article }: { article: Article }) {
         <p className="font-body mt-3 line-clamp-3 text-sm leading-relaxed font-light break-keep text-slate-400">
           {article.dek}
         </p>
-        <ArticleMeta article={article} className="mt-6 pt-1" />
+        <ArticleMeta article={article} className="mt-auto pt-6" />
       </div>
     </Link>
   );

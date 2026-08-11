@@ -1,11 +1,23 @@
+import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
 import ArticleGrid from "@/components/research/article-grid";
 import { FeaturedCard } from "@/components/research/article-card";
-import { getArticles, getFeatured, TAGS } from "@/lib/research";
+import { getNews } from "@/lib/news";
+import {
+  formatDate,
+  getArticlesPage,
+  getFeatured,
+  getTags,
+} from "@/lib/research";
 
-export default function ResearchIndex() {
-  const featured = getFeatured();
-  const all = getArticles();
+export default async function ResearchIndex() {
+  const [featured, firstPage, tags, news] = await Promise.all([
+    getFeatured(),
+    getArticlesPage(1),
+    getTags(),
+    getNews(),
+  ]);
+  const latestNews = news.slice(0, 3);
 
   return (
     <main>
@@ -30,10 +42,12 @@ export default function ResearchIndex() {
         </div>
       </section>
 
-      {/* Featured */}
-      <section className="mx-auto max-w-6xl px-6 pb-16 md:pb-20">
-        <FeaturedCard article={featured} />
-      </section>
+      {/* Featured — absent until the first piece is published */}
+      {featured && (
+        <section className="mx-auto max-w-6xl px-6 pb-16 md:pb-20">
+          <FeaturedCard article={featured} />
+        </section>
+      )}
 
       {/* Archive */}
       <section className="mx-auto max-w-6xl px-6 pb-24 md:pb-32">
@@ -42,13 +56,50 @@ export default function ResearchIndex() {
             All research
           </h2>
           <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
-            {all.length} pieces
+            {firstPage.total} pieces
           </p>
         </div>
         {/* the featured piece repeats here on purpose — otherwise filtering by
             its tag silently hides it and the count above stops matching */}
-        <ArticleGrid articles={all} tags={TAGS} />
+        <ArticleGrid initial={firstPage} tags={tags} />
       </section>
+
+      {/* News teaser — the tracking feed lives at /research/news; three rows
+          here keep the index the one place that shows everything we publish */}
+      {latestNews.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 pb-24 md:pb-32">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
+              News
+            </h2>
+            <Link
+              href="/research/news"
+              className="font-body inline-flex items-center gap-1.5 text-xs font-light text-slate-400 transition-colors hover:text-bay-300"
+            >
+              전체 뉴스
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <ul className="mt-6">
+            {latestNews.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={`/research/news/${item.slug}`}
+                  className="group flex flex-col gap-1.5 border-b border-white/6 py-5 md:flex-row md:items-baseline md:gap-6"
+                >
+                  <span className="font-mono flex shrink-0 items-center gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase md:w-48">
+                    {formatDate(item.date)}
+                    <span className="text-bay-300/70">{item.sourceName}</span>
+                  </span>
+                  <span className="font-body text-base font-medium break-keep text-white transition-colors group-hover:text-bay-100">
+                    {item.title}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Subscribe */}
       <section className="relative overflow-hidden pb-28 md:pb-36">
@@ -58,9 +109,8 @@ export default function ResearchIndex() {
               <h2 className="font-heading text-3xl tracking-[-1px] break-keep text-white md:text-4xl">
                 새 리서치를 먼저 받아보세요
               </h2>
-              <p className="font-body mt-3 max-w-md text-sm leading-relaxed font-light break-keep text-slate-400">
-                모든 글은 Medium에도 함께 발행됩니다. 팔로우하면 새 글이 올라올
-                때 알림을 받습니다.
+              <p className="font-body mt-3 text-sm leading-relaxed font-light break-keep md:whitespace-nowrap text-slate-400">
+                모든 글은 Medium에도 발행되니 팔로우하셔서 새 글이 올라올 때 알림을 받으세요.
               </p>
             </div>
             <a

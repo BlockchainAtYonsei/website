@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AUTHORS, getArticlesByAuthor } from "@/lib/authors";
+import Avatar from "@/components/research/avatar";
+import { getAuthors } from "@/lib/authors";
 
 export const metadata: Metadata = {
   title: "Authors",
   description: "BAY 리서치를 쓰는 사람들.",
 };
 
-export default function AuthorsPage() {
-  /* people with published work first, then 가나다 — the directory is for
-     finding writing, not reproducing the org chart */
-  const authors = [...AUTHORS].sort((a, b) => {
-    const diff =
-      getArticlesByAuthor(b.slug).length - getArticlesByAuthor(a.slug).length;
+export default async function AuthorsPage() {
+  /* the API already narrows to people with published work (?writers=1);
+     most-published first, then 가나다 — the directory is for finding
+     writing, not reproducing the org chart */
+  const authors = (await getAuthors()).sort((a, b) => {
+    const diff = b.articleCount - a.articleCount;
     return diff !== 0 ? diff : a.name.localeCompare(b.name, "ko");
   });
 
@@ -35,20 +36,27 @@ export default function AuthorsPage() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {authors.map((author) => {
-          const count = getArticlesByAuthor(author.slug).length;
+          const count = author.articleCount;
           return (
             <Link
               key={author.slug}
               href={`/research/author/${author.slug}`}
               className="liquid-glass group flex flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:-translate-y-1"
             >
-              <div>
-                <span className="font-body block text-base font-medium text-white transition-colors group-hover:text-bay-100">
-                  {author.name}
-                </span>
-                <span className="font-mono mt-0.5 block text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
-                  {author.role}
-                </span>
+              <div className="flex items-center gap-3.5">
+                <Avatar
+                  name={author.name}
+                  src={author.avatarUrl}
+                  className="h-11 w-11 shrink-0 text-base"
+                />
+                <div>
+                  <span className="font-body block text-base font-medium text-white transition-colors group-hover:text-bay-100">
+                    {author.name}
+                  </span>
+                  <span className="font-mono mt-0.5 block text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
+                    {author.role}
+                  </span>
+                </div>
               </div>
               <p className="font-body mt-4 text-sm leading-relaxed font-light break-keep text-slate-400">
                 {author.bio}

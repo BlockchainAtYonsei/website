@@ -103,7 +103,19 @@ const TEAMS: Team[] = [
     ].sort(byName),
   },
   {
-    lead: { role: "리서치팀장", name: "배예림", cohort: "17기" },
+    lead: {
+      role: "리서치팀장",
+      name: "배예림",
+      cohort: "17기",
+      links: {
+        github: "https://github.com/yerim-Bae",
+        linkedin:
+          "https://www.linkedin.com/in/%EC%98%88%EB%A6%BC-%EB%B0%B0-6120b2288/",
+        telegram: "https://t.me/DeFi_Auditor",
+        medium: "https://medium.com/@yelim8694",
+        website: "https://yerim-accounting.vercel.app/",
+      },
+    },
     team: "리서치팀",
     weight: 1.6,
     members: [
@@ -116,7 +128,7 @@ const TEAMS: Team[] = [
       { name: "임채윤", cohort: "18기" },
       { name: "장동현", cohort: "18기" },
       { name: "장윤선", cohort: "18기" },
-      { name: "조현재", cohort: "18기" },
+      { name: "조현채", cohort: "18기" },
     ].sort(byName),
   },
 ];

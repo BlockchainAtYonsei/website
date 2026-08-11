@@ -15,6 +15,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# where the BAY backend lives during prerender — research/news pages fetch it
+# at build time (SSG); deploy.sh passes the real value
+ARG API_URL=http://localhost:4000
+ENV API_URL=$API_URL
 RUN npm run build
 
 # 3. Minimal runtime image (output: "standalone")
