@@ -42,11 +42,11 @@ export default function ResearchNav() {
             }`}
           >
             {label}
-            {/* the dot, not an underline — an underline at 10px mono with wide
-                tracking reads as strikethrough clutter */}
+            {/* offset below the descender line so the underline reads as a
+                tab marker, not a strikethrough */}
             <span
               aria-hidden
-              className={`absolute -bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-bay-400 shadow-[0_0_6px_rgba(95,139,255,0.9)] transition-opacity ${
+              className={`absolute inset-x-0 -bottom-1.5 h-px bg-bay-400 shadow-[0_0_6px_rgba(95,139,255,0.8)] transition-opacity ${
                 on ? "opacity-100" : "opacity-0"
               }`}
             />

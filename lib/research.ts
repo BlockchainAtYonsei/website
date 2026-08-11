@@ -31,10 +31,18 @@ export type Article = {
   date: string; // ISO
   featured: boolean;
   readingMinutes: number; // precomputed by the API (500 chars/min)
+  views: number;
   coverUrl: string | null;
   /* first author's slug — kept for old call sites; `authors` is the truth */
   author: string | null;
   authors: Byline[];
+};
+
+export type ArticlePage = {
+  items: Article[];
+  total: number;
+  page: number;
+  size: number;
 };
 
 export type ArticleDetail = Article & {
@@ -46,11 +54,28 @@ export type ArticleDetail = Article & {
 
 const TAGS = ["articles"];
 
-/* size 50: the archive fits one page for now; the API paginates when the
-   archive outgrows it. */
-export async function getArticles(): Promise<Article[]> {
-  const res = await api<{ items: Article[] }>("/v1/articles?size=50", TAGS);
-  return res?.items ?? [];
+export const ARCHIVE_PAGE_SIZE = 12;
+
+export async function getArticlesPage(
+  page: number,
+  size = ARCHIVE_PAGE_SIZE,
+  category?: string,
+): Promise<ArticlePage> {
+  const q = new URLSearchParams({ page: String(page), size: String(size) });
+  if (category) q.set("category", category);
+  const res = await api<ArticlePage>(`/v1/articles?${q}`, TAGS);
+  return res ?? { items: [], total: 0, page, size };
+}
+
+/* Every published article, paging through the API's 50-per-page cap —
+   build-time only (generateStaticParams); pages render from getArticlesPage. */
+export async function getAllArticles(): Promise<Article[]> {
+  const all: Article[] = [];
+  for (let page = 1; ; page++) {
+    const res = await getArticlesPage(page, 50);
+    all.push(...res.items);
+    if (all.length >= res.total || res.items.length === 0) return all;
+  }
 }
 
 /* null when nothing is published yet — the index hides the featured slot. */

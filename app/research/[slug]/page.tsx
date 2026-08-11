@@ -7,14 +7,15 @@ import ArticleCard, { TagChip } from "@/components/research/article-card";
 import Avatar from "@/components/research/avatar";
 import CoverArt from "@/components/research/cover-art";
 import Toc from "@/components/research/toc";
-import { formatDate, getArticle, getArticles, getToc } from "@/lib/research";
+import ViewPing from "@/components/research/view-ping";
+import { formatDate, getAllArticles, getArticle, getToc } from "@/lib/research";
 
 /* Prerender what the API knows at build time; anything newer renders on
    first request. An unreachable API degrades to an empty list instead of a
    failed build — the pages still work once it's back. */
 export async function generateStaticParams() {
   try {
-    return (await getArticles()).map((a) => ({ slug: a.slug }));
+    return (await getAllArticles()).map((a) => ({ slug: a.slug }));
   } catch {
     return [];
   }
@@ -50,6 +51,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
 
   return (
     <main>
+      <ViewPing slug={slug} />
       {/* Article head */}
       <article>
         <header className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">

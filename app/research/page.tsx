@@ -3,12 +3,17 @@ import { ArrowUpRight } from "@/components/icons";
 import ArticleGrid from "@/components/research/article-grid";
 import { FeaturedCard } from "@/components/research/article-card";
 import { getNews } from "@/lib/news";
-import { formatDate, getArticles, getFeatured, getTags } from "@/lib/research";
+import {
+  formatDate,
+  getArticlesPage,
+  getFeatured,
+  getTags,
+} from "@/lib/research";
 
 export default async function ResearchIndex() {
-  const [featured, all, tags, news] = await Promise.all([
+  const [featured, firstPage, tags, news] = await Promise.all([
     getFeatured(),
-    getArticles(),
+    getArticlesPage(1),
     getTags(),
     getNews(),
   ]);
@@ -51,12 +56,12 @@ export default async function ResearchIndex() {
             All research
           </h2>
           <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
-            {all.length} pieces
+            {firstPage.total} pieces
           </p>
         </div>
         {/* the featured piece repeats here on purpose — otherwise filtering by
             its tag silently hides it and the count above stops matching */}
-        <ArticleGrid articles={all} tags={tags} />
+        <ArticleGrid initial={firstPage} tags={tags} />
       </section>
 
       {/* News teaser — the tracking feed lives at /research/news; three rows
