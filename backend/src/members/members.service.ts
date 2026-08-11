@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import type { MemberStatus } from "../generated/prisma/enums";
-import { ARTICLE_INCLUDE, toArticleListItem, toAuthor } from "../content/shape";
+import {
+  ARTICLE_INCLUDE,
+  toArticleListItem,
+  toAuthor,
+  toNewsItem,
+} from "../content/shape";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
@@ -41,11 +46,23 @@ export class MembersService {
     const member = await this.prisma.member.findUnique({ where: { slug } });
     if (!member) throw new NotFoundException();
 
-    const articles = await this.prisma.article.findMany({
-      where: { status: "published", authors: { some: { memberId: member.id } } },
-      include: ARTICLE_INCLUDE,
-      orderBy: { publishedAt: "desc" },
-    });
-    return { ...toAuthor(member), articles: articles.map(toArticleListItem) };
+    /* both tabs of the profile in one call: written research + curated news */
+    const [articles, news] = await Promise.all([
+      this.prisma.article.findMany({
+        where: { status: "published", authors: { some: { memberId: member.id } } },
+        include: ARTICLE_INCLUDE,
+        orderBy: { publishedAt: "desc" },
+      }),
+      this.prisma.newsItem.findMany({
+        where: { status: "published", curatorId: member.id },
+        include: { curator: true },
+        orderBy: { publishedAt: "desc" },
+      }),
+    ]);
+    return {
+      ...toAuthor(member),
+      articles: articles.map(toArticleListItem),
+      news: news.map(toNewsItem),
+    };
   }
 }

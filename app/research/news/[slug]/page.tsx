@@ -161,9 +161,6 @@ export default async function NewsDetailPage(
             className="liquid-glass-strong font-body mt-12 inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-medium text-white transition-transform hover:scale-[1.03]"
           >
             원문 보기
-            <span className="font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase">
-              {item.sourceName}
-            </span>
             <ArrowUpRight className="h-4 w-4" />
           </a>
         </article>

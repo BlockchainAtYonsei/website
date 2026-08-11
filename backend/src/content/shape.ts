@@ -1,6 +1,7 @@
 import type {
   ArticleModel as Article,
   MemberModel as Member,
+  NewsItemModel as NewsItem,
 } from "../generated/prisma/models";
 
 /* Response shaping — field names match the frontend's types (lib/authors.ts
@@ -73,3 +74,21 @@ export function toArticleDetail(a: ArticleWithAuthors) {
 export const ARTICLE_INCLUDE = {
   authors: { include: { member: true }, orderBy: { ord: "asc" as const } },
 };
+
+/* Shared by the news endpoints and the member profile's 뉴스 tab. */
+export function toNewsItem(n: NewsItem & { curator: Member | null }) {
+  return {
+    id: n.id,
+    slug: n.slug,
+    title: n.title,
+    url: n.url,
+    sourceName: n.sourceName,
+    summary: n.summary,
+    category: n.category,
+    date: isoDate(n.publishedAt),
+    views: n.views,
+    curator: n.curator
+      ? { slug: n.curator.slug, name: n.curator.name, avatarUrl: n.curator.avatarUrl }
+      : null,
+  };
+}

@@ -1,9 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { isoDate } from "../content/shape";
-import type {
-  MemberModel as Member,
-  NewsItemModel as NewsItem,
-} from "../generated/prisma/models";
+import { isoDate, toNewsItem } from "../content/shape";
+import type { NewsItemModel as NewsItem } from "../generated/prisma/models";
 import { PrismaService } from "../prisma/prisma.service";
 
 /* Keyset cursor over (publishedAt desc, id desc) — a feed that only grows
@@ -18,23 +15,6 @@ function decodeCursor(cursor: string): { date: Date; id: string } {
   const d = new Date(date);
   if (!id || Number.isNaN(d.getTime())) throw new BadRequestException("invalid cursor");
   return { date: d, id };
-}
-
-function toNewsItem(n: NewsItem & { curator: Member | null }) {
-  return {
-    id: n.id,
-    slug: n.slug,
-    title: n.title,
-    url: n.url,
-    sourceName: n.sourceName,
-    summary: n.summary,
-    category: n.category,
-    date: isoDate(n.publishedAt),
-    views: n.views,
-    curator: n.curator
-      ? { slug: n.curator.slug, name: n.curator.name, avatarUrl: n.curator.avatarUrl }
-      : null,
-  };
 }
 
 @Injectable()

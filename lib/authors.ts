@@ -3,6 +3,7 @@
    full roster stays the organization page's business. */
 
 import { api } from "./api";
+import type { NewsItem } from "./news";
 import type { Article } from "./research";
 
 /* Icon rendering happens in components (icons are React elements); data stays
@@ -63,15 +64,14 @@ export async function getAuthors(): Promise<Author[]> {
   return (res?.items ?? []).map(narrow);
 }
 
-/* Detail resolves regardless of roster visibility, and ships the author's
-   published articles in the same payload. */
+/* Detail resolves regardless of roster visibility, and ships both profile
+   tabs — written research and curated news — in the same payload. */
 export async function getAuthor(
   slug: string,
-): Promise<(Author & { articles: Article[] }) | null> {
-  const res = await api<RawAuthor & { articles: Article[] }>(
+): Promise<(Author & { articles: Article[]; news: NewsItem[] }) | null> {
+  const res = await api<RawAuthor & { articles: Article[]; news: NewsItem[] }>(
     `/v1/members/${encodeURIComponent(slug)}`,
-    /* member profile + article list render from this one call */
-    ["members", "articles"],
+    ["members", "articles", "news"],
   );
   return res ? narrow(res) : null;
 }

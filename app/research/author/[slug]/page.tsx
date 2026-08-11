@@ -10,7 +10,7 @@ import {
   TelegramIcon,
   XIcon,
 } from "@/components/icons";
-import ArticleCard from "@/components/research/article-card";
+import AuthorTabs from "@/components/research/author-tabs";
 import Avatar from "@/components/research/avatar";
 import { getAuthor, getAuthors, type SocialLabel } from "@/lib/authors";
 
@@ -62,8 +62,6 @@ export default async function AuthorPage(
   const { slug } = await props.params;
   const author = await getAuthor(slug);
   if (!author) notFound();
-
-  const articles = author.articles;
 
   return (
     <main className="mx-auto max-w-6xl px-6 pt-14 pb-24 md:pt-20 md:pb-32">
@@ -119,28 +117,8 @@ export default async function AuthorPage(
         )}
       </header>
 
-      {/* Articles */}
-      <section className="mt-16 border-t border-white/8 pt-14 md:mt-20">
-        <div className="mb-9 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
-            작성한 글
-          </h2>
-          <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
-            {articles.length} {articles.length === 1 ? "piece" : "pieces"}
-          </p>
-        </div>
-        {articles.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((a) => (
-              <ArticleCard key={a.slug} article={a} />
-            ))}
-          </div>
-        ) : (
-          <p className="font-body text-sm font-light text-slate-500">
-            아직 발행된 글이 없습니다.
-          </p>
-        )}
-      </section>
+      {/* Written research / curated news — the profile's two tabs */}
+      <AuthorTabs articles={author.articles} news={author.news} />
     </main>
   );
 }
