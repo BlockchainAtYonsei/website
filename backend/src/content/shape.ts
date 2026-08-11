@@ -55,6 +55,7 @@ export function toArticleListItem(a: ArticleWithAuthors) {
     date: a.publishedAt ? isoDate(a.publishedAt) : null,
     featured: a.featured,
     readingMinutes: a.readingMinutes,
+    views: a.views,
     coverUrl: a.coverUrl,
     author: authors[0]?.slug ?? null,
     authors,

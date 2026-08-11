@@ -67,6 +67,17 @@ export class ArticlesService {
     return { items: groups.map((g) => g.category) };
   }
 
+  /* Fire-and-forget page-view counter. updateMany so an unknown or draft
+     slug is a no-op instead of an exception — the endpoint is public and
+     must stay boring. Club-scale honesty: no dedup beyond the client's
+     per-session guard. */
+  async registerView(slug: string) {
+    await this.prisma.article.updateMany({
+      where: { ...PUBLISHED, slug },
+      data: { views: { increment: 1 } },
+    });
+  }
+
   async bySlug(slug: string) {
     const article = await this.prisma.article.findFirst({
       where: { ...PUBLISHED, slug },

@@ -95,6 +95,9 @@ model Article {
   body Json
   // Precomputed at sync: 500 chars/min (Korean), min 1.
   readingMinutes Int     @default(1) @map("reading_minutes")
+  // Page-view counter — owned by the API (sync never writes it), incremented
+  // by POST /v1/articles/:slug/view.
+  views Int @default(0)
   // Optional real artwork; null falls back to the generated CoverArt.
   coverUrl  String? @map("cover_url")
   mediumUrl String? @map("medium_url")

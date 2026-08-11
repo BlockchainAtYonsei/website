@@ -1,4 +1,13 @@
-import { BadRequestException, Controller, Get, Header, Param, Query } from "@nestjs/common";
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Header,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+} from "@nestjs/common";
 import { ArticlesService } from "./articles.service";
 
 const CACHE = "public, s-maxage=60, stale-while-revalidate=300";
@@ -42,5 +51,13 @@ export class ArticlesController {
   @Header("Cache-Control", CACHE)
   bySlug(@Param("slug") slug: string) {
     return this.articles.bySlug(slug);
+  }
+
+  /* Counter ping from the site (proxied through its /api/views route).
+     204 regardless of whether the slug exists — nothing to probe. */
+  @Post(":slug/view")
+  @HttpCode(204)
+  async view(@Param("slug") slug: string) {
+    await this.articles.registerView(slug);
   }
 }
