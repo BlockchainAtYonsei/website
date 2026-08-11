@@ -150,13 +150,20 @@ type MockNews = {
   draft?: boolean;
 };
 
+/* Dates cluster three-to-four items per week — the feed groups by the club's
+   weekly curation session, so the mock has to look like weekly batches. */
 const NEWS: MockNews[] = [
   { title: "이더리움 클라이언트 다양성 보고서 — 단일 클라이언트 점유율 첫 50% 아래로", url: "https://www.theblock.co/mock/client-diversity", sourceName: "The Block", summary: "숫자보다 감소 속도가 중요하다. 슈퍼머저리티 리스크가 처음으로 협상 가능한 범위에 들어왔다.", category: "Infra", publishedAt: "2026-08-09", curator: "younghwan-shin" },
   { title: "대형 거래소, 준비금 증명에 실시간 오라클 도입", url: "https://www.coindesk.com/mock/por-oracle", sourceName: "CoinDesk", summary: "월간 어테스테이션의 관측 공백 문제를 정확히 겨냥한 변화. 다만 보관 위험은 여전히 서명자에 있다.", category: "Market", publishedAt: "2026-08-07", curator: "sanghyeon-kwon" },
+  { title: "L2 수수료 급락 이후 첫 시퀀서 수익 보고서", url: "https://www.dlnews.com/mock/sequencer-revenue", sourceName: "DL News", summary: "블롭 이후 마진 구조가 어떻게 재편됐는지 보여주는 첫 실측 데이터.", category: "Infra", publishedAt: "2026-08-06", curator: "donghyun-jang" },
   { title: "롤업 A, 스테이지 2 달성 — 보안 카운슬 권한 대폭 축소", url: "https://www.dlnews.com/mock/stage2", sourceName: "DL News", summary: "탈출구가 코드로 보장되는 첫 대형 사례. 다른 롤업들의 로드맵 발표가 이어질 것.", category: "Infra", publishedAt: "2026-08-03", curator: "jaehwan-lee" },
   { title: "하드포크 일정 확정", url: "https://theblock.co/p/1", sourceName: "The Block", summary: "검증자 이탈률 조항이 핵심.", category: "Infra", publishedAt: "2026-08-01", curator: "yerim-bae" },
+  { title: "온체인 옵션 미결제약정 사상 최고 — 볼륨은 여전히 CEX의 5%", url: "https://www.bankless.com/mock/onchain-options", sourceName: "Bankless", summary: "성장률과 절대 규모를 섞어 읽으면 안 되는 대표적 지표.", category: "DeFi", publishedAt: "2026-07-31", curator: "jehee-noh" },
+  { title: "스테이킹 ETF 두 번째 승인 — 수탁 구조는 여전히 단일 사업자", url: "https://www.reuters.com/mock/staking-etf", sourceName: "Reuters", summary: "상품은 늘었지만 슬래싱 위험의 귀속 문제는 그대로다.", category: "Market", publishedAt: "2026-07-29", curator: "yunseon-jang" },
   { title: "미 재무부, 스테이블코인 발행사 연방 인가 세부 규칙 공개", url: "https://www.reuters.com/mock/stablecoin-charter", sourceName: "Reuters", summary: "준비금 구성보다 환매 SLA 조항이 실질적 진입장벽. 중소 발행사 통폐합이 시작될 자리다.", category: "Regulation", publishedAt: "2026-07-24", curator: "uihyeok-park" },
+  { title: "듄 리포트 — 리스테이킹 TVL의 실효 담보율 추정", url: "https://www.dune.com/mock/restaking-collateral", sourceName: "Dune", summary: "명목 TVL과 실효 담보의 간극을 처음으로 수치화한 시도.", category: "Infra", publishedAt: "2026-07-22", curator: "yerim-bae" },
   { title: "인텐트 기반 브릿지 점유율, 락앤민트 방식 첫 추월", url: "https://www.bankless.com/mock/intent-bridges", sourceName: "Bankless", summary: "솔버 담보 요건이 아직 표준화되지 않았다는 점을 기억할 것. 점유율 성장이 위험 총량 성장이기도 하다.", category: "DeFi", publishedAt: "2026-07-18", curator: "jehee-noh" },
+  { title: "ZK 프루버 시장에 첫 선물 계약 등장", url: "https://www.theblock.co/mock/prover-futures", sourceName: "The Block", summary: "용량을 미리 사두기 시작했다는 것 — 증명 시장 성숙의 신호로 읽어야 한다.", category: "ZK", publishedAt: "2026-07-16", curator: "seongjae-lee" },
   { title: "주요 DAO 투표율, 위임 만료제 도입 후 3배 상승", url: "https://www.decrypt.co/mock/delegation-expiry", sourceName: "Decrypt", summary: "방치된 투표권 회수가 정족수 문제의 실효적 해법임을 보여준 첫 대규모 실험.", category: "Governance", publishedAt: "2026-06-30", curator: "jaeseo-kim" },
   { title: "글로벌 은행 3곳, 토큰화 국채 결제망 공동 출범", url: "https://www.ft.com/mock/tokenized-treasuries", sourceName: "Financial Times", summary: "온체인 RWA의 유동성 분절 문제가 처음으로 발행 단에서 다뤄진다.", category: "Market", publishedAt: "2026-06-21", curator: "chaeyun-lim" },
   { title: "(초안) 다음 주 뉴스 후보", url: "https://example.com/mock/draft", sourceName: "TBD", summary: "", category: "Market", publishedAt: "2026-08-11", draft: true },

@@ -78,7 +78,11 @@ if [ -f backend/Dockerfile ] && [ -f "$ENV_FILE" ]; then
   done
   log "bay-backend healthy"
 elif [ -f backend/Dockerfile ]; then
-  log "backend.env missing at $ENV_FILE — web-only deploy"
+  # The web build prerenders against the API, so without a backend there is
+  # no successful web build either — stop with a clear reason instead of
+  # letting docker build fail cryptically every 60 seconds.
+  log "BLOCKED: backend.env missing at $ENV_FILE — create it (template in scripts/deploy.sh header), deploys resume automatically"
+  exit 1
 fi
 
 # ---- web ----
