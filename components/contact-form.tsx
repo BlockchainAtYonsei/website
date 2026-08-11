@@ -66,7 +66,7 @@ export default function ContactForm() {
         <p className="font-mono mb-3 text-[10px] tracking-[0.18em] text-bay-300 uppercase">
           Sent
         </p>
-        <p className="font-heading text-2xl tracking-[-0.5px] break-keep text-white italic md:text-3xl">
+        <p className="font-heading text-2xl tracking-[-0.5px] break-keep text-white md:text-3xl">
           문의가 전송되었습니다.
         </p>
         <p className="font-body mt-4 text-sm leading-relaxed font-light break-keep text-slate-400">
@@ -202,7 +202,7 @@ export default function ContactForm() {
         {status.state === "error" ? (
           <span className="text-red-300">{status.message}</span>
         ) : (
-          <>입력하신 내용이 BAY 메일함으로 바로 전송됩니다.</>
+          <>남겨주시면 입력하신 메일로 회신드립니다.</>
         )}
       </p>
     </form>

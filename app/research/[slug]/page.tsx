@@ -6,7 +6,7 @@ import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
 import CoverArt from "@/components/research/cover-art";
 import Toc from "@/components/research/toc";
-import { authorMark, authorName } from "@/lib/authors";
+import { authorName } from "@/lib/authors";
 import {
   ARTICLES,
   formatDate,
@@ -67,7 +67,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
             </span>
           </div>
 
-          <h1 className="font-heading mt-6 max-w-4xl text-4xl leading-[1.02] tracking-[-2px] break-keep text-white italic md:text-6xl lg:text-[4.25rem]">
+          <h1 className="font-heading mt-6 max-w-4xl text-4xl leading-[1.1] tracking-[-2px] break-keep text-white md:text-6xl lg:text-[4.25rem]">
             {article.title}
           </h1>
           <p className="font-body mt-7 max-w-2xl text-lg leading-relaxed font-light break-keep text-slate-400">
@@ -77,14 +77,8 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
           <div className="mt-9 border-t border-white/8 pt-7">
             <Link
               href={`/research/author/${article.author}`}
-              className="group inline-flex items-center gap-3.5"
+              className="group inline-flex items-center"
             >
-              <span
-                aria-hidden
-                className="font-display flex h-10 w-10 items-center justify-center rounded-full bg-bay-500/20 text-xs font-bold tracking-wide text-bay-200 transition-transform duration-300 group-hover:scale-105"
-              >
-                {authorMark(article.author)}
-              </span>
               <span>
                 <span className="font-body block text-sm text-white transition-colors group-hover:text-bay-100">
                   {authorName(article.author)}
@@ -125,7 +119,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
         <section className="border-t border-white/8">
           <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
             <div className="mb-9 flex flex-wrap items-end justify-between gap-4">
-              <h2 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+              <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
                 Keep reading
               </h2>
               <Link

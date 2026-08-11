@@ -27,6 +27,17 @@ const NAV_LINKS: {
 const NAV_ITEM =
   "font-body rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white";
 
+/* Language switch. NOTE: nothing on the site is translated yet — this stores
+   the choice and sets <html lang>, so the copy stays as-is until an i18n layer
+   lands. Kept here rather than hidden behind a flag so the control exists to
+   wire up; `LANG_KEY` is what that layer should read. */
+const LANGS = [
+  { code: "KR", htmlLang: "ko" },
+  { code: "EN", htmlLang: "en" },
+] as const;
+type LangCode = (typeof LANGS)[number]["code"];
+const LANG_KEY = "bay-lang";
+
 const HIDDEN = { filter: "blur(10px)", opacity: 0, y: 20 };
 const VISIBLE = { filter: "blur(0px)", opacity: 1, y: 0 };
 
@@ -35,12 +46,24 @@ export default function Hero() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [applyOpen, setApplyOpen] = useState(false);
+  const [lang, setLang] = useState<LangCode>("KR");
   // ?snap=1 jumps straight to the assembled state (screenshots, OG capture)
   const [snap, setSnap] = useState(false);
   useEffect(() => {
     setSnap(new URLSearchParams(window.location.search).has("snap"));
     setMounted(true);
+    /* read after mount, not during render: the server has no localStorage, so
+       reading it inline would hydrate with a different value than it rendered */
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved === "KR" || saved === "EN") setLang(saved);
   }, []);
+
+  const pickLang = (next: LangCode) => {
+    setLang(next);
+    localStorage.setItem(LANG_KEY, next);
+    document.documentElement.lang =
+      LANGS.find((l) => l.code === next)?.htmlLang ?? "ko";
+  };
 
   const reveal = (delay: number) => ({
     initial: snap ? false : HIDDEN,
@@ -158,6 +181,35 @@ export default function Hero() {
                       Apply
                       <ArrowUpRight className="h-4 w-4" />
                     </button>
+
+                    {/* Rule sets the switch apart from the destinations above
+                        it — it changes a setting, it does not navigate. */}
+                    <div className="mt-2 border-t border-white/10 px-2 pt-2.5 pb-1">
+                      <div
+                        role="group"
+                        aria-label="Language"
+                        className="flex items-center gap-1"
+                      >
+                        {LANGS.map(({ code }) => {
+                          const active = lang === code;
+                          return (
+                            <button
+                              key={code}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => pickLang(code)}
+                              className={`font-mono flex-1 cursor-pointer rounded-[0.65rem] py-1.5 text-[11px] tracking-[0.14em] transition-colors ${
+                                active
+                                  ? "bg-white/15 text-white"
+                                  : "text-white/45 hover:bg-white/8 hover:text-white/80"
+                              }`}
+                            >
+                              {code}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </motion.nav>
               </>
@@ -174,7 +226,11 @@ export default function Hero() {
       <div className="absolute inset-x-0 bottom-[12%] z-10 flex flex-col items-center gap-5 px-6 text-center">
         <motion.h1
           {...reveal(0.5)}
-          className="font-display mr-[-0.15em] text-3xl font-bold tracking-[0.15em] text-balance text-white uppercase [text-shadow:0_0_44px_rgba(47,107,255,0.55)] md:text-5xl lg:text-6xl"
+          /* One line at every width. The slope is set from the rendered
+             wordmark: at this tracking it measures ~14.7× its font size, and
+             the line has to clear the px-6 gutters, so the size tops out at
+             (100vw - 56px) / 14.7. Retune it if the display face changes. */
+          className="font-display mr-[-0.15em] text-[clamp(0.95rem,calc(6.7vw_-_3.7px),1.875rem)] font-bold tracking-[0.15em] whitespace-nowrap text-white uppercase [text-shadow:0_0_44px_rgba(47,107,255,0.55)] md:text-5xl lg:text-6xl"
         >
           Blockchain at Yonsei
           <span className="sr-only"> (BAY) — 연세대학교 블록체인 학회</span>

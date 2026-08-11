@@ -2,24 +2,9 @@ import Link from "next/link";
 import Hero from "@/components/hero";
 import ApplyTrigger from "@/components/apply-modal";
 import BlurText from "@/components/blur-text";
-import Partners from "@/components/partners";
+// import Partners from "@/components/partners";
 import SiteFooter from "@/components/site-footer";
-import {
-  ArrowUpRight,
-  CodeIcon,
-  GlobeIcon,
-  MagnifierIcon,
-} from "@/components/icons";
-
-const PILLARS: {
-  title: string;
-  href: string;
-  Icon: (props: { className?: string }) => React.ReactElement;
-}[] = [
-  { title: "Research", href: "/research", Icon: MagnifierIcon },
-  { title: "Build", href: "#history", Icon: CodeIcon },
-  { title: "Network", href: "#history", Icon: GlobeIcon },
-];
+import { ArrowUpRight, CodeIcon, MagnifierIcon } from "@/components/icons";
 
 /* hl: standout entries (awards, wins, marquee moments) render brighter */
 const HISTORY: {
@@ -116,6 +101,24 @@ const HISTORY: {
   },
 ];
 
+/* Each card is a door, not a pitch: the blurbs were cut on purpose, and what
+   fills the space is the oversized mark rather than any copy. */
+const PILLARS: {
+  title: string;
+  href: string;
+  /* leaves the site, so it opens in a new tab and skips the router */
+  external?: true;
+  Icon: (props: { className?: string }) => React.ReactElement;
+}[] = [
+  { title: "Research", href: "/research", Icon: MagnifierIcon },
+  {
+    title: "Build",
+    href: "https://github.com/BlockchainAtYonsei",
+    external: true,
+    Icon: CodeIcon,
+  },
+];
+
 export default function Home() {
   return (
     <main>
@@ -127,7 +130,7 @@ export default function Home() {
           <p className="font-body mb-6 text-sm font-light text-white/80">
             {"// What is BAY"}
           </p>
-          <p className="font-heading mb-16 max-w-4xl text-3xl leading-[1.05] tracking-[-1px] text-balance text-white italic md:mb-20 md:text-4xl lg:text-5xl">
+          <p className="font-heading mb-16 max-w-4xl text-3xl leading-[1.15] tracking-[-1px] text-balance text-white md:mb-20 md:text-4xl lg:text-5xl">
             Where the brightest minds and talents at Yonsei University learn and
             experience blockchain.
           </p>
@@ -137,7 +140,7 @@ export default function Home() {
           <BlurText
             justify="start"
             text="We stack blocks, we chain people."
-            className="font-heading text-5xl leading-[0.95] tracking-[-3px] text-white italic md:text-6xl lg:text-[5.5rem]"
+            className="font-heading text-5xl leading-[1.05] tracking-[-3px] text-white md:text-6xl lg:text-[5.5rem]"
           />
           <p className="font-body mt-8 max-w-2xl leading-relaxed font-light text-slate-400">
             Founded in 2017, Blockchain at Yonsei is the first blockchain
@@ -162,22 +165,60 @@ export default function Home() {
           <BlurText
             justify="start"
             text="The BAY at work"
-            className="font-heading text-5xl leading-[0.9] tracking-[-3px] text-white italic md:text-6xl"
+            className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
           />
-          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {PILLARS.map(({ title, href, Icon }) => (
-              <Link
-                key={title}
-                href={href}
-                className="group liquid-glass flex min-h-[180px] flex-col justify-between rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.02]"
-              >
-                <Icon className="h-6 w-6 text-bay-300 transition-colors group-hover:text-bay-100" />
-                <h3 className="font-heading flex items-center gap-2 text-3xl leading-none tracking-[-1px] text-white italic md:text-4xl">
-                  {title}
-                  <ArrowUpRight className="h-4 w-4 shrink-0 text-white/35 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-bay-200" />
-                </h3>
-              </Link>
-            ))}
+          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
+            {PILLARS.map(({ title, href, external, Icon }) => {
+              const card = (
+                <>
+                  {/* Same three layers the research cover art uses — grid,
+                      glow, oversized mark — so these cards read as the same
+                      site. The mark runs off the corner on purpose: cropped,
+                      it is texture rather than a second icon competing with
+                      the real one. */}
+                  <div
+                    aria-hidden
+                    className="bg-grid absolute inset-0 opacity-60"
+                  />
+                  <Icon
+                    aria-hidden
+                    className="pointer-events-none absolute -right-8 -bottom-10 h-48 w-48 text-white/[0.045] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105"
+                  />
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{
+                      background:
+                        "radial-gradient(75% 90% at 10% 0%, rgba(47,107,255,0.20) 0%, transparent 70%)",
+                    }}
+                  />
+
+                  <Icon className="relative h-6 w-6 text-bay-300 transition-colors group-hover:text-bay-100" />
+                  <h3 className="font-heading relative flex items-center gap-2 text-3xl leading-none tracking-[-1px] text-white md:text-4xl">
+                    {title}
+                    <ArrowUpRight className="h-4 w-4 shrink-0 text-white/35 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-bay-200" />
+                  </h3>
+                </>
+              );
+              const cls =
+                "group liquid-glass relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.02] md:min-h-[220px]";
+
+              return external ? (
+                <a
+                  key={title}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cls}
+                >
+                  {card}
+                </a>
+              ) : (
+                <Link key={title} href={href} className={cls}>
+                  {card}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -191,13 +232,13 @@ export default function Home() {
           <BlurText
             justify="start"
             text="The BAY so far"
-            className="font-heading text-5xl leading-[0.9] tracking-[-3px] text-white italic md:text-6xl"
+            className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
           />
           <div className="relative mt-14 max-w-3xl border-l border-white/10 pl-10">
             {HISTORY.map((y) => (
               <div key={y.year} className="relative pb-12 last:pb-0">
                 <span className="absolute top-3 -left-[44px] h-2 w-2 rounded-full bg-bay-400 shadow-[0_0_12px_rgba(95,139,255,0.9)]" />
-                <h3 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+                <h3 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
                   {y.year}
                 </h3>
                 <ul className="mt-4 space-y-2.5">
@@ -224,7 +265,11 @@ export default function Home() {
         </div>
       </section>
 
-      <Partners />
+      {/* Partners — held back on purpose. Some of the organizations listed
+          are not formal partnerships, and the section shows their logos, so
+          it stays off the page until the roster is confirmed. The component
+          and its logo files are intact; drop the comment to bring it back. */}
+      {/* <Partners /> */}
 
       {/* CTA */}
       <section id="apply" className="relative overflow-hidden bg-ink py-28 md:py-40">
@@ -238,7 +283,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-3xl px-6 text-center">
           <BlurText
             text="Be the next BAY."
-            className="font-heading text-5xl tracking-[-2px] text-white italic md:text-7xl"
+            className="font-heading text-5xl tracking-[-2px] text-white md:text-7xl"
           />
           <ApplyTrigger className="liquid-glass-strong font-body mt-9 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white transition-transform hover:scale-[1.03]">
             지원하기

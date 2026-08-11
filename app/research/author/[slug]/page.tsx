@@ -13,7 +13,6 @@ import {
 import ArticleCard from "@/components/research/article-card";
 import {
   AUTHORS,
-  authorMark,
   getArticlesByAuthor,
   getAuthor,
   type SocialLabel,
@@ -75,23 +74,13 @@ export default async function AuthorPage(
 
       {/* Profile */}
       <header className="mt-10 md:mt-12">
-        <div className="flex items-center gap-5">
-          <span
-            aria-hidden
-            className="font-display flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-bay-500/20 text-sm font-bold tracking-wide text-bay-200 md:h-20 md:w-20"
-          >
-            {authorMark(author.slug)}
-          </span>
-          <div>
-            {/* names stay in the body face: the heading serif is Latin-only,
-                so hangul would fall back with a synthetic slant */}
-            <h1 className="font-body text-4xl leading-[1.05] font-semibold tracking-[-0.02em] break-keep text-white md:text-5xl">
-              {author.name}
-            </h1>
-            <p className="font-mono mt-2 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
-              {author.role}
-            </p>
-          </div>
+        <div>
+          <h1 className="font-body text-4xl leading-[1.05] font-semibold tracking-[-0.02em] break-keep text-white md:text-5xl">
+            {author.name}
+          </h1>
+          <p className="font-mono mt-2 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
+            {author.role}
+          </p>
         </div>
 
         <p className="font-body mt-7 max-w-2xl leading-relaxed font-light break-keep text-slate-400">
@@ -124,7 +113,7 @@ export default async function AuthorPage(
       {/* Articles */}
       <section className="mt-16 border-t border-white/8 pt-14 md:mt-20">
         <div className="mb-9 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-heading text-3xl tracking-[-1px] text-white italic md:text-4xl">
+          <h2 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
             작성한 글
           </h2>
           <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">

@@ -9,14 +9,18 @@ import {
   GlobeIcon,
   InstagramIcon,
   LinkedInIcon,
+  MediumIcon,
+  TelegramIcon,
   XIcon,
 } from "./icons";
 
 export type Links = {
   github?: string;
   linkedin?: string;
+  telegram?: string;
   x?: string;
   instagram?: string;
+  medium?: string;
   website?: string;
 };
 export type Officer = {
@@ -44,8 +48,10 @@ const LINK_META: {
 }[] = [
   { key: "github", label: "GitHub", Icon: GitHubIcon },
   { key: "linkedin", label: "LinkedIn", Icon: LinkedInIcon },
+  { key: "telegram", label: "Telegram", Icon: TelegramIcon },
   { key: "x", label: "X", Icon: XIcon },
   { key: "instagram", label: "Instagram", Icon: InstagramIcon },
+  { key: "medium", label: "Medium", Icon: MediumIcon },
   { key: "website", label: "Website", Icon: GlobeIcon },
 ];
 
@@ -84,36 +90,39 @@ const EXEC_TRACKS = [0.55, 1.45, 1.45, 0.55];
 const ROOT_CENTRE = columnCentres([1]);
 const EXEC_CENTRES = columnCentres(EXEC_TRACKS).slice(1, 3);
 
-function Avatar({
-  name,
-  strong,
-  className,
-}: {
-  name: string;
-  strong?: boolean;
-  className: string;
-}) {
-  return (
-    <span
-      aria-hidden
-      className={`flex shrink-0 items-center justify-center rounded-full border ${
-        strong
-          ? "border-bay-300/40 bg-gradient-to-br from-bay-500/45 to-bay-700/25 shadow-[0_0_18px_rgba(47,107,255,0.35)]"
-          : "border-white/12 bg-gradient-to-br from-white/10 to-white/[0.03]"
-      } ${className}`}
-    >
-      {/* upright sans, not the serif italic: Instrument Serif has no hangul,
-          so Korean initials fall back to a system serif and pick up a fake
-          slant that throws the glyph off balance */}
-      <span className="font-display font-bold text-white">{name[0]}</span>
-    </span>
-  );
-}
-
 /* the hover-revealed corner arrow every clickable card shares */
 function CornerHint() {
   return (
     <ArrowUpRight className="absolute top-3.5 right-3.5 h-3.5 w-3.5 text-white/0 transition-colors duration-300 group-hover:text-white/45" />
+  );
+}
+
+/* Which links a person has, right on the card, so you can tell what's there
+   without opening the dialog. Decorative — the card is a button, so these
+   can't be anchors; the dialog behind it holds the real, labelled links. */
+function LinkGlyphs({
+  links,
+  reserve = false,
+  className = "",
+}: {
+  links?: Links;
+  /* keep the row's height even when empty, so cards sitting side by side in
+     the team tier stay level whether or not their lead has handed links in */
+  reserve?: boolean;
+  className?: string;
+}) {
+  const has = LINK_META.filter(({ key }) => links?.[key]);
+  if (has.length === 0 && !reserve) return null;
+
+  return (
+    <span
+      aria-hidden
+      className={`flex h-3.5 items-center gap-2 text-white/40 transition-colors duration-300 group-hover:text-white/75 ${className}`}
+    >
+      {has.map(({ key, Icon }) => (
+        <Icon key={key} className="h-3.5 w-3.5" />
+      ))}
+    </span>
   );
 }
 
@@ -122,6 +131,7 @@ function NodeRow({
   role,
   name,
   cohort,
+  links,
   strong,
   onClick,
 }: Officer & { strong?: boolean; onClick: () => void }) {
@@ -134,18 +144,13 @@ function NodeRow({
         strong
           ? "liquid-glass-strong shadow-[0_0_44px_rgba(47,107,255,0.16)]"
           : "liquid-glass"
-      } group relative flex w-full cursor-pointer items-center gap-4 overflow-hidden rounded-[1.25rem] px-5 py-4 text-left transition-transform duration-300 hover:-translate-y-1`}
+      } group relative flex w-full cursor-pointer items-center overflow-hidden rounded-[1.25rem] px-5 py-4 text-left transition-transform duration-300 hover:-translate-y-1`}
     >
       <span
         aria-hidden
         className={`absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent to-transparent ${
           strong ? "via-bay-300/70" : "via-bay-300/35"
         }`}
-      />
-      <Avatar
-        name={name}
-        strong={strong}
-        className={strong ? "h-12 w-12 text-xl" : "h-10 w-10 text-base"}
       />
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="font-mono text-[10px] tracking-[0.2em] whitespace-nowrap text-bay-200">
@@ -160,6 +165,7 @@ function NodeRow({
           </span>
         </span>
       </span>
+      <LinkGlyphs links={links} className="mt-auto ml-auto pl-4" />
       <CornerHint />
     </button>
   );
@@ -170,6 +176,7 @@ function NodeCol({
   role,
   name,
   cohort,
+  links,
   onClick,
 }: Officer & { onClick: () => void }) {
   return (
@@ -183,7 +190,6 @@ function NodeCol({
         aria-hidden
         className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-bay-300/35 to-transparent"
       />
-      <Avatar name={name} className="h-10 w-10 text-base" />
       <span className="flex flex-col items-center gap-1">
         <span className="font-mono text-[10px] tracking-[0.2em] whitespace-nowrap text-bay-200">
           {role}
@@ -195,14 +201,15 @@ function NodeCol({
       <span className="font-mono text-[11px] tracking-[0.2em] text-white/60">
         {cohort}
       </span>
+      <LinkGlyphs links={links} reserve className="justify-center" />
       <CornerHint />
     </button>
   );
 }
 
-/* One person, one row: initial, name, cohort. Quiet on purpose — the roster
-   sits inside a whisper of a container so the tree's cards stay the loudest
-   thing on the page. */
+/* One person, one row: name, cohort. Quiet on purpose — the roster sits
+   inside a whisper of a container so the tree's cards stay the loudest thing
+   on the page. */
 function MemberChip({
   name,
   cohort,
@@ -216,12 +223,6 @@ function MemberChip({
         aria-haspopup="dialog"
         className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-white/[0.06]"
       >
-        <span
-          aria-hidden
-          className="font-display flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.05] text-[11px] font-bold text-bay-100"
-        >
-          {name[0]}
-        </span>
         <span className="font-body text-[15px] whitespace-nowrap text-white">
           {name}
         </span>
@@ -443,23 +444,16 @@ export default function OrgChart({
       >
         {person && (
           <>
-            <div className="flex items-center gap-5">
-              <Avatar
-                name={person.name}
-                strong
-                className="h-16 w-16 text-3xl"
-              />
-              <div>
-                <p className="font-mono mb-1.5 text-[10px] tracking-[0.18em] text-bay-200 uppercase">
-                  Profile
-                </p>
-                <h2
-                  id="profile-title"
-                  className="font-body text-3xl leading-none font-semibold tracking-[-0.02em] text-white md:text-4xl"
-                >
-                  {person.name}
-                </h2>
-              </div>
+            <div>
+              <p className="font-mono mb-1.5 text-[10px] tracking-[0.18em] text-bay-200 uppercase">
+                Profile
+              </p>
+              <h2
+                id="profile-title"
+                className="font-body text-3xl leading-none font-semibold tracking-[-0.02em] text-white md:text-4xl"
+              >
+                {person.name}
+              </h2>
             </div>
 
             <p className="font-body mt-6 text-[15px] font-light text-slate-300">

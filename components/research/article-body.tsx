@@ -62,7 +62,7 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
               <h2
                 key={i}
                 id={headingId(b.text, i)}
-                className="font-heading mt-16 mb-5 scroll-mt-28 text-3xl leading-[1.15] tracking-[-1px] break-keep text-white italic md:text-4xl"
+                className="font-heading mt-16 mb-5 scroll-mt-28 text-3xl leading-[1.15] tracking-[-1px] break-keep text-white md:text-4xl"
               >
                 {b.text}
               </h2>
@@ -113,7 +113,7 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
                 key={i}
                 className="my-12 border-l-2 border-bay-400/60 pl-6 md:pl-8"
               >
-                <p className="font-heading text-2xl leading-[1.35] tracking-[-0.5px] break-keep text-white italic md:text-3xl">
+                <p className="font-heading text-2xl leading-[1.35] tracking-[-0.5px] break-keep text-white md:text-3xl">
                   {b.text}
                 </p>
                 {b.cite && (
