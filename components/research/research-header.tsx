@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ReadingProgress from "./reading-progress";
+import ResearchNav from "./research-nav";
 
 /* Standalone masthead: BAY RESEARCH reads as its own property rather than a
    breadcrumb hanging off the main site, so the wordmark is set in one weight of
@@ -23,28 +24,17 @@ export default function ResearchHeader() {
             />
           </Link>
 
+          {/* hidden on phones: the Research tab already leads home, and the
+              wordmark plus three tabs don't fit 390px side by side */}
           <Link
             href="/research"
-            className="font-display text-sm font-bold tracking-[0.15em] whitespace-nowrap text-white uppercase transition-colors hover:text-bay-300"
+            className="font-display hidden text-sm font-bold tracking-[0.15em] whitespace-nowrap text-white uppercase transition-colors hover:text-bay-300 sm:block"
           >
             BAY Research
           </Link>
         </div>
 
-        <nav className="flex items-center gap-6">
-          <Link
-            href="/research/news"
-            className="font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase transition-colors hover:text-bay-300"
-          >
-            News
-          </Link>
-          <Link
-            href="/research/author"
-            className="font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase transition-colors hover:text-bay-300"
-          >
-            Authors
-          </Link>
-        </nav>
+        <ResearchNav />
       </div>
       <ReadingProgress />
     </header>
