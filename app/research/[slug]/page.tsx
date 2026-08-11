@@ -6,25 +6,24 @@ import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
 import CoverArt from "@/components/research/cover-art";
 import Toc from "@/components/research/toc";
-import { authorName } from "@/lib/authors";
-import {
-  ARTICLES,
-  formatDate,
-  getArticle,
-  getRelated,
-  getToc,
-  readingMinutes,
-} from "@/lib/research";
+import { formatDate, getArticle, getArticles, getToc } from "@/lib/research";
 
-export function generateStaticParams() {
-  return ARTICLES.map((a) => ({ slug: a.slug }));
+/* Prerender what the API knows at build time; anything newer renders on
+   first request. An unreachable API degrades to an empty list instead of a
+   failed build — the pages still work once it's back. */
+export async function generateStaticParams() {
+  try {
+    return (await getArticles()).map((a) => ({ slug: a.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata(
   props: PageProps<"/research/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
   if (!article) return {};
 
   return {
@@ -42,11 +41,11 @@ export async function generateMetadata(
 
 export default async function ArticlePage(props: PageProps<"/research/[slug]">) {
   const { slug } = await props.params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
   if (!article) notFound();
 
-  const toc = getToc(article);
-  const related = getRelated(slug);
+  const toc = getToc(article.body);
+  const related = article.related;
 
   return (
     <main>
@@ -74,20 +73,30 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
             {article.dek}
           </p>
 
-          <div className="mt-9 border-t border-white/8 pt-7">
-            <Link
-              href={`/research/author/${article.author}`}
-              className="group inline-flex items-center"
-            >
-              <span>
-                <span className="font-body block text-sm text-white transition-colors group-hover:text-bay-100">
-                  {authorName(article.author)}
+          <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3 border-t border-white/8 pt-7">
+            {article.authors.map((a) => (
+              <Link
+                key={a.slug}
+                href={`/research/author/${a.slug}`}
+                className="group inline-flex items-center gap-3"
+              >
+                {/* plain img — avatars come from our own bucket and don't
+                    need the next/image remote allowlist dance */}
+                {a.avatarUrl && (
+                  <img
+                    src={a.avatarUrl}
+                    alt=""
+                    className="h-9 w-9 rounded-full object-cover"
+                  />
+                )}
+                <span className="font-body text-sm text-white transition-colors group-hover:text-bay-100">
+                  {a.name}
                 </span>
-                <span className="font-mono block text-[10px] tracking-[0.18em] text-white/40 uppercase">
-                  {readingMinutes(article)} min read
-                </span>
-              </span>
-            </Link>
+              </Link>
+            ))}
+            <span className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">
+              {article.readingMinutes} min read
+            </span>
           </div>
         </header>
 

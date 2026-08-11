@@ -1,7 +1,6 @@
 import Link from "next/link";
 import CoverArt from "./cover-art";
-import { authorName } from "@/lib/authors";
-import { formatDate, readingMinutes, type Article } from "@/lib/research";
+import { formatDate, type Article } from "@/lib/research";
 
 export function ArticleMeta({
   article,
@@ -16,7 +15,7 @@ export function ArticleMeta({
     >
       <span>{formatDate(article.date)}</span>
       <span className="h-px w-4 bg-bay-300/30" />
-      <span>{readingMinutes(article)} min read</span>
+      <span>{article.readingMinutes} min read</span>
     </div>
   );
 }
@@ -63,8 +62,23 @@ export function FeaturedCard({ article }: { article: Article }) {
           <ArticleMeta article={article} />
           {/* plain text, not a link — the whole card is already an anchor and
               anchors don't nest; the byline links live on the article page */}
-          <span className="font-body text-xs font-light text-slate-500">
-            {authorName(article.author)}
+          <span className="flex items-center gap-2.5">
+            <span className="flex -space-x-1.5">
+              {article.authors
+                .filter((a) => a.avatarUrl)
+                .slice(0, 3)
+                .map((a) => (
+                  <img
+                    key={a.slug}
+                    src={a.avatarUrl!}
+                    alt=""
+                    className="h-6 w-6 rounded-full border border-ink object-cover"
+                  />
+                ))}
+            </span>
+            <span className="font-body text-xs font-light text-slate-500">
+              {article.authors.map((a) => a.name).join(" · ")}
+            </span>
           </span>
         </div>
       </div>

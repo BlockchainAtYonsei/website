@@ -31,7 +31,13 @@ export default function ResearchHeader() {
           </Link>
         </div>
 
-        <nav>
+        <nav className="flex items-center gap-6">
+          <Link
+            href="/research/news"
+            className="font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase transition-colors hover:text-bay-300"
+          >
+            News
+          </Link>
           <Link
             href="/research/author"
             className="font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase transition-colors hover:text-bay-300"

@@ -11,12 +11,7 @@ import {
   XIcon,
 } from "@/components/icons";
 import ArticleCard from "@/components/research/article-card";
-import {
-  AUTHORS,
-  getArticlesByAuthor,
-  getAuthor,
-  type SocialLabel,
-} from "@/lib/authors";
+import { getAuthor, getAuthors, type SocialLabel } from "@/lib/authors";
 
 const SOCIAL_ICONS: Record<
   SocialLabel,
@@ -31,15 +26,21 @@ const SOCIAL_ICONS: Record<
   Website: GlobeIcon,
 };
 
-export function generateStaticParams() {
-  return AUTHORS.map((a) => ({ slug: a.slug }));
+/* Same degradation as the article page: API down at build → prerender
+   nothing, render on demand once it's back. */
+export async function generateStaticParams() {
+  try {
+    return (await getAuthors()).map((a) => ({ slug: a.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata(
   props: PageProps<"/research/author/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const author = getAuthor(slug);
+  const author = await getAuthor(slug);
   if (!author) return {};
 
   return {
@@ -58,10 +59,10 @@ export default async function AuthorPage(
   props: PageProps<"/research/author/[slug]">,
 ) {
   const { slug } = await props.params;
-  const author = getAuthor(slug);
+  const author = await getAuthor(slug);
   if (!author) notFound();
 
-  const articles = getArticlesByAuthor(slug);
+  const articles = author.articles;
 
   return (
     <main className="mx-auto max-w-6xl px-6 pt-14 pb-24 md:pt-20 md:pb-32">
@@ -74,13 +75,22 @@ export default async function AuthorPage(
 
       {/* Profile */}
       <header className="mt-10 md:mt-12">
-        <div>
-          <h1 className="font-body text-4xl leading-[1.05] font-semibold tracking-[-0.02em] break-keep text-white md:text-5xl">
-            {author.name}
-          </h1>
-          <p className="font-mono mt-2 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
-            {author.role}
-          </p>
+        <div className="flex items-center gap-6">
+          {author.avatarUrl && (
+            <img
+              src={author.avatarUrl}
+              alt=""
+              className="h-20 w-20 shrink-0 rounded-full object-cover md:h-24 md:w-24"
+            />
+          )}
+          <div>
+            <h1 className="font-body text-4xl leading-[1.05] font-semibold tracking-[-0.02em] break-keep text-white md:text-5xl">
+              {author.name}
+            </h1>
+            <p className="font-mono mt-2 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
+              {author.role}
+            </p>
+          </div>
         </div>
 
         <p className="font-body mt-7 max-w-2xl leading-relaxed font-light break-keep text-slate-400">
