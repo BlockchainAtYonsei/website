@@ -126,12 +126,18 @@ model ArticleAuthor {
 
 model NewsItem {
   id    String @id @default(uuid()) @db.Uuid
+  // Routable page identity — explicit Notion Slug property, or derived from
+  // the page id so curators never have to invent one.
+  slug  String @unique
   title String
   // Unique: the same story curated twice is an edit, not a second row.
   url        String @unique
   sourceName String @map("source_name")
   // The curator's one-line take — the value-add of the feature.
   summary  String
+  // Block[] — 요약/인사이트 authored in the Notion page body; [] = link-only.
+  body     Json   @default("[]")
+  views    Int    @default(0)
   category String
   // Original publication date of the story, not the curation date.
   publishedAt DateTime      @map("published_at") @db.Date

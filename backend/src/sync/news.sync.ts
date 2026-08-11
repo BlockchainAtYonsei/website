@@ -1,4 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { mapBlocks } from "../notion/block-mapper";
 import { NotionService } from "../notion/notion.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { pageToNews } from "./mappers/news.mapper";
@@ -43,11 +44,26 @@ export class NewsSyncService {
         }
       }
 
+      /* 요약/인사이트 live in the Notion page body — same Block[] contract as
+         articles. An empty page is a link-only item, not an error. */
+      let body: unknown = [];
+      try {
+        const mapped = mapBlocks(await this.notion.pageBlocks(page.id));
+        stats.warnings.push(...mapped.warnings.map((w) => `news ${data.slug}: ${w}`));
+        body = mapped.blocks;
+      } catch (e) {
+        stats.warnings.push(
+          `news ${data.slug}: body fetch failed (${(e as Error).message}), kept link-only`,
+        );
+      }
+
       const row = {
+        slug: data.slug,
         title: data.title,
         url: data.url,
         sourceName: data.sourceName,
         summary: data.summary,
+        body: body as object,
         category: data.category,
         publishedAt: new Date(data.publishedAt),
         status: data.status,

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { isoDate } from "../content/shape";
 import type {
   MemberModel as Member,
@@ -23,13 +23,17 @@ function decodeCursor(cursor: string): { date: Date; id: string } {
 function toNewsItem(n: NewsItem & { curator: Member | null }) {
   return {
     id: n.id,
+    slug: n.slug,
     title: n.title,
     url: n.url,
     sourceName: n.sourceName,
     summary: n.summary,
     category: n.category,
     date: isoDate(n.publishedAt),
-    curator: n.curator ? { slug: n.curator.slug, name: n.curator.name } : null,
+    views: n.views,
+    curator: n.curator
+      ? { slug: n.curator.slug, name: n.curator.name, avatarUrl: n.curator.avatarUrl }
+      : null,
   };
 }
 
@@ -74,5 +78,43 @@ export class NewsService {
       orderBy: { _count: { category: "desc" } },
     });
     return { items: groups.map((g) => g.category) };
+  }
+
+  /* Detail = the item + its body + both sidebar rails: latest overall and
+     same-category, each excluding the item itself. One call renders the page. */
+  async bySlug(slug: string) {
+    const item = await this.prisma.newsItem.findFirst({
+      where: { status: "published", slug },
+      include: { curator: true },
+    });
+    if (!item) throw new NotFoundException();
+
+    const rail = {
+      where: { status: "published" as const, id: { not: item.id } },
+      include: { curator: true },
+      orderBy: [{ publishedAt: "desc" as const }, { id: "desc" as const }],
+      take: 3,
+    };
+    const [latest, related] = await Promise.all([
+      this.prisma.newsItem.findMany(rail),
+      this.prisma.newsItem.findMany({
+        ...rail,
+        where: { ...rail.where, category: item.category },
+      }),
+    ]);
+
+    return {
+      ...toNewsItem(item),
+      body: item.body,
+      latest: latest.map(toNewsItem),
+      related: related.map(toNewsItem),
+    };
+  }
+
+  async registerView(slug: string) {
+    await this.prisma.newsItem.updateMany({
+      where: { status: "published", slug },
+      data: { views: { increment: 1 } },
+    });
   }
 }

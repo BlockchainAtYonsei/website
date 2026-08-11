@@ -150,6 +150,30 @@ type MockNews = {
   draft?: boolean;
 };
 
+/* 요약/인사이트 body in the reference layout's shape — numbered facts, then
+   numbered takes. Rough filler; real ones come from the Notion page body. */
+function newsBody(n: MockNews): Block[] {
+  return [
+    { t: "h2", text: "요약" },
+    {
+      t: "ol",
+      items: [
+        `${n.sourceName} 보도 요지: ${n.title}.`,
+        "관련 주체와 일정, 수치 등 팩트 요약이 이 자리에 들어간다. 목업이므로 두 문장으로 줄인다.",
+        "직전 주 흐름과 어떻게 이어지는지 한 항목으로 연결한다.",
+      ],
+    },
+    { t: "h2", text: "인사이트" },
+    {
+      t: "ol",
+      items: [
+        n.summary || "큐레이터의 첫 번째 코멘트가 들어갈 자리.",
+        "두 번째 관전 포인트 — 다음에 확인할 지표나 일정을 적는다.",
+      ],
+    },
+  ];
+}
+
 /* Dates cluster three-to-four items per week — the feed groups by the club's
    weekly curation session, so the mock has to look like weekly batches. */
 const NEWS: MockNews[] = [
@@ -232,10 +256,13 @@ async function main() {
   for (const [i, n] of NEWS.entries()) {
     await prisma.newsItem.create({
       data: {
+        slug: `news-${String(i + 1).padStart(2, "0")}`,
         title: n.title,
         url: n.url,
         sourceName: n.sourceName,
         summary: n.summary,
+        body: n.draft ? [] : newsBody(n),
+        views: ((i * 83) % 240) + 6,
         category: n.category,
         publishedAt: new Date(n.publishedAt),
         status: n.draft ? "draft" : "published",

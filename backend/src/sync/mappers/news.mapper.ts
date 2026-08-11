@@ -7,9 +7,10 @@ import {
   titleOf,
   urlOf,
 } from "../../notion/properties";
-import { CONTENT_STATUS_MAP, NEWS_PROPS as P } from "../../notion/schema";
+import { CONTENT_STATUS_MAP, NEWS_PROPS as P, SLUG_RE } from "../../notion/schema";
 
 export type NewsData = {
+  slug: string;
   title: string;
   url: string;
   sourceName: string;
@@ -57,8 +58,21 @@ export function pageToNews(page: PageObjectResponse): NewsMapResult {
     }
   }
 
+  /* News ships weekly in batches — hand-written slugs would be pure friction,
+     so a missing/invalid Slug property falls back to the page id (stable,
+     unique, just not pretty). */
+  const rawSlug = richTextOf(page, P.slug)?.toLowerCase();
+  const slug =
+    rawSlug && SLUG_RE.test(rawSlug)
+      ? rawSlug
+      : page.id.replace(/[^a-z0-9]/gi, "").toLowerCase();
+  if (rawSlug && slug !== rawSlug) {
+    warnings.push(`news ${label}: "${P.slug}" not [a-z0-9-], using page id instead`);
+  }
+
   return {
     data: {
+      slug,
       title,
       url,
       /* 출처 may be a select or plain text; falls back to the URL's host so a

@@ -83,21 +83,18 @@ export default async function ResearchIndex() {
           <ul className="mt-6">
             {latestNews.map((item) => (
               <li key={item.id}>
-                <a
-                  href={item.url}
-                  target="_blank"
-                  rel="noreferrer"
+                <Link
+                  href={`/research/news/${item.slug}`}
                   className="group flex flex-col gap-1.5 border-b border-white/6 py-5 md:flex-row md:items-baseline md:gap-6"
                 >
                   <span className="font-mono flex shrink-0 items-center gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase md:w-48">
                     {formatDate(item.date)}
                     <span className="text-bay-300/70">{item.sourceName}</span>
                   </span>
-                  <span className="font-body flex items-start gap-2 text-base font-medium break-keep text-white transition-colors group-hover:text-bay-100">
+                  <span className="font-body text-base font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                     {item.title}
-                    <ArrowUpRight className="mt-1 h-3.5 w-3.5 shrink-0 text-white/40 transition-colors group-hover:text-bay-300" />
                   </span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

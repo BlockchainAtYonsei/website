@@ -51,7 +51,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
 
   return (
     <main>
-      <ViewPing slug={slug} />
+      <ViewPing kind="articles" slug={slug} />
       {/* Article head */}
       <article>
         <header className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">

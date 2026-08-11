@@ -1,4 +1,13 @@
-import { BadRequestException, Controller, Get, Header, Query } from "@nestjs/common";
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Header,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+} from "@nestjs/common";
 import { NewsService } from "./news.service";
 
 const CACHE = "public, s-maxage=60, stale-while-revalidate=300";
@@ -36,5 +45,18 @@ export class NewsController {
   @Header("Cache-Control", CACHE)
   categories() {
     return this.news.categories();
+  }
+
+  /* static segment above is declared first — route order matters */
+  @Get(":slug")
+  @Header("Cache-Control", CACHE)
+  bySlug(@Param("slug") slug: string) {
+    return this.news.bySlug(slug);
+  }
+
+  @Post(":slug/view")
+  @HttpCode(204)
+  async view(@Param("slug") slug: string) {
+    await this.news.registerView(slug);
   }
 }

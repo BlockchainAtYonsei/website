@@ -42,6 +42,7 @@ export const ARTICLE_PROPS = {
 
 export const NEWS_PROPS = {
   title: "제목", // title
+  slug: "Slug", // rich_text — optional; derived from the page id when absent
   url: "URL", // url — unique key
   source: "출처", // select|rich_text
   summary: "코멘트", // rich_text — the curator's one-liner

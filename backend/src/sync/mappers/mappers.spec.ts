@@ -160,6 +160,17 @@ describe("pageToNews", () => {
     }
   });
 
+  it("derives a slug from the page id when Slug is absent", () => {
+    const { data, warnings } = pageToNews(page(newsProps()));
+    expect(data?.slug).toMatch(/^page\d+$/);
+    expect(warnings).toEqual([]);
+  });
+
+  it("uses an explicit Slug property when valid", () => {
+    const { data } = pageToNews(page(newsProps({ Slug: prop.richText("joint-crypto-unit") })));
+    expect(data?.slug).toBe("joint-crypto-unit");
+  });
+
   it("falls back to the URL host when 출처 is empty", () => {
     const { data } = pageToNews(page(newsProps({ 출처: prop.select(null) })));
     expect(data?.sourceName).toBe("theblock.co");

@@ -46,9 +46,11 @@ Members, 복수 = 공저) · Medium URL(url) · 커버(files, 아직 미사용).
 리스트, 인용(마지막 줄 `— 출처`), 콜아웃(첫 줄 굵게 = 제목), 표, 구분선.
 굵게·인라인 코드·링크 유지. 이미지 등 미지원 블록은 경고와 함께 스킵.
 
-**News** — 제목(title) · URL(url) · 출처(select) · 코멘트(text) ·
-카테고리(select) · 원문 발행일(date) · 큐레이터(relation → Members) ·
-상태(select: 발행/초안)
+**News** — 제목(title) · Slug(text, 선택 — 없으면 페이지 id로 자동) ·
+URL(url) · 출처(select) · 코멘트(text) · 카테고리(select) ·
+원문 발행일(date) · 큐레이터(relation → Members) · 상태(select: 발행/초안).
+**요약/인사이트는 페이지 본문에 쓰면** 뉴스 상세 페이지로 발행된다(리서치와
+같은 블록 지원). 본문이 비어 있으면 링크-온리 아이템.
 
 프로필 사진 재호스팅에는 S3 호환 버킷(R2 권장)이 필요 — `S3_*` env. 없으면
 sync는 돌지만 아바타만 경고와 함께 건너뛴다.

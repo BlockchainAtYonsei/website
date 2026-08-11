@@ -248,10 +248,12 @@ XSS 표면 없음(원래부터 `dangerouslySetInnerHTML` 미사용).
 
 ### 3.3 News DB
 
-속성: 제목(title), URL(url — 유니크 키), 출처(select 또는 rich_text),
-코멘트(rich_text — BAY의 한 줄 요약이 이 기능의 가치), 카테고리(select),
-원문 발행일(date), 큐레이터(relation → Members), 상태(select).
-본문 블록은 읽지 않는다 — 속성만으로 완결.
+속성: 제목(title), Slug(rich_text — 선택, 없으면 페이지 id에서 유도),
+URL(url — 유니크 키), 출처(select 또는 rich_text), 코멘트(rich_text — 상세
+페이지의 덱), 카테고리(select), 원문 발행일(date), 큐레이터(relation →
+Members), 상태(select).
+**페이지 본문 = 요약/인사이트** — 아티클과 같은 블록 매핑으로 뉴스 상세
+페이지(`/research/news/[slug]`)에 발행된다. 본문이 비면 링크-온리.
 
 ### 3.4 이미지 주의점
 
