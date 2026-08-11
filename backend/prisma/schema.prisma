@@ -1,0 +1,160 @@
+// BAY backend schema — see docs/backend-design.md §2.
+// Notion is the source of truth; the only write path is the sync worker,
+// so every content row carries its notion_page_id and sync bookkeeping.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Connection URL lives in prisma.config.ts (Prisma 7) — the runtime client
+// gets a driver adapter in PrismaService instead.
+datasource db {
+  provider = "postgresql"
+}
+
+enum MemberStatus {
+  active
+  alumni
+}
+
+// Shared by articles and news: drafts sync into the DB but never leave the API.
+enum ContentStatus {
+  draft
+  published
+  archived
+}
+
+// Cover-art palettes — mirrors `Accent` in the frontend's lib/research.ts.
+enum Accent {
+  blue
+  violet
+  teal
+  indigo
+}
+
+enum SyncResource {
+  members
+  articles
+  news
+}
+
+enum SyncTrigger {
+  cron
+  manual
+  webhook
+}
+
+enum SyncStatus {
+  running
+  ok
+  error
+}
+
+model Member {
+  id     String @id @default(uuid()) @db.Uuid
+  slug   String @unique
+  name   String
+  cohort Int
+  team   String
+  // 팀장 / 부장 / 부원 / 회장 …
+  position String
+  bio      String @default("")
+  // [{ label: SocialLabel, href: string }] — validated at sync time against
+  // the frontend's 7-label union; a per-member read never needs a join.
+  socials Json @default("[]")
+  // Re-hosted copy (S3/R2), never the expiring Notion file URL.
+  avatarUrl String?      @map("avatar_url")
+  status    MemberStatus @default(active)
+  // Roster visibility on the site; hidden members still resolve as bylines.
+  visible      Boolean  @default(true)
+  notionPageId String   @unique @map("notion_page_id")
+  syncedAt     DateTime @updatedAt @map("synced_at")
+
+  articles ArticleAuthor[]
+  curated  NewsItem[]
+
+  @@index([cohort, team])
+  @@map("members")
+}
+
+model Article {
+  id       String @id @default(uuid()) @db.Uuid
+  slug     String @unique
+  title    String
+  dek      String
+  // Free text on purpose: the tag-chip list is `SELECT DISTINCT category`,
+  // same derivation the frontend uses today.
+  category String
+  accent   Accent        @default(blue)
+  status   ContentStatus @default(draft)
+  publishedAt DateTime?  @map("published_at") @db.Date
+  featured    Boolean    @default(false)
+  // Block[] — the exact contract of the frontend's lib/research.ts, so the
+  // renderer consumes API responses unchanged.
+  body Json
+  // Precomputed at sync: 500 chars/min (Korean), min 1.
+  readingMinutes Int     @default(1) @map("reading_minutes")
+  // Optional real artwork; null falls back to the generated CoverArt.
+  coverUrl  String? @map("cover_url")
+  mediumUrl String? @map("medium_url")
+
+  notionPageId       String   @unique @map("notion_page_id")
+  notionLastEditedAt DateTime @map("notion_last_edited_at")
+
+  authors ArticleAuthor[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@map("articles")
+}
+
+// Join table from day one: co-authored research is a matter of time, and the
+// frontend can render authors[0] until it's ready for the full list.
+model ArticleAuthor {
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String  @map("article_id") @db.Uuid
+  member    Member  @relation(fields: [memberId], references: [id])
+  memberId  String  @map("member_id") @db.Uuid
+  ord       Int     @default(0)
+
+  @@id([articleId, memberId])
+  @@map("article_authors")
+}
+
+model NewsItem {
+  id    String @id @default(uuid()) @db.Uuid
+  title String
+  // Unique: the same story curated twice is an edit, not a second row.
+  url        String @unique
+  sourceName String @map("source_name")
+  // The curator's one-line take — the value-add of the feature.
+  summary  String
+  category String
+  // Original publication date of the story, not the curation date.
+  publishedAt DateTime      @map("published_at") @db.Date
+  curator     Member?       @relation(fields: [curatorId], references: [id])
+  curatorId   String?       @map("curator_id") @db.Uuid
+  status      ContentStatus @default(draft)
+
+  notionPageId String   @unique @map("notion_page_id")
+  syncedAt     DateTime @updatedAt @map("synced_at")
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@map("news_items")
+}
+
+model SyncRun {
+  id       String       @id @default(uuid()) @db.Uuid
+  resource SyncResource
+  trigger  SyncTrigger
+  status   SyncStatus   @default(running)
+  // { created, updated, archived, skipped, warnings: string[] } — one page
+  // failing to map lands here instead of killing the run.
+  stats      Json      @default("{}")
+  error      String?
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+
+  @@index([resource, startedAt(sort: Desc)])
+  @@map("sync_runs")
+}
