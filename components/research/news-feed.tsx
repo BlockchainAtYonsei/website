@@ -49,24 +49,31 @@ export default function NewsFeed({ items }: { items: NewsItem[] }) {
       <div className="mt-6">
         <AnimatePresence mode="popLayout">
           {weeks.map(({ key, label, range, items: weekItems }) => (
+            /* The week gap lives on the section, not the h2: every h2 is the
+               first child of its own section, so a `first:` variant there
+               matches every week and silently cancels the gap. */
             <motion.section
               key={`${active}-${key}`}
+              className="mt-16 first:mt-4"
               layout
               initial={{ opacity: 0, filter: "blur(8px)", y: 12 }}
               animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
               exit={{ opacity: 0, filter: "blur(8px)", y: -8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <h2 className="font-mono mt-10 flex items-baseline gap-3 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase first:mt-4">
+              <h2 className="font-mono flex items-baseline gap-3 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
                 {label}
                 <span className="text-white/30">{range}</span>
               </h2>
+              {/* the week's last row drops its rule — a group should end on
+                  whitespace, not on a divider that reads as belonging to the
+                  next week's heading */}
               <ul className="mt-2">
                 {weekItems.map((item) => (
-                  <li key={item.id}>
+                  <li key={item.id} className="border-b border-white/6 last:border-b-0">
                     <Link
                       href={`/research/news/${item.slug}`}
-                      className="group block border-b border-white/6 py-6"
+                      className="group block py-6"
                     >
                       <div className="font-mono flex flex-wrap items-center justify-between gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
                         <span className="flex items-center gap-3">
