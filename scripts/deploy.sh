@@ -77,6 +77,22 @@ if [ -f backend/Dockerfile ] && [ -f "$ENV_FILE" ]; then
     [ "$i" = 30 ] && { log "bay-backend never became healthy — aborting"; exit 1; }
   done
   log "bay-backend healthy"
+
+  # Sync before the web build, not after. The web image *bakes* the research
+  # pages at build time, and the sync cron only fires every 10 minutes — so on
+  # a fresh volume the build would otherwise prerender an empty site (0
+  # authors, 0 articles) and serve that snapshot to the first visitor after
+  # every container start. The manual trigger is awaited, so this returns once
+  # the rows are in. Not fatal: an unconfigured Notion or a Notion outage
+  # should still deploy the web changes.
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  if curl -sf -m 300 -X POST -H "x-sync-key: ${SYNC_KEY:-}" \
+      http://localhost:4000/v1/sync/all >> "$LOG" 2>&1; then
+    log "pre-build sync ok"
+  else
+    log "WARN: pre-build sync failed — prerender uses whatever the API has now"
+  fi
 elif [ -f backend/Dockerfile ]; then
   # The web build prerenders against the API, so without a backend there is
   # no successful web build either — stop with a clear reason instead of
