@@ -2,6 +2,7 @@ import Link from "next/link";
 import Hero from "@/components/hero";
 import ApplyTrigger from "@/components/apply-modal";
 import BlurText from "@/components/blur-text";
+import HistoryTimeline from "@/components/history-timeline";
 // import Partners from "@/components/partners";
 import SiteFooter from "@/components/site-footer";
 import { ArrowUpRight, CodeIcon, MagnifierIcon } from "@/components/icons";
@@ -223,47 +224,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* History */}
-      <section id="history" className="bg-ink pb-28 md:pb-36">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="font-body mb-6 text-sm font-light text-white/80">
-            {"// History"}
-          </p>
-          <BlurText
-            justify="start"
-            text="The BAY so far"
-            className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
-          />
-          <div className="relative mt-14 max-w-3xl border-l border-white/10 pl-10">
-            {HISTORY.map((y) => (
-              <div key={y.year} className="relative pb-12 last:pb-0">
-                <span className="absolute top-3 -left-[44px] h-2 w-2 rounded-full bg-bay-400 shadow-[0_0_12px_rgba(95,139,255,0.9)]" />
-                <h3 className="font-heading text-3xl tracking-[-1px] text-white md:text-4xl">
-                  {y.year}
-                </h3>
-                <ul className="mt-4 space-y-2.5">
-                  {y.items.map((item) => (
-                    <li key={item.text} className="flex items-baseline gap-4">
-                      <span className="font-mono w-9 shrink-0 text-[10px] tracking-widest text-bay-300/70">
-                        {item.month ?? ""}
-                      </span>
-                      <span
-                        className={`font-body text-sm break-keep ${
-                          item.hl
-                            ? "font-normal text-white"
-                            : "font-light text-white/65"
-                        }`}
-                      >
-                        {item.text}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* History — pinned; vertical scroll drives the horizontal track */}
+      <HistoryTimeline history={HISTORY} />
 
       {/* Partners — held back on purpose. Some of the organizations listed
           are not formal partnerships, and the section shows their logos, so
