@@ -6,9 +6,15 @@ import { usePathname } from "next/navigation";
 /* Hairline progress bar under the sticky header. Lives in the research layout
    so it survives navigation, but only means anything on an article — the index
    is a listing, not something you read to the end. */
+/* Section listings share an article's URL shape but are feeds you scan, so the
+   bar would have nothing to measure — /research/author in particular sat at
+   100% from the first pixel of scroll. */
+const LISTINGS = new Set(["/research/author", "/research/news"]);
+
 export default function ReadingProgress() {
   const pathname = usePathname();
-  const onArticle = /^\/research\/[^/]+$/.test(pathname);
+  const onArticle =
+    /^\/research\/[^/]+$/.test(pathname) && !LISTINGS.has(pathname);
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
