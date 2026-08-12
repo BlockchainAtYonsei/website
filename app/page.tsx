@@ -107,15 +107,16 @@ const HISTORY: {
 const PILLARS: {
   title: string;
   href: string;
-  /* leaves the site, so it opens in a new tab and skips the router */
-  external?: true;
+  /* opens in a new tab and skips the router — Build leaves the site outright,
+     Research is its own property and shouldn't take the landing page with it */
+  newTab?: true;
   Icon: (props: { className?: string }) => React.ReactElement;
 }[] = [
-  { title: "Research", href: "/research", Icon: MagnifierIcon },
+  { title: "Research", href: "/research", newTab: true, Icon: MagnifierIcon },
   {
     title: "Build",
     href: "https://github.com/BlockchainAtYonsei",
-    external: true,
+    newTab: true,
     Icon: CodeIcon,
   },
 ];
@@ -169,7 +170,7 @@ export default function Home() {
             className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
           />
           <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {PILLARS.map(({ title, href, external, Icon }) => {
+            {PILLARS.map(({ title, href, newTab, Icon }) => {
               const card = (
                 <>
                   {/* Same three layers the research cover art uses — grid,
@@ -204,7 +205,7 @@ export default function Home() {
               const cls =
                 "group liquid-glass relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.02] md:min-h-[220px]";
 
-              return external ? (
+              return newTab ? (
                 <a
                   key={title}
                   href={href}
