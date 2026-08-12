@@ -127,14 +127,32 @@ export default function Home() {
       <Hero />
 
       {/* Mission */}
-      <section id="about" className="relative bg-ink py-28 md:py-36">
+      {/* Asymmetric vertical padding: the top gap opens the section after the
+          hero, but the bottom only has to clear the label rhythm inside — the
+          full py-36 left a void between the mission copy and "// What we do". */}
+      <section
+        id="about"
+        className="relative bg-ink pt-28 pb-24 md:pt-36 md:pb-28"
+      >
         <div className="mx-auto max-w-6xl px-6">
           <p className="font-body mb-6 text-sm font-light text-white/80">
             {"// What is BAY"}
           </p>
-          <p className="font-heading mb-16 max-w-4xl text-3xl leading-[1.15] tracking-[-1px] text-balance text-white md:mb-20 md:text-4xl lg:text-5xl">
+          <p className="font-heading mb-8 max-w-4xl text-3xl leading-[1.15] tracking-[-1px] text-balance text-white md:mb-10 md:text-4xl lg:text-5xl">
             Where the brightest minds and talents at Yonsei University learn and
             experience blockchain.
+          </p>
+          <p className="font-body max-w-2xl leading-relaxed font-light text-slate-400">
+            Founded at Yonsei University in 2017, Blockchain at Yonsei (BAY) is{" "}
+            <span className="text-white">
+              Korea’s first and largest university blockchain community
+            </span>
+            .
+          </p>
+          <p className="font-body mt-6 mb-16 max-w-2xl leading-relaxed font-light text-slate-400 md:mb-20">
+            Our members explore blockchain through research, engineering, and
+            ecosystem building, collaborating with leading industry partners
+            while contributing to the broader Web3 ecosystem.
           </p>
           <p className="font-body mb-6 text-sm font-light text-white/80">
             {"// Our mission"}
@@ -145,12 +163,6 @@ export default function Home() {
             className="font-heading text-5xl leading-[1.05] tracking-[-3px] text-white md:text-6xl lg:text-[5.5rem]"
           />
           <p className="font-body mt-8 max-w-2xl leading-relaxed font-light text-slate-400">
-            Founded in 2017, Blockchain at Yonsei is the first blockchain
-            academy to engage and inspire young talents{" "}
-            <span className="text-white">to build innovative solutions</span> in
-            the blockchain and cryptocurrency industry.
-          </p>
-          <p className="font-body mt-6 max-w-2xl leading-relaxed font-light text-slate-400">
             Our mission is to offer in-depth expertise through our research and
             to develop a tangible change by building products with hands-on
             experience, as a team of talented researchers and engineers.
