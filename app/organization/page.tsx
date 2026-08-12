@@ -24,7 +24,18 @@ const EXEC: Officer[] = [
       x: "https://x.com/yemokoo2001",
     },
   },
-  { role: "부학회장", name: "이재근", cohort: "16기" },
+  {
+    role: "부학회장",
+    name: "이재근",
+    cohort: "16기",
+    links: {
+      github: "https://github.com/leejk206",
+      linkedin:
+        "https://www.linkedin.com/in/%EC%9E%AC%EA%B7%BC-%EC%9D%B4-3bb176406",
+      telegram: "https://t.me/leejk206",
+      x: "https://x.com/JkLee25731",
+    },
+  },
 ];
 
 /* One column per team, 가나다 order within each. `weight` is the column's
