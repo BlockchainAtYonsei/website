@@ -141,7 +141,7 @@ export default function Home() {
           </p>
           <BlurText
             justify="start"
-            text="We stack blocks, we chain people."
+            text="First movers, still moving."
             className="font-heading text-5xl leading-[1.05] tracking-[-3px] text-white md:text-6xl lg:text-[5.5rem]"
           />
           <p className="font-body mt-8 max-w-2xl leading-relaxed font-light text-slate-400">
