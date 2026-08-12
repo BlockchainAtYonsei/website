@@ -7,6 +7,9 @@ import { ApplyModal } from "./apply-modal";
 import BayScene from "./bay-scene";
 import ContactModal from "./contact-modal";
 import { ArrowUpRight, CloseIcon, MenuIcon } from "./icons";
+/* The switch renders here, but the state lives in the provider — the dialogs
+   below read the same value. Only those dialogs are translated so far. */
+import { LANGS, useLang } from "./lang-provider";
 
 /* Contact has no href — it opens the dialog instead of navigating anywhere,
    so it is rendered as a button. */
@@ -30,17 +33,6 @@ const NAV_LINKS: {
 const NAV_ITEM =
   "font-body rounded-[0.9rem] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white";
 
-/* Language switch. NOTE: nothing on the site is translated yet — this stores
-   the choice and sets <html lang>, so the copy stays as-is until an i18n layer
-   lands. Kept here rather than hidden behind a flag so the control exists to
-   wire up; `LANG_KEY` is what that layer should read. */
-const LANGS = [
-  { code: "KR", htmlLang: "ko" },
-  { code: "EN", htmlLang: "en" },
-] as const;
-type LangCode = (typeof LANGS)[number]["code"];
-const LANG_KEY = "bay-lang";
-
 const HIDDEN = { filter: "blur(10px)", opacity: 0, y: 20 };
 const VISIBLE = { filter: "blur(0px)", opacity: 1, y: 0 };
 
@@ -49,24 +41,13 @@ export default function Hero() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [applyOpen, setApplyOpen] = useState(false);
-  const [lang, setLang] = useState<LangCode>("KR");
+  const { lang, setLang } = useLang();
   // ?snap=1 jumps straight to the assembled state (screenshots, OG capture)
   const [snap, setSnap] = useState(false);
   useEffect(() => {
     setSnap(new URLSearchParams(window.location.search).has("snap"));
     setMounted(true);
-    /* read after mount, not during render: the server has no localStorage, so
-       reading it inline would hydrate with a different value than it rendered */
-    const saved = localStorage.getItem(LANG_KEY);
-    if (saved === "KR" || saved === "EN") setLang(saved);
   }, []);
-
-  const pickLang = (next: LangCode) => {
-    setLang(next);
-    localStorage.setItem(LANG_KEY, next);
-    document.documentElement.lang =
-      LANGS.find((l) => l.code === next)?.htmlLang ?? "ko";
-  };
 
   const reveal = (delay: number) => ({
     initial: snap ? false : HIDDEN,
@@ -204,7 +185,7 @@ export default function Hero() {
                               key={code}
                               type="button"
                               aria-pressed={active}
-                              onClick={() => pickLang(code)}
+                              onClick={() => setLang(code)}
                               className={`font-mono flex-1 cursor-pointer rounded-[0.65rem] py-1.5 text-[11px] tracking-[0.14em] transition-colors ${
                                 active
                                   ? "bg-white/15 text-white"

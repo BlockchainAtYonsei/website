@@ -6,14 +6,20 @@ import ResearchNav from "./research-nav";
 /* Standalone masthead: BAY RESEARCH reads as its own property rather than a
    breadcrumb hanging off the main site, so the wordmark is set in one weight of
    the hero's display face instead of the serif used for editorial titles.
-   The logo and the wordmark are separate targets on purpose — the logo is the
-   way back to the main site, the wordmark the way back to the research index. */
+   Both the logo and the wordmark lead to the research index, not to the main
+   site: research is opened in a new tab, so the way back to the main site is
+   the tab it was opened from, and a masthead that navigates away from the
+   property would strand the reader in the wrong tab. */
 export default function ResearchHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/8 bg-ink/75 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <div className="flex items-center gap-3">
-          <Link href="/" className="group flex items-center" aria-label="BAY 홈">
+          <Link
+            href="/research"
+            className="group flex items-center"
+            aria-label="BAY Research 홈"
+          >
             <Image
               src="/logo.png"
               alt=""

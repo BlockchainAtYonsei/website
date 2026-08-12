@@ -257,13 +257,12 @@ export default function Home() {
         />
         <div className="relative mx-auto max-w-3xl px-6 text-center">
           <BlurText
-            text="Be the next BAY."
+            text="Be the next BAY"
             className="font-heading text-5xl tracking-[-2px] text-white md:text-7xl"
           />
-          <ApplyTrigger className="liquid-glass-strong font-body mt-9 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white transition-transform hover:scale-[1.03]">
-            지원하기
-            <ArrowUpRight className="h-4 w-4" />
-          </ApplyTrigger>
+          {/* label omitted on purpose — the trigger reads the language switch,
+              which this server-rendered page cannot */}
+          <ApplyTrigger className="liquid-glass-strong font-body mt-9 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white transition-transform hover:scale-[1.03]" />
         </div>
       </section>
 

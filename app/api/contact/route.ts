@@ -25,6 +25,14 @@ const LIMITS = { name: 80, email: 160, affiliation: 120, topic: 60, message: 500
 
 const GENERIC_ERROR = "전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
 
+/* Failures answer with a stable `code` as well as the Korean `error` string.
+   The dialog is bilingual, so it words the failure itself from the code (see
+   lib/i18n); `error` stays for anything that reads this route directly and
+   for logs, and is what a client that ignores `code` still gets. */
+function fail(code: string, error: string, status: number) {
+  return Response.json({ code, error }, { status });
+}
+
 function clean(value: unknown, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
@@ -152,7 +160,7 @@ export async function POST(request: NextRequest) {
   try {
     payload = await request.json();
   } catch {
-    return Response.json({ error: "잘못된 요청입니다." }, { status: 400 });
+    return fail("bad_request", "잘못된 요청입니다.", 400);
   }
 
   // honeypot: a hidden field only a bot would fill. Report success so the bot
@@ -170,13 +178,10 @@ export async function POST(request: NextRequest) {
   };
 
   if (!submission.name || !submission.email || !submission.message) {
-    return Response.json(
-      { error: "이름, 이메일, 메시지를 모두 입력해주세요." },
-      { status: 400 },
-    );
+    return fail("missing_fields", "이름, 이메일, 메시지를 모두 입력해주세요.", 400);
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submission.email)) {
-    return Response.json({ error: "이메일 주소를 확인해주세요." }, { status: 400 });
+    return fail("bad_email", "이메일 주소를 확인해주세요.", 400);
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -188,11 +193,11 @@ export async function POST(request: NextRequest) {
       : await sendViaFormSubmit(submission, request.nextUrl.origin + "/");
   } catch (err) {
     console.error("[contact] delivery threw", err);
-    return Response.json({ error: GENERIC_ERROR }, { status: 502 });
+    return fail("send_failed", GENERIC_ERROR, 502);
   }
 
   if (!sent) {
-    return Response.json({ error: GENERIC_ERROR }, { status: 502 });
+    return fail("send_failed", GENERIC_ERROR, 502);
   }
 
   return Response.json({ ok: true });

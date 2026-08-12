@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { CloseIcon } from "./icons";
+import { useLang } from "./lang-provider";
+import { copyFor } from "@/lib/i18n";
 
 /* Shared dialog shell: backdrop, panel, Escape, scroll lock, focus handling.
    Both the contact and apply overlays need identical behaviour, so it lives
@@ -27,6 +29,8 @@ export default function Modal({
   const panelRef = useRef<HTMLDivElement>(null);
   const restoreTo = useRef<HTMLElement | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { lang } = useLang();
+  const t = copyFor(lang);
 
   useEffect(() => setMounted(true), []);
 
@@ -87,7 +91,7 @@ export default function Modal({
             <button
               type="button"
               onClick={onClose}
-              aria-label="닫기"
+              aria-label={t.close}
               className="absolute top-5 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
             >
               <CloseIcon className="h-5 w-5" />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import LangProvider from "@/components/lang-provider";
 /* Pretendard is the only typeface on the site — Latin and hangul, display
    through mono. Its @font-face rules are self-hosted in ./pretendard.css,
    which globals.css imports, so there is no next/font wiring left here. */
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="bg-ink font-body text-slate-200 antialiased">
-        {children}
+        {/* wraps everything so the switch in the hero menu and the dialogs that
+            read it can sit on different pages; children stay server-rendered */}
+        <LangProvider>{children}</LangProvider>
         {/* film grain — kills gradient banding, adds texture everywhere */}
         <div
           aria-hidden
