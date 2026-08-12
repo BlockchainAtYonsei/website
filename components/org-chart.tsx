@@ -267,9 +267,12 @@ function Roster({
 }
 
 /* A stub down from every node above, one horizontal bus, a stub down into
-   every node below, and a glowing junction dot where each branch leaves the
-   bus. The bus spans the outermost stub on either side, so it reaches the
-   wide row when the two rows differ in width. */
+   every node below, and a small joint where each branch leaves the bus. The
+   joint stays in the lines' own tonal range — a bright glowing bead would be
+   the loudest thing on the page, which inverts the hierarchy: the connector
+   is the least important element in the chart. The bus spans the outermost
+   stub on either side, so it reaches the wide row when the two rows differ
+   in width. */
 function Connector({ from, to }: { from: Pos[]; to: Pos[] }) {
   const all = [...from, ...to];
   const start = all.reduce((a, b) => (a.pct <= b.pct ? a : b));
@@ -301,7 +304,7 @@ function Connector({ from, to }: { from: Pos[]; to: Pos[] }) {
             style={{ left: left(pos) }}
           />
           <span
-            className="absolute top-7 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bay-400 shadow-[0_0_10px_rgba(95,139,255,0.9)]"
+            className="absolute top-7 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bay-300/45"
             style={{ left: left(pos) }}
           />
         </span>

@@ -14,10 +14,13 @@ const NAV_LINKS: {
   label: string;
   href?: string;
   external?: boolean;
+  /* Same-site, but opens in its own tab: research reads as a separate
+     property, so following it should not close down the page you were on. */
+  newTab?: true;
   dialog?: true;
 }[] = [
   { label: "Organization", href: "/organization" },
-  { label: "Research", href: "/research" },
+  { label: "Research", href: "/research", newTab: true },
   { label: "Contact", dialog: true },
 ];
 
@@ -145,13 +148,17 @@ export default function Hero() {
                           </button>
                         );
                       }
-                      // route links go through Link so the research section is a
-                      // client transition, not a full reload; hashes stay <a>
+                      // route links go through Link for a client transition
+                      // rather than a full reload; hashes stay <a>. Link
+                      // forwards target and skips the router for _blank, so a
+                      // newTab entry lands in a fresh tab.
                       const href = link.href ?? "#";
                       return href.startsWith("/") ? (
                         <Link
                           key={link.label}
                           href={href}
+                          target={link.newTab ? "_blank" : undefined}
+                          rel={link.newTab ? "noreferrer" : undefined}
                           onClick={() => setMenuOpen(false)}
                           className={cls}
                         >
