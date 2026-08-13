@@ -37,11 +37,26 @@ export default function CoverArt({
 }) {
   const { glow, wash } = PALETTE[accent];
 
+  /* The mark is sized to the card rather than to a fixed scale: tags come from
+     Notion, and one fixed size cannot serve both "RWA" and "Governance" — the
+     size that fits the long one leaves the short one tiny, and the size that
+     suits the short one runs the long one off the edge.
+
+     Advances are Pretendard's, in ems, rounded up a touch: hangul is full
+     width, caps are far wider than lowercase, and mixing them up is what makes
+     a estimate overflow. 0.86 leaves room for the left inset and a margin. */
+  const ADVANCE = (c: string) =>
+    /[ᄀ-ᇿ㄰-㆏가-힣]/.test(c) ? 1.02 : /[A-Z]/.test(c) ? 0.74 : /[0-9]/.test(c) ? 0.6 : /[a-z]/.test(c) ? 0.55 : 0.34;
+  const units = [...tag].reduce((n, c) => n + ADVANCE(c), 0);
+  const markSize = `${((large ? 0.9 : 0.86) * 100) / Math.max(units, 1)}cqw`;
+
   return (
     <div
       aria-hidden
       className={`relative overflow-hidden ${className}`}
-      style={{ background: wash }}
+      /* inline-size container so the mark can be measured against the card's
+         own width — the same component sits in a 3-up grid and a hero slot */
+      style={{ background: wash, containerType: "inline-size" }}
     >
       <div
         className="absolute inset-0"
@@ -54,11 +69,9 @@ export default function CoverArt({
       {/* soft vignette keeps the mark readable against the glow */}
       <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
       <span
-        /* sized so the longest tag still fits a 3-up card — a mark cropped
-           mid-word reads as a bug, not as a crop */
-        className={`font-heading absolute -bottom-[0.22em] left-4 leading-none text-white/[0.10] select-none ${
-          large ? "text-[7rem] md:text-[11rem]" : "text-[3.25rem] md:text-[4rem]"
-        }`}
+        /* a mark cropped mid-word reads as a bug, not as a crop — see markSize */
+        className="font-heading absolute -bottom-[0.22em] left-4 leading-none whitespace-nowrap text-white/[0.10] select-none"
+        style={{ fontSize: markSize }}
       >
         {tag}
       </span>

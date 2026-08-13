@@ -10,13 +10,32 @@ import { formatDate } from "@/lib/research";
    Rows link to the item's own page (요약/인사이트); the original story is the
    원문 button there. Weekly groups mirror the club's curation sessions. */
 
-export default function NewsFeed({ items }: { items: NewsItem[] }) {
+export default function NewsFeed({
+  items,
+  /* Preselected from ?topic= so arriving from 주제별's 전체 보기 keeps the
+     filter the reader already chose. An unknown value falls back to All
+     rather than showing an empty feed under a chip that isn't there. */
+  initialTag,
+}: {
+  items: NewsItem[];
+  initialTag?: string;
+}) {
   const tags = ["All", ...Array.from(new Set(items.map((n) => n.category)))];
-  const [active, setActive] = useState("All");
+  const [active, setActive] = useState(
+    initialTag && tags.includes(initialTag) ? initialTag : "All",
+  );
   const shown = active === "All" ? items : items.filter((n) => n.category === active);
 
+  /* Newest first, weeks included. The walk below only merges items that are
+     already adjacent, so it reads whatever order it is handed — and an
+     unsorted feed would emit the same week as two separate groups. The API
+     sorts by publishedAt desc today; sorting here makes the page's order its
+     own guarantee rather than a borrowed one. ISO dates compare
+     lexicographically, so a string compare is the chronological one. */
+  const ordered = [...shown].sort((a, b) => b.date.localeCompare(a.date));
+
   const weeks: { key: string; label: string; range: string; items: NewsItem[] }[] = [];
-  for (const item of shown) {
+  for (const item of ordered) {
     const w = weekOf(item.date);
     const last = weeks[weeks.length - 1];
     if (last?.key === w.key) last.items.push(item);
@@ -54,21 +73,31 @@ export default function NewsFeed({ items }: { items: NewsItem[] }) {
                matches every week and silently cancels the gap. */
             <motion.section
               key={`${active}-${key}`}
-              className="mt-16 first:mt-4"
+              className="mt-16 first:mt-12"
               layout
               initial={{ opacity: 0, filter: "blur(8px)", y: 12 }}
               animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
               exit={{ opacity: 0, filter: "blur(8px)", y: -8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <h2 className="font-mono flex items-baseline gap-3 text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
-                {label}
-                <span className="text-white/30">{range}</span>
+              {/* The week is the feed's organising unit, so its heading is set
+                  as one — display size, not the 10px mono label it used to
+                  share with every other bit of metadata on the row. The date
+                  range stays at label size beside it: it annotates the week
+                  rather than naming it, and baseline alignment keeps the two
+                  reading as one line. */}
+              <h2 className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className="font-heading text-2xl tracking-[-0.5px] break-keep text-bay-300 md:text-3xl">
+                  {label}
+                </span>
+                <span className="font-mono text-[10px] tracking-[0.18em] text-white/45 uppercase">
+                  {range}
+                </span>
               </h2>
               {/* the week's last row drops its rule — a group should end on
                   whitespace, not on a divider that reads as belonging to the
                   next week's heading */}
-              <ul className="mt-2">
+              <ul className="mt-5">
                 {weekItems.map((item) => (
                   <li key={item.id} className="border-b border-white/6 last:border-b-0">
                     <Link

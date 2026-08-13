@@ -37,6 +37,30 @@ export async function getNews(): Promise<NewsItem[]> {
   return res?.items ?? [];
 }
 
+/* Every published item, walked through the API's cursor. The landing page is
+   happy with the first 50 because it only ranks the front of the feed; the
+   archive is the one surface whose job is to be complete, so it pages.
+   The page cap is a runaway guard, not a limit anyone should hit — at club
+   cadence it is decades of curation. */
+export async function getAllNews(): Promise<NewsItem[]> {
+  const all: NewsItem[] = [];
+  let cursor: string | null = null;
+
+  for (let page = 0; page < 40; page++) {
+    const q = new URLSearchParams({ size: "50" });
+    if (cursor) q.set("cursor", cursor);
+    const res = await api<{ items: NewsItem[]; nextCursor: string | null }>(
+      `/v1/news?${q}`,
+      TAGS,
+    );
+    if (!res?.items.length) break;
+    all.push(...res.items);
+    if (!res.nextCursor) break;
+    cursor = res.nextCursor;
+  }
+  return all;
+}
+
 export function getNewsItem(slug: string): Promise<NewsDetail | null> {
   return api<NewsDetail>(`/v1/news/${encodeURIComponent(slug)}`, TAGS);
 }
