@@ -64,6 +64,18 @@ export async function getAuthors(): Promise<Author[]> {
   return (res?.items ?? []).map(narrow);
 }
 
+/* The whole visible roster — the /organization chart's data source. Errors
+   degrade to an empty list so the page renders its fallback note instead of
+   failing the build when the backend is unreachable. */
+export async function getRoster(): Promise<Author[]> {
+  try {
+    const res = await api<{ items: RawAuthor[] }>("/v1/members", TAGS);
+    return (res?.items ?? []).map(narrow);
+  } catch {
+    return [];
+  }
+}
+
 /* Detail resolves regardless of roster visibility, and ships both profile
    tabs — written research and curated news — in the same payload. */
 export async function getAuthor(

@@ -56,7 +56,7 @@ function Rail({
               <p className="font-mono mt-2 flex items-center gap-2.5 text-[10px] tracking-[0.15em] text-white/40 uppercase">
                 {n.curator && <span>{n.curator.name}</span>}
                 <span>{formatDate(n.date)}</span>
-                <span className="text-bay-300/70">{n.category}</span>
+                <span className="text-bay-300/70">{n.categories.join(" · ")}</span>
               </p>
             </Link>
           </li>
@@ -73,6 +73,19 @@ function Rail({
       )}
     </section>
   );
+}
+
+
+/* Content Summary arrives as the curator typed it into the Notion property:
+   bullet or numbered lines separated by newlines. Rendering keeps their line
+   structure but replaces their markers ("•", "1.") with the site's own, so a
+   summary reads as a list rather than a run-on paragraph — and numbering
+   isn't doubled. */
+function summaryLines(summary: string): string[] {
+  return summary
+    .split(/\n+/)
+    .map((l) => l.trim().replace(/^([•·▪‣\-–—]|\d+[.)])\s*/, ""))
+    .filter(Boolean);
 }
 
 export default async function NewsDetailPage(
@@ -99,7 +112,10 @@ export default async function NewsDetailPage(
         <article>
           <header>
             <div className="flex flex-wrap items-center gap-3">
-              <TagChip label={item.category} />
+              {/* every topic the curator tagged, not just the first */}
+              {item.categories.map((c) => (
+                <TagChip key={c} label={c} />
+              ))}
               <span className="font-mono text-[10px] tracking-[0.18em] text-bay-300/80 uppercase">
                 {week.label}
               </span>
@@ -111,13 +127,11 @@ export default async function NewsDetailPage(
             <h1 className="font-heading mt-6 max-w-3xl text-3xl leading-[1.15] tracking-[-1px] break-keep text-white md:text-5xl">
               {item.title}
             </h1>
-            {item.summary && (
-              <p className="font-body mt-6 max-w-2xl text-lg leading-relaxed font-light break-keep text-slate-400">
-                {item.summary}
-              </p>
-            )}
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-white/8 pt-6">
+            {/* Byline right under the title, where an article signs itself —
+                it used to sit below the summary, splitting the content in
+                half with a profile card. */}
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-6">
               {item.curator ? (
                 <Link
                   href={`/research/author/${item.curator.slug}`}
@@ -144,6 +158,31 @@ export default async function NewsDetailPage(
                 {item.views.toLocaleString("en-US")} views
               </span>
             </div>
+
+            {/* The curators write the summary as bullet lines in a Notion
+                property; one <p> collapsed the newlines and their numbering
+                read as a run-on blob. Split on the line structure they typed
+                and give it back its bullets. */}
+            {summaryLines(item.summary).length > 0 && (
+              <div className="mt-8">
+                <p className="font-mono mb-4 text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+                  Summary
+                </p>
+                <ul className="max-w-2xl space-y-3">
+                  {summaryLines(item.summary).map((line, i) => (
+                    <li key={i} className="flex gap-3.5">
+                      <span
+                        aria-hidden
+                        className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-bay-300/80"
+                      />
+                      <span className="font-body text-[15px] leading-relaxed font-light break-keep text-slate-300">
+                        {line}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </header>
 
           {item.body.length > 0 && (
@@ -152,8 +191,9 @@ export default async function NewsDetailPage(
             </div>
           )}
 
-          {/* the way out to the original story — always present, and the only
-              external link on the page */}
+          {/* the way out to the original story — the only external link on
+              the page, and absent when the write-up stands alone */}
+          {item.url && (
           <a
             href={item.url}
             target="_blank"
@@ -163,6 +203,7 @@ export default async function NewsDetailPage(
             원문 보기
             <ArrowUpRight className="h-4 w-4" />
           </a>
+          )}
         </article>
 
         {/* the reference layout's right column; below lg it would just push

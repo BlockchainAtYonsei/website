@@ -1,6 +1,7 @@
 // BAY backend schema — see docs/backend-design.md §2.
-// Notion is the source of truth; the only write path is the sync worker,
-// so every content row carries its notion_page_id and sync bookkeeping.
+// Notion is the source of truth for content (articles, news): those rows carry
+// their notion_page_id and are written only by the sync worker. The member
+// roster is owned by this database — seeded and edited via scripts/seed-members.ts.
 
 generator client {
   provider = "prisma-client"
@@ -34,7 +35,6 @@ enum Accent {
 }
 
 enum SyncResource {
-  members
   articles
   news
 }
@@ -67,9 +67,8 @@ model Member {
   avatarUrl String?      @map("avatar_url")
   status    MemberStatus @default(active)
   // Roster visibility on the site; hidden members still resolve as bylines.
-  visible      Boolean  @default(true)
-  notionPageId String   @unique @map("notion_page_id")
-  syncedAt     DateTime @updatedAt @map("synced_at")
+  visible   Boolean  @default(true)
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   articles ArticleAuthor[]
   curated  NewsItem[]
@@ -130,15 +129,23 @@ model NewsItem {
   // the page id so curators never have to invent one.
   slug  String @unique
   title String
-  // Unique: the same story curated twice is an edit, not a second row.
-  url        String @unique
-  sourceName String @map("source_name")
+  // Unique when present: the same story curated twice is an edit, not a second
+  // row. Nullable because a quarter of the published items carry no link — the
+  // curator's write-up is the piece, and the original is a courtesy.
+  url        String? @unique
+  sourceName String  @default("") @map("source_name")
   // The curator's one-line take — the value-add of the feature.
   summary  String
   // Block[] — 요약/인사이트 authored in the Notion page body; [] = link-only.
-  body     Json   @default("[]")
-  views    Int    @default(0)
-  category String
+  body  Json    @default("[]")
+  views Int     @default(0)
+  // The 리서치팀's own "이번 주 꼭 볼 것" checkbox, rather than something the
+  // site infers from dates.
+  pick  Boolean @default(false)
+  // Notion's Topic is a multi-select and stories genuinely carry two or three
+  // — 보안 and DeFi at once. Ordered as the curator tagged them, so the first
+  // is the one a cramped surface shows.
+  categories String[]
   // Original publication date of the story, not the curation date.
   publishedAt DateTime      @map("published_at") @db.Date
   curator     Member?       @relation(fields: [curatorId], references: [id])
@@ -149,6 +156,7 @@ model NewsItem {
   syncedAt     DateTime @updatedAt @map("synced_at")
 
   @@index([status, publishedAt(sort: Desc)])
+  @@index([categories], type: Gin)
   @@map("news_items")
 }
 

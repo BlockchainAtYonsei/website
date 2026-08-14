@@ -10,10 +10,19 @@ export type NewsItem = {
   id: string;
   slug: string;
   title: string;
-  url: string; // the original story
+  /* The original story. Absent on a fifth of the feed — the curator's
+     write-up is the piece and the link is a courtesy. */
+  url: string | null;
   sourceName: string;
   summary: string;
-  category: string;
+  /* Notion's Topic is a multi-select — a story is 보안 and DeFi at once. In
+     the curator's tagging order, so [0] is the one a cramped surface shows. */
+  categories: string[];
+  /* The 리서치팀's own "이번 주 꼭 볼 것" checkbox in Notion. */
+  pick: boolean;
+  /* First image out of the write-up's body — the card thumbnail. Null falls
+     back to generated cover art. */
+  imageUrl: string | null;
   date: string; // ISO — the story's original publication date
   views: number;
   curator: { slug: string; name: string; avatarUrl: string | null } | null;
@@ -22,8 +31,21 @@ export type NewsItem = {
 export type NewsDetail = NewsItem & {
   body: Block[]; // [] = link-only item
   latest: NewsItem[]; // sidebar rail: newest overall
-  related: NewsItem[]; // sidebar rail: same category
+  related: NewsItem[]; // sidebar rail: shares a topic
 };
+
+
+/* The summary as one clamp-friendly line for cards and rows. Curators write
+   it as bullet lines; a card that clamps two lines must not spend them on
+   "•" markers and hard breaks. The detail page keeps the full structure —
+   this is for everywhere smaller. */
+export function summaryPreview(summary: string): string {
+  return summary
+    .split(/\n+/)
+    .map((l) => l.trim().replace(/^([•·▪‣\-–—]|\d+[.)])\s*/, ""))
+    .filter(Boolean)
+    .join(" ");
+}
 
 const TAGS = ["news"];
 

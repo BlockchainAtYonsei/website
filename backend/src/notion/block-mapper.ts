@@ -109,19 +109,45 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
     listItems = [];
   };
 
+  /* A list item's subtree, flattened into the flat list the renderer knows:
+     the item's own line absorbs any nested prose (the write-ups indent an
+     item's explanation as a child paragraph), and nested list items — either
+     kind — become further items of the same list. Nesting is presentation
+     here, not structure, so flattening loses indentation but no words. */
+  const flattenItem = (b: NotionBlock): string[] => {
+    let own =
+      b.type === "bulleted_list_item"
+        ? toMicroformat(b.bulleted_list_item.rich_text)
+        : b.type === "numbered_list_item"
+          ? toMicroformat(b.numbered_list_item.rich_text)
+          : "";
+    const trailing: string[] = [];
+    for (const child of (b.children ?? []) as NotionBlock[]) {
+      if (child.type === "bulleted_list_item" || child.type === "numbered_list_item") {
+        trailing.push(...flattenItem(child));
+        continue;
+      }
+      const rt = (child as never)[child.type] as
+        | { rich_text?: RichTextItemResponse[] }
+        | undefined;
+      if (rt?.rich_text?.length) {
+        const text = toMicroformat(rt.rich_text).replace(/\n/g, " ").trim();
+        if (text) own = own ? `${own} — ${text}` : text;
+      } else if (child.type !== "divider") {
+        warnings.push(`unsupported block type "${child.type}" (${child.id}) skipped`);
+      }
+    }
+    return own.trim() ? [own, ...trailing] : trailing;
+  };
+
   for (const b of notionBlocks) {
     if (b.type === "bulleted_list_item" || b.type === "numbered_list_item") {
       const t = b.type === "bulleted_list_item" ? "ul" : "ol";
-      const text =
-        b.type === "bulleted_list_item"
-          ? toMicroformat(b.bulleted_list_item.rich_text)
-          : toMicroformat(b.numbered_list_item.rich_text);
       if (listType !== t) {
         flushList();
         listType = t;
       }
-      if (text.trim()) listItems.push(text);
-      if (b.has_children) warnings.push(`list item ${b.id}: nested items dropped`);
+      listItems.push(...flattenItem(b));
       continue;
     }
     flushList();
@@ -162,8 +188,54 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
       case "divider":
         blocks.push({ t: "divider" });
         break;
-      default:
-        warnings.push(`unsupported block type "${b.type}" (${b.id}) skipped`);
+      case "image": {
+        /* The URL leaves here as whatever Notion handed over — an expiring
+           signed link for uploads, permanent for external images. The sync
+           re-hosts uploads after mapping; this stays pure. */
+        const img = b.image;
+        const url = img.type === "file" ? img.file.url : img.external.url;
+        if (url) {
+          const caption = plainText(img.caption).trim();
+          blocks.push({ t: "image", url, ...(caption ? { caption } : {}) });
+        }
+        break;
+      }
+      case "toggle": {
+        /* A toggle is a paragraph that hides its children; on a static page
+           there is nothing to toggle, so both halves render in order. */
+        const text = toMicroformat(b.toggle.rich_text).trim();
+        if (text) blocks.push({ t: "p", text });
+        break;
+      }
+      default: {
+        /* A type the renderer has no shape for still must not cost the words
+           inside it — the live pages hide heading_4s and code blocks in their
+           write-ups. Text-bearing strays render as plain paragraphs and the
+           warning says so; only genuinely textless blocks (image, embed) are
+           skipped outright. */
+        const rt = (b as never)[b.type] as
+          | { rich_text?: RichTextItemResponse[] }
+          | undefined;
+        const text = rt?.rich_text?.length
+          ? toMicroformat(rt.rich_text).replace(/\n/g, " ").trim()
+          : "";
+        if (text) {
+          blocks.push({ t: "p", text });
+          warnings.push(`block type "${b.type}" (${b.id}) rendered as plain text`);
+        } else {
+          warnings.push(`unsupported block type "${b.type}" (${b.id}) skipped`);
+        }
+      }
+    }
+
+    /* Whatever hangs beneath a prose block reads on, in order — indented
+       paragraphs under a paragraph are the same authoring habit as under a
+       list item. Tables are excluded: their children are the rows, already
+       consumed above. */
+    if (b.children?.length && b.type !== "table") {
+      const nested = mapBlocks(b.children as NotionBlock[]);
+      blocks.push(...nested.blocks);
+      warnings.push(...nested.warnings);
     }
   }
   flushList();

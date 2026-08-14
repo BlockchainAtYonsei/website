@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import ArticleCard from "./article-card";
-import type { NewsItem } from "@/lib/news";
+import { summaryPreview, type NewsItem } from "@/lib/news";
 import { formatDate, type Article } from "@/lib/research";
 
 /* The profile's two bodies of work: written research and curated news.
@@ -78,7 +78,9 @@ export default function AuthorTabs({
                       <span>{formatDate(item.date)}</span>
                       <span aria-hidden className="h-px w-4 bg-white/20" />
                       <span>{item.sourceName}</span>
-                      <span className="text-bay-300/70">{item.category}</span>
+                      <span className="text-bay-300/70">
+                        {item.categories.join(" · ")}
+                      </span>
                     </span>
                     <span>{item.views.toLocaleString("en-US")} views</span>
                   </div>
@@ -87,7 +89,7 @@ export default function AuthorTabs({
                   </h3>
                   {item.summary && (
                     <p className="font-body mt-2 max-w-3xl text-sm leading-relaxed font-light break-keep text-slate-400">
-                      {item.summary}
+                      {summaryPreview(item.summary)}
                     </p>
                   )}
                 </Link>

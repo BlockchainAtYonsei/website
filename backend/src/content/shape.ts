@@ -75,6 +75,18 @@ export const ARTICLE_INCLUDE = {
   authors: { include: { member: true }, orderBy: { ord: "asc" as const } },
 };
 
+
+/* The first image in a body, surfaced so list cards can show the story's
+   real picture instead of generated cover art. Null when the write-up has
+   none — the card falls back to the cover art it always had. */
+function firstImageUrl(body: unknown): string | null {
+  if (!Array.isArray(body)) return null;
+  for (const b of body as { t?: string; url?: string }[]) {
+    if (b?.t === "image" && typeof b.url === "string") return b.url;
+  }
+  return null;
+}
+
 /* Shared by the news endpoints and the member profile's 뉴스 tab. */
 export function toNewsItem(n: NewsItem & { curator: Member | null }) {
   return {
@@ -84,7 +96,9 @@ export function toNewsItem(n: NewsItem & { curator: Member | null }) {
     url: n.url,
     sourceName: n.sourceName,
     summary: n.summary,
-    category: n.category,
+    categories: n.categories,
+    pick: n.pick,
+    imageUrl: firstImageUrl(n.body),
     date: isoDate(n.publishedAt),
     views: n.views,
     curator: n.curator

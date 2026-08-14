@@ -213,7 +213,6 @@ async function main() {
         avatarUrl: m.avatarUrl,
         status: "active",
         visible: true,
-        notionPageId: `mock-member-${m.slug}`,
       },
     });
     idBySlug.set(m.slug, row.id);

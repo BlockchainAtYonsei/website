@@ -26,7 +26,9 @@ export class NewsService {
     const items = await this.prisma.newsItem.findMany({
       where: {
         status: "published",
-        ...(filter.category ? { category: filter.category } : {}),
+        /* "carries this topic", not "is this topic" — a story tagged 보안 and
+           DeFi has to answer to both chips. */
+        ...(filter.category ? { categories: { has: filter.category } } : {}),
         ...(filter.from ? { publishedAt: { gte: new Date(filter.from) } } : {}),
         ...(filter.to ? { publishedAt: { lte: new Date(filter.to) } } : {}),
         ...(keyset
@@ -50,18 +52,23 @@ export class NewsService {
     };
   }
 
+  /* Topics by how often they are used. groupBy cannot reach inside an array
+     column, so the counting happens in Postgres via unnest — one row per tag
+     per story, then grouped. */
   async categories() {
-    const groups = await this.prisma.newsItem.groupBy({
-      by: ["category"],
-      where: { status: "published" },
-      _count: { category: true },
-      orderBy: { _count: { category: "desc" } },
-    });
-    return { items: groups.map((g) => g.category) };
+    const rows = await this.prisma.$queryRaw<{ category: string }[]>`
+      SELECT unnest(categories) AS category
+      FROM news_items
+      WHERE status = 'published'
+      GROUP BY category
+      ORDER BY count(*) DESC, category ASC
+    `;
+    return { items: rows.map((r) => r.category) };
   }
 
   /* Detail = the item + its body + both sidebar rails: latest overall and
-     same-category, each excluding the item itself. One call renders the page. */
+     topic-adjacent, each excluding the item itself. One call renders the
+     page. */
   async bySlug(slug: string) {
     const item = await this.prisma.newsItem.findFirst({
       where: { status: "published", slug },
@@ -79,7 +86,9 @@ export class NewsService {
       this.prisma.newsItem.findMany(rail),
       this.prisma.newsItem.findMany({
         ...rail,
-        where: { ...rail.where, category: item.category },
+        /* Overlapping topics, not an exact match: with several tags per item
+           "same category" is a shared one. */
+        where: { ...rail.where, categories: { hasSome: item.categories } },
       }),
     ]);
 

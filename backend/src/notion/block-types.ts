@@ -12,4 +12,7 @@ export type Block =
   | { t: "quote"; text: string; cite?: string }
   | { t: "callout"; title?: string; text: string }
   | { t: "table"; head: string[]; rows: string[][] }
+  /* url is re-hosted at sync time when storage is configured — a raw Notion
+     file URL expires within the hour and must never ship as-is to prod. */
+  | { t: "image"; url: string; caption?: string }
   | { t: "divider" };

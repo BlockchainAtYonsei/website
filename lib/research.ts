@@ -14,6 +14,7 @@ export type Block =
   | { t: "quote"; text: string; cite?: string }
   | { t: "callout"; title?: string; text: string }
   | { t: "table"; head: string[]; rows: string[][] }
+  | { t: "image"; url: string; caption?: string }
   | { t: "divider" };
 
 /* cover art palettes — pulled from the hero's atmosphere gradient so research

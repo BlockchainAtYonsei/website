@@ -26,17 +26,28 @@ export class NotionService {
 
   constructor(private readonly config: ConfigService) {}
 
+  /* True when anything at all can sync. The cron uses this to decide whether
+     to bother; `configuredFor` decides which resources actually run. */
   get configured(): boolean {
-    return Boolean(
-      this.config.get("NOTION_TOKEN") &&
-        this.config.get("NOTION_DB_MEMBERS") &&
-        this.config.get("NOTION_DB_ARTICLES") &&
-        this.config.get("NOTION_DB_NEWS"),
+    return (
+      Boolean(this.config.get("NOTION_TOKEN")) &&
+      (["articles", "news"] as const).some((r) => this.configuredFor(r))
     );
   }
 
+  /* Per resource, because the databases arrive one at a time: news went live
+     against a real Notion DB while articles were still mock, and a global
+     check meant the missing one blocked the ready one. */
+  configuredFor(resource: "articles" | "news"): boolean {
+    const key = {
+      articles: "NOTION_DB_ARTICLES",
+      news: "NOTION_DB_NEWS",
+    }[resource];
+    return Boolean(this.config.get("NOTION_TOKEN") && this.config.get(key));
+  }
+
   /* Env values may be bare ids or full Notion URLs — accept both. */
-  databaseId(envKey: "NOTION_DB_MEMBERS" | "NOTION_DB_ARTICLES" | "NOTION_DB_NEWS"): string {
+  databaseId(envKey: "NOTION_DB_ARTICLES" | "NOTION_DB_NEWS"): string {
     const raw = this.config.getOrThrow<string>(envKey);
     const id = extractNotionId(raw);
     if (!id) throw new Error(`${envKey}: "${raw}" is not a Notion id or URL`);
@@ -89,28 +100,41 @@ export class NotionService {
     return pages;
   }
 
-  /* Top-level blocks of a page, with children attached for tables (rows live
-     one level down). Other nesting is out of the v1 renderer's scope — the
-     mapper warns when it drops some. */
-  async pageBlocks(pageId: string): Promise<NotionBlock[]> {
-    const top = (
+  /* A page's title text — how the articles sync turns a 작성자 relation into a
+     name it can match against the roster. Null when the page is inaccessible
+     or its title is empty; the caller decides what a nameless author means. */
+  async pageTitle(pageId: string): Promise<string | null> {
+    const page = await this.client.pages.retrieve({ page_id: pageId });
+    if (!isFullPage(page)) return null;
+    for (const prop of Object.values(page.properties)) {
+      if (prop.type === "title") {
+        const text = prop.title.map((r) => r.plain_text).join("").trim();
+        return text || null;
+      }
+    }
+    return null;
+  }
+
+  /* The page's full block tree. Children are fetched wherever Notion says
+     they exist — the news write-ups keep most of their prose one level down,
+     as indented paragraphs under numbered items, and fetching only the top
+     level was silently dropping ~80% of some pages' text. Depth is capped at
+     a value no real write-up reaches, purely as a runaway guard. */
+  async pageBlocks(pageId: string, depth = 0): Promise<NotionBlock[]> {
+    const blocks = (
       await collectPaginatedAPI(this.client.blocks.children.list, {
         block_id: pageId,
         page_size: 100,
       })
     ).filter(isFullBlock);
 
+    if (depth >= 4) return blocks;
     return Promise.all(
-      top.map(async (block): Promise<NotionBlock> => {
-        if (block.type !== "table" || !block.has_children) return block;
-        const children = (
-          await collectPaginatedAPI(this.client.blocks.children.list, {
-            block_id: block.id,
-            page_size: 100,
-          })
-        ).filter(isFullBlock);
-        return { ...block, children };
-      }),
+      blocks.map(async (block): Promise<NotionBlock> =>
+        block.has_children
+          ? { ...block, children: await this.pageBlocks(block.id, depth + 1) }
+          : block,
+      ),
     );
   }
 }

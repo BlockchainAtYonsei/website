@@ -178,6 +178,25 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
                 </table>
               </div>
             );
+          case "image":
+            /* plain <img>, like the avatars — the sources are our own R2/S3
+               copies (or Notion URLs in local dev), so next/image's remote
+               domain allow-list would only add configuration to keep in sync */
+            return (
+              <figure key={i} className="my-10">
+                <img
+                  src={b.url}
+                  alt={b.caption ?? ""}
+                  loading="lazy"
+                  className="w-full rounded-[1.25rem] border border-white/8"
+                />
+                {b.caption && (
+                  <figcaption className="font-body mt-3 text-center text-xs font-light break-keep text-slate-500">
+                    {b.caption}
+                  </figcaption>
+                )}
+              </figure>
+            );
           case "divider":
             return (
               <hr
