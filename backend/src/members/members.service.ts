@@ -13,9 +13,11 @@ export class MembersService {
   constructor(private readonly prisma: PrismaService) {}
 
   /* Roster: visible members only. `writers` narrows to people with published
-     articles — the research Authors directory is for finding writing, not
-     reproducing the org chart. Every item carries its published count so the
-     frontend can order by output without N+1 calls. */
+     work — articles or curated news, since a 리서치팀원 whose output so far is
+     all news tracking still has a profile page worth finding. The directory
+     is for finding writing, not reproducing the org chart. Every item carries
+     its published counts so the frontend can order by output without N+1
+     calls. */
   async list(filter: {
     cohort?: number;
     team?: string;
@@ -23,19 +25,38 @@ export class MembersService {
     writers?: boolean;
   }) {
     const published = { article: { status: "published" as const } };
+    const publishedNews = { status: "published" as const };
     const members = await this.prisma.member.findMany({
       where: {
         visible: true,
         ...(filter.cohort !== undefined ? { cohort: filter.cohort } : {}),
         ...(filter.team ? { team: filter.team } : {}),
         ...(filter.status ? { status: filter.status } : {}),
-        ...(filter.writers ? { articles: { some: published } } : {}),
+        ...(filter.writers
+          ? {
+              OR: [
+                { articles: { some: published } },
+                { curated: { some: publishedNews } },
+              ],
+            }
+          : {}),
       },
-      include: { _count: { select: { articles: { where: published } } } },
+      include: {
+        _count: {
+          select: {
+            articles: { where: published },
+            curated: { where: publishedNews },
+          },
+        },
+      },
       orderBy: [{ cohort: "asc" }, { name: "asc" }],
     });
     return {
-      items: members.map((m) => ({ ...toAuthor(m), articleCount: m._count.articles })),
+      items: members.map((m) => ({
+        ...toAuthor(m),
+        articleCount: m._count.articles,
+        newsCount: m._count.curated,
+      })),
     };
   }
 
@@ -61,6 +82,11 @@ export class MembersService {
     ]);
     return {
       ...toAuthor(member),
+      /* counts the list endpoint promises on every Author — the profile's
+         stats panel reads them, and articles/news.length is their
+         definition here */
+      articleCount: articles.length,
+      newsCount: news.length,
       articles: articles.map(toArticleListItem),
       news: news.map(toNewsItem),
     };

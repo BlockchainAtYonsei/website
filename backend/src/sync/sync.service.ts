@@ -9,12 +9,13 @@ import type { SyncRunModel as SyncRun } from "../generated/prisma/models";
 import { NotionService } from "../notion/notion.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { ArticlesSyncService } from "./articles.sync";
-import { MembersSyncService } from "./members.sync";
 import { NewsSyncService } from "./news.sync";
 import { RevalidateService } from "./revalidate.service";
 import type { RunStats } from "./sync.types";
 
-export const RESOURCES: SyncResource[] = ["members", "articles", "news"];
+/* Content only — the member roster is owned by this database (see
+   scripts/seed-members.ts) and has no Notion counterpart to sync. */
+export const RESOURCES: SyncResource[] = ["articles", "news"];
 
 /* Notion last_edited_time is minute-granular; overlap the cursor so an edit
    landing in the same minute as the previous run isn't missed. Upserts make
@@ -31,14 +32,13 @@ export class SyncService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notion: NotionService,
-    private readonly members: MembersSyncService,
     private readonly articles: ArticlesSyncService,
     private readonly news: NewsSyncService,
     private readonly revalidate: RevalidateService,
   ) {}
 
-  /* members → articles → news: articles resolve author relations against the
-     member rows written moments earlier (design §4). */
+  /* articles → news, both resolving their author names against the DB-owned
+     member roster. */
   async run(
     resource: SyncResource | "all",
     trigger: SyncTrigger,
@@ -46,9 +46,15 @@ export class SyncService {
   ): Promise<SyncRun[]> {
     /* Nest exceptions so the manual-trigger endpoint reports real status
        codes; the cron caller just logs .message either way. */
-    if (!this.notion.configured) {
+    /* Configuration is checked per resource, not globally: news is the only
+       database that has to exist for the feature that runs on it, and a
+       missing NOTION_DB_ARTICLES used to silently stop news from syncing
+       too. */
+    const resources = resource === "all" ? RESOURCES : [resource];
+    const runnable = resources.filter((r) => this.notion.configuredFor(r));
+    if (runnable.length === 0) {
       throw new ServiceUnavailableException(
-        "Notion is not configured (NOTION_TOKEN / NOTION_DB_* missing)",
+        `Notion is not configured for ${resources.join(", ")} (NOTION_TOKEN / NOTION_DB_* missing)`,
       );
     }
     if (this.running) {
@@ -56,9 +62,8 @@ export class SyncService {
     }
     this.running = true;
     try {
-      const resources = resource === "all" ? RESOURCES : [resource];
       const runs: SyncRun[] = [];
-      for (const r of resources) {
+      for (const r of runnable) {
         runs.push(await this.runOne(r, trigger, full));
       }
       return runs;
@@ -68,7 +73,7 @@ export class SyncService {
   }
 
   private syncer(resource: SyncResource) {
-    return { members: this.members, articles: this.articles, news: this.news }[resource];
+    return { articles: this.articles, news: this.news }[resource];
   }
 
   private async runOne(

@@ -58,6 +58,11 @@ export function tableRow(cells: RichTextItemResponse[][]): NotionBlock {
 export const prop = {
   title: (text: string) => ({ type: "title", title: text ? [rt(text)] : [] }),
   richText: (text: string) => ({ type: "rich_text", rich_text: text ? [rt(text)] : [] }),
+  /* rich_text carrying a hyperlink — how the news DB stores its Source. */
+  link: (text: string, href: string) => ({
+    type: "rich_text",
+    rich_text: [rt(text, { href })],
+  }),
   number: (n: number | null) => ({ type: "number", number: n }),
   select: (name: string | null) => ({ type: "select", select: name ? { name } : null }),
   status: (name: string | null) => ({ type: "status", status: name ? { name } : null }),
@@ -65,6 +70,14 @@ export const prop = {
   checkbox: (checked: boolean) => ({ type: "checkbox", checkbox: checked }),
   date: (start: string | null) => ({ type: "date", date: start ? { start } : null }),
   relation: (ids: string[]) => ({ type: "relation", relation: ids.map((id) => ({ id })) }),
+  multiSelect: (names: string[]) => ({
+    type: "multi_select",
+    multi_select: names.map((name) => ({ name })),
+  }),
+  people: (names: string[]) => ({
+    type: "people",
+    people: names.map((name, i) => ({ object: "user", id: `user-${i}`, name })),
+  }),
   files: (url: string) => ({
     type: "files",
     files: [{ type: "file", name: "f", file: { url, expiry_time: "" } }],

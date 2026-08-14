@@ -2,30 +2,6 @@
    sync mappers. Rename a property in Notion → change it here, one place.
    docs/backend-design.md §3 mirrors this table. */
 
-export const MEMBER_PROPS = {
-  name: "이름", // title
-  slug: "Slug", // rich_text — required, [a-z0-9-]
-  cohort: "기수", // number
-  team: "팀", // select
-  position: "직책", // select
-  bio: "소개", // rich_text
-  status: "상태", // select|status: 활동 | 알럼나이
-  visible: "사이트 노출", // checkbox
-  avatar: "프로필 사진", // files
-} as const;
-
-/* url property per social — only filled ones land in the socials array.
-   Labels match the frontend's SocialLabel union. */
-export const MEMBER_SOCIAL_PROPS = [
-  "X",
-  "Telegram",
-  "LinkedIn",
-  "Medium",
-  "Instagram",
-  "GitHub",
-  "Website",
-] as const;
-
 export const ARTICLE_PROPS = {
   title: "제목", // title
   slug: "Slug", // rich_text — required, [a-z0-9-]
@@ -40,16 +16,32 @@ export const ARTICLE_PROPS = {
   cover: "커버", // files (re-hosting deferred — design §3.4)
 } as const;
 
+/* Names as they actually read in the 리서치팀's Blockchain News Tracking DB.
+   That database is the team's weekly working tool, so it sets the vocabulary
+   and this file follows it — renaming their columns to suit the sync would
+   break the views and templates ten people use every week. */
 export const NEWS_PROPS = {
-  title: "제목", // title
-  slug: "Slug", // rich_text — optional; derived from the page id when absent
-  url: "URL", // url — unique key
-  source: "출처", // select|rich_text
-  summary: "코멘트", // rich_text — the curator's one-liner
-  category: "카테고리", // select
-  publishedAt: "원문 발행일", // date
-  curator: "큐레이터", // relation → Members DB
-  status: "상태", // select|status: 발행 | 초안 | 보관
+  /* rich_text, not title: the title property of that database is Insight,
+     which is a scratch field the team leaves as "insight" more often than
+     not. The headline lives in Title. */
+  title: "Title", // rich_text
+  slug: "Slug", // rich_text — no such column today; a pretty-URL lever the
+  // team can add without a code change. Absent → derived from the page id.
+  url: "Source", // rich_text holding a URL — often empty, see the mapper
+  summary: "Content Summary", // rich_text — the curator's write-up
+  category: "Topic", // multi_select
+  publishedAt: "Date of issue", // date
+  curator: "Author", // multi_select of names, matched against the roster
+  status: "Status", // multi_select
+  pick: "Pick", // checkbox — 이번 주 꼭 볼 것
+  /* A card image chosen by hand, for the stories nothing can be crawled from:
+     no Source link, a Source that is a PDF, a publisher that 403s a bot. Same
+     lever as Slug — no such column today, and adding it in Notion needs no
+     code change. URL text (or a linked cell), never Files & media: a Notion
+     upload's URL expires within the hour. */
+  cover: "Cover", // rich_text/url holding an image URL
+  /* Week ("2026.08.09~2026.08.15") exists in the DB but is not mapped —
+     the site derives weeks from Date of issue. */
 } as const;
 
 /* Korean labels are canonical; English accepted so a DB built from Notion's
@@ -57,18 +49,15 @@ export const NEWS_PROPS = {
 export const CONTENT_STATUS_MAP: Record<string, "draft" | "published" | "archived"> = {
   발행: "published",
   published: "published",
+  "홈페이지 게시": "published", // the news DB's own wording for "ship it"
   초안: "draft",
   draft: "draft",
+  "작성 중": "draft",
+  "In progress": "draft",
+  "Not started": "draft",
+  미완성: "draft",
   보관: "archived",
   archived: "archived",
-};
-
-export const MEMBER_STATUS_MAP: Record<string, "active" | "alumni"> = {
-  활동: "active",
-  active: "active",
-  알럼나이: "alumni",
-  알럼: "alumni",
-  alumni: "alumni",
 };
 
 export const ACCENTS = ["blue", "violet", "teal", "indigo"] as const;

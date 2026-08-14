@@ -21,8 +21,7 @@ export default async function NewsPage() {
             News Tracking
           </h1>
           <p className="font-body mt-3 max-w-xl text-sm leading-relaxed font-light break-keep text-slate-400">
-            시장에서 골라 온 소식에 큐레이터의 한 줄을 얹습니다. 제목을 누르면
-            원문으로 이동합니다.
+            시장에서 골라 온 소식에 큐레이터의 한 줄을 얹습니다.
           </p>
         </div>
         <p className="font-mono text-[10px] tracking-[0.18em] text-white/40 uppercase">

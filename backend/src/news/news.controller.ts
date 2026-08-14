@@ -3,9 +3,7 @@ import {
   Controller,
   Get,
   Header,
-  HttpCode,
   Param,
-  Post,
   Query,
 } from "@nestjs/common";
 import { NewsService } from "./news.service";
@@ -52,11 +50,5 @@ export class NewsController {
   @Header("Cache-Control", CACHE)
   bySlug(@Param("slug") slug: string) {
     return this.news.bySlug(slug);
-  }
-
-  @Post(":slug/view")
-  @HttpCode(204)
-  async view(@Param("slug") slug: string) {
-    await this.news.registerView(slug);
   }
 }

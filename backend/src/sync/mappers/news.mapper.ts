@@ -1,45 +1,72 @@
 import type { PageObjectResponse } from "@notionhq/client";
 import {
+  checkboxOf,
   dateOf,
-  relationIdsOf,
+  linkOf,
+  multiSelectOf,
+  namesOf,
   richTextOf,
   selectOf,
-  titleOf,
-  urlOf,
 } from "../../notion/properties";
 import { CONTENT_STATUS_MAP, NEWS_PROPS as P, SLUG_RE } from "../../notion/schema";
 
 export type NewsData = {
   slug: string;
   title: string;
-  url: string;
+  /* Absent on a quarter of the published items — the write-up is the piece
+     and the link is a courtesy, so it cannot be a reason to drop a story. */
+  url?: string;
+  pick: boolean;
   sourceName: string;
   summary: string;
-  category: string;
+  categories: string[];
+  /* A card image the team picked by hand, for stories nothing can be crawled
+     from. Beats the og:image; loses to a picture inside the write-up. */
+  cover?: string;
   publishedAt: string; // ISO date
   status: "draft" | "published" | "archived";
-  curatorPageId?: string;
+  /* Written by hand in Notion, resolved against the member roster in the
+     syncer — the roster lives in this database, so there is no relation to
+     follow. */
+  curatorName?: string;
 };
 
 export type NewsMapResult = { data?: NewsData; warnings: string[] };
 
 export function pageToNews(page: PageObjectResponse): NewsMapResult {
   const warnings: string[] = [];
-  const title = titleOf(page, P.title);
-  const url = urlOf(page, P.url);
+  const title = richTextOf(page, P.title);
+  const rawStatus = namesOf(page, P.status)[0] ?? selectOf(page, P.status);
+
+  /* Their board keeps a run of untouched rows at the bottom as next week's
+     slots. Empty title AND empty status is one of those — skipping it is
+     routine, so it must not file a warning each time or the sync report
+     becomes 26 lines of noise nobody reads. */
+  if (!title && !rawStatus) return { warnings };
 
   const label = title ?? page.id;
-  if (!title) warnings.push(`news ${label}: "${P.title}" is empty — skipped`);
+  if (!title) {
+    warnings.push(`news ${label}: "${P.title}" is empty — skipped`);
+    return { warnings };
+  }
+
+  /* Source is a hyperlink whose visible text is the headline, so the value is
+     the href rather than the text. A row with neither is fine: the write-up is
+     the piece and the original is a courtesy. */
+  const rawUrl = linkOf(page, P.url);
+  let url: string | undefined;
   let host: string | undefined;
   try {
-    host = url ? new URL(url).hostname.replace(/^www\./, "") : undefined;
+    if (rawUrl) {
+      host = new URL(rawUrl).hostname.replace(/^www\./, "");
+      url = rawUrl;
+    }
   } catch {
-    /* fall through to the warning below */
+    warnings.push(
+      `news ${label}: "${P.url}" is not a URL ("${rawUrl?.slice(0, 40)}") — kept without a link`,
+    );
   }
-  if (!url || !host) warnings.push(`news ${label}: "${P.url}" missing or invalid — skipped`);
-  if (!title || !url || !host) return { warnings };
 
-  const rawStatus = selectOf(page, P.status);
   const status = (rawStatus && CONTENT_STATUS_MAP[rawStatus]) || "draft";
   if (rawStatus && !CONTENT_STATUS_MAP[rawStatus]) {
     warnings.push(`news ${label}: unknown "${P.status}" value "${rawStatus}", kept as draft`);
@@ -70,19 +97,53 @@ export function pageToNews(page: PageObjectResponse): NewsMapResult {
     warnings.push(`news ${label}: "${P.slug}" not [a-z0-9-], using page id instead`);
   }
 
+  /* A hand-picked card image. Nonsense in the cell is dropped rather than
+     stored: a broken <img> on the card is worse than the generated art it
+     would have replaced. */
+  const rawCover = linkOf(page, P.cover) ?? richTextOf(page, P.cover);
+  let cover: string | undefined;
+  if (rawCover) {
+    try {
+      const u = new URL(rawCover);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error("scheme");
+      cover = u.href;
+    } catch {
+      /* the cell is filled but not with a link — a note-to-self, a half-pasted
+         URL. Saying so is how it gets finished; silence would read as done. */
+      warnings.push(
+        `news ${label}: "${P.cover}" is not a URL ("${rawCover.slice(0, 40)}") — ignored`,
+      );
+    }
+  }
+
+  /* Deduped: a multi-select cannot hold the same option twice, but nothing
+     downstream should depend on that — the same tag rendered twice on a card
+     is a visible defect and a duplicate React key at once. */
+  const topics = [
+    ...new Set(
+      multiSelectOf(page, P.category) ??
+        (selectOf(page, P.category) ? [selectOf(page, P.category)!] : []),
+    ),
+  ];
+
   return {
     data: {
       slug,
       title,
       url,
-      /* 출처 may be a select or plain text; falls back to the URL's host so a
-         missing property degrades to something true rather than blank */
-      sourceName: selectOf(page, P.source) ?? richTextOf(page, P.source) ?? host,
+      /* The link's host names the source; an item with no link has no source
+         to name — the byline carries the attribution. */
+      sourceName: host ?? "",
       summary,
-      category: selectOf(page, P.category) ?? "General",
+      /* Kept in the curator's tagging order: the first is what a cramped
+         surface shows, so it should be the one they reached for first. An
+         untagged story still needs a bucket to be findable under. */
+      categories: topics.length > 0 ? topics : ["기타"],
       publishedAt: publishedAt.slice(0, 10),
       status,
-      curatorPageId: relationIdsOf(page, P.curator)?.[0],
+      pick: checkboxOf(page, P.pick) ?? false,
+      cover,
+      curatorName: namesOf(page, P.curator)[0],
     },
     warnings,
   };

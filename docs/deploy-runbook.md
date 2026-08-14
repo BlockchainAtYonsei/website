@@ -39,11 +39,13 @@ SYNC_KEY=$(openssl rand -hex 24)
 REVALIDATE_SECRET=$(openssl rand -hex 24)
 REVALIDATE_URL=http://host.docker.internal:3001/api/revalidate
 # Notion — 준비되면 채우고 저장만 하면 됨 (없어도 배포는 됨, 리서치 섹션이 비어 보일 뿐)
+# 멤버는 Notion이 아니라 backend/scripts/seed-members.ts가 원본 — 부팅 시 자동 반영
 NOTION_TOKEN=
-NOTION_DB_MEMBERS=
 NOTION_DB_ARTICLES=
 NOTION_DB_NEWS=
-# 프로필 사진 재호스팅용 R2/S3 — 선택
+# 뉴스 본문 이미지 재호스팅용 R2/S3 — 뉴스 sync를 켰다면 사실상 필수:
+# 미설정이면 Notion 서명 URL을 그대로 저장하는데, 그 URL은 1시간이면 죽는다
+# 설정 절차는 docs/r2-setup.md (운영자에게 그대로 넘기면 되는 단독 문서)
 S3_ENDPOINT=
 S3_REGION=auto
 S3_BUCKET=
@@ -91,3 +93,7 @@ docker exec bay-pg pg_dump -U bay bay > ~/bay-backup-$(date +%Y%m%d).sql
   셋업이 안 된 것입니다.
 - 마이그레이션은 bay-backend 부팅 시 자동 적용되고, 실패하면 기존
   컨테이너가 유지됩니다.
+- **멤버 명단 수정** = `backend/scripts/seed-members.ts` 편집 → 머지.
+  부팅 시 자동으로 upsert됩니다(실패해도 서버는 뜨고 로그만 남음).
+  아티클을 mock으로 채우려면: `docker exec bay-backend npm run seed:mock`
+  (아티클만 갈아엎음 — 멤버·뉴스는 건드리지 않음).

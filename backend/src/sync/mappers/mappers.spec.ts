@@ -1,68 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { page, prop } from "../../notion/test-fixtures";
 import { pageToArticleMeta } from "./article.mapper";
-import { pageToMember } from "./member.mapper";
 import { pageToNews } from "./news.mapper";
-
-function memberProps(over: Record<string, unknown> = {}) {
-  return {
-    이름: prop.title("배예림"),
-    Slug: prop.richText("yerim-bae"),
-    기수: prop.number(17),
-    팀: prop.select("리서치팀"),
-    직책: prop.select("팀장"),
-    소개: prop.richText("리서치팀을 이끕니다."),
-    상태: prop.select("활동"),
-    "사이트 노출": prop.checkbox(true),
-    GitHub: prop.url("https://github.com/yerim"),
-    X: prop.url(null),
-    ...over,
-  };
-}
-
-describe("pageToMember", () => {
-  it("maps a complete page", () => {
-    const { data, warnings } = pageToMember(page(memberProps()));
-    expect(warnings).toEqual([]);
-    expect(data).toMatchObject({
-      slug: "yerim-bae",
-      name: "배예림",
-      cohort: 17,
-      team: "리서치팀",
-      position: "팀장",
-      status: "active",
-      visible: true,
-      socials: [{ label: "GitHub", href: "https://github.com/yerim" }],
-    });
-  });
-
-  it("skips when Slug is missing or malformed", () => {
-    for (const bad of [prop.richText(""), prop.richText("Yerim Bae")]) {
-      const { data, warnings } = pageToMember(page(memberProps({ Slug: bad })));
-      expect(data).toBeUndefined();
-      expect(warnings.join()).toMatch(/Slug/);
-    }
-  });
-
-  it("skips when 기수 is missing", () => {
-    const { data } = pageToMember(page(memberProps({ 기수: prop.number(null) })));
-    expect(data).toBeUndefined();
-  });
-
-  it("accepts a status-type 상태 property and warns on unknown values", () => {
-    const viaStatus = pageToMember(page(memberProps({ 상태: prop.status("알럼나이") })));
-    expect(viaStatus.data?.status).toBe("alumni");
-
-    const unknown = pageToMember(page(memberProps({ 상태: prop.select("휴학") })));
-    expect(unknown.data?.status).toBe("active");
-    expect(unknown.warnings.join()).toMatch(/휴학/);
-  });
-
-  it("lowercases slugs", () => {
-    const { data } = pageToMember(page(memberProps({ Slug: prop.richText("Yerim-Bae") })));
-    expect(data?.slug).toBe("yerim-bae");
-  });
-});
 
 function articleProps(over: Record<string, unknown> = {}) {
   return {
@@ -126,16 +65,23 @@ describe("pageToArticleMeta", () => {
   });
 });
 
+/* Columns and property TYPES are the 리서치팀's Blockchain News Tracking DB
+   verbatim, read off the live database — Title is rich_text rather than the
+   title property (that one is Insight, a scratch field), Source is rich_text
+   holding a link, and Status is a multi_select. Guessing any of those wrong
+   silently syncs nothing, which is what these fixtures exist to catch. */
 function newsProps(over: Record<string, unknown> = {}) {
   return {
-    제목: prop.title("이더리움 다음 하드포크 일정 확정"),
-    URL: prop.url("https://www.theblock.co/post/12345"),
-    출처: prop.select("The Block"),
-    코멘트: prop.richText("일정보다 검증자 이탈률 조항이 핵심."),
-    카테고리: prop.select("Infra"),
-    "원문 발행일": prop.date("2026-08-01"),
-    큐레이터: prop.relation(["member-page-1"]),
-    상태: prop.select("발행"),
+    Insight: prop.title("insight"),
+    Title: prop.richText("이더리움 다음 하드포크 일정 확정"),
+    Source: prop.richText("https://www.theblock.co/post/12345"),
+    "Content Summary": prop.richText("일정보다 검증자 이탈률 조항이 핵심."),
+    Topic: prop.multiSelect(["보안", "DeFi"]),
+    "Date of issue": prop.date("2026-08-01"),
+    Author: prop.multiSelect(["장동현"]),
+    Status: prop.multiSelect(["홈페이지 게시"]),
+    Pick: prop.checkbox(false),
+    Week: prop.richText("2026.07.27~2026.08.02"),
     ...over,
   };
 }
@@ -145,19 +91,81 @@ describe("pageToNews", () => {
     const { data, warnings } = pageToNews(page(newsProps()));
     expect(warnings).toEqual([]);
     expect(data).toMatchObject({
-      sourceName: "The Block",
+      title: "이더리움 다음 하드포크 일정 확정",
+      url: "https://www.theblock.co/post/12345",
       status: "published",
       publishedAt: "2026-08-01",
-      curatorPageId: "member-page-1",
+      curatorName: "장동현",
     });
   });
 
-  it("skips on a missing or invalid URL", () => {
-    for (const bad of [prop.url(null), prop.url("배포전")]) {
-      const { data, warnings } = pageToNews(page(newsProps({ URL: bad })));
-      expect(data).toBeUndefined();
-      expect(warnings.join()).toMatch(/URL/);
+  it("reads 홈페이지 게시 as published and unfinished states as draft", () => {
+    expect(pageToNews(page(newsProps())).data?.status).toBe("published");
+    for (const wip of ["미완성", "In progress", "Not started"]) {
+      const { data, warnings } = pageToNews(page(newsProps({ Status: prop.multiSelect([wip]) })));
+      expect(data?.status).toBe("draft");
+      expect(warnings).toEqual([]);
     }
+  });
+
+  it("keeps a story that has no Source link — a fifth of them have none", () => {
+    const { data, warnings } = pageToNews(page(newsProps({ Source: prop.richText("") })));
+    expect(data?.url).toBeUndefined();
+    expect(data?.title).toBe("이더리움 다음 하드포크 일정 확정");
+    expect(data?.sourceName).toBe("");
+    expect(warnings).toEqual([]);
+  });
+
+  it("takes the link out of a Source hyperlink, not its visible text", () => {
+    /* How the DB actually holds it: the headline is the text, the article is
+       the href. Reading the text would store the headline as the URL. */
+    const { data, warnings } = pageToNews(
+      page(newsProps({ Source: prop.link("칼시 열풍…순손실", "https://www.blockmedia.co.kr/archives/1118567") })),
+    );
+    expect(data?.url).toBe("https://www.blockmedia.co.kr/archives/1118567");
+    expect(data?.sourceName).toBe("blockmedia.co.kr");
+    expect(warnings).toEqual([]);
+  });
+
+  it("treats unlinked text in Source as no link, quietly", () => {
+    const { data, warnings } = pageToNews(page(newsProps({ Source: prop.richText("추후 추가") })));
+    expect(data?.url).toBeUndefined();
+    expect(warnings).toEqual([]);
+  });
+
+  it("passes the Pick checkbox through", () => {
+    expect(pageToNews(page(newsProps())).data?.pick).toBe(false);
+    expect(pageToNews(page(newsProps({ Pick: prop.checkbox(true) }))).data?.pick).toBe(true);
+  });
+
+  it("skips the board's blank filler rows without filing a warning", () => {
+    const { data, warnings } = pageToNews(
+      page(newsProps({ Title: prop.richText(""), Status: prop.multiSelect([]) })),
+    );
+    expect(data).toBeUndefined();
+    expect(warnings).toEqual([]);
+  });
+
+  it("keeps every Topic, in the curator's order", () => {
+    expect(pageToNews(page(newsProps())).data?.categories).toEqual(["보안", "DeFi"]);
+  });
+
+  it("buckets an untagged story rather than leaving it unfindable", () => {
+    const { data } = pageToNews(page(newsProps({ Topic: prop.multiSelect([]) })));
+    expect(data?.categories).toEqual(["기타"]);
+  });
+
+  it("reads Topic and Author whichever property type they are", () => {
+    const asSelect = pageToNews(
+      page(newsProps({ Topic: prop.select("기관"), Author: prop.select("배예림") })),
+    );
+    expect(asSelect.data).toMatchObject({ categories: ["기관"], curatorName: "배예림" });
+
+    const asPeople = pageToNews(page(newsProps({ Author: prop.people(["이성재"]) })));
+    expect(asPeople.data?.curatorName).toBe("이성재");
+
+    const asText = pageToNews(page(newsProps({ Author: prop.richText("노제희, 이재환") })));
+    expect(asText.data?.curatorName).toBe("노제희");
   });
 
   it("derives a slug from the page id when Slug is absent", () => {
@@ -171,14 +179,33 @@ describe("pageToNews", () => {
     expect(data?.slug).toBe("joint-crypto-unit");
   });
 
-  it("falls back to the URL host when 출처 is empty", () => {
-    const { data } = pageToNews(page(newsProps({ 출처: prop.select(null) })));
-    expect(data?.sourceName).toBe("theblock.co");
+  it("falls back to the URL host for the source name — their DB has no 출처", () => {
+    expect(pageToNews(page(newsProps())).data?.sourceName).toBe("theblock.co");
   });
 
-  it("warns when a published item has no curator comment", () => {
-    const { data, warnings } = pageToNews(page(newsProps({ 코멘트: prop.richText("") })));
+  it("warns when a published item has no write-up", () => {
+    const { data, warnings } = pageToNews(
+      page(newsProps({ "Content Summary": prop.richText("") })),
+    );
     expect(data?.summary).toBe("");
-    expect(warnings.join()).toMatch(/코멘트/);
+    expect(warnings.join()).toMatch(/Content Summary/);
+  });
+
+  it("reads a hand-picked Cover, as a URL cell or as linked text", () => {
+    const url = "https://upload.wikimedia.org/wikipedia/commons/x.jpg";
+    expect(pageToNews(page(newsProps({ Cover: prop.url(url) }))).data?.cover).toBe(url);
+    expect(pageToNews(page(newsProps({ Cover: prop.link("표지", url) }))).data?.cover).toBe(url);
+  });
+
+  it("has no Cover until the column exists — the lever is opt-in", () => {
+    const { data, warnings } = pageToNews(page(newsProps()));
+    expect(data?.cover).toBeUndefined();
+    expect(warnings).toEqual([]);
+  });
+
+  it("drops a Cover that is not a URL rather than shipping a broken image", () => {
+    const { data, warnings } = pageToNews(page(newsProps({ Cover: prop.richText("나중에 찾기") })));
+    expect(data?.cover).toBeUndefined();
+    expect(warnings.join()).toMatch(/"Cover" is not a URL/);
   });
 });

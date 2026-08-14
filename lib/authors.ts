@@ -32,6 +32,8 @@ export type Author = {
   avatarUrl: string | null;
   socials: Social[];
   articleCount: number;
+  /* curated news tracking items — 뉴스만 쓴 큐레이터도 디렉토리에 선다 */
+  newsCount: number;
 };
 
 const KNOWN_LABELS = new Set<string>([
@@ -62,6 +64,18 @@ const TAGS = ["members"];
 export async function getAuthors(): Promise<Author[]> {
   const res = await api<{ items: RawAuthor[] }>("/v1/members?writers=1", TAGS);
   return (res?.items ?? []).map(narrow);
+}
+
+/* The whole visible roster — the /organization chart's data source. Errors
+   degrade to an empty list so the page renders its fallback note instead of
+   failing the build when the backend is unreachable. */
+export async function getRoster(): Promise<Author[]> {
+  try {
+    const res = await api<{ items: RawAuthor[] }>("/v1/members", TAGS);
+    return (res?.items ?? []).map(narrow);
+  } catch {
+    return [];
+  }
 }
 
 /* Detail resolves regardless of roster visibility, and ships both profile

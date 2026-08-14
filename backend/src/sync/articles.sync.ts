@@ -22,13 +22,25 @@ export class ArticlesSyncService {
       opts.since,
     );
 
-    /* 작성자 relation resolves against members already synced — the orchestrator
-       runs members first. A page pointing at a not-yet-synced member skips
-       with a warning and lands on the next run. */
-    const members = await this.prisma.member.findMany({
-      select: { id: true, notionPageId: true },
-    });
-    const memberIdByPage = new Map(members.map((m) => [m.notionPageId, m.id]));
+    /* 작성자 is a relation to Notion pages this database knows nothing about —
+       the roster lives here, not in Notion. So each related page's title is
+       fetched once and matched against member names, the same
+       whitespace-stripped matching the news sync uses. A name held by two
+       members resolves to neither: guessing a byline is worse than skipping. */
+    const members = await this.prisma.member.findMany({ select: { id: true, name: true } });
+    const memberIdByName = new Map<string, string | null>();
+    for (const m of members) {
+      const key = m.name.replace(/\s+/g, "");
+      memberIdByName.set(key, memberIdByName.has(key) ? null : m.id);
+    }
+    const titleCache = new Map<string, string | null>();
+    const authorId = async (pageId: string): Promise<string | undefined> => {
+      if (!titleCache.has(pageId)) {
+        titleCache.set(pageId, await this.notion.pageTitle(pageId).catch(() => null));
+      }
+      const name = titleCache.get(pageId);
+      return (name && memberIdByName.get(name.replace(/\s+/g, ""))) || undefined;
+    };
 
     for (const page of pages) {
       const { meta, warnings } = pageToArticleMeta(page);
@@ -38,11 +50,11 @@ export class ArticlesSyncService {
         continue;
       }
 
-      const authorIds = meta.authorPageIds.map((id) => memberIdByPage.get(id));
+      const authorIds = await Promise.all(meta.authorPageIds.map(authorId));
       if (authorIds.some((id) => id === undefined)) {
         stats.skipped++;
         stats.warnings.push(
-          `article ${meta.slug}: 작성자 not found among synced members — will retry next run`,
+          `article ${meta.slug}: 작성자 matches no member in the roster — add them via seed-members and re-sync`,
         );
         continue;
       }

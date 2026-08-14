@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { weekOf, type NewsItem } from "@/lib/news";
+import { summaryPreview, weekOf, type NewsItem } from "@/lib/news";
 import type { Accent } from "@/lib/research";
 import Avatar from "./avatar";
 import CoverArt from "./cover-art";
@@ -13,26 +14,45 @@ import { ArrowUpRight } from "../icons";
    weight to every story, which is the wrong shape for a page you arrive at
    cold — these sections rank instead.
 
-   Two gaps against the design, both in the data rather than here:
+   One gap against the design, in the data rather than here: news items carry
+   no image, so the hero and the topic grid use the same generated cover art
+   the research cards use. A real `imageUrl` on the Notion DB would slot
+   straight into <CoverArt>'s place. Topics, which were the other gap, now
+   come through in full — Notion's Topic is a multi-select and a card shows
+   every tag the curator applied.
 
-     - news items carry no image. The hero and the topic grid use the same
-       generated cover art the research cards use; a real `imageUrl` on the
-       Notion DB would slot straight into <CoverArt>'s place.
-     - an item carries one category, so a card shows one chip, not the two or
-       three the mock pairs up. Multiple chips need a tags relation first.
-
-   "Editor's Picks" is derived, not flagged: it is the newest week's curation,
-   which is what "이번주 꼭 봐야 할 이슈" describes. A real pick flag on the
-   Notion DB would replace `thisWeek` below and nothing else. */
+   "Editor's Picks" reads the team's own Pick checkbox. It falls back to the
+   newest week's curation when nothing is ticked, so the band never goes blank
+   on a week nobody got round to marking. */
 
 const RAIL_SIZE = 4; // stories in The Latest, beside the hero
 const PICK_SIZE = 6; // cards in Editor's Picks — two rows of three
 const TOPIC_CHIPS = 8; // topics shown before 더보기
 const TOPIC_SIZE = 9; // three rows of three, then out to the archive
 
-/* Chip tints, picked by a hash of the topic so a category keeps its colour
-   across sections and reorderings without anyone maintaining a mapping —
-   these come from Notion and change without a deploy. */
+/* The topic options as they stand in the Notion DB, tinted to echo the colours
+   they already wear there — a curator who tags 보안 green sees green here.
+   Notion's palette is set on light; these are the dark-surface equivalents.
+
+   Not a whitelist: a topic added in Notion appears the moment a story carries
+   it, just with a hashed colour until it is named here. Nothing breaks, so
+   this table can lag behind without anyone noticing at 2am. */
+const TOPIC_TINTS: Record<string, string> = {
+  DeFi: "bg-orange-500/15 text-orange-200",
+  RWA: "bg-orange-500/15 text-orange-200",
+  시장: "bg-bay-500/15 text-bay-200",
+  투자: "bg-violet-500/15 text-violet-200",
+  기관: "bg-fuchsia-500/15 text-fuchsia-200",
+  스테이블코인: "bg-rose-500/15 text-rose-200",
+  보안: "bg-emerald-500/15 text-emerald-200",
+  기술: "bg-amber-500/15 text-amber-200",
+  "규제/법안": "bg-slate-400/15 text-slate-200",
+  예측시장: "bg-slate-400/15 text-slate-200",
+  기타: "bg-slate-400/15 text-slate-200",
+};
+
+/* Fallback for anything not in the table above, so an unnamed topic still
+   keeps one colour everywhere on the page instead of flickering per render. */
 const TINTS = [
   "bg-bay-500/15 text-bay-200",
   "bg-emerald-500/15 text-emerald-200",
@@ -49,18 +69,36 @@ function hash(s: string): number {
   return h;
 }
 
-const tintOf = (topic: string) => TINTS[hash(topic) % TINTS.length];
+const tintOf = (topic: string) =>
+  TOPIC_TINTS[topic] ?? TINTS[hash(topic) % TINTS.length];
 const accentOf = (topic: string) => ACCENTS[hash(topic) % ACCENTS.length];
 
 /* "2026-08-11" → "08.11". The year is carried by the section, not the row. */
 const monthDay = (iso: string) => iso.slice(5).replace("-", ".");
 
-function TopicChip({ topic }: { topic: string }) {
+/* Every tag the story carries. Capped at three so a heavily-tagged item can't
+   push the byline off its own card — the rest stay reachable through the
+   topic filter, which is where someone browsing by tag is looking anyway. */
+function TopicChips({ topics, max = 3 }: { topics: string[]; max?: number }) {
+  /* Deduped here too: the mapper already does it, but this component also
+     renders whatever an older row in the database happens to hold, and a
+     repeated key would take the card down rather than just look wrong. */
+  const shown = [...new Set(topics)].slice(0, max);
   return (
-    <span
-      className={`font-body rounded-full px-2.5 py-1 text-[11px] font-medium whitespace-nowrap ${tintOf(topic)}`}
-    >
-      {topic}
+    <span className="flex flex-wrap items-center justify-end gap-1.5">
+      {shown.map((topic) => (
+        <span
+          key={topic}
+          className={`font-body rounded-full px-2.5 py-1 text-[11px] font-medium whitespace-nowrap ${tintOf(topic)}`}
+        >
+          {topic}
+        </span>
+      ))}
+      {topics.length > shown.length && (
+        <span className="font-mono text-[10px] text-slate-500">
+          +{topics.length - shown.length}
+        </span>
+      )}
     </span>
   );
 }
@@ -132,10 +170,14 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
     if (!feed.length) return [];
     const above = new Set([hero, ...rail].map((n) => n.id));
     const rest = feed.filter((n) => !above.has(n.id));
+
+    const ticked = rest.filter((n) => n.pick);
+    if (ticked.length > 0) return ticked.slice(0, PICK_SIZE);
+
+    /* Nothing ticked — fall back to the newest curation week so the band still
+       says something rather than disappearing. */
     const key = weekOf(feed[0].date).key;
     const week = rest.filter((n) => weekOf(n.date).key === key);
-    /* Prefer this week, but a quiet week must not blank a whole band of the
-       page — under three left and older items backfill, still newest first. */
     return (week.length >= 3 ? week : rest).slice(0, PICK_SIZE);
   }, [feed, hero, rail]);
 
@@ -143,16 +185,27 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
      to the front on their own. */
   const topics = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const n of feed) counts.set(n.category, (counts.get(n.category) ?? 0) + 1);
+    /* One story counts once per topic it carries, so the chips add up to more
+       than the feed — which is the honest reading of "how much 보안 is here". */
+    for (const n of feed) {
+      for (const c of n.categories) counts.set(c, (counts.get(c) ?? 0) + 1);
+    }
     return [...counts.entries()]
       .map(([topic, count]) => ({ topic, count }))
-      .sort((a, b) => b.count - a.count || a.topic.localeCompare(b.topic));
+      /* 기타 last whatever its count — it is the bucket for everything that
+         didn't fit a topic, so leading with it says nothing. */
+      .sort(
+        (a, b) =>
+          Number(a.topic === "기타") - Number(b.topic === "기타") ||
+          b.count - a.count ||
+          a.topic.localeCompare(b.topic),
+      );
   }, [feed]);
 
   const [topic, setTopic] = useState<string | null>(null);
   const [allTopics, setAllTopics] = useState(false);
   const shownTopics = allTopics ? topics : topics.slice(0, TOPIC_CHIPS);
-  const byTopic = topic ? feed.filter((n) => n.category === topic) : feed;
+  const byTopic = topic ? feed.filter((n) => n.categories.includes(topic)) : feed;
 
   /* Three rows and out. The section is a sampler of what each topic holds, not
      the archive — the chip counts say how much is behind it and 전체 보기 goes
@@ -182,29 +235,58 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
             href={`/research/news/${hero.slug}`}
             className="group liquid-glass flex flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.01] lg:col-span-7"
           >
-            <CoverArt
-              accent={accentOf(hero.category)}
-              tag={hero.category}
-              large
-              className="aspect-[16/9] w-full"
-            />
+            {hero.imageUrl ? (
+              /* the story's own picture beats generated art every time. The
+                 photos arrive in every temperature a newsroom ships, so the
+                 same bottom vignette CoverArt bakes in goes over every real
+                 photo too — that alone is enough to sit them beside each
+                 other. They keep their colour: draining it made a room of
+                 press photos read as an archive. */
+              <div className="relative aspect-[16/9] w-full overflow-hidden">
+                {/* through /_next/image, not hot-linked: publishers ship
+                    1400px+ originals (up to 2.2MB measured) that turned
+                    topic-switching into a 2-3s wait — the optimizer serves
+                    card-sized WebPs from our own host instead */}
+                <Image
+                  src={hero.imageUrl}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+              </div>
+            ) : (
+              <CoverArt
+                accent={accentOf(hero.categories[0] ?? "")}
+                tag={hero.categories[0] ?? "News"}
+                large
+                className="aspect-[16/9] w-full"
+              />
+            )}
             <div className="flex flex-1 flex-col p-6 md:p-7">
               <h3 className="font-heading text-2xl leading-[1.15] tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-3xl">
                 {hero.title}
               </h3>
               {hero.summary && (
                 <p className="font-body mt-4 line-clamp-2 text-sm leading-relaxed font-light break-keep text-slate-400">
-                  {hero.summary}
+                  {summaryPreview(hero.summary)}
                 </p>
               )}
               <div className="mt-7 flex flex-wrap items-center justify-between gap-3">
                 <Byline item={hero} />
-                <TopicChip topic={hero.category} />
+                <TopicChips topics={hero.categories} />
               </div>
             </div>
           </Link>
 
-          <div className="liquid-glass rounded-[1.25rem] p-6 md:p-7 lg:col-span-5">
+          {/* The rail is as tall as the hero beside it, and four items of
+              their own height left a hand's width of glass empty under the
+              last one. The list takes the leftover instead: each row grows to
+              an equal share of it and centres its lines, so the dividers stay
+              evenly spaced and the panel ends where the hero does. */}
+          <div className="liquid-glass flex flex-col rounded-[1.25rem] p-6 md:p-7 lg:col-span-5">
             <div className="flex items-baseline justify-between gap-4 border-b border-white/15 pb-4">
               <h3 className="font-heading text-xl tracking-[-0.5px] text-white">
                 The Latest
@@ -220,12 +302,18 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               </Link>
             </div>
 
-            <ul>
+            <ul className="flex flex-1 flex-col">
               {rail.map((item) => (
-                <li key={item.id} className="border-b border-white/8 last:border-b-0">
-                  <Link href={`/research/news/${item.slug}`} className="group block py-4">
+                <li
+                  key={item.id}
+                  className="flex-1 border-b border-white/8 last:border-b-0"
+                >
+                  <Link
+                    href={`/research/news/${item.slug}`}
+                    className="group flex h-full flex-col justify-center py-4"
+                  >
                     <p className="font-body text-[11px] font-medium text-bay-300">
-                      {item.category}
+                      {item.categories.join(" · ")}
                     </p>
                     <h4 className="font-body mt-1.5 text-[15px] leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                       {item.title}
@@ -252,21 +340,46 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               <Link
                 key={item.id}
                 href={`/research/news/${item.slug}`}
-                className="group liquid-glass flex h-full flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.015]"
+                className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
               >
-                <h3 className="font-body text-lg leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
-                  {item.title}
-                </h3>
-                {item.summary && (
-                  <p className="font-body mt-3 line-clamp-2 text-sm leading-relaxed font-light break-keep text-slate-400">
-                    {item.summary}
-                  </p>
+                {/* Same picture-then-prose card as 주제별 below: a pick is the
+                    band the page wants you to stop at, so it should not be the
+                    one section that reads as a wall of text. What still tells
+                    the two apart is the write-up — a pick keeps its summary. */}
+                {item.imageUrl ? (
+                  <div className="relative aspect-[16/9] w-full overflow-hidden">
+                    <Image
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  </div>
+                ) : (
+                  <CoverArt
+                    accent={accentOf(item.categories[0] ?? "")}
+                    tag={item.categories[0] ?? "News"}
+                    className="aspect-[16/9] w-full"
+                  />
                 )}
-                {/* mt-auto pins the footer to the card floor, so a short title
-                    and a long one still line their bylines up across a row */}
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-7">
-                  <Byline item={item} />
-                  <TopicChip topic={item.category} />
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-body text-lg leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
+                    {item.title}
+                  </h3>
+                  {item.summary && (
+                    <p className="font-body mt-3 line-clamp-2 text-sm leading-relaxed font-light break-keep text-slate-400">
+                      {summaryPreview(item.summary)}
+                    </p>
+                  )}
+                  {/* mt-auto pins the footer to the card floor, so a short
+                      title and a long one still line their bylines up across
+                      a row */}
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-7">
+                    <Byline item={item} />
+                    <TopicChips topics={item.categories} />
+                  </div>
                 </div>
               </Link>
             ))}
@@ -332,18 +445,31 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               href={`/research/news/${item.slug}`}
               className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
             >
-              <CoverArt
-                accent={accentOf(item.category)}
-                tag={item.category}
-                className="aspect-[16/9] w-full"
-              />
+              {item.imageUrl ? (
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
+                  <Image
+                    src={item.imageUrl}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                </div>
+              ) : (
+                <CoverArt
+                  accent={accentOf(item.categories[0] ?? "")}
+                  tag={item.categories[0] ?? "News"}
+                  className="aspect-[16/9] w-full"
+                />
+              )}
               <div className="flex flex-1 flex-col p-6">
                 <h3 className="font-body text-base leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                   {item.title}
                 </h3>
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
                   <Byline item={item} />
-                  <TopicChip topic={item.category} />
+                  <TopicChips topics={item.categories} />
                 </div>
               </div>
             </Link>

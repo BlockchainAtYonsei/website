@@ -14,6 +14,10 @@ export type Block =
   | { t: "quote"; text: string; cite?: string }
   | { t: "callout"; title?: string; text: string }
   | { t: "table"; head: string[]; rows: string[][] }
+  | { t: "image"; url: string; caption?: string }
+  /* a display line the author set apart from the prose — a diagram, a
+     structure sketch, actual code. Rendered verbatim, newlines and all. */
+  | { t: "code"; text: string; lang?: string }
   | { t: "divider" };
 
 /* cover art palettes — pulled from the hero's atmosphere gradient so research

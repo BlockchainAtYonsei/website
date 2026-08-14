@@ -4,16 +4,21 @@
 
 ## 0. 설계 원칙
 
-**Notion이 어드민이다.** 학회 운영진이 이미 쓰는 Notion을 저작·관리 UI로 삼고,
-백엔드는 Notion → PostgreSQL 동기화 + 읽기 전용 API만 담당한다.
+**콘텐츠는 Notion이 어드민이다.** 리서치팀이 이미 쓰는 Notion을 저작 UI로
+삼고, 백엔드는 Notion → PostgreSQL 동기화 + 읽기 전용 API만 담당한다.
 어드민 페이지를 따로 만들지 않는 것이 이 설계의 가장 큰 결정이다.
 
+**예외 — 멤버는 이 DB가 원본이다.** 리서치 노션의 팀원 문서는 로스터
+(기수·팀·직책·소셜)를 담을 수 없는 형태라, 명단은
+`backend/scripts/seed-members.ts`가 소유하고 편집한다. Notion의 작성자 값은
+이 로스터와 **이름 매칭**으로만 연결된다.
+
 ```
-┌─────────┐   sync (cron/webhook)   ┌────────────┐   REST(JSON)   ┌──────────┐
+┌─────────┐   sync (cron/manual)    ┌────────────┐   REST(JSON)   ┌──────────┐
 │ Notion  │ ──────────────────────▶ │  NestJS    │ ─────────────▶ │ Next.js  │
-│ 3 DBs   │                         │ + Postgres │   ISR/tag 캐시 │  (기존)  │
-└─────────┘                         └────────────┘                └──────────┘
-  저작/관리                          동기화 + 서빙                   렌더링
+│ 콘텐츠  │                         │ + Postgres │   ISR/tag 캐시 │  (기존)  │
+└─────────┘                         └─(멤버 원본)┘                └──────────┘
+  저작                               동기화 + 서빙                   렌더링
 ```
 
 - **Postgres가 서빙 스토어**: 사이트는 절대 Notion을 직접 치지 않는다.
@@ -46,17 +51,16 @@ erDiagram
     members {
         uuid id PK
         text slug UK "yerim-bae"
-        text name "배예림"
+        text name "배예림 — 뉴스/아티클 작성자 이름 매칭의 키"
         int cohort "17"
-        text team "리서치팀"
-        text position "팀장 | 부장 | 부원 | 회장 ..."
+        text team "리서치팀 (운영진은 빈 문자열)"
+        text position "학회장 | 부학회장 | 부장 | 팀장 | 부원"
         text bio
         jsonb socials "[{label, href}]"
         text avatar_url "nullable"
         enum status "active | alumni"
         bool visible "사이트 노출 여부"
-        text notion_page_id UK
-        timestamptz synced_at
+        timestamptz updated_at
     }
     articles {
         uuid id PK
@@ -82,20 +86,24 @@ erDiagram
     }
     news_items {
         uuid id PK
+        text slug UK "페이지 id 유도 (Slug 컬럼이 생기면 그 값)"
         text title
-        text url UK
-        text source_name "CoinDesk, The Block ..."
-        text summary "BAY 큐레이터 코멘트"
-        text category
+        text url UK "nullable — 링크 없는 큐레이션도 한 편"
+        text source_name "링크의 호스트에서 유도"
+        text summary "큐레이터의 Content Summary"
+        jsonb body "Block[] — 요약/인사이트 페이지 본문"
+        text_array categories "Topic multi-select 그대로 (GIN)"
+        bool pick "이번 주 꼭 볼 것"
+        int views
         date published_at "원문 발행일"
-        uuid curator_id FK "nullable"
-        enum status "draft | published"
+        uuid curator_id FK "nullable — 이름 매칭 실패는 빈 바이라인"
+        enum status "draft | published | archived"
         text notion_page_id UK
         timestamptz synced_at
     }
     sync_runs {
         uuid id PK
-        enum resource "members | articles | news"
+        enum resource "articles | news"
         enum trigger "cron | manual | webhook"
         enum status "running | ok | error"
         jsonb stats "created/updated/skipped/warnings[]"
@@ -130,102 +138,32 @@ erDiagram
 - **기수/모집 상태**(`CLOSED_COHORT`/`NEXT_COHORT`)는 v1에서는 프론트 상수
   유지. 옮기고 싶으면 `site_settings` 단일행 JSONB 테이블 하나면 끝.
 
-### Prisma 스키마 스케치
+### Prisma 스키마
 
-```prisma
-model Member {
-  id           String   @id @default(uuid())
-  slug         String   @unique
-  name         String
-  cohort       Int
-  team         String
-  position     String
-  bio          String   @default("")
-  socials      Json     @default("[]")
-  avatarUrl    String?
-  status       MemberStatus @default(active)
-  visible      Boolean  @default(true)
-  notionPageId String   @unique
-  syncedAt     DateTime @updatedAt
-  articles     ArticleAuthor[]
-  curated      NewsItem[]
-
-  @@index([cohort, team])
-}
-
-model Article {
-  id                 String   @id @default(uuid())
-  slug               String   @unique
-  title              String
-  dek                String
-  category           String
-  accent             Accent   @default(blue)
-  status             ContentStatus @default(draft)
-  publishedAt        DateTime? @db.Date
-  featured           Boolean  @default(false)
-  body               Json     // Block[] — 프론트 lib/research.ts 계약
-  readingMinutes     Int      @default(1)
-  coverUrl           String?
-  mediumUrl          String?
-  notionPageId       String   @unique
-  notionLastEditedAt DateTime
-  authors            ArticleAuthor[]
-
-  @@index([status, publishedAt(sort: Desc)])
-}
-
-model ArticleAuthor {
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId String
-  member    Member  @relation(fields: [memberId], references: [id])
-  memberId  String
-  ord       Int     @default(0)
-
-  @@id([articleId, memberId])
-}
-
-model NewsItem {
-  id           String   @id @default(uuid())
-  title        String
-  url          String   @unique
-  sourceName   String
-  summary      String
-  category     String
-  publishedAt  DateTime @db.Date
-  curator      Member?  @relation(fields: [curatorId], references: [id])
-  curatorId    String?
-  status       ContentStatus @default(draft)
-  notionPageId String   @unique
-  syncedAt     DateTime @updatedAt
-
-  @@index([status, publishedAt(sort: Desc)])
-}
-```
+실물은 `backend/prisma/schema.prisma` — 여기 사본을 두면 틀린 쪽이 생긴다.
+위 ER 다이어그램은 조인 구조를 읽기 위한 지도일 뿐, 컬럼의 진실은 스키마
+파일과 마이그레이션이다.
 
 ## 3. Notion 구조와 매핑
 
-Notion 데이터베이스 3개. 속성 이름은 sync 설정에 상수로 박는다.
+동기화 대상 Notion 데이터베이스는 2개(아티클·뉴스). 속성 이름은
+`backend/src/notion/schema.ts`에 상수로 박는다 — Notion에서 컬럼명을 바꾸면
+고칠 곳도 거기 하나다.
 
-### 3.1 Members DB
+### 3.1 멤버 — Notion 아님
 
-| Notion 속성 | 타입 | → DB |
-|---|---|---|
-| 이름 | title | `name` |
-| Slug | rich_text | `slug` (필수·유니크 — 없으면 sync 경고, 스킵) |
-| 기수 | number | `cohort` |
-| 팀 | select | `team` |
-| 직책 | select | `position` |
-| 소개 | rich_text | `bio` |
-| X / GitHub / LinkedIn / ... | url ×7 | `socials` (값 있는 것만) |
-| 프로필 사진 | files | `avatar_url` (§3.4 재호스팅) |
-| 상태 | select (활동/알럼나이) | `status` |
-| 사이트 노출 | checkbox | `visible` |
+리서치 노션의 팀원 문서에는 로스터가 없다(제목·소개뿐). 명단·기수·팀·직책·
+소셜·한줄소개는 `backend/scripts/seed-members.ts`가 원본이고,
+`npm run seed:members`가 편집 반영 경로다(슬러그 upsert — 재실행 안전).
+조직도(`/organization`)와 리서치 작성자 페이지가 같은 행을 읽는다.
 
 ### 3.2 Research DB — 페이지 본문이 곧 아티클
 
 속성: 제목(title), Slug, Dek, 카테고리(select), Accent(select), 상태(select:
-초안/발행/보관), 발행일(date), Featured(checkbox), 작성자(**relation →
-Members DB**, 다중 = 공저), Medium URL(url), 커버(files).
+초안/발행/보관), 발행일(date), Featured(checkbox), 작성자(relation — sync가
+relation 대상 페이지의 **제목을 읽어 로스터와 이름 매칭**, 다중 = 공저),
+Medium URL(url), 커버(files). *아직 실 DB 미접속 — 접속 시 뉴스처럼 실측
+후 속성 이름을 맞출 것(뉴스에서 전 속성이 추정과 달랐다).*
 
 **본문 매핑** — 페이지 블록 트리 → 기존 `Block` union:
 
@@ -246,14 +184,17 @@ Members DB**, 다중 = 공저), Medium URL(url), 커버(files).
 annotation(bold/code)과 link를 이 문법으로 직렬화한다. 렌더러 수정 없음,
 XSS 표면 없음(원래부터 `dangerouslySetInnerHTML` 미사용).
 
-### 3.3 News DB
+### 3.3 News DB — 리서치팀의 Blockchain News Tracking (실측)
 
-속성: 제목(title), Slug(rich_text — 선택, 없으면 페이지 id에서 유도),
-URL(url — 유니크 키), 출처(select 또는 rich_text), 코멘트(rich_text — 상세
-페이지의 덱), 카테고리(select), 원문 발행일(date), 큐레이터(relation →
-Members), 상태(select).
-**페이지 본문 = 요약/인사이트** — 아티클과 같은 블록 매핑으로 뉴스 상세
-페이지(`/research/news/[slug]`)에 발행된다. 본문이 비면 링크-온리.
+리서치팀이 매주 실제로 쓰는 보드라 어휘는 그쪽이 정한다. 실제 속성:
+Title(rich_text — title 속성은 Insight라는 스크래치 필드), Source(rich_text
+하이퍼링크 — 표시 텍스트는 헤드라인, 값은 href), Content Summary(rich_text),
+Topic(multi_select — 복수 유지), Author(multi_select의 이름 — 로스터와 이름
+매칭), Date of issue(date), Status(multi_select — "홈페이지 게시" = 발행),
+Pick(checkbox), Week(미사용 — 주차는 날짜에서 유도).
+**페이지 본문 = 요약/인사이트** — 아티클과 같은 블록 매핑(중첩 블록 재귀
+수집 포함)으로 뉴스 상세 페이지(`/research/news/[slug]`)에 발행된다. 본문이
+비면 링크-온리. 본문 이미지는 §3.4 재호스팅 대상.
 
 ### 3.4 이미지 주의점
 
@@ -261,9 +202,11 @@ Notion `files` URL은 **만료되는 S3 서명 URL**이다. 그대로 저장하�
 깨진다. sync가 다운로드해서 자체 스토리지(S3/R2 버킷 하나)에 올리고 그 URL을
 저장한다.
 
-- **아바타는 v1 필수** — 리서치 페이지가 프로필 사진을 쓰므로, 멤버 sync에
-  아바타 재호스팅(다운로드 → 버킷 업로드 → 콘텐츠 해시로 변경 감지)이
-  포함돼야 한다.
+- **뉴스 본문 이미지가 실사용처** — sync가 다운로드 → 콘텐츠 해시 키로
+  버킷 업로드(같은 바이트 재업로드 없음). `S3_*` 미설정이면 경고와 함께
+  Notion URL을 유지한다 — 로컬에선 충분하고, **프로덕션에선 한 시간 안에
+  깨지므로 반드시 설정**.
+- 아바타는 현재 전원 null(이니셜 폴백) — 사진을 받으면 같은 경로를 쓴다.
 - 아티클 커버는 미룰 수 있다 — 어차피 `CoverArt` 생성물이 폴백.
 
 ## 4. 동기화 설계
@@ -278,9 +221,10 @@ NotionSyncService
 
 - **증분**: data source query를 `last_edited_time > cursor` 필터로 조회,
   `notion_page_id` 기준 upsert. 커서는 `sync_runs` 마지막 성공 시각.
-- **순서**: members → articles → news (articles의 작성자 relation이 members를
-  참조하므로). relation이 가리키는 멤버가 아직 없으면 그 아티클은 경고와 함께
-  스킵하고 다음 런에서 재시도.
+- **순서**: articles → news. 둘 다 작성자를 DB 로스터와 **이름 매칭**으로
+  해석한다(공백 무시; 동명이인은 어느 쪽도 아님 — 빈 바이라인 + 경고).
+  로스터에 없는 이름의 아티클은 경고와 함께 스킵하고, seed-members로 사람을
+  추가한 뒤 재싱크한다.
 - **발행 게이트**: Notion 상태 속성이 `발행`인 것만 `published`. 초안은 DB에
   들어와도 API에 안 나간다.
 - **실패 격리**: 페이지 하나 매핑 실패가 런 전체를 죽이지 않는다. 페이지 단위
@@ -302,13 +246,13 @@ backend/src/
 ├── config/                 # env 검증 (DATABASE_URL, NOTION_TOKEN, NOTION_DB_*, SYNC_KEY, REVALIDATE_URL)
 ├── prisma/                 # PrismaService (전역)
 ├── notion/
-│   ├── notion.client.ts    # SDK 래퍼 + 백오프
+│   ├── notion.service.ts   # SDK 래퍼 (data source 해석, 재귀 블록 수집)
 │   ├── block-mapper.ts     # Notion 블록 → Block[]  ← 단위 테스트 1순위
-│   └── richtext.ts         # rich_text → **bold**/`code`/[link]() 직렬화
+│   └── schema.ts           # Notion 속성 이름 상수 (실측 어휘)
 ├── sync/
 │   ├── sync.service.ts     # 오케스트레이션(순서·커서·리컨실)
-│   ├── members.sync.ts / articles.sync.ts / news.sync.ts
-│   └── sync.controller.ts  # 수동 트리거 + webhook + runs 조회 (모두 guarded)
+│   ├── articles.sync.ts / news.sync.ts
+│   └── sync.controller.ts  # 수동 트리거 + runs 조회 (모두 guarded)
 ├── members/  members.controller.ts + members.service.ts   # 읽기 전용
 ├── articles/ articles.controller.ts + articles.service.ts # 읽기 전용
 ├── news/     news.controller.ts + news.service.ts         # 읽기 전용
@@ -333,7 +277,7 @@ GET /health
 관리(guarded — `X-Sync-Key`):
 
 ```
-POST /v1/sync/:resource               # members | articles | news | all
+POST /v1/sync/:resource               # articles | news | all
 POST /v1/webhooks/notion              # 서명 검증
 GET  /v1/sync/runs?resource=&limit=   # 최근 런 + 경고 확인
 ```
@@ -344,25 +288,20 @@ GET  /v1/sync/runs?resource=&limit=   # 최근 런 + 경고 확인
   비공개 인원 데이터(연락처·회비 등)는 이 시스템 범위 밖으로 확정했으므로
   admin 스코프 자체가 없다. guarded 엔드포인트는 sync 트리거뿐.
 
-## 7. 프론트 마이그레이션 경로
+## 7. 현재 상태 (2026-08)
 
-1. `lib/research.ts` — `ARTICLES` 상수 제거, `getArticles()` 등을 API fetch로
-   교체 (`next: { revalidate, tags: ['articles'] }`). **`Block` 타입·
-   `headingId`·`getToc`·`formatDate`는 그대로** — 렌더러/TOC 무변경.
-2. `lib/authors.ts` — 동일하게 API 클라이언트화. `authorName` 폴백 로직 유지.
-3. `readingMinutes` — API가 계산해서 내려주는 값 사용.
-4. 뉴스트래킹 — 신규 `/news` 섹션(프론트 리뉴얼 페이즈에서 설계).
-5. 조직도(`org-chart.tsx`) — members API로 대체 가능해지지만 별도 단계로.
+- **뉴스트래킹 — 실데이터.** 리서치 노션과 붙어 sync가 돌고, 본문 이미지
+  재호스팅 경로까지 완성(프로덕션 `S3_*`만 남음).
+- **멤버 — DB 소유.** `seed-members.ts`가 전체 명단(운영진 포함 37명)을
+  갖고, 조직도와 작성자 페이지가 members API를 읽는다. 부팅 시 자동 시드.
+- **아티클 — mock.** `seed:mock`이 실제 로스터 위에 mock 아티클만 얹는다
+  (멤버·뉴스는 건드리지 않음). 실제 리서치 DB가 정해지면 뉴스처럼 실측 →
+  `schema.ts` 어휘 교체 → sync 활성화 순서로 간다.
 
-## 8. 구현 순서 (제안)
+## 8. 남은 것
 
-1. **뼈대**: `backend/` 스캐폴드 + Prisma 스키마 + 마이그레이션 + health
-2. **Notion 연동 코어**: client + `block-mapper`(+ 단위 테스트) + richtext
-3. **sync v1**: members(아바타 재호스팅 포함) → articles 증분 + 수동 트리거
-   + runs 기록
-4. **읽기 API**: members/articles 엔드포인트 + 캐시 헤더
-5. **프론트 전환**: lib 두 파일 API화 + revalidate 연결 — *여기까지가 리서치
-   페이지 리뉴얼의 백엔드 전제조건*
-6. **news**: DB·sync·API + 프론트 신규 섹션
-7. **후순위**: webhook, 아티클 커버 재호스팅, 검색(tsvector)
+1. **아티클 실데이터 전환** — §3.2. 뉴스에서 배운 것: 속성 이름·타입은
+   전부 실측하고, 붙기 전까지 mapper를 확정하지 말 것.
+2. **아바타** — 사진이 모이면 뉴스 이미지와 같은 재호스팅 경로 사용.
+3. **후순위**: webhook, 검색(tsvector), 아티클 커버 재호스팅.
 ```

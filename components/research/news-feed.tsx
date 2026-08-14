@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { weekOf, type NewsItem } from "@/lib/news";
+import { summaryPreview, weekOf, type NewsItem } from "@/lib/news";
 import { formatDate } from "@/lib/research";
 
 /* Rows, not cards — news is a feed you scan, research is work you choose.
@@ -20,11 +20,12 @@ export default function NewsFeed({
   items: NewsItem[];
   initialTag?: string;
 }) {
-  const tags = ["All", ...Array.from(new Set(items.map((n) => n.category)))];
+  const tags = ["All", ...Array.from(new Set(items.flatMap((n) => n.categories)))];
   const [active, setActive] = useState(
     initialTag && tags.includes(initialTag) ? initialTag : "All",
   );
-  const shown = active === "All" ? items : items.filter((n) => n.category === active);
+  const shown =
+    active === "All" ? items : items.filter((n) => n.categories.includes(active));
 
   /* Newest first, weeks included. The walk below only merges items that are
      already adjacent, so it reads whatever order it is handed — and an
@@ -102,23 +103,22 @@ export default function NewsFeed({
                   <li key={item.id} className="border-b border-white/6 last:border-b-0">
                     <Link
                       href={`/research/news/${item.slug}`}
-                      className="group block py-6"
+                      className="group block py-8"
                     >
-                      <div className="font-mono flex flex-wrap items-center justify-between gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
-                        <span className="flex items-center gap-3">
-                          <span>{formatDate(item.date)}</span>
-                          <span aria-hidden className="h-px w-4 bg-white/20" />
-                          <span>{item.sourceName}</span>
-                          <span className="text-bay-300/70">{item.category}</span>
+                      <div className="font-mono flex flex-wrap items-center gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+                        <span>{formatDate(item.date)}</span>
+                        <span aria-hidden className="h-px w-4 bg-white/20" />
+                        <span>{item.sourceName}</span>
+                        <span className="text-bay-300/70">
+                          {item.categories.join(" · ")}
                         </span>
-                        <span>{item.views.toLocaleString("en-US")} views</span>
                       </div>
-                      <h3 className="font-body mt-2.5 text-lg font-medium break-keep text-white transition-colors group-hover:text-bay-100 md:text-xl">
+                      <h3 className="font-body mt-3 text-lg font-medium break-keep text-white transition-colors group-hover:text-bay-100 md:text-xl">
                         {item.title}
                       </h3>
                       {item.summary && (
-                        <p className="font-body mt-2 max-w-3xl text-sm leading-relaxed font-light break-keep text-slate-400">
-                          {item.summary}
+                        <p className="font-body mt-3 line-clamp-3 max-w-3xl text-sm leading-relaxed font-light break-keep text-slate-400">
+                          {summaryPreview(item.summary)}
                         </p>
                       )}
                       {item.curator && (
