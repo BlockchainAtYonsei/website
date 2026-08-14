@@ -71,24 +71,21 @@ export default function AuthorTabs({
               <li key={item.id}>
                 <Link
                   href={`/research/news/${item.slug}`}
-                  className="group block border-b border-white/6 py-6 first:pt-0"
+                  className="group block border-b border-white/6 py-8 first:pt-0"
                 >
-                  <div className="font-mono flex flex-wrap items-center justify-between gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
-                    <span className="flex items-center gap-3">
-                      <span>{formatDate(item.date)}</span>
-                      <span aria-hidden className="h-px w-4 bg-white/20" />
-                      <span>{item.sourceName}</span>
-                      <span className="text-bay-300/70">
-                        {item.categories.join(" · ")}
-                      </span>
+                  <div className="font-mono flex flex-wrap items-center gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+                    <span>{formatDate(item.date)}</span>
+                    <span aria-hidden className="h-px w-4 bg-white/20" />
+                    <span>{item.sourceName}</span>
+                    <span className="text-bay-300/70">
+                      {item.categories.join(" · ")}
                     </span>
-                    <span>{item.views.toLocaleString("en-US")} views</span>
                   </div>
-                  <h3 className="font-body mt-2.5 text-lg font-medium break-keep text-white transition-colors group-hover:text-bay-100">
+                  <h3 className="font-body mt-3 text-lg font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                     {item.title}
                   </h3>
                   {item.summary && (
-                    <p className="font-body mt-2 max-w-3xl text-sm leading-relaxed font-light break-keep text-slate-400">
+                    <p className="font-body mt-3 line-clamp-3 max-w-3xl text-sm leading-relaxed font-light break-keep text-slate-400">
                       {summaryPreview(item.summary)}
                     </p>
                   )}

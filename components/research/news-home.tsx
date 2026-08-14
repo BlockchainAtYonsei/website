@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { summaryPreview, weekOf, type NewsItem } from "@/lib/news";
 import type { Accent } from "@/lib/research";
@@ -235,12 +236,27 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
             className="group liquid-glass flex flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.01] lg:col-span-7"
           >
             {hero.imageUrl ? (
-              /* the story's own picture beats generated art every time */
-              <img
-                src={hero.imageUrl}
-                alt=""
-                className="aspect-[16/9] w-full object-cover"
-              />
+              /* the story's own picture beats generated art every time. The
+                 photos arrive in every temperature a newsroom ships, so the
+                 same bottom vignette CoverArt bakes in goes over every real
+                 photo too — that alone is enough to sit them beside each
+                 other. They keep their colour: draining it made a room of
+                 press photos read as an archive. */
+              <div className="relative aspect-[16/9] w-full overflow-hidden">
+                {/* through /_next/image, not hot-linked: publishers ship
+                    1400px+ originals (up to 2.2MB measured) that turned
+                    topic-switching into a 2-3s wait — the optimizer serves
+                    card-sized WebPs from our own host instead */}
+                <Image
+                  src={hero.imageUrl}
+                  alt=""
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 640px, 100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+              </div>
             ) : (
               <CoverArt
                 accent={accentOf(hero.categories[0] ?? "")}
@@ -265,7 +281,12 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
             </div>
           </Link>
 
-          <div className="liquid-glass rounded-[1.25rem] p-6 md:p-7 lg:col-span-5">
+          {/* The rail is as tall as the hero beside it, and four items of
+              their own height left a hand's width of glass empty under the
+              last one. The list takes the leftover instead: each row grows to
+              an equal share of it and centres its lines, so the dividers stay
+              evenly spaced and the panel ends where the hero does. */}
+          <div className="liquid-glass flex flex-col rounded-[1.25rem] p-6 md:p-7 lg:col-span-5">
             <div className="flex items-baseline justify-between gap-4 border-b border-white/15 pb-4">
               <h3 className="font-heading text-xl tracking-[-0.5px] text-white">
                 The Latest
@@ -281,10 +302,16 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               </Link>
             </div>
 
-            <ul>
+            <ul className="flex flex-1 flex-col">
               {rail.map((item) => (
-                <li key={item.id} className="border-b border-white/8 last:border-b-0">
-                  <Link href={`/research/news/${item.slug}`} className="group block py-4">
+                <li
+                  key={item.id}
+                  className="flex-1 border-b border-white/8 last:border-b-0"
+                >
+                  <Link
+                    href={`/research/news/${item.slug}`}
+                    className="group flex h-full flex-col justify-center py-4"
+                  >
                     <p className="font-body text-[11px] font-medium text-bay-300">
                       {item.categories.join(" · ")}
                     </p>
@@ -313,21 +340,46 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               <Link
                 key={item.id}
                 href={`/research/news/${item.slug}`}
-                className="group liquid-glass flex h-full flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.015]"
+                className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
               >
-                <h3 className="font-body text-lg leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
-                  {item.title}
-                </h3>
-                {item.summary && (
-                  <p className="font-body mt-3 line-clamp-2 text-sm leading-relaxed font-light break-keep text-slate-400">
-                    {summaryPreview(item.summary)}
-                  </p>
+                {/* Same picture-then-prose card as 주제별 below: a pick is the
+                    band the page wants you to stop at, so it should not be the
+                    one section that reads as a wall of text. What still tells
+                    the two apart is the write-up — a pick keeps its summary. */}
+                {item.imageUrl ? (
+                  <div className="relative aspect-[16/9] w-full overflow-hidden">
+                    <Image
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                  </div>
+                ) : (
+                  <CoverArt
+                    accent={accentOf(item.categories[0] ?? "")}
+                    tag={item.categories[0] ?? "News"}
+                    className="aspect-[16/9] w-full"
+                  />
                 )}
-                {/* mt-auto pins the footer to the card floor, so a short title
-                    and a long one still line their bylines up across a row */}
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-7">
-                  <Byline item={item} />
-                  <TopicChips topics={item.categories} />
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-body text-lg leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
+                    {item.title}
+                  </h3>
+                  {item.summary && (
+                    <p className="font-body mt-3 line-clamp-2 text-sm leading-relaxed font-light break-keep text-slate-400">
+                      {summaryPreview(item.summary)}
+                    </p>
+                  )}
+                  {/* mt-auto pins the footer to the card floor, so a short
+                      title and a long one still line their bylines up across
+                      a row */}
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-7">
+                    <Byline item={item} />
+                    <TopicChips topics={item.categories} />
+                  </div>
                 </div>
               </Link>
             ))}
@@ -394,12 +446,16 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
             >
               {item.imageUrl ? (
-                <img
-                  src={item.imageUrl}
-                  alt=""
-                  loading="lazy"
-                  className="aspect-[16/9] w-full object-cover"
-                />
+                <div className="relative aspect-[16/9] w-full overflow-hidden">
+                  <Image
+                    src={item.imageUrl}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+                </div>
               ) : (
                 <CoverArt
                   accent={accentOf(item.categories[0] ?? "")}

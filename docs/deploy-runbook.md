@@ -45,6 +45,7 @@ NOTION_DB_ARTICLES=
 NOTION_DB_NEWS=
 # 뉴스 본문 이미지 재호스팅용 R2/S3 — 뉴스 sync를 켰다면 사실상 필수:
 # 미설정이면 Notion 서명 URL을 그대로 저장하는데, 그 URL은 1시간이면 죽는다
+# 설정 절차는 docs/r2-setup.md (운영자에게 그대로 넘기면 되는 단독 문서)
 S3_ENDPOINT=
 S3_REGION=auto
 S3_BUCKET=

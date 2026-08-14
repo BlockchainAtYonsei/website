@@ -50,6 +50,28 @@ function splitAtNewline(
   return null;
 }
 
+/* Authors reach for a bold line where the page wants a heading — /h3 is one
+   keystroke away but "make it bold" is the habit, and one write-up arrived
+   with all 25 of its section titles shaped that way, so the article rendered
+   as an unbroken wall of paragraphs with no index to it.
+
+   A line is a title when the whole line is bold, it is short, and it does not
+   close a sentence. That last test is what keeps a fully-bold pull quote
+   ("행정명령은 정권이 바뀌면 사라지지만, 법률은 영구적이다.") and a bold lead-in
+   sentence out — both end in punctuation. A bold line carrying a link is
+   never a heading: headings render raw, so the link would be lost. */
+const HEADING_MAX = 60;
+
+function boldHeading(rt: RichTextItemResponse[]): string | null {
+  const text = plainText(rt).trim();
+  if (!text || text.length > HEADING_MAX || text.includes("\n")) return null;
+  if (/[.!?…][")'\]”’]?$/.test(text)) return null;
+  const runs = rt.filter((i) => i.plain_text.trim().length > 0);
+  if (runs.length === 0) return null;
+  if (runs.some((i) => i.href || !i.annotations.bold)) return null;
+  return text;
+}
+
 function callout(rt: RichTextItemResponse[]): Block {
   const split = splitAtNewline(rt);
   if (split) {
@@ -91,6 +113,62 @@ function tableBlock(block: NotionBlock, warnings: string[]): Block | null {
     head: [],
     rows: cells.map((row) => row.map((c) => toMicroformat(c))),
   };
+}
+
+/* A credit typed as its own paragraph under a picture — "출처: 블록미디어" —
+   is that picture's caption; 7 of the feed's 15 images arrive that way rather
+   than through Notion's own caption field. Folding it in is what lets lead
+   art carry its source when the page lifts the image out of the flow, and it
+   keeps a one-line credit from rendering as body copy. Any link inside it
+   survives: the text is already microformat by this point. */
+const CREDIT = /^(?:(?:출처|자료|사진|이미지|영상|source|photo|credit)\s*[:：]|©)/i;
+
+function foldCredits(blocks: Block[]): Block[] {
+  const out: Block[] = [];
+  for (const b of blocks) {
+    const prev = out[out.length - 1];
+    if (
+      prev?.t === "image" &&
+      !prev.caption &&
+      b.t === "p" &&
+      b.text.length <= 60 &&
+      !b.text.includes("\n") &&
+      CREDIT.test(b.text)
+    ) {
+      out[out.length - 1] = { ...prev, caption: b.text };
+      continue;
+    }
+    out.push(b);
+  }
+  return out;
+}
+
+/* A news item is 요약 + 인사이트: the summary is a Notion property, the page
+   body is the take. The page labels both sections itself, so a body that
+   opens by labelling itself again says the same thing twice — and the eight
+   write-ups that do it spell it six different ways ("인사이트", "Insights",
+   "💡 인사이트", "간단한 인사이트", "핵심 인사이트 5개", "🧠 인사이트").
+
+   Only a heading that is purely the label goes, and only at the top. The two
+   write-ups that use "Insights" halfway down are marking where their take
+   starts after a table or a recap — there it carries information, so it
+   stays. Nothing but the heading is touched; the take underneath is
+   untouched either way.
+
+   Insight labels only, never 요약. Two paper write-ups open with a "3줄 요약"
+   section that repeats the Content Summary word for word; dropping that
+   heading would leave the repeat sitting under the page's own Summary with
+   nothing to explain it. The duplication is for a curator to delete, and a
+   labelled duplicate is the version they can see. */
+const LEAD_LABEL =
+  /^[\p{Extended_Pictographic}️\s]*(?:간단한|핵심|주요)?\s*(?:인사이트|insights?)\s*(?:\d+\s*개)?[\s:：]*$/iu;
+
+export function stripLeadLabel(blocks: Block[]): Block[] {
+  /* lead art comes first often enough that the label is the second block */
+  const i = blocks[0]?.t === "image" ? 1 : 0;
+  const b = blocks[i];
+  if (!b || (b.t !== "h2" && b.t !== "h3") || !LEAD_LABEL.test(b.text)) return blocks;
+  return [...blocks.slice(0, i), ...blocks.slice(i + 1)];
 }
 
 export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
@@ -165,9 +243,36 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
         blocks.push({ t: "h3", text: plainText(b.heading_3.rich_text).trim() });
         break;
       case "paragraph": {
-        const text = toMicroformat(b.paragraph.rich_text).trim();
-        if (text) blocks.push({ t: "p", text });
+        /* a whole-line bold run is a section title the author typed by hand;
+           it has to become a heading here or the page has no index at all */
+        const heading = boldHeading(b.paragraph.rich_text);
+        if (heading) {
+          blocks.push({ t: "h3", text: heading });
+          break;
+        }
+        /* Newlines survive: a Shift+Enter break inside a paragraph is the
+           author's line, and the renderer honours it. Collapsing them ran
+           "2.규제는 장벽이 아니다" straight into the dashes beneath it. */
+        const text = toMicroformat(b.paragraph.rich_text).replace(/\s+$/, "");
+        if (text.trim()) blocks.push({ t: "p", text });
         // empty paragraphs are author spacing, not content — skip silently
+        break;
+      }
+      case "code": {
+        /* The write-ups use code blocks for structure sketches
+           ("Wallet → NFT → Token") as much as for code; either way the author
+           set the line apart from the prose and it must not render as prose.
+           Raw text, never microformat — a backtick or asterisk inside is
+           content here. */
+        const text = plainText(b.code.rich_text).replace(/\s+$/, "");
+        const lang = b.code.language;
+        if (text) {
+          blocks.push({
+            t: "code",
+            text,
+            ...(lang && lang !== "plain text" ? { lang } : {}),
+          });
+        }
         break;
       }
       case "quote": {
@@ -195,7 +300,10 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
         const img = b.image;
         const url = img.type === "file" ? img.file.url : img.external.url;
         if (url) {
-          const caption = plainText(img.caption).trim();
+          /* Microformat, not plain text: a caption is where the credit goes
+             ("출처: [칼시](https://…)"), and reading it flat threw the link
+             away — the one place in a write-up a link is load-bearing. */
+          const caption = toMicroformat(img.caption).replace(/\n/g, " ").trim();
           blocks.push({ t: "image", url, ...(caption ? { caption } : {}) });
         }
         break;
@@ -219,7 +327,12 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
         const text = rt?.rich_text?.length
           ? toMicroformat(rt.rich_text).replace(/\n/g, " ").trim()
           : "";
-        if (text) {
+        /* Notion keeps adding heading levels below h3; the page has only two,
+           so anything deeper lands on the smaller one rather than losing its
+           rank entirely and reading as body copy. */
+        if (text && b.type.startsWith("heading_")) {
+          blocks.push({ t: "h3", text: plainText(rt?.rich_text ?? []).trim() });
+        } else if (text) {
           blocks.push({ t: "p", text });
           warnings.push(`block type "${b.type}" (${b.id}) rendered as plain text`);
         } else {
@@ -240,5 +353,5 @@ export function mapBlocks(notionBlocks: NotionBlock[]): MapResult {
   }
   flushList();
 
-  return { blocks, warnings };
+  return { blocks: foldCredits(blocks), warnings };
 }

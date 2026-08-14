@@ -98,9 +98,10 @@ export function toNewsItem(n: NewsItem & { curator: Member | null }) {
     summary: n.summary,
     categories: n.categories,
     pick: n.pick,
-    imageUrl: firstImageUrl(n.body),
+    /* the curator's own picture beats the publisher's og:image; null means
+       the card falls back to generated cover art */
+    imageUrl: firstImageUrl(n.body) ?? n.coverUrl,
     date: isoDate(n.publishedAt),
-    views: n.views,
     curator: n.curator
       ? { slug: n.curator.slug, name: n.curator.name, avatarUrl: n.curator.avatarUrl }
       : null,

@@ -6,7 +6,7 @@ import { headingId, type Block } from "@/lib/research";
    so pasted content can't inject markup. */
 const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
 
-function inline(text: string): ReactNode[] {
+export function inline(text: string): ReactNode[] {
   return text.split(INLINE).map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
@@ -44,6 +44,25 @@ function inline(text: string): ReactNode[] {
   });
 }
 
+/* A Shift+Enter break inside a paragraph is a line the author drew — the
+   news write-ups use it to hang "-" notes under a numbered lead-in. HTML
+   collapses it to a space, which ran the note into the line above it. */
+function inlineMultiline(text: string): ReactNode[] {
+  return text.split("\n").flatMap((line, i) =>
+    i === 0 ? inline(line) : [<br key={`br${i}`} />, ...inline(line)],
+  );
+}
+
+/* An author who ended a line with Enter instead of a full stop meant a line
+   break, not a new paragraph — "NFT와 Wallet의 관계를 뒤집는 것에 있다." finishes
+   the line above it. Notion sets those a few pixels apart, so at a whole
+   paragraph's gap one sentence reads as two. Spacing only: the blocks stay
+   separate and nothing is merged, so a wrong guess costs a tight gap. */
+function continuesPrevious(blocks: Block[], i: number): boolean {
+  const prev = blocks[i - 1];
+  return prev?.t === "p" && !/[.!?…:][")'\]”’]?$/.test(prev.text.trimEnd());
+}
+
 const P = "font-body text-[0.975rem] leading-[1.85] font-light break-keep text-slate-300 md:text-base";
 
 function Bullet() {
@@ -79,8 +98,11 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
             );
           case "p":
             return (
-              <p key={i} className={`${P} mt-6`}>
-                {inline(b.text)}
+              <p
+                key={i}
+                className={`${P} ${continuesPrevious(blocks, i) ? "mt-1" : "mt-6"}`}
+              >
+                {inlineMultiline(b.text)}
               </p>
             );
           case "ul":
@@ -191,11 +213,28 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
                   className="w-full rounded-[1.25rem] border border-white/8"
                 />
                 {b.caption && (
+                  /* through inline(): a caption is where the credit lives, so
+                     "출처: [칼시](https://…)" has to come out as a link */
                   <figcaption className="font-body mt-3 text-center text-xs font-light break-keep text-slate-500">
-                    {b.caption}
+                    {inline(b.caption)}
                   </figcaption>
                 )}
               </figure>
+            );
+          case "code":
+            /* Set apart, not syntax-highlighted: the write-ups reach for a
+               code block to draw a structure ("Wallet → NFT → Token") far
+               more often than to show code, and both want the same thing —
+               a line that is visibly not prose. */
+            return (
+              <pre
+                key={i}
+                className="my-6 overflow-x-auto rounded-[0.9rem] border border-white/10 bg-white/[0.03] px-5 py-4"
+              >
+                <code className="font-mono text-[0.85rem] leading-relaxed break-keep whitespace-pre-wrap text-bay-100">
+                  {b.text}
+                </code>
+              </pre>
             );
           case "divider":
             return (

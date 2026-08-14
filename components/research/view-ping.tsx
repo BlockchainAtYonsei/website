@@ -3,12 +3,13 @@
 import { useEffect } from "react";
 
 /* Counts a page view once per browser session per page. The sessionStorage
-   guard also absorbs React strict-mode's double effect in dev. */
+   guard also absorbs React strict-mode's double effect in dev. Articles only
+   — news dropped its view counter. */
 export default function ViewPing({
   kind,
   slug,
 }: {
-  kind: "articles" | "news";
+  kind: "articles";
   slug: string;
 }) {
   useEffect(() => {

@@ -20,6 +20,9 @@ export type NewsData = {
   sourceName: string;
   summary: string;
   categories: string[];
+  /* A card image the team picked by hand, for stories nothing can be crawled
+     from. Beats the og:image; loses to a picture inside the write-up. */
+  cover?: string;
   publishedAt: string; // ISO date
   status: "draft" | "published" | "archived";
   /* Written by hand in Notion, resolved against the member roster in the
@@ -94,6 +97,25 @@ export function pageToNews(page: PageObjectResponse): NewsMapResult {
     warnings.push(`news ${label}: "${P.slug}" not [a-z0-9-], using page id instead`);
   }
 
+  /* A hand-picked card image. Nonsense in the cell is dropped rather than
+     stored: a broken <img> on the card is worse than the generated art it
+     would have replaced. */
+  const rawCover = linkOf(page, P.cover) ?? richTextOf(page, P.cover);
+  let cover: string | undefined;
+  if (rawCover) {
+    try {
+      const u = new URL(rawCover);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error("scheme");
+      cover = u.href;
+    } catch {
+      /* the cell is filled but not with a link — a note-to-self, a half-pasted
+         URL. Saying so is how it gets finished; silence would read as done. */
+      warnings.push(
+        `news ${label}: "${P.cover}" is not a URL ("${rawCover.slice(0, 40)}") — ignored`,
+      );
+    }
+  }
+
   /* Deduped: a multi-select cannot hold the same option twice, but nothing
      downstream should depend on that — the same tag rendered twice on a card
      is a visible defect and a duplicate React key at once. */
@@ -120,6 +142,7 @@ export function pageToNews(page: PageObjectResponse): NewsMapResult {
       publishedAt: publishedAt.slice(0, 10),
       status,
       pick: checkboxOf(page, P.pick) ?? false,
+      cover,
       curatorName: namesOf(page, P.curator)[0],
     },
     warnings,

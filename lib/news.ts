@@ -24,7 +24,6 @@ export type NewsItem = {
      back to generated cover art. */
   imageUrl: string | null;
   date: string; // ISO — the story's original publication date
-  views: number;
   curator: { slug: string; name: string; avatarUrl: string | null } | null;
 };
 
@@ -35,16 +34,54 @@ export type NewsDetail = NewsItem & {
 };
 
 
-/* The summary as one clamp-friendly line for cards and rows. Curators write
-   it as bullet lines; a card that clamps two lines must not spend them on
-   "•" markers and hard breaks. The detail page keeps the full structure —
-   this is for everywhere smaller. */
-export function summaryPreview(summary: string): string {
-  return summary
+/* The summary is one Notion property the curator types the whole list into,
+   and the DB holds two habits: a point per line, and "1. … 2. … 3. …" run
+   together on a single line. Both are the same list, so both have to come
+   back out as one — reading only the newlines left the second shape as a
+   blob whose own numbering surfaced mid-sentence.
+
+   `ordered` is what the curator numbered, kept rather than flattened to
+   dots: the points are steps and cross-refer to each other by number. */
+export type SummaryList = { ordered: boolean; items: string[] };
+
+const MARKER = /^([•·▪‣\-–—]|\d+[.)])\s*/;
+
+/* One line, cut at its own "1." "2." "3." markers. The run has to start at 1
+   and count up, so a date ("2026. 8.") or a stray figure inside a point
+   can't cut it in half; anything before the first marker stays as its own
+   item rather than being dropped. */
+function splitEnumerated(line: string): string[] {
+  const cuts: number[] = [];
+  let expected = 1;
+  for (const m of line.matchAll(/(^|\s)(\d+)[.)]/g)) {
+    if (Number(m[2]) !== expected) continue;
+    cuts.push((m.index ?? 0) + m[1].length);
+    expected++;
+  }
+  if (cuts.length < 2) return [line];
+  const head = cuts[0] > 0 ? [line.slice(0, cuts[0])] : [];
+  return [...head, ...cuts.map((c, i) => line.slice(c, cuts[i + 1]))];
+}
+
+export function summaryList(summary: string): SummaryList {
+  const raw = summary
     .split(/\n+/)
-    .map((l) => l.trim().replace(/^([•·▪‣\-–—]|\d+[.)])\s*/, ""))
-    .filter(Boolean)
-    .join(" ");
+    .flatMap(splitEnumerated)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const ordered =
+    raw.length > 1 && raw.every((l, i) => l.startsWith(`${i + 1}.`) || l.startsWith(`${i + 1})`));
+  return {
+    ordered,
+    items: raw.map((l) => l.replace(MARKER, "").trim()).filter(Boolean),
+  };
+}
+
+/* The summary as one clamp-friendly line for cards and rows. A card that
+   clamps two lines must not spend them on "•" markers and hard breaks. The
+   detail page keeps the full structure — this is for everywhere smaller. */
+export function summaryPreview(summary: string): string {
+  return summaryList(summary).items.join(" ");
 }
 
 const TAGS = ["news"];

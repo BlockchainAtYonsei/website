@@ -34,6 +34,12 @@ export const NEWS_PROPS = {
   curator: "Author", // multi_select of names, matched against the roster
   status: "Status", // multi_select
   pick: "Pick", // checkbox — 이번 주 꼭 볼 것
+  /* A card image chosen by hand, for the stories nothing can be crawled from:
+     no Source link, a Source that is a PDF, a publisher that 403s a bot. Same
+     lever as Slug — no such column today, and adding it in Notion needs no
+     code change. URL text (or a linked cell), never Files & media: a Notion
+     upload's URL expires within the hour. */
+  cover: "Cover", // rich_text/url holding an image URL
   /* Week ("2026.08.09~2026.08.15") exists in the DB but is not mapped —
      the site derives weeks from Date of issue. */
 } as const;

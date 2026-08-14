@@ -190,4 +190,22 @@ describe("pageToNews", () => {
     expect(data?.summary).toBe("");
     expect(warnings.join()).toMatch(/Content Summary/);
   });
+
+  it("reads a hand-picked Cover, as a URL cell or as linked text", () => {
+    const url = "https://upload.wikimedia.org/wikipedia/commons/x.jpg";
+    expect(pageToNews(page(newsProps({ Cover: prop.url(url) }))).data?.cover).toBe(url);
+    expect(pageToNews(page(newsProps({ Cover: prop.link("표지", url) }))).data?.cover).toBe(url);
+  });
+
+  it("has no Cover until the column exists — the lever is opt-in", () => {
+    const { data, warnings } = pageToNews(page(newsProps()));
+    expect(data?.cover).toBeUndefined();
+    expect(warnings).toEqual([]);
+  });
+
+  it("drops a Cover that is not a URL rather than shipping a broken image", () => {
+    const { data, warnings } = pageToNews(page(newsProps({ Cover: prop.richText("나중에 찾기") })));
+    expect(data?.cover).toBeUndefined();
+    expect(warnings.join()).toMatch(/"Cover" is not a URL/);
+  });
 });

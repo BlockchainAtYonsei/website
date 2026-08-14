@@ -99,11 +99,4 @@ export class NewsService {
       related: related.map(toNewsItem),
     };
   }
-
-  async registerView(slug: string) {
-    await this.prisma.newsItem.updateMany({
-      where: { status: "published", slug },
-      data: { views: { increment: 1 } },
-    });
-  }
 }

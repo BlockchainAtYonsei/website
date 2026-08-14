@@ -138,10 +138,13 @@ model NewsItem {
   summary  String
   // Block[] — 요약/인사이트 authored in the Notion page body; [] = link-only.
   body  Json    @default("[]")
-  views Int     @default(0)
   // The 리서치팀's own "이번 주 꼭 볼 것" checkbox, rather than something the
   // site infers from dates.
   pick  Boolean @default(false)
+  // The original story's og:image, fetched once at sync time — the card
+  // fallback when the write-up itself carries no picture. Null = generated
+  // cover art.
+  coverUrl String? @map("cover_url")
   // Notion's Topic is a multi-select and stories genuinely carry two or three
   // — 보안 and DeFi at once. Ordered as the curator tagged them, so the first
   // is the one a cramped surface shows.

@@ -15,4 +15,7 @@ export type Block =
   /* url is re-hosted at sync time when storage is configured — a raw Notion
      file URL expires within the hour and must never ship as-is to prod. */
   | { t: "image"; url: string; caption?: string }
+  /* a display line the author set apart from the prose — a diagram, a
+     structure sketch, actual code. Rendered verbatim, newlines and all. */
+  | { t: "code"; text: string; lang?: string }
   | { t: "divider" };

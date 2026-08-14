@@ -38,6 +38,12 @@ type Seed = {
   team: string; // "" for the exec tier
   position: string; // 학회장 / 부학회장 / 부장 / 팀장 / 부원
   bio?: string;
+  // Profile photo — an external URL (github.com/u/... etc.), or "/members/
+  // <slug>.jpg" for a file committed to the frontend's public/members/ (no
+  // S3/R2 is configured, so that's where a handed-over photo file goes — see
+  // public/members/README.md). The 리서치팀 batch arrives 2026-08-15; until
+  // someone's lands here the site shows the monogram fallback.
+  avatarUrl?: string;
   socials?: { label: string; href: string }[];
 };
 
@@ -79,6 +85,9 @@ const STAFF: Seed[] = [
     cohort: 17,
     team: "홍보팀",
     position: "부장",
+    bio: "ZK 기술로 블록체인 생태계를 해결해 나가는 그림을 그립니다.",
+    /* GitHub 프사 — u/<id> is stable even if the handle changes */
+    avatarUrl: "https://avatars.githubusercontent.com/u/174609772?v=4",
     socials: [
       { label: "GitHub", href: "https://github.com/0xSHKWON" },
       { label: "LinkedIn", href: "https://www.linkedin.com/in/sanghyeon-kwon-31623438a" },
@@ -301,7 +310,11 @@ const RESEARCH: Seed[] = [
     cohort: 17,
     team: "리서치팀",
     position: "부원",
-    bio: "Web3 기술",
+    bio: "블록체인을 통한 RWA시장의 변화를 주시하고 있습니다.",
+    socials: [
+      { label: "Telegram", href: "https://t.me/delpa818" },
+      { label: "X", href: "https://x.com/delpa818" },
+    ],
   },
   {
     slug: "jaeseo-kim",
@@ -394,6 +407,13 @@ const RESEARCH: Seed[] = [
     cohort: 18,
     team: "리서치팀",
     position: "부원",
+    /* 붙여쓴 게 맞다 — 본인이 그렇게 쓴 문체이니 띄어쓰기를 넣지 말 것 */
+    bio: "안녕하세요조현채입니다잘부탁드립니다",
+    socials: [
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/hyunchae-jo" },
+      { label: "Telegram", href: "https://t.me/catalyze_juno" },
+      { label: "X", href: "https://x.com/trip4e_J" },
+    ],
   },
 ];
 
@@ -407,6 +427,7 @@ async function main() {
       team: m.team,
       position: m.position,
       bio: m.bio ?? "",
+      avatarUrl: m.avatarUrl ?? null,
       socials: m.socials ?? [],
       status: "active" as const,
       visible: true,

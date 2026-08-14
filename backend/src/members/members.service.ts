@@ -82,6 +82,11 @@ export class MembersService {
     ]);
     return {
       ...toAuthor(member),
+      /* counts the list endpoint promises on every Author — the profile's
+         stats panel reads them, and articles/news.length is their
+         definition here */
+      articleCount: articles.length,
+      newsCount: news.length,
       articles: articles.map(toArticleListItem),
       news: news.map(toNewsItem),
     };
