@@ -60,7 +60,7 @@ export async function fetchOgImage(pageUrl: string): Promise<string | null> {
       signal: AbortSignal.timeout(8000),
       headers: {
         /* some news sites 403 the default undici UA */
-        "user-agent": "Mozilla/5.0 (compatible; BAYNewsBot/1.0; +https://bay-yonsei.com)",
+        "user-agent": "Mozilla/5.0 (compatible; BAYNewsBot/1.0; +https://www.blockchainatyonsei.com)",
         accept: "text/html,application/xhtml+xml",
       },
     });

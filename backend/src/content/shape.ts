@@ -101,6 +101,11 @@ export function toNewsItem(n: NewsItem & { curator: Member | null }) {
     /* the curator's own picture beats the publisher's og:image; null means
        the card falls back to generated cover art */
     imageUrl: firstImageUrl(n.body) ?? n.coverUrl,
+    /* Ships alongside rather than folded in, so a card whose imageUrl fails
+       to load has somewhere to go: the two are different hosts, and the whole
+       point of a fallback is that it doesn't die with the thing it backs up.
+       Equal to imageUrl when the write-up carried no picture of its own. */
+    coverUrl: n.coverUrl,
     date: isoDate(n.publishedAt),
     curator: n.curator
       ? { slug: n.curator.slug, name: n.curator.name, avatarUrl: n.curator.avatarUrl }

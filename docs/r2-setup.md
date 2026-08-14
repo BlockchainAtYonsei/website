@@ -3,12 +3,38 @@
 **소요 시간: 약 10분. 코드 수정은 없습니다.** Cloudflare 대시보드에서 값 6개를
 받아 맥미니의 설정 파일에 적고, 컨테이너를 한 번 재시작하면 끝입니다.
 
-## 왜 필요한가
+---
+
+## 먼저 — 이 한 줄만 급합니다 (Cloudflare 작업 없음, 1분)
+
+맥미니 터미널에서:
+
+```sh
+source /Users/Shared/srv/.bay-web-cicd/backend.env
+curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
+```
+
+이것만으로 두 가지가 해결됩니다:
+
+- **깨져 보이던 사진 자리가 없어집니다.** 사진이 안 열릴 때 언론사 사진으로
+  대신 채우도록 코드가 바뀌었고, 이 명령이 그 대체 사진을 모든 글에 채워
+  넣습니다.
+- **가짜 뉴스 30건이 사이트에서 내려갑니다.** (아래 8단계 참고)
+
+**2~3분쯤 걸리고 그동안 응답이 없습니다.** 정상입니다.
+
+아래 R2 셋업(1~7단계)은 이 다음에 여유 있을 때 하시면 됩니다. 급한 불은 위
+한 줄로 꺼집니다.
+
+---
+
+## 왜 (R2가) 필요한가
 
 뉴스 큐레이터가 노션 글에 붙여넣은 사진은, 노션이 주는 **1시간짜리 임시
 주소**를 갖고 있습니다. 지금은 사이트가 그 주소를 그대로 저장하고 있어서
-한 시간 뒤에 전부 죽습니다 — 실제로 최근 50건 중 11건이 이미 깨졌고,
-페이지에서는 에러도 없이 사진 자리만 조용히 비어 보입니다.
+한 시간 뒤에 전부 죽습니다. 위 한 줄을 실행하면 그 자리가 언론사 사진으로
+채워져 **빈 자리로 보이지는 않지만**, 큐레이터가 고른 원래 사진은 여전히
+안 뜹니다.
 
 고치는 방법은 사진을 **우리 저장소로 복사해두는 것**이고, 그 코드는 이미
 짜여 있습니다. 지금은 저장소 주소만 비어 있어서 건너뛰고 있을 뿐입니다.
@@ -47,7 +73,7 @@ R2 화면 우측 **{} API** 또는 **Manage API Tokens** → **Create API Token*
 버킷 `bay-media` → **Settings** 탭 → **Public access** 항목 →
 **Connect Domain**
 
-- 도메인: `img.bay-yonsei.com`
+- 도메인: `img.blockchainatyonsei.com`
 
 DNS가 이미 Cloudflare에 있어서 자동으로 연결됩니다. 연결 후 상태가
 `Active`가 될 때까지 1~2분 걸릴 수 있습니다.
@@ -78,7 +104,7 @@ S3_REGION=auto
 S3_BUCKET=bay-media
 S3_ACCESS_KEY_ID=<2단계의 Access Key ID>
 S3_SECRET_ACCESS_KEY=<2단계의 Secret Access Key>
-S3_PUBLIC_URL=https://img.bay-yonsei.com
+S3_PUBLIC_URL=https://img.blockchainatyonsei.com
 ```
 
 주의할 점 세 가지:
@@ -134,12 +160,42 @@ curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
 curl -s "localhost:4000/v1/news?size=50" | grep -c amazonaws
 ```
 
-`0`이 나왔다면 브라우저에서 https://bay-yonsei.com/research/news 를 열어
+`0`이 나왔다면 브라우저에서 https://www.blockchainatyonsei.com/research/news 를 열어
 사진들이 제대로 뜨는지 눈으로도 한 번 봐주세요.
 
 ---
 
-## 8단계 (선택) — 언론사 사진도 우리 쪽으로 가져오기
+## 8단계 — 가짜 뉴스 30건이 사라졌는지 확인
+
+**맨 위 "먼저" 절이나 6단계 중 하나만 실행했으면 이미 정리됐습니다** (둘 다
+같은 명령입니다). 확인만 해주시면 됩니다.
+
+사이트 개발 초기에 화면 배치를 보려고 만든 **가짜 뉴스 30건**이 실제
+데이터베이스에 들어간 채로 남아 있습니다. 제목도 요약도 그럴듯하고 부원들
+실명이 작성자로 붙어 있어서, 진짜 뉴스와 섞여 있으면 구별이 안 됩니다
+(뉴스 아카이브 108건 중 30건이 이것입니다). 출처 링크에 `mock`이라는
+글자가 들어 있는 것만이 유일한 표시입니다.
+
+`?full=1` 동기화는 "노션에 없는 글은 내린다"는 규칙도 같이 실행하기 때문에,
+이 30건이 자동으로 숨겨집니다. 아래 명령의 결과가 **`0`** 이면 정리된
+것입니다:
+
+```sh
+curl -s "localhost:4000/v1/news?size=100" | grep -c "/mock/"
+```
+
+`0`이 아니면 명령 끝의 `?full=1`이 빠졌을 가능성이 높습니다. 그대로 다시
+실행해주세요.
+
+> 위 방법은 글을 **숨기는**(archived) 것이라 데이터베이스에는 행이 남습니다.
+> 완전히 지우고 싶으시면 아래를 한 번 실행하시면 되는데, 급하지 않습니다.
+> ```sh
+> docker exec bay-pg psql -U bay -d bay -c "DELETE FROM news_items WHERE notion_page_id LIKE 'mock-news-%';"
+> ```
+
+---
+
+## 9단계 (선택) — 언론사 사진도 우리 쪽으로 가져오기
 
 여기까지 하면 **깨지는 문제는 완전히 해결됩니다.** 아래는 급하지 않은
 개선이라 나중에 하셔도 됩니다.
@@ -157,6 +213,7 @@ docker exec bay-pg psql -U bay -d bay -c "UPDATE news_items SET cover_url = NULL
 > **순서 주의:** 이 명령은 반드시 위 1~7단계를 모두 마친 뒤에 실행해야
 > 합니다. R2 설정 전에 실행하면 언론사 주소를 다시 그대로 저장해서 아무
 > 효과가 없습니다.
+
 
 ---
 
@@ -187,11 +244,11 @@ curl -s -H "x-sync-key: $SYNC_KEY" localhost:4000/v1/sync/runs | head -40
 
 **Q. 사진이 여전히 안 보입니다**
 
-`img.bay-yonsei.com` 연결이 아직 `Active`가 아닐 수 있습니다. 3단계 화면에서
+`img.blockchainatyonsei.com` 연결이 아직 `Active`가 아닐 수 있습니다. 3단계 화면에서
 상태를 확인하고, 브라우저에서 직접 열어보세요:
 
 ```sh
-curl -s -o /dev/null -w "%{http_code}\n" https://img.bay-yonsei.com
+curl -s -o /dev/null -w "%{http_code}\n" https://img.blockchainatyonsei.com
 ```
 
 **Q. 되돌리고 싶습니다**

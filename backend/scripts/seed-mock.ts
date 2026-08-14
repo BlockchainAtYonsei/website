@@ -1,7 +1,8 @@
 /* Mock articles — the one dataset still waiting on its real Notion DB.
 
    npm run seed:mock   (DESTRUCTIVE for articles only: wipes and re-creates
-   them; members and news are never touched)
+   them; members and news are never touched, and a non-local DATABASE_URL is
+   refused outright — see assertLocalDatabase below)
 
    The roster is real (seed:members) and news tracking syncs from the 리서치
    Notion, so this script owns exactly what is still mock: the research
@@ -23,6 +24,39 @@ try {
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 });
+
+/* Where the local database lives — everything else is somebody's real data.
+   Names, not addresses: the production DB answers to `bay-pg` on the docker
+   network (docs/deploy-runbook.md), so a container hostname is exactly the
+   case this has to catch. */
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+
+/* This script wipes tables. An earlier version of it seeded news as well, and
+   a run of that one against production put thirty invented stories on the
+   live site under real members' bylines, where they sat for weeks — nobody
+   was going to notice, because they look exactly like the real ones. The
+   news seeding is gone; the `deleteMany` on articles is not, so the same
+   slip is still one shell history entry away.
+
+   The environment is the only thing that distinguishes the two runs, so the
+   environment is what gets checked. An intentional remote seed still works,
+   it just has to be said out loud rather than inherited from whatever
+   DATABASE_URL happened to be exported. */
+function assertLocalDatabase(): void {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is not set");
+  if (process.env.SEED_ALLOW_REMOTE === "1") {
+    console.warn("  SEED_ALLOW_REMOTE=1 — seeding a non-local database on purpose");
+    return;
+  }
+  const host = new URL(url).hostname;
+  if (LOCAL_HOSTS.has(host)) return;
+  throw new Error(
+    `refusing to seed: DATABASE_URL points at "${host}", not a local database. ` +
+      "This script deletes every article row. If that is genuinely what you want " +
+      "there, re-run with SEED_ALLOW_REMOTE=1.",
+  );
+}
 
 /* ---- filler articles: enough volume to exercise the archive layout ----
    Titles/bodies are deliberately rough ("대충") — they exist to answer "what
@@ -102,6 +136,8 @@ const PAIRINGS: Record<string, string[]> = {
 };
 
 async function main() {
+  assertLocalDatabase();
+
   /* bylines resolve against the real roster — run seed:members first */
   const members = await prisma.member.findMany({
     select: { id: true, slug: true, team: true },

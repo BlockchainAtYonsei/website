@@ -23,6 +23,11 @@ export type NewsItem = {
   /* First image out of the write-up's body — the card thumbnail. Null falls
      back to generated cover art. */
   imageUrl: string | null;
+  /* The publisher's og:image, kept as the second try when imageUrl doesn't
+     load: it lives on a different host, so the failure that takes one out
+     rarely takes both. Equal to imageUrl when the write-up had no picture of
+     its own, and null when the story has no crawlable original. */
+  coverUrl: string | null;
   date: string; // ISO — the story's original publication date
   curator: { slug: string; name: string; avatarUrl: string | null } | null;
 };

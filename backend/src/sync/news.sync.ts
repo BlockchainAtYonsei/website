@@ -79,8 +79,9 @@ export class NewsSyncService {
     );
   }
 
-  /* Card-image fallback for write-ups that carry no picture: the original
-     story's og:image, fetched once per item. Re-hosted when storage is
+  /* The original story's og:image, fetched once per item — the card picture
+     for a write-up that carries none, and the fallback under one that does.
+     Re-hosted when storage is
      configured; kept as the publisher's CDN URL otherwise — unlike Notion
      files those don't expire, so local work needs no warning. An existing
      cover is reused unless the Source link changed, which keeps the nightly
@@ -167,11 +168,13 @@ export class NewsSyncService {
           select: { id: true, url: true, coverUrl: true },
         });
 
-        /* a picture the curator put in the write-up wins; the og:image only
-           stands in when the body has none */
-        const coverUrl = body.some((b) => b.t === "image")
-          ? null
-          : await this.coverFor(data, existing, stats.warnings);
+        /* Both pictures are kept, and the render picks: the curator's own
+           beats the publisher's og:image every time (content/shape.ts), but
+           nulling the loser here meant one dead image left the card with
+           nothing at all to show — which is exactly what shipped. Two URLs
+           per row is the cheapest insurance there is against a picture that
+           stops resolving, and publishers do rename paths. */
+        const coverUrl = await this.coverFor(data, existing, stats.warnings);
 
         const row = {
           slug: data.slug,

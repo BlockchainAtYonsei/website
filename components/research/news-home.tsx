@@ -1,12 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { summaryPreview, weekOf, type NewsItem } from "@/lib/news";
 import type { Accent } from "@/lib/research";
 import Avatar from "./avatar";
-import CoverArt from "./cover-art";
+import NewsThumb from "./news-thumb";
 import { ArrowUpRight } from "../icons";
 
 /* The news page in three passes over one feed: what just landed, what the
@@ -14,12 +13,11 @@ import { ArrowUpRight } from "../icons";
    weight to every story, which is the wrong shape for a page you arrive at
    cold — these sections rank instead.
 
-   One gap against the design, in the data rather than here: news items carry
-   no image, so the hero and the topic grid use the same generated cover art
-   the research cards use. A real `imageUrl` on the Notion DB would slot
-   straight into <CoverArt>'s place. Topics, which were the other gap, now
-   come through in full — Notion's Topic is a multi-select and a card shows
-   every tag the curator applied.
+   Every picture on the page goes through <NewsThumb>, which owns the walk
+   from the curator's own image down to the publisher's og:image down to
+   generated art — the sections differ in size and priority, not in what they
+   do when a photo fails to load. Topics come through in full: Notion's Topic
+   is a multi-select and a card shows every tag the curator applied.
 
    "Editor's Picks" reads the team's own Pick checkbox. It falls back to the
    newest week's curation when nothing is ticked, so the band never goes blank
@@ -235,36 +233,14 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
             href={`/research/news/${hero.slug}`}
             className="group liquid-glass flex flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.01] lg:col-span-7"
           >
-            {hero.imageUrl ? (
-              /* the story's own picture beats generated art every time. The
-                 photos arrive in every temperature a newsroom ships, so the
-                 same bottom vignette CoverArt bakes in goes over every real
-                 photo too — that alone is enough to sit them beside each
-                 other. They keep their colour: draining it made a room of
-                 press photos read as an archive. */
-              <div className="relative aspect-[16/9] w-full overflow-hidden">
-                {/* through /_next/image, not hot-linked: publishers ship
-                    1400px+ originals (up to 2.2MB measured) that turned
-                    topic-switching into a 2-3s wait — the optimizer serves
-                    card-sized WebPs from our own host instead */}
-                <Image
-                  src={hero.imageUrl}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 640px, 100vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-              </div>
-            ) : (
-              <CoverArt
-                accent={accentOf(hero.categories[0] ?? "")}
-                tag={hero.categories[0] ?? "News"}
-                large
-                className="aspect-[16/9] w-full"
-              />
-            )}
+            {/* the story's own picture beats generated art every time */}
+            <NewsThumb
+              item={hero}
+              accent={accentOf(hero.categories[0] ?? "")}
+              sizes="(min-width: 1024px) 640px, 100vw"
+              priority
+              large
+            />
             <div className="flex flex-1 flex-col p-6 md:p-7">
               <h3 className="font-heading text-2xl leading-[1.15] tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-3xl">
                 {hero.title}
@@ -346,24 +322,11 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
                     band the page wants you to stop at, so it should not be the
                     one section that reads as a wall of text. What still tells
                     the two apart is the write-up — a pick keeps its summary. */}
-                {item.imageUrl ? (
-                  <div className="relative aspect-[16/9] w-full overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                  </div>
-                ) : (
-                  <CoverArt
-                    accent={accentOf(item.categories[0] ?? "")}
-                    tag={item.categories[0] ?? "News"}
-                    className="aspect-[16/9] w-full"
-                  />
-                )}
+                <NewsThumb
+                  item={item}
+                  accent={accentOf(item.categories[0] ?? "")}
+                  sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+                />
                 <div className="flex flex-1 flex-col p-6">
                   <h3 className="font-body text-lg leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                     {item.title}
@@ -445,24 +408,11 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               href={`/research/news/${item.slug}`}
               className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
             >
-              {item.imageUrl ? (
-                <div className="relative aspect-[16/9] w-full overflow-hidden">
-                  <Image
-                    src={item.imageUrl}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-                </div>
-              ) : (
-                <CoverArt
-                  accent={accentOf(item.categories[0] ?? "")}
-                  tag={item.categories[0] ?? "News"}
-                  className="aspect-[16/9] w-full"
-                />
-              )}
+              <NewsThumb
+                item={item}
+                accent={accentOf(item.categories[0] ?? "")}
+                sizes="(min-width: 1024px) 352px, (min-width: 640px) 50vw, 100vw"
+              />
               <div className="flex flex-1 flex-col p-6">
                 <h3 className="font-body text-base leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
                   {item.title}
