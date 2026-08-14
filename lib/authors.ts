@@ -32,6 +32,8 @@ export type Author = {
   avatarUrl: string | null;
   socials: Social[];
   articleCount: number;
+  /* curated news tracking items — 뉴스만 쓴 큐레이터도 디렉토리에 선다 */
+  newsCount: number;
 };
 
 const KNOWN_LABELS = new Set<string>([

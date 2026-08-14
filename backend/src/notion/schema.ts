@@ -25,16 +25,17 @@ export const NEWS_PROPS = {
      which is a scratch field the team leaves as "insight" more often than
      not. The headline lives in Title. */
   title: "Title", // rich_text
-  slug: "Slug", // rich_text — optional; derived from the page id when absent
+  slug: "Slug", // rich_text — no such column today; a pretty-URL lever the
+  // team can add without a code change. Absent → derived from the page id.
   url: "Source", // rich_text holding a URL — often empty, see the mapper
-  source: "출처", // select|rich_text — no such column; the host is the fallback
   summary: "Content Summary", // rich_text — the curator's write-up
   category: "Topic", // multi_select
   publishedAt: "Date of issue", // date
   curator: "Author", // multi_select of names, matched against the roster
   status: "Status", // multi_select
   pick: "Pick", // checkbox — 이번 주 꼭 볼 것
-  week: "Week", // rich_text "2026.08.09~2026.08.15" — unused; dates carry it
+  /* Week ("2026.08.09~2026.08.15") exists in the DB but is not mapped —
+     the site derives weeks from Date of issue. */
 } as const;
 
 /* Korean labels are canonical; English accepted so a DB built from Notion's

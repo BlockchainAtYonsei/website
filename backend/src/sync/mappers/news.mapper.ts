@@ -109,9 +109,9 @@ export function pageToNews(page: PageObjectResponse): NewsMapResult {
       slug,
       title,
       url,
-      /* No 출처 column exists; the host stands in for it, and an item with no
-         link has no source to name — the byline carries the attribution. */
-      sourceName: selectOf(page, P.source) ?? richTextOf(page, P.source) ?? host ?? "",
+      /* The link's host names the source; an item with no link has no source
+         to name — the byline carries the attribution. */
+      sourceName: host ?? "",
       summary,
       /* Kept in the curator's tagging order: the first is what a cramped
          surface shows, so it should be the one they reached for first. An

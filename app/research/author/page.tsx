@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function AuthorsPage() {
-  /* the API already narrows to people with published work (?writers=1);
-     most-published first, then 가나다 — the directory is for finding
-     writing, not reproducing the org chart */
+  /* the API already narrows to people with published work (?writers=1) —
+     articles or curated news; most-published first, then 가나다. The
+     directory is for finding writing, not reproducing the org chart. */
   const authors = (await getAuthors()).sort((a, b) => {
-    const diff = b.articleCount - a.articleCount;
+    const diff = b.articleCount + b.newsCount - (a.articleCount + a.newsCount);
     return diff !== 0 ? diff : a.name.localeCompare(b.name, "ko");
   });
 
@@ -36,7 +36,7 @@ export default async function AuthorsPage() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {authors.map((author) => {
-          const count = author.articleCount;
+          const count = author.articleCount + author.newsCount;
           return (
             <Link
               key={author.slug}

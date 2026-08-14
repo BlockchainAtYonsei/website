@@ -1,12 +1,13 @@
-/* Local mock seed — full research roster + articles + news so layout work
-   has a realistically shaped dataset before Notion connects.
+/* Mock articles — the one dataset still waiting on its real Notion DB.
 
-   npm run seed:mock   (DESTRUCTIVE: wipes members/articles/news first)
+   npm run seed:mock   (DESTRUCTIVE for articles only: wipes and re-creates
+   them; members and news are never touched)
 
-   Every member gets exactly one byline via two-author pairings: the Authors
-   directory lists writers only, so this is what makes the whole team visible
-   there. Avatars mix pravatar placeholders with a few nulls to keep the
-   no-photo rendering honest. */
+   The roster is real (seed:members) and news tracking syncs from the 리서치
+   Notion, so this script owns exactly what is still mock: the research
+   articles. Bylines attach to the real member rows by slug — a pairing whose
+   slug has left the roster drops with a warning rather than failing the
+   seed. */
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -22,45 +23,6 @@ try {
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 });
-
-const mockSocials = (slug: string) => [
-  { label: "X", href: `https://x.com/${slug}` },
-  { label: "GitHub", href: `https://github.com/${slug}` },
-  { label: "LinkedIn", href: "https://www.linkedin.com" },
-];
-
-const avatar = (slug: string) => `https://i.pravatar.cc/300?u=${slug}`;
-
-type MockMember = {
-  slug: string;
-  name: string;
-  cohort: number;
-  team: string;
-  position: string;
-  bio: string;
-  avatarUrl: string | null;
-  socials?: { label: string; href: string }[];
-};
-
-const MEMBERS: MockMember[] = [
-  { slug: "yerim-bae", name: "배예림", cohort: 17, team: "리서치팀", position: "팀장", bio: "리서치팀을 이끌며 스테이킹 파생 구조와 프로토콜 인센티브 설계를 봅니다.", avatarUrl: avatar("yerim-bae") },
-  { slug: "jehee-noh", name: "노제희", cohort: 17, team: "리서치팀", position: "부원", bio: "DeFi 시장 구조와 MEV, 온체인 유동성의 이동을 추적합니다.", avatarUrl: avatar("jehee-noh") },
-  { slug: "jaehwan-lee", name: "이재환", cohort: 17, team: "리서치팀", position: "부원", bio: "ZK 증명 시스템과 롤업 인프라의 비용 구조를 파고듭니다.", avatarUrl: avatar("jaehwan-lee") },
-  { slug: "jaeseo-kim", name: "김재서", cohort: 18, team: "리서치팀", position: "부원", bio: "온체인 거버넌스와 DAO의 의사결정 구조를 데이터로 봅니다.", avatarUrl: avatar("jaeseo-kim") },
-  { slug: "uihyeok-park", name: "박의혁", cohort: 18, team: "리서치팀", position: "부원", bio: "스테이블코인과 RWA, 온체인 금융의 신뢰 구조에 관심이 있습니다.", avatarUrl: null },
-  { slug: "younghwan-shin", name: "신영환", cohort: 18, team: "리서치팀", position: "부원", bio: "모듈러 블록체인과 DA 레이어의 경제성을 들여다봅니다.", avatarUrl: avatar("younghwan-shin") },
-  { slug: "seongjae-lee", name: "이성재", cohort: 18, team: "리서치팀", position: "부원", bio: "합의 알고리즘과 노드 인프라의 안정성을 공부합니다.", avatarUrl: null },
-  { slug: "chaeyun-lim", name: "임채윤", cohort: 18, team: "리서치팀", position: "부원", bio: "토큰 이코노미와 프로토콜 수익 모델을 분석합니다.", avatarUrl: avatar("chaeyun-lim") },
-  { slug: "donghyun-jang", name: "장동현", cohort: 18, team: "리서치팀", position: "부원", bio: "크로스체인 브릿지와 상호운용성 프로토콜의 위험을 봅니다.", avatarUrl: avatar("donghyun-jang") },
-  { slug: "yunseon-jang", name: "장윤선", cohort: 18, team: "리서치팀", position: "부원", bio: "온체인 데이터 분석과 시장 미시구조에 관심이 있습니다.", avatarUrl: null },
-  { slug: "hyunchae-cho", name: "조현채", cohort: 18, team: "리서치팀", position: "부원", bio: "지갑 UX와 계정 추상화, 온보딩 구조를 리서치합니다.", avatarUrl: avatar("hyunchae-cho") },
-  {
-    slug: "sanghyeon-kwon", name: "권상현", cohort: 17, team: "홍보팀", position: "부장",
-    bio: "학회 바깥으로 나가는 글과 브랜드를 만듭니다. 시장 구조와 인프라 경제성에 대해 씁니다.",
-    avatarUrl: "https://github.com/0xSHKWON.png",
-    socials: [{ label: "GitHub", href: "https://github.com/0xSHKWON" }],
-  },
-];
 
 /* ---- filler articles: enough volume to exercise the archive layout ----
    Titles/bodies are deliberately rough ("대충") — they exist to answer "what
@@ -139,93 +101,41 @@ const PAIRINGS: Record<string, string[]> = {
   "modular-da-economics": ["younghwan-shin", "donghyun-jang"],
 };
 
-type MockNews = {
-  title: string;
-  url: string;
-  sourceName: string;
-  summary: string;
-  category: string;
-  publishedAt: string;
-  curator?: string;
-  draft?: boolean;
-};
-
-/* 요약/인사이트 body in the reference layout's shape — numbered facts, then
-   numbered takes. Rough filler; real ones come from the Notion page body. */
-function newsBody(n: MockNews): Block[] {
-  return [
-    { t: "h2", text: "요약" },
-    {
-      t: "ol",
-      items: [
-        `${n.sourceName} 보도 요지: ${n.title}.`,
-        "관련 주체와 일정, 수치 등 팩트 요약이 이 자리에 들어간다. 목업이므로 두 문장으로 줄인다.",
-        "직전 주 흐름과 어떻게 이어지는지 한 항목으로 연결한다.",
-      ],
-    },
-    { t: "h2", text: "인사이트" },
-    {
-      t: "ol",
-      items: [
-        n.summary || "큐레이터의 첫 번째 코멘트가 들어갈 자리.",
-        "두 번째 관전 포인트 — 다음에 확인할 지표나 일정을 적는다.",
-      ],
-    },
-  ];
-}
-
-/* Dates cluster three-to-four items per week — the feed groups by the club's
-   weekly curation session, so the mock has to look like weekly batches. */
-const NEWS: MockNews[] = [
-  { title: "이더리움 클라이언트 다양성 보고서 — 단일 클라이언트 점유율 첫 50% 아래로", url: "https://www.theblock.co/mock/client-diversity", sourceName: "The Block", summary: "숫자보다 감소 속도가 중요하다. 슈퍼머저리티 리스크가 처음으로 협상 가능한 범위에 들어왔다.", category: "Infra", publishedAt: "2026-08-09", curator: "younghwan-shin" },
-  { title: "대형 거래소, 준비금 증명에 실시간 오라클 도입", url: "https://www.coindesk.com/mock/por-oracle", sourceName: "CoinDesk", summary: "월간 어테스테이션의 관측 공백 문제를 정확히 겨냥한 변화. 다만 보관 위험은 여전히 서명자에 있다.", category: "Market", publishedAt: "2026-08-07", curator: "sanghyeon-kwon" },
-  { title: "L2 수수료 급락 이후 첫 시퀀서 수익 보고서", url: "https://www.dlnews.com/mock/sequencer-revenue", sourceName: "DL News", summary: "블롭 이후 마진 구조가 어떻게 재편됐는지 보여주는 첫 실측 데이터.", category: "Infra", publishedAt: "2026-08-06", curator: "donghyun-jang" },
-  { title: "롤업 A, 스테이지 2 달성 — 보안 카운슬 권한 대폭 축소", url: "https://www.dlnews.com/mock/stage2", sourceName: "DL News", summary: "탈출구가 코드로 보장되는 첫 대형 사례. 다른 롤업들의 로드맵 발표가 이어질 것.", category: "Infra", publishedAt: "2026-08-03", curator: "jaehwan-lee" },
-  { title: "하드포크 일정 확정", url: "https://theblock.co/p/1", sourceName: "The Block", summary: "검증자 이탈률 조항이 핵심.", category: "Infra", publishedAt: "2026-08-01", curator: "yerim-bae" },
-  { title: "온체인 옵션 미결제약정 사상 최고 — 볼륨은 여전히 CEX의 5%", url: "https://www.bankless.com/mock/onchain-options", sourceName: "Bankless", summary: "성장률과 절대 규모를 섞어 읽으면 안 되는 대표적 지표.", category: "DeFi", publishedAt: "2026-07-31", curator: "jehee-noh" },
-  { title: "스테이킹 ETF 두 번째 승인 — 수탁 구조는 여전히 단일 사업자", url: "https://www.reuters.com/mock/staking-etf", sourceName: "Reuters", summary: "상품은 늘었지만 슬래싱 위험의 귀속 문제는 그대로다.", category: "Market", publishedAt: "2026-07-29", curator: "yunseon-jang" },
-  { title: "미 재무부, 스테이블코인 발행사 연방 인가 세부 규칙 공개", url: "https://www.reuters.com/mock/stablecoin-charter", sourceName: "Reuters", summary: "준비금 구성보다 환매 SLA 조항이 실질적 진입장벽. 중소 발행사 통폐합이 시작될 자리다.", category: "Regulation", publishedAt: "2026-07-24", curator: "uihyeok-park" },
-  { title: "듄 리포트 — 리스테이킹 TVL의 실효 담보율 추정", url: "https://www.dune.com/mock/restaking-collateral", sourceName: "Dune", summary: "명목 TVL과 실효 담보의 간극을 처음으로 수치화한 시도.", category: "Infra", publishedAt: "2026-07-22", curator: "yerim-bae" },
-  { title: "인텐트 기반 브릿지 점유율, 락앤민트 방식 첫 추월", url: "https://www.bankless.com/mock/intent-bridges", sourceName: "Bankless", summary: "솔버 담보 요건이 아직 표준화되지 않았다는 점을 기억할 것. 점유율 성장이 위험 총량 성장이기도 하다.", category: "DeFi", publishedAt: "2026-07-18", curator: "jehee-noh" },
-  { title: "ZK 프루버 시장에 첫 선물 계약 등장", url: "https://www.theblock.co/mock/prover-futures", sourceName: "The Block", summary: "용량을 미리 사두기 시작했다는 것 — 증명 시장 성숙의 신호로 읽어야 한다.", category: "ZK", publishedAt: "2026-07-16", curator: "seongjae-lee" },
-  { title: "주요 DAO 투표율, 위임 만료제 도입 후 3배 상승", url: "https://www.decrypt.co/mock/delegation-expiry", sourceName: "Decrypt", summary: "방치된 투표권 회수가 정족수 문제의 실효적 해법임을 보여준 첫 대규모 실험.", category: "Governance", publishedAt: "2026-06-30", curator: "jaeseo-kim" },
-  { title: "글로벌 은행 3곳, 토큰화 국채 결제망 공동 출범", url: "https://www.ft.com/mock/tokenized-treasuries", sourceName: "Financial Times", summary: "온체인 RWA의 유동성 분절 문제가 처음으로 발행 단에서 다뤄진다.", category: "Market", publishedAt: "2026-06-21", curator: "chaeyun-lim" },
-  { title: "(초안) 다음 주 뉴스 후보", url: "https://example.com/mock/draft", sourceName: "TBD", summary: "", category: "Market", publishedAt: "2026-08-11", draft: true },
-];
-
 async function main() {
-  await prisma.articleAuthor.deleteMany();
-  await prisma.article.deleteMany();
-  await prisma.newsItem.deleteMany();
-  await prisma.member.deleteMany();
-
-  const idBySlug = new Map<string, string>();
-  for (const m of MEMBERS) {
-    const row = await prisma.member.create({
-      data: {
-        slug: m.slug,
-        name: m.name,
-        cohort: m.cohort,
-        team: m.team,
-        position: m.position,
-        bio: m.bio,
-        socials: m.socials ?? mockSocials(m.slug),
-        avatarUrl: m.avatarUrl,
-        status: "active",
-        visible: true,
-      },
-    });
-    idBySlug.set(m.slug, row.id);
+  /* bylines resolve against the real roster — run seed:members first */
+  const members = await prisma.member.findMany({
+    select: { id: true, slug: true, team: true },
+  });
+  const idBySlug = new Map(members.map((m) => [m.slug, m.id]));
+  if (idBySlug.size === 0) {
+    throw new Error("the roster is empty — run `npm run seed:members` first");
   }
 
-  const memberSlugs = MEMBERS.map((m) => m.slug);
+  /* fillers rotate through the research team (slug-sorted for deterministic
+     reruns) so every research author page gets a multi-piece list */
+  const writerSlugs = members
+    .filter((m) => m.team === "리서치팀")
+    .map((m) => m.slug)
+    .sort();
+
+  await prisma.articleAuthor.deleteMany();
+  await prisma.article.deleteMany();
+
+  let dropped = 0;
   const all: (Article & { views?: number })[] = [...ARTICLES, ...FILLERS];
   for (const [i, a] of all.entries()) {
-    /* real mocks keep their curated pairings; fillers rotate through the
-       roster so every author page gets a multi-piece list */
-    const authors =
-      PAIRINGS[a.slug] ??
-      [memberSlugs[i % 12], memberSlugs[(i + 5) % 12]];
+    /* real mocks keep their curated pairings */
+    const authors = (
+      PAIRINGS[a.slug] ?? [
+        writerSlugs[i % writerSlugs.length],
+        writerSlugs[(i + 5) % writerSlugs.length],
+      ]
+    ).filter((slug) => {
+      if (idBySlug.has(slug)) return true;
+      dropped++;
+      console.warn(`  ${a.slug}: author "${slug}" is not in the roster — byline dropped`);
+      return false;
+    });
     const article = await prisma.article.create({
       data: {
         slug: a.slug,
@@ -252,27 +162,9 @@ async function main() {
     });
   }
 
-  for (const [i, n] of NEWS.entries()) {
-    await prisma.newsItem.create({
-      data: {
-        slug: `news-${String(i + 1).padStart(2, "0")}`,
-        title: n.title,
-        url: n.url,
-        sourceName: n.sourceName,
-        summary: n.summary,
-        body: n.draft ? [] : newsBody(n),
-        views: ((i * 83) % 240) + 6,
-        category: n.category,
-        publishedAt: new Date(n.publishedAt),
-        status: n.draft ? "draft" : "published",
-        curatorId: n.curator ? idBySlug.get(n.curator) : null,
-        notionPageId: `mock-news-${i}`,
-      },
-    });
-  }
-
   console.log(
-    `seeded ${MEMBERS.length} members, ${all.length} articles, ${NEWS.length} news items`,
+    `seeded ${all.length} mock articles over the ${idBySlug.size}-member roster` +
+      (dropped ? ` (${dropped} bylines dropped)` : ""),
   );
 }
 
