@@ -41,8 +41,8 @@ type Seed = {
   // Profile photo — an external URL (github.com/u/... etc.), or "/members/
   // <slug>.jpg" for a file committed to the frontend's public/members/ (no
   // S3/R2 is configured, so that's where a handed-over photo file goes — see
-  // public/members/README.md). The 리서치팀 batch landed 2026-08-15, 10 of 11;
-  // until 이재환's arrives he shows the monogram fallback.
+  // public/members/README.md). The 리서치팀 batch landed 2026-08-15, all 11 of
+  // them; the other teams are still on the monogram fallback.
   avatarUrl?: string;
   socials?: { label: string; href: string }[];
 };
@@ -313,6 +313,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "블록체인을 통한 RWA시장의 변화를 주시하고 있습니다.",
+    avatarUrl: "/members/jaehwan-lee.webp",
     socials: [
       { label: "Telegram", href: "https://t.me/delpa818" },
       { label: "X", href: "https://x.com/delpa818" },
