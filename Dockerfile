@@ -31,9 +31,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/.next/standalone ./
+# --chown, because the app runs as nextjs below: a root-owned .next means the
+# image optimizer (and ISR) can't create .next/cache — it fails silently and
+# re-fetches every original on every request instead
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
