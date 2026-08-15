@@ -57,9 +57,9 @@ docker exec bay-backend npm run seed:mock     # 샘플 글 (뉴스·멤버는 �
 
 ```sh
 docker ps                        # bay-pg, bay-backend, bay-web 세 개
-curl -s localhost:4000/health    # {"status":"ok","db":"up",...}
+curl -s localhost:4001/health    # {"status":"ok","db":"up",...}
 curl -s localhost:3001/research/news -o /dev/null -w "%{http_code}\n"   # 200
-curl -s "localhost:4000/v1/news?size=50" | grep -c amazonaws            # 0 (R2 후)
+curl -s "localhost:4001/v1/news?size=50" | grep -c amazonaws            # 0 (R2 후)
 ```
 
 넷 다 통과하면 끝입니다. 막히면 `/Users/Shared/srv/.bay-web-cicd/deploy.log`

@@ -8,7 +8,8 @@
 [Cloudflare 터널] → bay-web :3001 (Next.js)
                       │ 서버사이드 fetch
                       ▼
-                    bay-backend :4000 (NestJS · Notion sync + API)
+                    bay-backend 호스트 :4001 → 컨테이너 :4000
+                                     (NestJS · Notion sync + API)
                       │ bay-net (도커 내부망)
                       ▼
                     bay-pg (Postgres 17 · 볼륨 bay-pg-data)
@@ -58,13 +59,13 @@ chmod 600 $BASE/backend.env
 # 3. 다음 폴링(60초)에 자동 배포됨. 확인:
 tail -20 $BASE/deploy.log
 docker ps            # bay-pg, bay-backend, bay-web 세 개
-curl -s localhost:4000/health   # {"status":"ok","db":"up",...}
+curl -s localhost:4001/health   # {"status":"ok","db":"up",...}
 curl -s localhost:3001/research -o /dev/null -w "%{http_code}\n"   # 200
 ```
 
 ## Cloudflare 주의
 
-- 터널/프록시는 **:3001(bay-web)만** 노출합니다. :4000은 노출할 필요
+- 터널/프록시는 **:3001(bay-web)만** 노출합니다. :4001은 노출할 필요
   없습니다 — 사이트가 서버사이드에서만 호출합니다.
 - 지금 main이 Cloudflare **Pages** 정적 호스팅이라면, 이 버전부터는 그
   방식이 불가합니다(백엔드 + DB + ISR 필요). 맥미니 + 터널 구성으로
@@ -80,10 +81,10 @@ curl -s localhost:3001/research -o /dev/null -w "%{http_code}\n"   # 200
 
 ```sh
 # Notion에서 발행 직후 즉시 반영하고 싶을 때 (평소엔 10분 주기 자동)
-curl -X POST -H "x-sync-key: $SYNC_KEY" localhost:4000/v1/sync/all
+curl -X POST -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/all
 
 # 콘텐츠가 안 보일 때 — sync 런 경고 확인
-curl -H "x-sync-key: $SYNC_KEY" localhost:4000/v1/sync/runs
+curl -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/runs
 
 # 데이터 백업 (가끔)
 docker exec bay-pg pg_dump -U bay bay > ~/bay-backup-$(date +%Y%m%d).sql

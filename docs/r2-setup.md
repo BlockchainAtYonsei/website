@@ -11,7 +11,7 @@
 
 ```sh
 source /Users/Shared/srv/.bay-web-cicd/backend.env
-curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
+curl -i -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4001/v1/sync/news?full=1"
 ```
 
 이것만으로 두 가지가 해결됩니다:
@@ -21,7 +21,15 @@ curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
   넣습니다.
 - **가짜 뉴스 30건이 사이트에서 내려갑니다.** (아래 8단계 참고)
 
-**2~3분쯤 걸리고 그동안 응답이 없습니다.** 정상입니다.
+**2~3분쯤 걸리고 그동안 응답이 없습니다.** 정상입니다. 끝나면 맨 위에
+`HTTP/1.1 201`과 처리 건수가 나옵니다.
+
+> **포트는 4001입니다.** 백엔드는 컨테이너 안에서 4000을 듣지만 맥미니
+> 바깥으로는 4001로 열려 있습니다. 이 문서가 한동안 4000으로 적혀 있었고,
+> 그 포트로 보내면 `curl`이 **아무 말 없이 아무것도 안 합니다** — 실행한 것
+> 처럼 보이는데 서버에는 닿지 않습니다. 위 명령에 `-i`가 붙어 있는 이유가
+> 이것으로, 상태 코드가 찍히니 그런 실패를 눈으로 잡을 수 있습니다.
+> 포트가 의심되면 `docker port bay-backend`로 확인하세요.
 
 아래 R2 셋업(1~7단계)은 이 다음에 여유 있을 때 하시면 됩니다. 급한 불은 위
 한 줄로 꺼집니다.
@@ -127,7 +135,7 @@ docker restart bay-backend
 10초쯤 뒤 정상 기동 확인:
 
 ```sh
-curl -s localhost:4000/health
+curl -s localhost:4001/health
 ```
 
 `{"status":"ok","db":"up",...}` 가 나오면 됩니다.
@@ -138,7 +146,7 @@ curl -s localhost:4000/health
 
 ```sh
 source /Users/Shared/srv/.bay-web-cicd/backend.env
-curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
+curl -i -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4001/v1/sync/news?full=1"
 ```
 
 **끝에 붙은 `?full=1`이 반드시 있어야 합니다.** 이게 없으면 최근에 수정된
@@ -157,7 +165,7 @@ curl -X POST -H "x-sync-key: $SYNC_KEY" "localhost:4000/v1/sync/news?full=1"
 안 남았다는 뜻):
 
 ```sh
-curl -s "localhost:4000/v1/news?size=50" | grep -c amazonaws
+curl -s "localhost:4001/v1/news?size=50" | grep -c amazonaws
 ```
 
 `0`이 나왔다면 브라우저에서 https://www.blockchainatyonsei.com/research/news 를 열어
@@ -181,7 +189,7 @@ curl -s "localhost:4000/v1/news?size=50" | grep -c amazonaws
 것입니다:
 
 ```sh
-curl -s "localhost:4000/v1/news?size=100" | grep -c "/mock/"
+curl -s "localhost:4001/v1/news?size=100" | grep -c "/mock/"
 ```
 
 `0`이 아니면 명령 끝의 `?full=1`이 빠졌을 가능성이 높습니다. 그대로 다시
@@ -225,7 +233,7 @@ docker exec bay-pg psql -U bay -d bay -c "UPDATE news_items SET cover_url = NULL
 
 ```sh
 source /Users/Shared/srv/.bay-web-cicd/backend.env
-curl -s -H "x-sync-key: $SYNC_KEY" localhost:4000/v1/sync/runs | head -40
+curl -s -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/runs | head -40
 ```
 
 여기 나온 경고 문구를 그대로 개발자에게 전달해주시면 됩니다. 자주 나오는
