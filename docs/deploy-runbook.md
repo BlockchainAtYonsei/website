@@ -1,11 +1,9 @@
-# 맥미니 배포 런북 — 리서치 백엔드 합류판
+# 맥미니 배포 런북
 
-이 브랜치가 main에 머지되면 배포 구조가 **컨테이너 1개 → 3개**로 바뀝니다.
-운영자가 맥미니에서 **한 번만** 해줄 일이 있고, 그 전까지는 기존 사이트가
-그대로 떠 있습니다(안전).
+배포 구조는 **컨테이너 3개**입니다.
 
 ```
-[Cloudflare 터널] → bay-web :3001 (Next.js)
+[Cloudflare 터널] → bay-web 호스트 :3001 → 컨테이너 :3000 (Next.js)
                       │ 서버사이드 fetch
                       ▼
                     bay-backend 호스트 :4001 → 컨테이너 :4000
@@ -15,14 +13,38 @@
                     bay-pg (Postgres 17 · 볼륨 bay-pg-data)
 ```
 
-## 머지 직후 무슨 일이 일어나나
+> **백엔드 호스트 포트를 믿지 말고 확인하세요 — `docker port bay-backend`.**
+> 이 저장소의 `scripts/deploy.sh`는 `-p 4000:4000`으로 띄우는데, 맥미니에서
+> 실제로 동작한 명령은 4001이었습니다(`docs/r2-setup.md`). launchd가 실행하는
+> 것은 checkout이 아니라 `/Users/Shared/srv/BAY-WEB/scripts/deploy.sh` 복사본
+> 이라, 그 복사본이 구버전이면 이렇게 갈립니다. 틀린 포트로 보내면 `curl`이
+> **조용히 아무것도 안 합니다** — 그래서 아래 명령에는 `-i`를 붙입니다.
 
-기존 `deploy.sh`(운영자 복사본)가 새 main을 빌드하려다 **실패하고 기존
-컨테이너를 유지**합니다 — 새 웹은 빌드 시점에 백엔드 API가 필요하기
-때문입니다. 즉 머지 자체로 사이트가 죽지는 않지만, 아래 셋업 전까지 새
-버전은 배포되지 않습니다.
+## 지금 상태 (2026-08-15)
 
-## 1회 셋업 (순서대로)
+아래 1회 셋업과 R2 연결은 **이미 끝났습니다.** 이 문서는 재구축·인수인계용
+으로 남깁니다. 현재 돌아가는 방식:
+
+- **뉴스** — Notion에서 10분 주기로 동기화되는 실제 데이터. 본문 이미지는
+  R2(버킷 `bay-media`)로 재호스팅되어 `img.blockchainatyonsei.com`으로
+  나갑니다.
+- **리서치 글** — 아직 **의도된 목업**입니다. 리서치용 Notion DB가 없어서
+  `NOTION_DB_ARTICLES`를 비워둔 채 `seed:mock`으로 채워둔 상태이고,
+  실명 바이라인이 붙습니다. 실제 DB가 생기면 아래 "리서치 Notion DB 붙이기"
+  대로 전환하세요.
+- **멤버 명단** — Notion이 아니라 저장소가 원본입니다.
+  `backend/scripts/seed-members.ts` 편집 → 머지 → 컨테이너 부팅 시 자동 반영.
+
+## 자동으로 되는 것 (할 일 아님)
+
+머지되면 맥미니의 자동 배포(60초 폴링)가 처리합니다:
+
+- 컨테이너 3개 빌드·재기동
+- DB 스키마 마이그레이션 (부팅 시 자동, 실패하면 기존 컨테이너 유지)
+- 멤버 명단 upsert (부팅 시 자동, 실패해도 서버는 뜨고 로그만 남음)
+- Notion 동기화 (10분 주기 + 배포 직전 1회)
+
+## 1회 셋업 (재구축 시, 순서대로)
 
 ```sh
 BASE=/Users/Shared/srv/.bay-web-cicd
@@ -39,10 +61,10 @@ DATABASE_URL=postgresql://bay:$PG_PW@bay-pg:5432/bay
 SYNC_KEY=$(openssl rand -hex 24)
 REVALIDATE_SECRET=$(openssl rand -hex 24)
 REVALIDATE_URL=http://host.docker.internal:3001/api/revalidate
-# Notion — 준비되면 채우고 저장만 하면 됨 (없어도 배포는 됨, 리서치 섹션이 비어 보일 뿐)
+# Notion — 토큰과 뉴스 DB id 2개는 상현에게 받으면 됩니다. 나머지는 비워두세요.
 # 멤버는 Notion이 아니라 backend/scripts/seed-members.ts가 원본 — 부팅 시 자동 반영
 NOTION_TOKEN=
-NOTION_DB_ARTICLES=
+NOTION_DB_ARTICLES=   # 비워둘 것 — 리서치용 Notion DB가 아직 없습니다(아래 참고)
 NOTION_DB_NEWS=
 # 뉴스 본문 이미지 재호스팅용 R2/S3 — 뉴스 sync를 켰다면 사실상 필수:
 # 미설정이면 Notion 서명 URL을 그대로 저장하는데, 그 URL은 1시간이면 죽는다
@@ -61,11 +83,18 @@ tail -20 $BASE/deploy.log
 docker ps            # bay-pg, bay-backend, bay-web 세 개
 curl -s localhost:4001/health   # {"status":"ok","db":"up",...}
 curl -s localhost:3001/research -o /dev/null -w "%{http_code}\n"   # 200
+curl -s "localhost:4001/v1/news?size=50" | grep -c amazonaws       # 0 (R2 연결 후)
 ```
+
+## 리서치 Notion DB 붙이기 (나중에)
+
+리서치용 Notion DB를 만들면: 그 DB를 통합에 공유 → id를
+`NOTION_DB_ARTICLES`에 넣기 → `docker restart bay-backend`. 그 전까지
+리서치 목록은 `seed:mock`이 채운 목업입니다(운영 섹션 참고).
 
 ## Cloudflare 주의
 
-- 터널/프록시는 **:3001(bay-web)만** 노출합니다. :4001은 노출할 필요
+- 터널/프록시는 **:3001(bay-web)만** 노출합니다. 백엔드 포트는 노출할 필요
   없습니다 — 사이트가 서버사이드에서만 호출합니다.
 - 지금 main이 Cloudflare **Pages** 정적 호스팅이라면, 이 버전부터는 그
   방식이 불가합니다(백엔드 + DB + ISR 필요). 맥미니 + 터널 구성으로
@@ -81,7 +110,7 @@ curl -s localhost:3001/research -o /dev/null -w "%{http_code}\n"   # 200
 
 ```sh
 # Notion에서 발행 직후 즉시 반영하고 싶을 때 (평소엔 10분 주기 자동)
-curl -X POST -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/all
+curl -i -X POST -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/all
 
 # 콘텐츠가 안 보일 때 — sync 런 경고 확인
 curl -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/runs
