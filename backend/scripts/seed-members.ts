@@ -41,8 +41,8 @@ type Seed = {
   // Profile photo — an external URL (github.com/u/... etc.), or "/members/
   // <slug>.jpg" for a file committed to the frontend's public/members/ (no
   // S3/R2 is configured, so that's where a handed-over photo file goes — see
-  // public/members/README.md). The 리서치팀 batch arrives 2026-08-15; until
-  // someone's lands here the site shows the monogram fallback.
+  // public/members/README.md). The 리서치팀 batch landed 2026-08-15, 9 of 11;
+  // until the rest arrive those two show the monogram fallback.
   avatarUrl?: string;
   socials?: { label: string; href: string }[];
 };
@@ -285,6 +285,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "팀장",
     bio: "RWA와 스테이블코인을 중심으로 전통금융이 온체인으로 확장되는 흐름을 살펴보고 있습니다.",
+    avatarUrl: "/members/yerim-bae.webp",
     socials: [
       { label: "GitHub", href: "https://github.com/yerim-Bae" },
       {
@@ -303,6 +304,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "RWA·스테이블코인·재보험",
+    avatarUrl: "/members/jehee-noh.webp",
   },
   {
     slug: "jaehwan-lee",
@@ -323,6 +325,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "데이터와 리서치를 기반으로 Web3의 새로운 가능성을 탐구합니다",
+    avatarUrl: "/members/jaeseo-kim.webp",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/ethan-kim-806b90374" },
       { label: "Telegram", href: "https://t.me/ethankim02" },
@@ -335,6 +338,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "전통금융의 눈으로 온체인 생태계를 쉽게 전달합니다.",
+    avatarUrl: "/members/uihyeok-park.webp",
     socials: [{ label: "Telegram", href: "https://t.me/insiapark" }],
   },
   {
@@ -344,6 +348,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "블록체인 거래 내의 Programmable UX 과 AI Agent 의 역할을 파고듭니다.",
+    avatarUrl: "/members/younghwan-shin.webp",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/yeonghwan-shin/" },
       { label: "Telegram", href: "https://t.me/yhshinsimon" },
@@ -357,6 +362,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "블록체인이 만들어갈 변화와 가능성을 꾸준히 기록합니다",
+    avatarUrl: "/members/seongjae-lee.webp",
     socials: [
       { label: "GitHub", href: "https://github.com/sungjae0309" },
       { label: "Telegram", href: "https://t.me/sungjae0309" },
@@ -370,6 +376,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "온체인 데이터와 마켓 메이커의 자금 흐름을 추적하며, 가상자산 제도권 편입 시나리오를 파고듭니다.",
+    avatarUrl: "/members/chaeyun-lim.webp",
     socials: [{ label: "Telegram", href: "https://t.me/limchaeyooon" }],
   },
   {
@@ -379,6 +386,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "웹2,3 취약점 및 스마트컨트랙트 보안을 파고듭니다.",
+    avatarUrl: "/members/donghyun-jang.webp",
     socials: [
       {
         label: "LinkedIn",
@@ -396,6 +404,7 @@ const RESEARCH: Seed[] = [
     team: "리서치팀",
     position: "부원",
     bio: "프로젝트의 비즈니스 모델과 기관의 움직임으로 블록체인 시장을 바라봅니다.",
+    avatarUrl: "/members/yunseon-jang.webp",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/yoonsun-jang-990705276" },
       { label: "Medium", href: "https://medium.com/@yoonsunjang1250" },
