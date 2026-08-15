@@ -47,7 +47,8 @@ export type NewsDetail = NewsItem & {
 
    `ordered` is what the curator numbered, kept rather than flattened to
    dots: the points are steps and cross-refer to each other by number. */
-export type SummaryList = { ordered: boolean; items: string[] };
+export type SummaryItem = { text: string; children: string[] };
+export type SummaryList = { ordered: boolean; items: SummaryItem[] };
 
 const MARKER = /^([•·▪‣\-–—]|\d+[.)])\s*/;
 
@@ -68,25 +69,68 @@ function splitEnumerated(line: string): string[] {
   return [...head, ...cuts.map((c, i) => line.slice(c, cuts[i + 1]))];
 }
 
+const NUMBERED = /^\s*\d+[.)]/;
+const BULLETED = /^\s*[•·▪‣]/;
+
+/* Some summaries are an outline rather than a list — a numbered point that
+   names a heading ("2.투자구조") with its actual content bulleted underneath.
+   Flattening that made the heading a sibling of the two lines it was
+   introducing, so "투자구조" read as a point that says nothing.
+
+   Only an explicit bullet nests. The tempting rule — "any line after a
+   numbered one belongs to it" — reads the curators' data wrong: they hard-
+   wrap long points, so "3.제도권 금융사의 RWA 온체인" / "이전 본격화" is one
+   sentence in two lines, and that rule turned the second half into a
+   sub-point of the first. A bare line is genuinely ambiguous between a
+   sub-point and a wrapped line, and there is no signal in the text to tell
+   them apart, so those stay exactly as they rendered before. */
 export function summaryList(summary: string): SummaryList {
-  const raw = summary
+  const lines = summary
     .split(/\n+/)
     .flatMap(splitEnumerated)
-    .map((l) => l.trim())
-    .filter(Boolean);
+    .filter((l) => l.trim());
+
+  const items: SummaryItem[] = [];
+  let open: SummaryItem | null = null; // the numbered group taking children
+
+  for (const line of lines) {
+    /* trim before stripping the marker, never after: a child is indented, and
+       MARKER is anchored, so "  • reUSD" keeps its bullet if the whitespace
+       goes second. The raw line is what the group test reads, since that's
+       where the indentation still is. */
+    const text = line.trim().replace(MARKER, "").trim();
+    if (!text) continue;
+    if (open && BULLETED.test(line)) {
+      open.children.push(text);
+    } else if (NUMBERED.test(line)) {
+      open = { text, children: [] };
+      items.push(open);
+    } else {
+      open = null;
+      items.push({ text, children: [] });
+    }
+  }
+
+  /* Numbering is the curator's own and the points cross-refer to each other
+     by it, so it's kept rather than flattened to dots — but only when every
+     group carries one, in the order they were typed. */
   const ordered =
-    raw.length > 1 && raw.every((l, i) => l.startsWith(`${i + 1}.`) || l.startsWith(`${i + 1})`));
-  return {
-    ordered,
-    items: raw.map((l) => l.replace(MARKER, "").trim()).filter(Boolean),
-  };
+    items.length > 1 &&
+    lines.filter((l) => NUMBERED.test(l)).length === items.length &&
+    lines
+      .filter((l) => NUMBERED.test(l))
+      .every((l, i) => l.trim().startsWith(`${i + 1}.`) || l.trim().startsWith(`${i + 1})`));
+
+  return { ordered, items };
 }
 
 /* The summary as one clamp-friendly line for cards and rows. A card that
    clamps two lines must not spend them on "•" markers and hard breaks. The
    detail page keeps the full structure — this is for everywhere smaller. */
 export function summaryPreview(summary: string): string {
-  return summaryList(summary).items.join(" ");
+  return summaryList(summary)
+    .items.flatMap((i) => [i.text, ...i.children])
+    .join(" ");
 }
 
 const TAGS = ["news"];

@@ -14,7 +14,7 @@ import {
   type NewsDetail,
   type NewsItem,
 } from "@/lib/news";
-import { formatDate } from "@/lib/research";
+import { formatDate, type Block } from "@/lib/research";
 
 export async function generateStaticParams() {
   try {
@@ -83,6 +83,24 @@ function Rail({
 }
 
 
+/* A news item is two sections, 요약 and 인사이트, and this draws the line
+   between them.
+
+   They used to be 10px mono eyebrows, which put a section label below its own
+   contents in every way that reads as hierarchy — smaller than the body text
+   under it, and far smaller than a heading a curator typed inside it. A rule
+   plus a heading at 24px settles the order, and the label is a real <h2> now:
+   the page's outline was h1 → h2 (a curator's sub-heading) with the sections
+   themselves as untagged <p>, which is backwards for anything reading the
+   document rather than looking at it. */
+function SectionHead({ title }: { title: string }) {
+  return (
+    <h2 className="font-heading mb-5 border-t border-white/10 pt-7 text-2xl tracking-[-0.5px] break-keep text-white">
+      {title}
+    </h2>
+  );
+}
+
 /* Content Summary arrives as the curator typed it into the Notion property.
    `summaryList` recovers the points from either shape they use; rendering
    replaces their markers ("•", "1.") with the site's own so the numbering
@@ -92,12 +110,10 @@ function Summary({ summary }: { summary: string }) {
   if (items.length === 0) return null;
   const List = ordered ? "ol" : "ul";
   return (
-    <div className="mt-8">
-      <p className="font-mono mb-4 text-[10px] tracking-[0.18em] text-bay-300 uppercase">
-        Summary
-      </p>
+    <div className="mt-10">
+      <SectionHead title="요약" />
       <List className="max-w-2xl space-y-3">
-        {items.map((line, i) => (
+        {items.map((item, i) => (
           <li key={i} className="flex gap-3.5">
             {ordered ? (
               <span className="font-mono mt-[0.3em] w-4 shrink-0 text-xs text-bay-300/80">
@@ -109,14 +125,52 @@ function Summary({ summary }: { summary: string }) {
                 className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-bay-300/80"
               />
             )}
-            <span className="font-body text-[15px] leading-relaxed font-light break-keep text-slate-300">
-              {line}
-            </span>
+            <div>
+              {/* A point that opens a group is a label for what follows, so it
+                  carries the weight; one that stands alone reads as prose and
+                  keeps the light body voice the rest of the page uses. */}
+              <span
+                className={`font-body text-[15px] leading-relaxed break-keep ${
+                  item.children.length > 0
+                    ? "font-medium text-white"
+                    : "font-light text-slate-300"
+                }`}
+              >
+                {item.text}
+              </span>
+              {item.children.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {item.children.map((child, j) => (
+                    <li key={j} className="flex gap-3">
+                      <span
+                        aria-hidden
+                        className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-white/25"
+                      />
+                      <span className="font-body text-[15px] leading-relaxed font-light break-keep text-slate-300">
+                        {child}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </li>
         ))}
       </List>
     </div>
   );
+}
+
+/* Everything a curator writes lives under 인사이트, so a heading they typed
+   is a sub-heading of it and can't be rendered as its peer. Research articles
+   own their own page and keep h2 at full size; here one step down puts a
+   curator's heading (18px) between the section (24px) and the prose (15.6px),
+   which is the order the page actually has.
+
+   A news write-up is a few hundred words, so h3 is the floor — nothing below
+   it is worth a fourth size. */
+function demoteHeadings(blocks: Block[]): Block[] {
+  return blocks.map((b) => (b.t === "h2" ? { ...b, t: "h3" as const } : b));
 }
 
 /* The picture the story leads with, and where it comes from. `imageUrl` is
@@ -258,13 +312,16 @@ export default async function NewsDetailPage(
           {/* 요약 & 인사이트 is the agreed shape of a news item, so the page
               draws both labels rather than trusting 78 write-ups to type them
               — eight of them did, in six different spellings, and the sync
-              drops those now that this is here. */}
+              drops those now that this is here.
+
+              Two sections and no more. What a curator writes beyond them —
+              a "용어" list, a table of numbers — is 인사이트 content, not a
+              third section: only these two are agreed, so only these two can
+              be promised to look the same on all 78. */}
           {lead.blocks.length > 0 && (
-            <div className="mt-10">
-              <p className="font-mono mb-1 text-[10px] tracking-[0.18em] text-bay-300 uppercase">
-                Insight
-              </p>
-              <ArticleBody blocks={lead.blocks} />
+            <div className="mt-12">
+              <SectionHead title="인사이트" />
+              <ArticleBody blocks={demoteHeadings(lead.blocks)} />
             </div>
           )}
 
