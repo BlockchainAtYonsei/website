@@ -303,8 +303,13 @@ const RESEARCH: Seed[] = [
     cohort: 17,
     team: "리서치팀",
     position: "부원",
-    bio: "RWA·스테이블코인·재보험",
+    bio: "보험의 리스크 구조와 온체인 금융의 접점을 탐색합니다.",
     avatarUrl: "/members/jehee-noh.webp",
+    socials: [
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/jehee-roh-8465ba36a" },
+      { label: "Telegram", href: "https://t.me/heeberlin" },
+      { label: "X", href: "https://x.com/jellyberlinn" },
+    ],
   },
   {
     slug: "jaehwan-lee",
