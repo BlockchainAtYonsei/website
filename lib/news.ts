@@ -174,20 +174,26 @@ export function getNewsItem(slug: string): Promise<NewsDetail | null> {
 }
 
 /* The club curates in weekly sessions, so news time is week time:
-   Monday-anchored, labeled the way meetings are ("2026년 8월 1주차" = the week
-   whose Monday is the month's first). A week straddling a month boundary
-   belongs to its Monday's month — same as how the session would be named. */
+   Sunday-anchored, labeled the way meetings are ("2026년 8월 1주차" = the week
+   whose Sunday is the month's first). A week straddling a month boundary
+   belongs to its Sunday's month — same as how the session would be named.
+
+   Sunday rather than the ISO Monday because the 리서치팀's own 주차 pages in
+   Notion run 일–토 ("2026-08-09 · 2026-08-15"), and a site that anchors a day
+   later files every Sunday story under the week that just ended — 08.09 landed
+   in 08.03–08.09 here while it opened the session in Notion. The two have to
+   name the same seven days or neither number means anything. */
 export function weekOf(iso: string): { key: string; label: string; range: string } {
   const d = new Date(`${iso}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // back to Monday
-  const sunday = new Date(d);
-  sunday.setUTCDate(sunday.getUTCDate() + 6);
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // back to Sunday
+  const saturday = new Date(d);
+  saturday.setUTCDate(saturday.getUTCDate() + 6);
   const nth = Math.floor((d.getUTCDate() - 1) / 7) + 1;
   const dd = (x: Date) =>
     `${String(x.getUTCMonth() + 1).padStart(2, "0")}.${String(x.getUTCDate()).padStart(2, "0")}`;
   return {
     key: d.toISOString().slice(0, 10),
     label: `${d.getUTCFullYear()}년 ${d.getUTCMonth() + 1}월 ${nth}주차`,
-    range: `${dd(d)} – ${dd(sunday)}`,
+    range: `${dd(d)} – ${dd(saturday)}`,
   };
 }

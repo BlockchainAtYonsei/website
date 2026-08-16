@@ -19,9 +19,9 @@ import { ArrowUpRight } from "../icons";
    do when a photo fails to load. Topics come through in full: Notion's Topic
    is a multi-select and a card shows every tag the curator applied.
 
-   "Editor's Picks" reads the team's own Pick checkbox. It falls back to the
-   newest week's curation when nothing is ticked, so the band never goes blank
-   on a week nobody got round to marking. */
+   "Editor's Picks" reads the team's own Pick checkbox, for the newest curated
+   week only. It falls back to that week's stories when nothing is ticked, so
+   the band never goes blank on a week nobody got round to marking. */
 
 const RAIL_SIZE = 4; // stories in The Latest, beside the hero
 const PICK_SIZE = 6; // cards in Editor's Picks — two rows of three
@@ -157,7 +157,7 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
   const [hero, ...rest] = feed;
   const rail = rest.slice(0, RAIL_SIZE);
 
-  /* The newest week, by the same Monday-anchored reckoning the curation
+  /* The newest week, by the same Sunday-anchored reckoning the curation
      sessions use — not "the last seven days", which would split a session.
 
      Minus whatever the section above already showed: both draw from the front
@@ -169,12 +169,18 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
     const above = new Set([hero, ...rail].map((n) => n.id));
     const rest = feed.filter((n) => !above.has(n.id));
 
-    const ticked = rest.filter((n) => n.pick);
+    /* Bounded to the newest curated week, which is what the checkbox says in
+       Notion ("이번 주 꼭 볼 것") and what the heading promises here. Reading
+       every ticked row instead let a week whose boxes nobody cleared keep its
+       stories in the band: on 08.16 two 08.05 picks were still sitting under
+       "이번주", in slots this week's own picks had been pushed out of. Stale
+       ticks now age out on their own, so nothing is unticked by hand. */
+    const key = weekOf(feed[0].date).key;
+    const ticked = rest.filter((n) => n.pick && weekOf(n.date).key === key);
     if (ticked.length > 0) return ticked.slice(0, PICK_SIZE);
 
     /* Nothing ticked — fall back to the newest curation week so the band still
        says something rather than disappearing. */
-    const key = weekOf(feed[0].date).key;
     const week = rest.filter((n) => weekOf(n.date).key === key);
     return (week.length >= 3 ? week : rest).slice(0, PICK_SIZE);
   }, [feed, hero, rail]);
