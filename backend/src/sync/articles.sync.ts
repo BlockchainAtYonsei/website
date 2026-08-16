@@ -1,9 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { mapBlocks } from "../notion/block-mapper";
+import type { Block } from "../notion/block-types";
 import { NotionService } from "../notion/notion.service";
 import { readingMinutes } from "../notion/reading-time";
 import { PrismaService } from "../prisma/prisma.service";
+import { ImageRehostService } from "./images.service";
 import { pageToArticleMeta } from "./mappers/article.mapper";
+import { loadRoster, nameKey } from "./roster";
 import { newStats, type RunStats, type SyncOptions } from "./sync.types";
 
 @Injectable()
@@ -13,6 +16,7 @@ export class ArticlesSyncService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notion: NotionService,
+    private readonly images: ImageRehostService,
   ) {}
 
   async sync(opts: SyncOptions): Promise<RunStats> {
@@ -42,22 +46,16 @@ export class ArticlesSyncService {
 
     /* 작성자 is a relation to Notion pages this database knows nothing about —
        the roster lives here, not in Notion. So each related page's title is
-       fetched once and matched against member names, the same
-       whitespace-stripped matching the news sync uses. A name held by two
-       members resolves to neither: guessing a byline is worse than skipping. */
-    const members = await this.prisma.member.findMany({ select: { id: true, name: true } });
-    const memberIdByName = new Map<string, string | null>();
-    for (const m of members) {
-      const key = m.name.replace(/\s+/g, "");
-      memberIdByName.set(key, memberIdByName.has(key) ? null : m.id);
-    }
+       fetched once and matched against member names (roster.ts — the same
+       rule the news sync applies to its typed-in names). */
+    const memberIdByName = await loadRoster(this.prisma);
     const titleCache = new Map<string, string | null>();
     const authorId = async (pageId: string): Promise<string | undefined> => {
       if (!titleCache.has(pageId)) {
         titleCache.set(pageId, await this.notion.pageTitle(pageId).catch(() => null));
       }
       const name = titleCache.get(pageId);
-      return (name && memberIdByName.get(name.replace(/\s+/g, ""))) || undefined;
+      return (name && memberIdByName.get(nameKey(name))) || undefined;
     };
 
     for (const page of pages) {
@@ -77,12 +75,19 @@ export class ArticlesSyncService {
         continue;
       }
 
-      let body: unknown;
+      let body: Block[];
       let minutes: number;
       try {
         const mapped = mapBlocks(await this.notion.pageBlocks(page.id));
         stats.warnings.push(...mapped.warnings.map((w) => `article ${meta.slug}: ${w}`));
-        body = mapped.blocks;
+        /* same re-hosting as news bodies — an uploaded figure's Notion URL
+           dies within the hour, and articles lean on figures harder */
+        body = await this.images.rehost(
+          `articles/${meta.slug}`,
+          `article ${meta.slug}`,
+          mapped.blocks,
+          stats.warnings,
+        );
         minutes = readingMinutes(mapped.blocks);
       } catch (e) {
         stats.skipped++;

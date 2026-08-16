@@ -11,7 +11,6 @@ import { PrismaService } from "../prisma/prisma.service";
 import { ArticlesSyncService } from "./articles.sync";
 import { NewsSyncService } from "./news.sync";
 import { RevalidateService } from "./revalidate.service";
-import type { RunStats } from "./sync.types";
 
 /* Content only — the member roster is owned by this database (see
    scripts/seed-members.ts) and has no Notion counterpart to sync. */
@@ -118,9 +117,5 @@ export class SyncService {
       select: { startedAt: true },
     });
     return last ? new Date(last.startedAt.getTime() - CURSOR_OVERLAP_MS) : undefined;
-  }
-
-  stats(run: SyncRun): RunStats {
-    return run.stats as RunStats;
   }
 }

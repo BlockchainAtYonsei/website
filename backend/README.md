@@ -27,33 +27,33 @@ npm run start:dev      # http://localhost:4000/health
 
 1. [notion.so/my-integrations](https://www.notion.so/my-integrations)에서 **internal
    integration** 생성 → 토큰을 `NOTION_TOKEN`에.
-2. 데이터베이스 3개를 만들고 각각 인테그레이션에 **연결(공유)**. DB 링크(URL
-   그대로 붙여넣기 가능)를 `NOTION_DB_MEMBERS` / `NOTION_DB_ARTICLES` /
-   `NOTION_DB_NEWS`에.
+2. 데이터베이스 2개(Research/News)를 각각 인테그레이션에 **연결(공유)**.
+   DB 링크(URL 그대로 붙여넣기 가능)를 `NOTION_DB_ARTICLES` /
+   `NOTION_DB_NEWS`에. 멤버 명단은 Notion에 없다 — 이 DB가 원본이고,
+   `npm run seed:members`(scripts/seed-members.ts)로 관리한다.
 3. 속성 이름은 아래 표와 **정확히** 일치해야 한다(다르게 쓰고 싶으면
    `src/notion/schema.ts` 한 파일만 수정).
 
-**Members** — 이름(title) · Slug(text, `[a-z0-9-]`) · 기수(number) ·
-팀(select) · 직책(select) · 소개(text) · 상태(select: 활동/알럼나이) ·
-사이트 노출(checkbox) · 프로필 사진(files) ·
-X/Telegram/LinkedIn/Medium/Instagram/GitHub/Website(각 url)
-
-**Research** — 제목(title) · Slug(text) · Dek(text) · 카테고리(select) ·
-Accent(select: blue/violet/teal/indigo, 비우면 자동) · 상태(select:
-발행/초안/보관) · 발행일(date) · Featured(checkbox) · 작성자(relation →
-Members, 복수 = 공저) · Medium URL(url) · 커버(files, 아직 미사용).
+**Research** — 제목(title) · Slug(text, `[a-z0-9-]` 필수) · Dek(text) ·
+카테고리(select) · Accent(select: blue/violet/teal/indigo, 비우면 자동) ·
+상태(select: 발행/초안/보관) · 발행일(date) · Featured(checkbox) ·
+작성자(relation → 멤버 페이지, 복수 = 공저 — 페이지 제목을 명부의 이름과
+공백 무시로 대조) · Medium URL(url) · 커버(files, 아직 미사용).
 **본문은 페이지 안에 그냥 쓰면 된다** — 지원 블록: 제목2/3, 문단, 불릿/번호
-리스트, 인용(마지막 줄 `— 출처`), 콜아웃(첫 줄 굵게 = 제목), 표, 구분선.
-굵게·인라인 코드·링크 유지. 이미지 등 미지원 블록은 경고와 함께 스킵.
+리스트, 인용(마지막 줄 `— 출처`), 콜아웃(첫 줄 굵게 = 제목), 표, 이미지,
+코드, 구분선. 굵게·인라인 코드·링크 유지. 미지원 블록은 경고와 함께 스킵.
 
-**News** — 제목(title) · Slug(text, 선택 — 없으면 페이지 id로 자동) ·
-URL(url) · 출처(select) · 코멘트(text) · 카테고리(select) ·
-원문 발행일(date) · 큐레이터(relation → Members) · 상태(select: 발행/초안).
+**News** — 리서치팀의 Blockchain News Tracking DB를 그대로 읽는다(컬럼명이
+곧 계약): Title(text) · Source(원문 링크 — 하이퍼링크 걸린 텍스트) ·
+Content Summary(text) · Topic(multi-select) · Date of issue(date) ·
+Author(이름 — 명부와 공백 무시로 대조) · Status · Pick(checkbox) ·
+Slug/Cover(선택 — 없으면 페이지 id/크롤링 og:image로 자동).
 **요약/인사이트는 페이지 본문에 쓰면** 뉴스 상세 페이지로 발행된다(리서치와
 같은 블록 지원). 본문이 비어 있으면 링크-온리 아이템.
 
-프로필 사진 재호스팅에는 S3 호환 버킷(R2 권장)이 필요 — `S3_*` env. 없으면
-sync는 돌지만 아바타만 경고와 함께 건너뛴다.
+본문 이미지·카드 커버 재호스팅에는 S3 호환 버킷(R2 권장)이 필요 — `S3_*`
+env. 없으면 sync는 돌지만 Notion 업로드 이미지 URL이 만료된다는 경고를
+남긴다(로컬 개발용으로만 허용).
 
 ## 운영
 

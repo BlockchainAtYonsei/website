@@ -8,7 +8,6 @@ export type Env = {
   PORT: number;
   CORS_ORIGIN: string[];
   NOTION_TOKEN?: string;
-  NOTION_DB_MEMBERS?: string;
   NOTION_DB_ARTICLES?: string;
   NOTION_DB_NEWS?: string;
   SYNC_KEY?: string;
@@ -46,7 +45,6 @@ export function validateEnv(raw: Record<string, unknown>): Env {
       .map((s) => s.trim())
       .filter(Boolean),
     NOTION_TOKEN: str("NOTION_TOKEN"),
-    NOTION_DB_MEMBERS: str("NOTION_DB_MEMBERS"),
     NOTION_DB_ARTICLES: str("NOTION_DB_ARTICLES"),
     NOTION_DB_NEWS: str("NOTION_DB_NEWS"),
     SYNC_KEY: str("SYNC_KEY"),
