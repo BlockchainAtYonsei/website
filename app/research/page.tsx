@@ -141,6 +141,7 @@ export default async function ResearchHome() {
               <CoverArt
                 accent={article.accent}
                 tag={article.tag}
+                seed={article.slug}
                 large
                 className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
               />

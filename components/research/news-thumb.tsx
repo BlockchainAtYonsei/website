@@ -32,7 +32,9 @@ export default function NewsThumb({
   large = false,
   className = "aspect-[16/9] w-full",
 }: {
-  item: Pick<NewsItem, "imageUrl" | "coverUrl" | "categories">;
+  /* slug rides along only to seed the generated fallback's figure, so two
+     stories under one topic don't fall back to the same picture */
+  item: Pick<NewsItem, "slug" | "imageUrl" | "coverUrl" | "categories">;
   accent: Accent;
   sizes: string;
   priority?: boolean;
@@ -53,6 +55,7 @@ export default function NewsThumb({
       <CoverArt
         accent={accent}
         tag={item.categories[0] ?? "News"}
+        seed={item.slug}
         large={large}
         className={className}
       />

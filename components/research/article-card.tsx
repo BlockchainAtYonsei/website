@@ -42,6 +42,7 @@ export function FeaturedCard({ article }: { article: Article }) {
       <CoverArt
         accent={article.accent}
         tag={article.tag}
+        seed={article.slug}
         large
         className="aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[340px]"
       />
@@ -97,6 +98,7 @@ export default function ArticleCard({ article }: { article: Article }) {
       <CoverArt
         accent={article.accent}
         tag={article.tag}
+        seed={article.slug}
         className="aspect-[16/9] w-full"
       />
       <div className="flex flex-1 flex-col p-6">

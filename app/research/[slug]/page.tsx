@@ -101,6 +101,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
           <CoverArt
             accent={article.accent}
             tag={article.tag}
+            seed={article.slug}
             large
             className="mt-12 aspect-[21/9] w-full rounded-[1.5rem] md:mt-14"
           />
