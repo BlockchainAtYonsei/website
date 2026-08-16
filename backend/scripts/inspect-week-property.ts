@@ -97,6 +97,9 @@ function datesIn(value: string): string[] {
   );
 }
 
+const dayName = (iso: string) =>
+  ["일", "월", "화", "수", "목", "금", "토"][new Date(`${iso}T00:00:00Z`).getUTCDay()];
+
 /* The two candidate boundaries, as the start date of the week `iso` falls in. */
 function weekStart(iso: string, anchor: "sun" | "mon"): string {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -137,42 +140,79 @@ async function main() {
   for (const [v, n] of [...counts].sort((a, b) => b[1] - a[1]).slice(0, 20))
     console.log(`   ${String(n).padStart(3)}건  ${JSON.stringify(v)}`);
 
-  /* Which boundary does the team's own value actually describe? */
-  let sun = 0, mon = 0, neither = 0, unparsed = 0;
-  const off: string[] = [];
+  /* Per value: what seven days does it name, and do the rows filed under it
+     actually fall inside? A bucket whose dates spill months before its own
+     start is a batch marker — "entered in this session" — not a week. */
+  console.log(`\n값별 상세 (오래된 순):`);
+  const buckets = new Map<string, string[]>();
   for (const r of filled) {
-    const ds = datesIn(r.week);
-    if (ds.length < 1) {
+    if (r.date) buckets.set(r.week, [...(buckets.get(r.week) ?? []), r.date]);
+  }
+  for (const [w, ds] of [...buckets].sort()) {
+    const [s, e] = datesIn(w);
+    const span = s && e ? (Date.parse(e) - Date.parse(s)) / 86400000 + 1 : NaN;
+    const inside = ds.filter((d) => s && e && d >= s && d <= e).length;
+    const sorted = [...ds].sort();
+    console.log(
+      `   ${w}  [${s ? dayName(s) : "?"}~${e ? dayName(e) : "?"}, ${span}일]  ` +
+        `${String(ds.length).padStart(3)}건  범위안 ${inside} 밖 ${ds.length - inside}` +
+        `   발행일 ${sorted[0]} ~ ${sorted[sorted.length - 1]}`,
+    );
+  }
+
+  /* Two different questions, and the earlier version of this script conflated
+     them. (1) Which weekday does the team start a week on — answered by the
+     anchor tally, and answered wrongly for any bucket that isn't a full seven
+     days, since its start can't equal a Sunday no matter where the row sits.
+     (2) Would reading Week move a story to a different week than its date
+     already puts it in — answered only by containment. */
+  let sun = 0, mon = 0, other = 0, unparsed = 0;
+  let inside = 0, before = 0, after = 0;
+  const off: string[] = [];
+  const gaps: number[] = [];
+  for (const r of filled) {
+    const [s, e] = datesIn(r.week);
+    if (!s) {
       unparsed++;
       continue;
     }
     if (!r.date) continue;
-    const start = ds[0];
-    const s = weekStart(r.date, "sun");
-    const m = weekStart(r.date, "mon");
-    if (start === s) sun++;
-    else if (start === m) mon++;
-    else {
-      neither++;
-      if (off.length < 20)
-        off.push(
-          `   발행일 ${r.date}  Week=${r.week}  (일앵커 ${s} / 월앵커 ${m})  ${r.title.slice(0, 30)}`,
-        );
-    }
+    if (s === weekStart(r.date, "sun")) sun++;
+    else if (s === weekStart(r.date, "mon")) mon++;
+    else other++;
+
+    if (!e) continue;
+    if (r.date >= s && r.date <= e) inside++;
+    else if (r.date < s) {
+      before++;
+      gaps.push(Math.round((Date.parse(s) - Date.parse(r.date)) / 86400000));
+      if (off.length < 15)
+        off.push(`   발행일 ${r.date}  Week=${r.week}  ${r.title.slice(0, 34)}`);
+    } else after++;
   }
 
-  console.log(`\n발행일에서 계산한 주차와 Week 값의 시작일 대조:`);
+  console.log(`\n① 주 시작 요일 — Week 값의 시작일 vs 발행일에서 계산한 주 시작일`);
   console.log(`   일요일 앵커와 일치 : ${sun}`);
   console.log(`   월요일 앵커와 일치 : ${mon}`);
-  console.log(`   어느 쪽도 아님     : ${neither}   ← 발행일과 세션 주차가 실제로 다른 행`);
+  console.log(`   둘 다 아님         : ${other}   (7일이 아닌 버킷은 여기로 샌다)`);
   console.log(`   날짜를 못 읽음     : ${unparsed}`);
+
+  console.log(`\n② 매핑 시 이동량 — 발행일이 그 행의 Week 범위 안에 있는가`);
+  console.log(`   범위 안   : ${inside}`);
+  console.log(`   범위 이전 : ${before}   ← 지난 기사를 나중 세션에 정리한 행`);
+  console.log(`   범위 이후 : ${after}`);
+  if (gaps.length) {
+    gaps.sort((a, b) => a - b);
+    console.log(`   이전인 행의 격차(일): 중앙값 ${gaps[Math.floor(gaps.length / 2)]}, 최대 ${gaps.at(-1)}`);
+  }
   if (off.length) {
-    console.log(`\n어긋난 행 (최대 20건):`);
+    console.log(`\n범위 이전인 행 (최대 15건):`);
     for (const l of off) console.log(l);
   }
   console.log(
-    `\n판단 기준: "어느 쪽도 아님"이 많다면 Week 속성을 읽는 쪽이 맞고,\n` +
-      `0에 가깝다면 발행일에서 계산해도 결과가 같으니 매핑할 이유가 없다.\n`,
+    `\n판단: ①이 주차 경계를 정한다. ②의 "범위 이전"이 크고 고유 Week 값이\n` +
+      `적다면 Week는 주차가 아니라 배치 기록이므로, 아카이브 그룹핑에 쓰면\n` +
+      `오래된 기사가 최근 주차로 뭉친다 — 그때는 매핑하지 않는 쪽이 맞다.\n`,
   );
 }
 
