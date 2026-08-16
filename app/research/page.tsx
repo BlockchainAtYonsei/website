@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
-import { inline } from "@/components/research/article-body";
 import ArticleThumb from "@/components/research/article-thumb";
 import HomeHero from "@/components/research/home-hero";
 import NewsThumb from "@/components/research/news-thumb";
@@ -138,34 +137,26 @@ export default async function ResearchHome() {
           </div>
 
           {article && (
-            /* The picture and, when the piece's own figure is what's showing,
-               that figure's credit under it. The credit is a sibling of the
-               link rather than inside it: a caption is where "출처:
-               [칼시](https://…)" lives, and an anchor cannot nest inside the
-               anchor wrapping the image. Nothing renders for a piece whose
-               picture is a cover or generated art — there is no one to
-               credit, and an empty line under the panel is worse than none. */
-            <div className="order-1 lg:order-2">
-              <Link
-                href={`/research/${article.slug}`}
-                className="group mt-0 block overflow-hidden lg:rounded-l-[1.5rem]"
-                tabIndex={-1}
-                aria-hidden
-              >
-                <ArticleThumb
-                  article={article}
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  priority
-                  large
-                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
-                />
-              </Link>
-              {article.imageCaption && (
-                <p className="font-body px-6 pt-3 text-xs leading-relaxed font-light break-keep text-slate-500 lg:pr-16 lg:pl-0">
-                  {inline(article.imageCaption)}
-                </p>
-              )}
-            </div>
+            /* No credit line here, unlike the article's own header. This is a
+               taster the size of half a screen and the credit was the only
+               small grey type on it, sitting under a full-bleed panel with
+               nothing else beside it — it read as a caption for the page
+               rather than for the picture. The attribution is owed once, and
+               it is paid where the picture is actually shown, one click in. */
+            <Link
+              href={`/research/${article.slug}`}
+              className="group order-1 mt-0 block overflow-hidden lg:order-2 lg:rounded-l-[1.5rem]"
+              tabIndex={-1}
+              aria-hidden
+            >
+              <ArticleThumb
+                article={article}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+                large
+                className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
+              />
+            </Link>
           )}
         </Reveal>
       </section>
