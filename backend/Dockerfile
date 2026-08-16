@@ -47,8 +47,28 @@ USER nest
 ENV PORT=4000
 EXPOSE 4000
 
-# Boot: migrations, then the roster seed, then the server. Migrations are
-# fatal on purpose — schema and code must land together. The seed is not:
-# it's an idempotent upsert whose failure should cost a log line, never the
-# whole API. Editing a member is: edit scripts/seed-members.ts, deploy.
-CMD ["sh", "-c", "npx prisma migrate deploy && (npm run seed:members || echo 'seed:members failed — roster unchanged') && node dist/main.js"]
+# Boot: migrations, the roster seed, the mock articles while there are no real
+# ones, then the server. Migrations are fatal on purpose — schema and code must
+# land together. Neither seed is: a seed's failure should cost a log line,
+# never the whole API.
+#
+# The articles seed is gated on NOTION_DB_ARTICLES being empty, which is the
+# database's way of saying nothing else owns this table. That is the state
+# today (docs/deploy-runbook.md: research articles are intentionally mock), and
+# the gate retires itself — the day that variable holds a real database id the
+# sync owns articles and this stops running, without anyone remembering to
+# remove it. SEED_ALLOW_REMOTE is spelled out here rather than inherited,
+# because the guard it opens exists to stop an ambient DATABASE_URL from
+# turning a local command into a production wipe; saying it in the image is
+# that decision made once, in review.
+#
+# Editing a member, or the mock articles, is: edit the script, deploy. Which
+# is the point — the only shell that reaches the deployed containers is on a
+# machine nobody is sitting at.
+CMD ["sh", "-c", "npx prisma migrate deploy \
+  && (npm run seed:members || echo 'seed:members failed — roster unchanged') \
+  && { [ -n \"$NOTION_DB_ARTICLES\" ] \
+       && echo 'NOTION_DB_ARTICLES set — articles come from the sync, skipping the mock seed' \
+       || SEED_ALLOW_REMOTE=1 npm run seed:mock \
+       || echo 'seed:mock failed — articles unchanged'; } \
+  && node dist/main.js"]

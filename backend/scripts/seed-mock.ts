@@ -152,16 +152,26 @@ const FILLER_BODY = (title: string, tag: string, i: number): Block[] => [
    path the sync takes: what fails here fails there. A reference site that
    publishes no preview image leaves the cover null and the card falls back to
    generated art, which is the honest local picture of what production does.
-   Cached per URL — several pieces cite the same page and it is somebody
-   else's server. */
+   Every distinct reference is fetched once, and all of them at once. Once
+   because several pieces cite the same page; at once because this runs on the
+   backend container's boot, where the deploy waits sixty seconds for /health
+   before giving up — a dozen references crawled in series, each with an
+   eight-second timeout, is a bad day away from failing a deploy. In parallel
+   the whole crawl costs one timeout. */
 const ogCache = new Map<string, string | null>();
 
-async function coverFrom(body: Block[]): Promise<{ url: string; credit: string } | null> {
+async function warmCovers(bodies: Block[][]): Promise<void> {
+  const urls = [
+    ...new Set(bodies.map(firstReference).filter((r) => r !== null).map((r) => r.url)),
+  ];
+  const images = await Promise.all(urls.map((u) => fetchOgImage(u)));
+  urls.forEach((u, i) => ogCache.set(u, images[i]));
+}
+
+function coverFrom(body: Block[]): { url: string; credit: string } | null {
   const ref = firstReference(body);
-  if (!ref) return null;
-  if (!ogCache.has(ref.url)) ogCache.set(ref.url, await fetchOgImage(ref.url));
-  const url = ogCache.get(ref.url);
-  return url ? { url, credit: referenceCredit(ref) } : null;
+  const url = ref && ogCache.get(ref.url);
+  return url && ref ? { url, credit: referenceCredit(ref) } : null;
 }
 
 /* newest filler sits behind the real mocks; dates walk back ~2 weeks per
@@ -251,17 +261,23 @@ async function main() {
   }
   const fillers = fillersFor(writerSlugs, curated);
 
-  await prisma.articleAuthor.deleteMany();
-  await prisma.article.deleteMany();
-
-  let dropped = 0;
-  let missingCover = 0;
   /* newest first, so the rotation hands each tag's best-fitting photo to the
      piece most likely to be on a front page rather than to whichever filler
      happens to sit at the bottom of the archive */
   const all: (Article & { views?: number })[] = [...ARTICLES, ...fillers].sort(
     (x, y) => y.date.localeCompare(x.date),
   );
+
+  /* crawl before the wipe, not during it: between the deleteMany and the last
+     insert the archive is empty, and on a container boot that window sits in
+     front of the API coming up at all */
+  await warmCovers(all.map((a) => a.body));
+
+  await prisma.articleAuthor.deleteMany();
+  await prisma.article.deleteMany();
+
+  let dropped = 0;
+  let missingCover = 0;
   for (const [i, a] of all.entries()) {
     /* real mocks keep their curated pairings; a filler carries its one */
     const authors = (PAIRINGS[a.slug] ?? [a.author]).filter((slug) => {
@@ -270,7 +286,7 @@ async function main() {
       console.warn(`  ${a.slug}: author "${slug}" is not in the roster — byline dropped`);
       return false;
     });
-    const cover = await coverFrom(a.body);
+    const cover = coverFrom(a.body);
     if (!cover) missingCover++;
     const article = await prisma.article.create({
       data: {
