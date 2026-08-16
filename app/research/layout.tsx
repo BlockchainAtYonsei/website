@@ -14,14 +14,17 @@ export const metadata: Metadata = {
 export default function ResearchLayout({
   children,
 }: LayoutProps<"/research">) {
-  /* A flex column rather than a plain block: the home page fills exactly the
-     space header and footer leave (see its lg:flex-1) so it can hold a whole
-     screen without scrolling, while every other page just grows past it and
-     scrolls as before. */
+  /* A flex column so a short page still pushes the footer to the bottom of
+     the screen. The page slot itself is a plain block: a page whose <main>
+     centers itself with mx-auto would, as a flex item, have its auto margins
+     beat align-self:stretch and collapse to fit-content — so the column's
+     width would follow whatever text happened to be on the page instead of
+     max-w-6xl. As a block child it fills the line box and mx-auto only
+     centers within the cap. */
   return (
     <div className="flex min-h-svh flex-col bg-ink">
       <ResearchHeader />
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className="flex-1">{children}</div>
       <SiteFooter />
     </div>
   );
