@@ -12,22 +12,29 @@ import { formatDate, getFeatured, type Accent } from "@/lib/research";
    each, so everything on it is a taster.
 
    Two rows that mirror each other — research reads text-then-picture, news
-   picture-then-text — and each picture runs off its own edge of the screen:
-   the bleed is what makes the rows read as a composed front page instead of
-   boxes in a column. Type keeps to the header's grid; only images leave it.
+   picture-then-text — and both stop at the header's edge. They used to run
+   off the screen instead, which on a laptop looked like a composed front page
+   and on a 27" monitor looked like a mistake: the picture took half of 2560px
+   and stood 720px tall, the row grew taller than the viewport, and the
+   navigation sat in a 1152px band up the middle of it with the artwork
+   sailing past on both sides. A full-bleed picture has no width of its own,
+   so the bigger the display the bigger it gets — the one measurement on this
+   page that nothing bounded.
+
+   So everything here is the header's box: mx-auto max-w-6xl px-6, the exact
+   classes research-header.tsx uses. Pictures end where the wordmark and the
+   tabs end, which is the alignment a wide screen actually shows you, and the
+   row's height stops growing at 1152px.
+
    Glass appears exactly once, on the Medium band, because that is the only
    thing here asking to be clicked rather than read. */
 
 const HOME_NEWS = 3; // a taste of the feed; 전체 뉴스 goes and gets the rest
 
-/* The header centers a max-w-6xl (1152px) box and pads it px-6 (24px), so its
-   own left/right edges sit at 24px on a narrow screen and drift outward
-   together as the viewport grows past 1200px. This page is full-bleed (no
-   max-w wrapper) so its edges could not track that drift with a plain
-   px-* scale — max() reproduces the header's exact formula: pinned at 24px
-   until 1200px, then equal to the header's half-of-the-overflow inset. */
-const NAV_INSET = "max(1.5rem, calc((100vw - 1152px) / 2 + 1.5rem))";
-const PAGE_X = { paddingLeft: NAV_INSET, paddingRight: NAV_INSET };
+/* The header's own box, copied from research-header.tsx rather than
+   approximated: the two are aligned or they are not, and a second formula
+   drifting from the first is how they stop being. */
+const PAGE_BOX = "mx-auto max-w-6xl px-6";
 
 /* Generated art only shows when a story ships no picture of its own, but when
    it does the colour has to be the one the news page already gives that topic
@@ -88,23 +95,19 @@ export default async function ResearchHome() {
           }}
         />
         <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
-        <div
-          className="relative pt-20 pb-16 md:pt-28 md:pb-20"
-          style={PAGE_X}
-        >
+        <div className={`relative pt-20 pb-16 md:pt-28 md:pb-20 ${PAGE_BOX}`}>
           <HomeHero />
         </div>
       </section>
 
-      {/* Research — type on the grid, the art running off the right edge.
+      {/* Research — type left, picture right, both inside the header's box.
           On phones the picture leads: a headline with nothing above it reads
           as the page starting over. */}
       <section className="border-t border-white/12">
-        <Reveal className="grid grid-cols-1 items-center gap-y-8 lg:grid-cols-2">
-          <div
-            className="order-2 px-6 pb-14 lg:order-1 lg:py-20 lg:pr-16"
-            style={{ paddingLeft: NAV_INSET }}
-          >
+        <Reveal
+          className={`grid grid-cols-1 items-center gap-y-8 py-12 md:py-16 lg:grid-cols-2 lg:gap-x-14 ${PAGE_BOX}`}
+        >
+          <div className="order-2 lg:order-1">
             {/* not "Latest": this slot is pinned, and a label promising
                 recency next to a piece from three months ago reads as a
                 stale site rather than a chosen one */}
@@ -145,7 +148,7 @@ export default async function ResearchHome() {
                it is paid where the picture is actually shown, one click in. */
             <Link
               href={`/research/${article.slug}`}
-              className="group order-1 mt-0 block overflow-hidden lg:order-2 lg:rounded-l-[1.5rem]"
+              className="group order-1 block overflow-hidden rounded-[1.25rem] lg:order-2"
               tabIndex={-1}
               aria-hidden
             >
@@ -161,14 +164,15 @@ export default async function ResearchHome() {
         </Reveal>
       </section>
 
-      {/* News — mirrored: the picture bleeds off the left edge, type keeps
-          to the grid on the right. */}
+      {/* News — mirrored: picture left, type right, same box. */}
       <section className="border-t border-white/12">
-        <Reveal className="grid grid-cols-1 items-center gap-y-8 lg:grid-cols-2">
+        <Reveal
+          className={`grid grid-cols-1 items-center gap-y-8 py-12 md:py-16 lg:grid-cols-2 lg:gap-x-14 ${PAGE_BOX}`}
+        >
           {heroNews && (
             <Link
               href={`/research/news/${heroNews.slug}`}
-              className="group block overflow-hidden lg:rounded-r-[1.5rem]"
+              className="group block overflow-hidden rounded-[1.25rem]"
               tabIndex={-1}
               aria-hidden
             >
@@ -182,10 +186,7 @@ export default async function ResearchHome() {
             </Link>
           )}
 
-          <div
-            className="px-6 pb-14 lg:py-20 lg:pl-16"
-            style={{ paddingRight: NAV_INSET }}
-          >
+          <div>
             <RowHead
               label="News tracking"
               href="/research/news"
@@ -227,7 +228,7 @@ export default async function ResearchHome() {
 
       {/* Medium — the page's one glass object */}
       <section className="border-t border-white/12">
-        <Reveal className="py-14 md:py-16" style={PAGE_X}>
+        <Reveal className={`py-14 md:py-16 ${PAGE_BOX}`}>
           <div className="liquid-glass flex flex-col items-start justify-between gap-5 rounded-[1.25rem] px-7 py-6 sm:flex-row sm:items-center">
             <div>
               <p className="font-heading text-lg tracking-[-0.5px] break-keep text-white">
