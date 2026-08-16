@@ -24,9 +24,33 @@ import { Client, collectPaginatedAPI, isFullPage } from "@notionhq/client";
 import type { PageObjectResponse } from "@notionhq/client";
 import { NEWS_PROPS as P } from "../src/notion/schema";
 
-process.loadEnvFile();
-const notion = new Client({ auth: process.env.NOTION_TOKEN! });
-const DB = process.env.NOTION_DB_NEWS!;
+/* Same handling as seed-members.ts, and for the same reason: the container
+   this is most useful inside gets its environment from docker, not from a
+   .env on disk, and an unguarded loadEnvFile turns "no file here" into a
+   stack trace before the script can say what it actually wants. */
+try {
+  process.loadEnvFile();
+} catch {
+  /* env comes from the shell */
+}
+
+const TOKEN = process.env.NOTION_TOKEN;
+const DB_ID = process.env.NOTION_DB_NEWS;
+if (!TOKEN || !DB_ID) {
+  console.error(
+    `NOTION_TOKEN / NOTION_DB_NEWS 가 필요합니다. 셋 중 하나로 주세요:\n` +
+      `  docker exec bay-backend npx tsx scripts/inspect-week-property.ts   # 서버, env는 컨테이너에\n` +
+      `  NOTION_TOKEN=... NOTION_DB_NEWS=... npx tsx scripts/inspect-week-property.ts\n` +
+      `  backend/.env 를 두고 이 디렉터리에서 실행\n` +
+      `현재: NOTION_TOKEN=${TOKEN ? "설정됨" : "없음"}, NOTION_DB_NEWS=${DB_ID ? "설정됨" : "없음"}`,
+  );
+  process.exit(1);
+}
+
+const notion = new Client({ auth: TOKEN });
+/* Annotated rather than inferred: the narrowing above does not survive into
+   main()'s closure, and `DB!` at the use site hides the guard that earns it. */
+const DB: string = DB_ID;
 const WEEK_PROP = "Week";
 
 /* Whatever Notion is holding it as — the column could be rich_text today and a
