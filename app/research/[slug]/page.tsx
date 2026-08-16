@@ -6,6 +6,7 @@ import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
 import Avatar from "@/components/research/avatar";
 import CoverArt from "@/components/research/cover-art";
+import ReadingProgress from "@/components/research/reading-progress";
 import Toc from "@/components/research/toc";
 import ViewPing from "@/components/research/view-ping";
 import { formatDate, getAllArticles, getArticle, getToc } from "@/lib/research";
@@ -51,12 +52,13 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
 
   return (
     <main>
+      <ReadingProgress />
       <ViewPing kind="articles" slug={slug} />
       {/* Article head */}
       <article>
         <header className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">
           <Link
-            href="/research"
+            href="/research/articles"
             className="font-mono inline-flex items-center gap-2 text-[10px] tracking-[0.18em] text-white/45 uppercase transition-colors hover:text-bay-300"
           >
             <span aria-hidden>←</span> All research
@@ -127,7 +129,7 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
                 Keep reading
               </h2>
               <Link
-                href="/research"
+                href="/research/articles"
                 className="font-body inline-flex items-center gap-1.5 text-xs font-light text-slate-400 transition-colors hover:text-bay-300"
               >
                 전체 리서치

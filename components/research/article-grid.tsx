@@ -9,16 +9,23 @@ import type { Article, ArticlePage } from "@/lib/research";
    further pages through /api/articles (the site's proxy — the backend URL
    never reaches the browser). Filtering is server-side: at archive scale the
    client no longer holds every article, so a chip is a query, not a filter
-   over what happens to be loaded. */
+   over what happens to be loaded.
+
+   `initialCategory` is what the page was asked for in the URL — the home's
+   topic chips link straight into a filtered archive — so `initial` is page
+   one OF THAT CATEGORY, not of everything. That is why the no-refetch
+   shortcut below tests against it rather than against "All". */
 
 export default function ArticleGrid({
   initial,
   tags,
+  initialCategory = "All",
 }: {
   initial: ArticlePage;
   tags: string[];
+  initialCategory?: string;
 }) {
-  const [active, setActive] = useState("All");
+  const [active, setActive] = useState(initialCategory);
   const [items, setItems] = useState(initial.items);
   const [total, setTotal] = useState(initial.total);
   const [page, setPage] = useState(initial.page);
@@ -46,8 +53,8 @@ export default function ArticleGrid({
   const pick = (tag: string) => {
     if (tag === active) return;
     setActive(tag);
-    if (tag === "All") {
-      // page one for All is what the server already sent — no refetch
+    if (tag === initialCategory) {
+      // page one for this tag is what the server already sent — no refetch
       setItems(initial.items);
       setTotal(initial.total);
       setPage(initial.page);

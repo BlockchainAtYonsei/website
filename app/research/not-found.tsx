@@ -13,7 +13,7 @@ export default function ResearchNotFound() {
         주소가 바뀌었거나 아직 발행되지 않은 글일 수 있습니다.
       </p>
       <Link
-        href="/research"
+        href="/research/articles"
         className="liquid-glass-strong font-body mt-9 inline-flex w-fit items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-white transition-transform hover:scale-[1.03]"
       >
         전체 리서치 보기

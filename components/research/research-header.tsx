@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import ReadingProgress from "./reading-progress";
 import ResearchNav from "./research-nav";
 
 /* Standalone masthead: BAY RESEARCH reads as its own property rather than a
@@ -30,8 +29,8 @@ export default function ResearchHeader() {
             />
           </Link>
 
-          {/* hidden on phones: the Research tab already leads home, and the
-              wordmark plus three tabs don't fit 390px side by side */}
+          {/* hidden on phones: the Home tab already leads here, and the
+              wordmark plus four tabs don't fit 390px side by side */}
           <Link
             href="/research"
             className="font-display hidden text-sm font-bold tracking-[0.15em] whitespace-nowrap text-white uppercase transition-colors hover:text-bay-300 sm:block"
@@ -42,7 +41,6 @@ export default function ResearchHeader() {
 
         <ResearchNav />
       </div>
-      <ReadingProgress />
     </header>
   );
 }

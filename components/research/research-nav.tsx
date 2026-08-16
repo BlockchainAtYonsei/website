@@ -5,21 +5,22 @@ import { usePathname } from "next/navigation";
 
 /* The research property's three surfaces as one tab set. Client component
    because active state needs the pathname; the header itself stays server-
-   rendered. Article pages light up Research — they're the archive's leaves. */
+   rendered. Home isn't a tab — the logo is the way back to it — so the row
+   only lights up once you've left it for one of these three. Article pages
+   light up Research — they're the archive's leaves. */
 
 const TABS = [
-  { href: "/research", label: "Research" },
+  { href: "/research/articles", label: "Research" },
   { href: "/research/news", label: "News" },
   { href: "/research/author", label: "Authors" },
 ] as const;
 
 function isActive(href: string, pathname: string): boolean {
-  if (href === "/research") {
+  if (href === "/research/articles") {
     return (
-      pathname === "/research" ||
-      (pathname.startsWith("/research/") &&
-        !pathname.startsWith("/research/news") &&
-        !pathname.startsWith("/research/author"))
+      pathname.startsWith("/research/") &&
+      !pathname.startsWith("/research/news") &&
+      !pathname.startsWith("/research/author")
     );
   }
   return pathname.startsWith(href);
