@@ -33,6 +33,37 @@ describe("pageToArticleMeta", () => {
     });
   });
 
+  it("maps 커버 and keeps the credit's hyperlink as inline markup", () => {
+    const { meta, warnings } = pageToArticleMeta(
+      page(
+        articleProps({
+          커버: prop.filesExternal("https://example.com/photo.jpg"),
+          "커버 출처": prop.link("Wikimedia Commons", "https://commons.wikimedia.org/x"),
+        }),
+      ),
+    );
+    expect(warnings).toEqual([]);
+    expect(meta?.coverUrl).toBe("https://example.com/photo.jpg");
+    /* the renderer's link form, so the source is clickable under the picture
+       rather than a name the reader has to go and look up */
+    expect(meta?.coverCredit).toBe("[Wikimedia Commons](https://commons.wikimedia.org/x)");
+  });
+
+  it("warns when a cover ships without a credit", () => {
+    const { meta, warnings } = pageToArticleMeta(
+      page(articleProps({ 커버: prop.files("https://notion.so/upload.png") })),
+    );
+    expect(meta?.coverUrl).toBe("https://notion.so/upload.png");
+    expect(meta?.coverCredit).toBeUndefined();
+    expect(warnings.join()).toMatch(/커버 출처/);
+  });
+
+  it("says nothing about credits when there is no cover", () => {
+    const { meta, warnings } = pageToArticleMeta(page(articleProps()));
+    expect(meta?.coverUrl).toBeUndefined();
+    expect(warnings.join()).not.toMatch(/커버/);
+  });
+
   it("skips when the 작성자 relation is empty", () => {
     const { meta, warnings } = pageToArticleMeta(
       page(articleProps({ 작성자: prop.relation([]) })),

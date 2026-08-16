@@ -99,7 +99,13 @@ model Article {
   views Int @default(0)
   // Optional real artwork; null falls back to the generated CoverArt.
   coverUrl  String? @map("cover_url")
-  mediumUrl String? @map("medium_url")
+  // Who the cover belongs to, as a line of prose: "사진: 이름 / [출처](url)
+  // (라이선스)". Free text with the body renderer's inline markup, because a
+  // credit is a sentence with a link in it, not four columns — and the ones
+  // that matter (CC BY-SA) require naming author, source and licence
+  // together. A cover with no credit is our own artwork or a stand-in.
+  coverCredit String? @map("cover_credit")
+  mediumUrl   String? @map("medium_url")
 
   notionPageId       String   @unique @map("notion_page_id")
   notionLastEditedAt DateTime @map("notion_last_edited_at")

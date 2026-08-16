@@ -47,6 +47,16 @@ type ArticleWithAuthors = Article & { authors: { member: Member }[] };
 
 export function toArticleListItem(a: ArticleWithAuthors) {
   const authors = a.authors.map(({ member }) => toByline(member));
+  /* Same rule the news feed already runs on: the picture the author put in
+     the piece beats anything derived, and its caption comes with it — a
+     figure's credit is written beside the figure, so a surface that shows
+     the picture away from the article can show the credit with it rather
+     than inventing a second field for the same sentence.
+
+     The two halves stay paired on the way down: a piece with no figure shows
+     its cover, and then the credit has to be the cover's, never the figure's
+     from a piece that has one. */
+  const figure = firstImage(a.body);
   return {
     slug: a.slug,
     title: a.title,
@@ -57,6 +67,8 @@ export function toArticleListItem(a: ArticleWithAuthors) {
     featured: a.featured,
     readingMinutes: a.readingMinutes,
     views: a.views,
+    imageUrl: figure?.url ?? a.coverUrl,
+    imageCaption: figure ? figure.caption : a.coverCredit,
     coverUrl: a.coverUrl,
     author: authors[0]?.slug ?? null,
     authors,
@@ -78,11 +90,15 @@ export const ARTICLE_INCLUDE = {
 
 /* The first image in a body, surfaced so list cards can show the story's
    real picture instead of generated cover art. Null when the write-up has
-   none — the card falls back to the cover art it always had. */
-function firstImageUrl(body: unknown): string | null {
+   none — the card falls back to the cover art it always had. The caption
+   rides along: it is where a credit lives ("출처: …"), and a picture lifted
+   out of the piece has to carry its credit with it. */
+function firstImage(body: unknown): { url: string; caption: string | null } | null {
   if (!Array.isArray(body)) return null;
-  for (const b of body as { t?: string; url?: string }[]) {
-    if (b?.t === "image" && typeof b.url === "string") return b.url;
+  for (const b of body as { t?: string; url?: string; caption?: string }[]) {
+    if (b?.t === "image" && typeof b.url === "string") {
+      return { url: b.url, caption: b.caption ?? null };
+    }
   }
   return null;
 }
@@ -100,7 +116,7 @@ export function toNewsItem(n: NewsItem & { curator: Member | null }) {
     pick: n.pick,
     /* the curator's own picture beats the publisher's og:image; null means
        the card falls back to generated cover art */
-    imageUrl: firstImageUrl(n.body) ?? n.coverUrl,
+    imageUrl: firstImage(n.body)?.url ?? n.coverUrl,
     /* Ships alongside rather than folded in, so a card whose imageUrl fails
        to load has somewhere to go: the two are different hosts, and the whole
        point of a fallback is that it doesn't die with the thing it backs up.

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
-import CoverArt from "@/components/research/cover-art";
+import { inline } from "@/components/research/article-body";
+import ArticleThumb from "@/components/research/article-thumb";
 import HomeHero from "@/components/research/home-hero";
 import NewsThumb from "@/components/research/news-thumb";
 import Reveal from "@/components/research/reveal";
 import { getNews } from "@/lib/news";
-import { formatDate, getArticlesPage, type Accent } from "@/lib/research";
+import { formatDate, getFeatured, type Accent } from "@/lib/research";
 
 /* The property's front door. The archive and the feed each own a tab; this
    page's job is to say what the team publishes and hand over the newest of
@@ -65,11 +66,13 @@ function RowHead({
 }
 
 export default async function ResearchHome() {
-  const [latest, news] = await Promise.all([
-    getArticlesPage(1, 1),
-    getNews(),
-  ]);
-  const article = latest.items[0];
+  /* The pinned piece, not the newest one. A front door shows the work the
+     team wants read first, and the archive is where recency belongs — the
+     flag is a Featured checkbox in Notion, so which piece stands here is an
+     editorial decision the 리서치팀 makes without touching this file. Falls
+     back to the newest published piece API-side, so the slot is never empty
+     just because nobody has ticked the box. */
+  const [article, news] = await Promise.all([getFeatured(), getNews()]);
   const latestNews = news.slice(0, HOME_NEWS);
   const heroNews = latestNews[0];
 
@@ -103,8 +106,11 @@ export default async function ResearchHome() {
             className="order-2 px-6 pb-14 lg:order-1 lg:py-20 lg:pr-16"
             style={{ paddingLeft: NAV_INSET }}
           >
+            {/* not "Latest": this slot is pinned, and a label promising
+                recency next to a piece from three months ago reads as a
+                stale site rather than a chosen one */}
             <RowHead
-              label="Latest research"
+              label="Featured research"
               href="/research/articles"
               cta="전체 리서치"
             />
@@ -132,20 +138,34 @@ export default async function ResearchHome() {
           </div>
 
           {article && (
-            <Link
-              href={`/research/${article.slug}`}
-              className="group order-1 mt-0 block overflow-hidden lg:order-2 lg:rounded-l-[1.5rem]"
-              tabIndex={-1}
-              aria-hidden
-            >
-              <CoverArt
-                accent={article.accent}
-                tag={article.tag}
-                seed={article.slug}
-                large
-                className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
-              />
-            </Link>
+            /* The picture and, when the piece's own figure is what's showing,
+               that figure's credit under it. The credit is a sibling of the
+               link rather than inside it: a caption is where "출처:
+               [칼시](https://…)" lives, and an anchor cannot nest inside the
+               anchor wrapping the image. Nothing renders for a piece whose
+               picture is a cover or generated art — there is no one to
+               credit, and an empty line under the panel is worse than none. */
+            <div className="order-1 lg:order-2">
+              <Link
+                href={`/research/${article.slug}`}
+                className="group mt-0 block overflow-hidden lg:rounded-l-[1.5rem]"
+                tabIndex={-1}
+                aria-hidden
+              >
+                <ArticleThumb
+                  article={article}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  priority
+                  large
+                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
+                />
+              </Link>
+              {article.imageCaption && (
+                <p className="font-body px-6 pt-3 text-xs leading-relaxed font-light break-keep text-slate-500 lg:pr-16 lg:pl-0">
+                  {inline(article.imageCaption)}
+                </p>
+              )}
+            </div>
           )}
         </Reveal>
       </section>

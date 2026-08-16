@@ -1,5 +1,5 @@
 import type { PageObjectResponse } from "@notionhq/client";
-import { plainText } from "./richtext";
+import { plainText, toMicroformat } from "./richtext";
 
 /* Property extraction — every helper returns undefined for a missing property
    OR a type mismatch, so mappers can decide per-field whether that's a
@@ -23,6 +23,18 @@ export function richTextOf(page: PageObjectResponse, name: string): string | und
   const p = get(page, name);
   if (p?.type !== "rich_text") return undefined;
   const text = plainText(p.rich_text).trim();
+  return text.length > 0 ? text : undefined;
+}
+
+/* Rich text with its formatting kept, in the same microformat the body blocks
+   use. For the one-line fields where a link is the point — a photo credit is
+   "사진: 이름 / 출처 (라이선스)" with the source word hyperlinked — so the
+   curator writes it in Notion the way they write anything else, rather than
+   typing markdown into a cell. */
+export function microformatOf(page: PageObjectResponse, name: string): string | undefined {
+  const p = get(page, name);
+  if (p?.type !== "rich_text") return undefined;
+  const text = toMicroformat(p.rich_text).trim();
   return text.length > 0 ? text : undefined;
 }
 

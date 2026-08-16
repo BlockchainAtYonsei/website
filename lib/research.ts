@@ -36,6 +36,14 @@ export type Article = {
   featured: boolean;
   readingMinutes: number; // precomputed by the API (500 chars/min)
   views: number;
+  /* The piece's own picture — the first image in its body, else the cover
+     the sync stored. Null on an article that ships neither, which is most of
+     them: the surfaces that show a picture fall back to generated CoverArt. */
+  imageUrl: string | null;
+  /* That image's caption, verbatim, credit and all — rendered through the
+     body renderer's `inline()` so "출처: [칼시](https://…)" stays a link
+     wherever the picture is shown. */
+  imageCaption: string | null;
   coverUrl: string | null;
   /* first author's slug — kept for old call sites; `authors` is the truth */
   author: string | null;

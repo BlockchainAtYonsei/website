@@ -82,6 +82,13 @@ export const prop = {
     type: "files",
     files: [{ type: "file", name: "f", file: { url, expiry_time: "" } }],
   }),
+  /* The other half of a files column: a picture pasted in by URL rather than
+     uploaded. It carries no expiry, which is what decides whether the sync
+     re-hosts it. */
+  filesExternal: (url: string) => ({
+    type: "files",
+    files: [{ type: "external", name: "f", external: { url } }],
+  }),
 };
 
 let pageSeq = 0;

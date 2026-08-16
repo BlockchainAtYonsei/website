@@ -2,6 +2,8 @@ import type { PageObjectResponse } from "@notionhq/client";
 import {
   checkboxOf,
   dateOf,
+  fileUrlOf,
+  microformatOf,
   relationIdsOf,
   richTextOf,
   selectOf,
@@ -27,6 +29,10 @@ export type ArticleMeta = {
   publishedAt: string; // ISO date
   featured: boolean;
   mediumUrl?: string;
+  /* The picture as Notion holds it — an expiring upload URL as often as not,
+     so the syncer re-hosts it before storing. The mapper stays pure. */
+  coverUrl?: string;
+  coverCredit?: string;
   /* Notion page ids from the 작성자 relation — resolved to member rows by the
      syncer, which has DB access; the mapper stays pure. */
   authorPageIds: string[];
@@ -82,6 +88,19 @@ export function pageToArticleMeta(page: PageObjectResponse): ArticleMapResult {
   const dek = richTextOf(page, P.dek) ?? "";
   if (!dek) warnings.push(`article ${slug}: "${P.dek}" is empty`);
 
+  /* A licensed photo is licensed on the condition that it is credited, and the
+     credit is the one part nobody notices missing — the picture looks right
+     either way. So an uncredited cover is said out loud in the run log rather
+     than left to be spotted on the page. It is a warning, not a skip: plenty
+     of covers are the team's own work and have nobody to credit. */
+  const coverUrl = fileUrlOf(page, P.cover);
+  const coverCredit = microformatOf(page, P.coverCredit);
+  if (coverUrl && !coverCredit) {
+    warnings.push(
+      `article ${slug}: "${P.cover}" is set but "${P.coverCredit}" is empty — a borrowed photo needs its credit`,
+    );
+  }
+
   return {
     meta: {
       slug,
@@ -93,6 +112,8 @@ export function pageToArticleMeta(page: PageObjectResponse): ArticleMapResult {
       publishedAt: publishedAt.slice(0, 10),
       featured: checkboxOf(page, P.featured) ?? false,
       mediumUrl: urlOf(page, P.mediumUrl),
+      coverUrl,
+      coverCredit,
       authorPageIds,
     },
     warnings,

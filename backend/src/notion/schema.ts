@@ -13,7 +13,13 @@ export const ARTICLE_PROPS = {
   featured: "Featured", // checkbox
   authors: "작성자", // relation → Members DB
   mediumUrl: "Medium URL", // url
-  cover: "커버", // files (re-hosting deferred — design §3.4)
+  /* files — a Notion upload or a pasted URL. An upload's URL expires within
+     the hour, so it is re-hosted at sync time exactly like a body figure. */
+  cover: "커버", // files
+  /* rich_text — whose photo that is. Read with its formatting, so hyperlinking
+     the source word in Notion is what makes it a link on the site. Optional:
+     a cover the team drew themselves has nobody to credit. */
+  coverCredit: "커버 출처", // rich_text
 } as const;
 
 /* Names as they actually read in the 리서치팀's Blockchain News Tracking DB.

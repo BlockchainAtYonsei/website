@@ -1,6 +1,6 @@
 import Link from "next/link";
+import ArticleThumb from "./article-thumb";
 import Avatar from "./avatar";
-import CoverArt from "./cover-art";
 import { formatDate, type Article } from "@/lib/research";
 
 /* The card's bottom line, identical on every card: date bottom-left, view
@@ -39,10 +39,9 @@ export function FeaturedCard({ article }: { article: Article }) {
       href={`/research/${article.slug}`}
       className="group liquid-glass grid grid-cols-1 overflow-hidden rounded-[1.5rem] transition-transform duration-300 hover:scale-[1.006] md:grid-cols-2"
     >
-      <CoverArt
-        accent={article.accent}
-        tag={article.tag}
-        seed={article.slug}
+      <ArticleThumb
+        article={article}
+        sizes="(min-width: 768px) 50vw, 100vw"
         large
         className="aspect-[16/10] w-full md:aspect-auto md:h-full md:min-h-[340px]"
       />
@@ -95,10 +94,9 @@ export default function ArticleCard({ article }: { article: Article }) {
       href={`/research/${article.slug}`}
       className="group liquid-glass flex h-full flex-col overflow-hidden rounded-[1.25rem] transition-transform duration-300 hover:scale-[1.015]"
     >
-      <CoverArt
-        accent={article.accent}
-        tag={article.tag}
-        seed={article.slug}
+      <ArticleThumb
+        article={article}
+        sizes="(min-width: 1024px) 352px, (min-width: 768px) 50vw, 100vw"
         className="aspect-[16/9] w-full"
       />
       <div className="flex flex-1 flex-col p-6">

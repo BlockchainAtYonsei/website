@@ -125,5 +125,16 @@ docker exec bay-pg pg_dump -U bay bay > ~/bay-backup-$(date +%Y%m%d).sql
   컨테이너가 유지됩니다.
 - **멤버 명단 수정** = `backend/scripts/seed-members.ts` 편집 → 머지.
   부팅 시 자동으로 upsert됩니다(실패해도 서버는 뜨고 로그만 남음).
-  아티클을 mock으로 채우려면: `docker exec bay-backend npm run seed:mock`
-  (아티클만 갈아엎음 — 멤버·뉴스는 건드리지 않음).
+- **아티클 목업 갱신** — 목업 내용이 바뀌었으면(개수, 참고자료, 커버) 배포
+  만으로는 반영되지 않습니다. 아티클 행은 부팅 시 자동 시드되지 않고, 이
+  명령을 손으로 돌려야 갈립니다:
+
+  ```sh
+  docker exec -e SEED_ALLOW_REMOTE=1 bay-backend npm run seed:mock
+  ```
+
+  `SEED_ALLOW_REMOTE=1`이 필요한 이유: 이 스크립트는 아티클 테이블을 통째로
+  지우고 다시 만들기 때문에, 로컬이 아닌 DB(여기서는 `bay-pg`)를 향하면
+  기본적으로 거부합니다 — 예전에 같은 계열 스크립트가 프로덕션에 지어낸
+  뉴스 서른 건을 실명 바이라인으로 몇 주간 올려둔 적이 있어서입니다.
+  멤버·뉴스는 건드리지 않습니다.

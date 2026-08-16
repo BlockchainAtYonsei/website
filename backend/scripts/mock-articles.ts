@@ -2,16 +2,11 @@
    recovered from the frontend's pre-API lib/research.ts. Placeholder
    editorial content; real pieces arrive through the Notion sync. */
 
-export type Block =
-  | { t: "h2"; text: string }
-  | { t: "h3"; text: string }
-  | { t: "p"; text: string }
-  | { t: "ul"; items: string[] }
-  | { t: "ol"; items: string[] }
-  | { t: "quote"; text: string; cite?: string }
-  | { t: "callout"; title?: string; text: string }
-  | { t: "table"; head: string[]; rows: string[][] }
-  | { t: "divider" };
+/* The body contract itself is not mock — it is the same union the sync writes
+   and the site renders, so a block shape that works here works there. It used
+   to be copied into this file and had already drifted (no image, no code). */
+export type { Block } from "../src/notion/block-types";
+import type { Block } from "../src/notion/block-types";
 
 /* cover art palettes — pulled from the hero's atmosphere gradient so research
    pages read as the same site, not a bolted-on blog */
@@ -31,7 +26,21 @@ export type Article = {
 
 /* Placeholder editorial content — replace with real BAY research.
    Bylines are mock: articles are spread across research-team members so the
-   author pages have something to show. Reassign as real pieces land. */
+   author pages have something to show. Reassign as real pieces land.
+
+   The first one is `featured`, which is the flag the research home pins its
+   one research slot to (GET /v1/articles/featured), so it is the piece that
+   has to read as finished work — a full argument rather than three filler
+   paragraphs. Everything after it is a card in a grid. When a real piece is
+   ready, tick Featured on it in Notion and this one stops being the front
+   door on the next sync; nothing here needs editing.
+
+   Nothing here sets a cover picture, and that is on purpose. Every piece ends
+   with 참고자료, and the seed does what the sync does: takes the first
+   reference's link-preview image and credits it back (src/content/
+   references.ts). The references are real pages — the pictures are theirs,
+   about this subject, chosen by people who work on it. A piece that carries
+   its own figure beats both. */
 export const ARTICLES: Article[] = [
   {
     slug: "restaking-risk-surface",
@@ -122,6 +131,15 @@ export const ARTICLES: Article[] = [
         t: "p",
         text: "리스테이킹은 자본 효율을 실제로 개선한다. 다만 그 대가는 위험의 총량 증가가 아니라 위험의 **구조 변경**이다. 독립적인 여러 위험이 하나의 꼬리 위험으로 접히고, 그 꼬리는 평상시 데이터에 거의 나타나지 않는다. 평가 지표를 수익률에서 상관관계로 옮기지 않으면, 우리가 측정하고 있는 것은 위험이 없다는 사실이 아니라 아직 발생하지 않았다는 사실뿐이다.",
       },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[EigenLayer — Restaking](https://www.eigenlayer.xyz/)",
+          "[ethereum.org — 스테이킹](https://ethereum.org/en/staking/)",
+        ],
+      },
     ],
   },
   {
@@ -177,6 +195,15 @@ export const ARTICLES: Article[] = [
           "실패한 증명의 비용을 누가 지는가 — 이 조항이 프루버 집합의 개방성을 실질적으로 결정한다",
         ],
       },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[Succinct — Blog](https://blog.succinct.xyz/)",
+          "[ethereum.org — 영지식 증명](https://ethereum.org/en/zero-knowledge-proofs/)",
+        ],
+      },
     ],
   },
   {
@@ -230,6 +257,15 @@ export const ARTICLES: Article[] = [
         t: "p",
         text: "세 번째가 가장 덜 풀렸다. 담보 없는 약속은 시장이 조용할 때만 지켜진다.",
       },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[Paradigm — Intent-Based Architectures and Their Risks](https://www.paradigm.xyz/2023/06/intents)",
+          "[ethereum.org — 디파이](https://ethereum.org/en/defi/)",
+        ],
+      },
     ],
   },
   {
@@ -271,6 +307,15 @@ export const ARTICLES: Article[] = [
         t: "p",
         text: "세 번째 접근이 실무적으로 가장 유망해 보이지만, 거부권을 쥔 주체를 어떻게 뽑을지가 다시 같은 문제로 돌아온다.",
       },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[ethereum.org — DAO](https://ethereum.org/en/dao/)",
+          "[ENS — Blog](https://blog.ens.domains/)",
+        ],
+      },
     ],
   },
   {
@@ -308,6 +353,15 @@ export const ARTICLES: Article[] = [
         t: "p",
         text: "토큰화된 국채 형태로 준비금을 보유하면 관측 빈도 문제는 상당 부분 해소된다. 다만 보관 위험이 사라지는 게 아니라 발행 주체와 브릿지로 옮겨간다는 점은 그대로다.",
       },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[Circle — USDC Transparency](https://www.circle.com/transparency)",
+          "[ethereum.org — 스테이블코인](https://ethereum.org/en/stablecoins/)",
+        ],
+      },
     ],
   },
   {
@@ -336,6 +390,15 @@ export const ARTICLES: Article[] = [
       {
         t: "p",
         text: "DA 제공자 입장에서는 수요가 늘어도 단가가 같은 속도로 떨어지면 매출이 늘지 않는다. 결국 블록 공간을 파는 대신 결제나 공유 시퀀싱 같은 상위 서비스로 올라가려 하고, 그 순간 중립적 인프라라는 포지셔닝과 충돌한다.",
+      },
+      { t: "divider" },
+      { t: "h2", text: "참고자료" },
+      {
+        t: "ul",
+        items: [
+          "[Celestia — What is Celestia](https://celestia.org/what-is-celestia/)",
+          "[ethereum.org — 댕크샤딩](https://ethereum.org/en/roadmap/danksharding/)",
+        ],
       },
     ],
   },
