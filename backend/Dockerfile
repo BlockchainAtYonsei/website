@@ -27,9 +27,17 @@ RUN addgroup --system --gid 1001 nodejs \
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-# scripts + generated client ride along so the roster seed can run in the
-# container — the member roster's edit path is this repo, not an admin UI
-COPY --from=builder /app/src/generated ./src/generated
+# scripts ride along so the seeds can run in the container — the member
+# roster's edit path is this repo, not an admin UI.
+#
+# The whole of src/ comes with them, not just the generated client. A seed is
+# a tsx entry point that imports the app's own code — reading-time today,
+# reference extraction and the og:image crawl now — so shipping the generated
+# client alone left `npm run seed:mock` dying on MODULE_NOT_FOUND inside the
+# container while working perfectly from a checkout. Sources are text next to
+# a node_modules that already carries the Prisma CLI; the narrower copy buys
+# nothing and breaks the next time a script imports something.
+COPY --from=builder /app/src ./src
 COPY scripts ./scripts
 COPY package.json prisma.config.ts ./
 COPY prisma ./prisma
