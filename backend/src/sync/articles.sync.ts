@@ -22,6 +22,24 @@ export class ArticlesSyncService {
       opts.since,
     );
 
+    /* Deletions reconcile before the upserts, same as the news sync, so a
+       page deleted and replaced in one edit session settles in one run. Note
+       the trap this does NOT clear: slug here is unique across archived rows
+       too, so re-entering a deleted article under the same Slug property
+       stays blocked until someone renames or purges the ghost. The news url
+       index went partial for exactly this; slug is routing identity and can't
+       until the readers of findUnique(slug) learn to prefer the live row. */
+    if (opts.full) {
+      const archived = await this.prisma.article.updateMany({
+        where: {
+          notionPageId: { notIn: pages.map((p) => p.id) },
+          status: { not: "archived" },
+        },
+        data: { status: "archived" },
+      });
+      stats.archived = archived.count;
+    }
+
     /* 작성자 is a relation to Notion pages this database knows nothing about —
        the roster lives here, not in Notion. So each related page's title is
        fetched once and matched against member names, the same
@@ -109,24 +127,15 @@ export class ArticlesSyncService {
         });
         existing ? stats.updated++ : stats.created++;
       } catch (e) {
-        stats.skipped++;
+        /* failed, not skipped: mapped content the database refused — the one
+           number that means a story is missing from the site. */
+        stats.failed++;
         stats.warnings.push(`article ${meta.slug}: upsert failed (${(e as Error).message})`);
       }
     }
 
-    if (opts.full) {
-      const archived = await this.prisma.article.updateMany({
-        where: {
-          notionPageId: { notIn: pages.map((p) => p.id) },
-          status: { not: "archived" },
-        },
-        data: { status: "archived" },
-      });
-      stats.archived = archived.count;
-    }
-
     this.logger.log(
-      `articles: +${stats.created} ~${stats.updated} -${stats.archived} skip ${stats.skipped}`,
+      `articles: +${stats.created} ~${stats.updated} -${stats.archived} skip ${stats.skipped} FAIL ${stats.failed}`,
     );
     return stats;
   }

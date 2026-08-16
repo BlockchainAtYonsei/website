@@ -129,10 +129,15 @@ model NewsItem {
   // the page id so curators never have to invent one.
   slug  String @unique
   title String
-  // Unique when present: the same story curated twice is an edit, not a second
-  // row. Nullable because a quarter of the published items carry no link — the
+  // Unique among LIVE rows: the same story curated twice is an edit, not a
+  // second row — but an archived row is a deleted Notion page's residue, and
+  // the 리서치팀 deletes and re-enters rows with the same Source link as part
+  // of the weekly shuffle, so a ghost must not block the story's return. The
+  // index is partial (WHERE status <> 'archived'), which Prisma cannot spell,
+  // so it lives in migrations/20260816000000_* rather than as @unique here.
+  // Nullable because a quarter of the published items carry no link — the
   // curator's write-up is the piece, and the original is a courtesy.
-  url        String? @unique
+  url        String?
   sourceName String  @default("") @map("source_name")
   // The curator's one-line take — the value-add of the feature.
   summary  String
@@ -168,8 +173,8 @@ model SyncRun {
   resource SyncResource
   trigger  SyncTrigger
   status   SyncStatus   @default(running)
-  // { created, updated, archived, skipped, warnings: string[] } — one page
-  // failing to map lands here instead of killing the run.
+  // { created, updated, archived, skipped, failed, warnings: string[] } — one
+  // page failing to map or upsert lands here instead of killing the run.
   stats      Json      @default("{}")
   error      String?
   startedAt  DateTime  @default(now()) @map("started_at")

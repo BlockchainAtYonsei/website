@@ -113,6 +113,23 @@ export class NewsSyncService {
       opts.since,
     );
 
+    /* Deletions reconcile BEFORE the upserts, not after. The team deletes a
+       row and re-enters the story as a fresh page in the same board shuffle,
+       and the fresh page carries the same Source link; url is unique among
+       live rows, so the ghost has to stop being live before the replacement
+       can insert. With this after the loop, the replacement failed once and
+       waited a full day for the next reconcile to try again. */
+    if (opts.full) {
+      const archived = await this.prisma.newsItem.updateMany({
+        where: {
+          notionPageId: { notIn: pages.map((p) => p.id) },
+          status: { not: "archived" },
+        },
+        data: { status: "archived" },
+      });
+      stats.archived = archived.count;
+    }
+
     /* 작성자 is a name typed in Notion, so the roster is indexed by name.
        Whitespace is stripped rather than trimmed — "장 동현" and "장동현" are
        the same person, and which one gets typed is a coin flip. A name held
@@ -197,24 +214,16 @@ export class NewsSyncService {
         });
         existing ? stats.updated++ : stats.created++;
       } catch (e) {
-        stats.skipped++;
+        /* failed, not skipped: this page mapped as content the site should
+           have, and the write is what refused. The story is missing until
+           someone acts, and the count + warning are how anyone finds out. */
+        stats.failed++;
         stats.warnings.push(`news ${data.title}: upsert failed (${(e as Error).message})`);
       }
     }
 
-    if (opts.full) {
-      const archived = await this.prisma.newsItem.updateMany({
-        where: {
-          notionPageId: { notIn: pages.map((p) => p.id) },
-          status: { not: "archived" },
-        },
-        data: { status: "archived" },
-      });
-      stats.archived = archived.count;
-    }
-
     this.logger.log(
-      `news: +${stats.created} ~${stats.updated} -${stats.archived} skip ${stats.skipped}`,
+      `news: +${stats.created} ~${stats.updated} -${stats.archived} skip ${stats.skipped} FAIL ${stats.failed}`,
     );
     return stats;
   }

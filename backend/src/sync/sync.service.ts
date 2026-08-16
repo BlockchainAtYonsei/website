@@ -87,6 +87,11 @@ export class SyncService {
     try {
       const since = full ? undefined : await this.cursor(resource);
       const stats = await this.syncer(resource).sync({ since, full });
+      /* Warnings used to live only inside the run row, where reading them
+         took a curl with the sync key — so a story blocked from the site for
+         a day looked, from the logs, like a healthy sync. docker logs is the
+         first (often only) place anyone looks; the warnings belong there. */
+      for (const w of stats.warnings) this.logger.warn(`${resource}: ${w}`);
       const done = await this.prisma.syncRun.update({
         where: { id: run.id },
         data: { status: "ok", stats, finishedAt: new Date() },
