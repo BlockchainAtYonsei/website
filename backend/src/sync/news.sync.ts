@@ -113,12 +113,13 @@ export class NewsSyncService {
       opts.since,
     );
 
-    /* Deletions reconcile BEFORE the upserts, not after. The team deletes a
-       row and re-enters the story as a fresh page in the same board shuffle,
-       and the fresh page carries the same Source link; url is unique among
-       live rows, so the ghost has to stop being live before the replacement
-       can insert. With this after the loop, the replacement failed once and
-       waited a full day for the next reconcile to try again. */
+    /* Deletions reconcile BEFORE the upserts, not after. The team deletes
+       rows and re-enters their stories as fresh pages in one board shuffle;
+       running the archive last meant a run's own upserts raced whatever
+       constraint the ghosts still satisfied, and a failed insert waited a
+       full day for the next reconcile. Nothing unique rides on news url any
+       more, but ordering reconciliation first is simply the honest shape of
+       a full sync — the page list is already complete before the loop. */
     if (opts.full) {
       const archived = await this.prisma.newsItem.updateMany({
         where: {

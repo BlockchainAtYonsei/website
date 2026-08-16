@@ -129,12 +129,12 @@ model NewsItem {
   // the page id so curators never have to invent one.
   slug  String @unique
   title String
-  // Unique among LIVE rows: the same story curated twice is an edit, not a
-  // second row — but an archived row is a deleted Notion page's residue, and
-  // the 리서치팀 deletes and re-enters rows with the same Source link as part
-  // of the weekly shuffle, so a ghost must not block the story's return. The
-  // index is partial (WHERE status <> 'archived'), which Prisma cannot spell,
-  // so it lives in migrations/20260816000000_* rather than as @unique here.
+  // Deliberately NOT unique. It was, on the theory that the same story curated
+  // twice is an edit — and then two curators wrote up the same Re-protocol
+  // piece from different angles and the team ruled both belong on the site.
+  // The write-up is the item and the link is shared context; identity lives in
+  // notionPageId (sync) and slug (routing). Uniqueness here also let archived
+  // ghosts block a re-entered story's insert for a day at a time.
   // Nullable because a quarter of the published items carry no link — the
   // curator's write-up is the piece, and the original is a courtesy.
   url        String?

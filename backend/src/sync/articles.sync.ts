@@ -26,9 +26,9 @@ export class ArticlesSyncService {
        page deleted and replaced in one edit session settles in one run. Note
        the trap this does NOT clear: slug here is unique across archived rows
        too, so re-entering a deleted article under the same Slug property
-       stays blocked until someone renames or purges the ghost. The news url
-       index went partial for exactly this; slug is routing identity and can't
-       until the readers of findUnique(slug) learn to prefer the live row. */
+       stays blocked until someone renames or purges the ghost. News dropped
+       url uniqueness over this class of problem; slug is routing identity and
+       can't, until the readers of findUnique(slug) prefer the live row. */
     if (opts.full) {
       const archived = await this.prisma.article.updateMany({
         where: {
