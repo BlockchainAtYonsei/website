@@ -58,7 +58,7 @@ function RowHead({
   cta: string;
 }) {
   return (
-    <p className="font-mono mb-5 flex items-center justify-between gap-4 text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+    <p className="font-mono mb-5 flex items-center justify-between gap-4 text-sm tracking-[0.18em] text-bay-300 uppercase">
       {label}
       <Link
         href={href}
@@ -112,7 +112,7 @@ export default async function ResearchHome() {
                 recency next to a piece from three months ago reads as a
                 stale site rather than a chosen one */}
             <RowHead
-              label="Featured research"
+              label="Research"
               href="/research/articles"
               cta="전체 리서치"
             />
