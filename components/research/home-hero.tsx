@@ -20,12 +20,6 @@ const reveal = (delay: number) => ({
 export default function HomeHero() {
   return (
     <>
-      <motion.p
-        {...reveal(0.05)}
-        className="font-mono mb-7 text-[10px] tracking-[0.3em] text-bay-300 uppercase"
-      >
-        BAY Research
-      </motion.p>
       <motion.h1
         {...reveal(0.16)}
         className="font-heading max-w-4xl text-4xl leading-[1.08] tracking-[-2px] break-keep text-white md:text-6xl"
