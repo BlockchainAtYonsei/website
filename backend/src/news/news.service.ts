@@ -1,20 +1,31 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { isoDate, toNewsItem } from "../content/shape";
+import { toNewsItem } from "../content/shape";
 import type { NewsItemModel as NewsItem } from "../generated/prisma/models";
 import { PrismaService } from "../prisma/prisma.service";
 
-/* Keyset cursor over (publishedAt desc, id desc) — a feed that only grows
-   shouldn't shift under the reader the way offset pages do. */
+/* Keyset cursor over (publishedAt desc, createdAt desc) — a feed that only
+   grows shouldn't shift under the reader the way offset pages do.
+   publishedAt is a bare date (@db.Date, no time-of-day), so any day with more
+   than one story ties on it; createdAt — set once at insert, never touched by
+   a later reconcile — is what breaks the tie, in the order stories actually
+   landed on the site. id used to be that tiebreaker, but it is a random uuid
+   with no chronology of its own, so which same-day story led kept changing
+   as new stories synced in and won or lost the uuid comparison by chance. */
 function encodeCursor(item: NewsItem): string {
-  return Buffer.from(`${isoDate(item.publishedAt)}|${item.id}`).toString("base64url");
+  return Buffer.from(`${item.publishedAt.toISOString()}|${item.createdAt.toISOString()}`).toString(
+    "base64url",
+  );
 }
 
-function decodeCursor(cursor: string): { date: Date; id: string } {
+function decodeCursor(cursor: string): { publishedAt: Date; createdAt: Date } {
   const raw = Buffer.from(cursor, "base64url").toString();
-  const [date, id] = raw.split("|");
-  const d = new Date(date);
-  if (!id || Number.isNaN(d.getTime())) throw new BadRequestException("invalid cursor");
-  return { date: d, id };
+  const [publishedAt, createdAt] = raw.split("|");
+  const p = new Date(publishedAt);
+  const c = new Date(createdAt);
+  if (Number.isNaN(p.getTime()) || Number.isNaN(c.getTime())) {
+    throw new BadRequestException("invalid cursor");
+  }
+  return { publishedAt: p, createdAt: c };
 }
 
 @Injectable()
@@ -34,14 +45,14 @@ export class NewsService {
         ...(keyset
           ? {
               OR: [
-                { publishedAt: { lt: keyset.date } },
-                { publishedAt: keyset.date, id: { lt: keyset.id } },
+                { publishedAt: { lt: keyset.publishedAt } },
+                { publishedAt: keyset.publishedAt, createdAt: { lt: keyset.createdAt } },
               ],
             }
           : {}),
       },
       include: { curator: true },
-      orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
       take: filter.size + 1, // one extra to know whether a next page exists
     });
 
@@ -79,7 +90,7 @@ export class NewsService {
     const rail = {
       where: { status: "published" as const, id: { not: item.id } },
       include: { curator: true },
-      orderBy: [{ publishedAt: "desc" as const }, { id: "desc" as const }],
+      orderBy: [{ publishedAt: "desc" as const }, { createdAt: "desc" as const }],
       take: 3,
     };
     const [latest, related] = await Promise.all([

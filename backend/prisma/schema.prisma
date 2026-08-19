@@ -160,16 +160,23 @@ model NewsItem {
   // — 보안 and DeFi at once. Ordered as the curator tagged them, so the first
   // is the one a cramped surface shows.
   categories String[]
-  // Original publication date of the story, not the curation date.
+  // Original publication date of the story, not the curation date. A bare
+  // date — several stories share a day, and ordering ties on it fall through
+  // to createdAt below rather than to id, which carries no chronology at all.
   publishedAt DateTime      @map("published_at") @db.Date
   curator     Member?       @relation(fields: [curatorId], references: [id])
   curatorId   String?       @map("curator_id") @db.Uuid
   status      ContentStatus @default(draft)
 
   notionPageId String   @unique @map("notion_page_id")
-  syncedAt     DateTime @updatedAt @map("synced_at")
+  // Set once at insert and never touched again — unlike syncedAt, which every
+  // reconcile bumps whether or not anything changed. The feed's same-day tie
+  // break: which of two stories published the same date landed on the site
+  // first.
+  createdAt DateTime @default(now()) @map("created_at")
+  syncedAt  DateTime @updatedAt @map("synced_at")
 
-  @@index([status, publishedAt(sort: Desc)])
+  @@index([status, publishedAt(sort: Desc), createdAt(sort: Desc)])
   @@index([categories], type: Gin)
   @@map("news_items")
 }
