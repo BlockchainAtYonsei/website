@@ -53,7 +53,7 @@ export default function AuthorTabs({
 
   return (
     <section className="mt-16 border-t border-white/8 pt-14 md:mt-20">
-      <div className="mb-9 flex items-center gap-8 border-b border-white/8">
+      <div className="mb-9 flex items-center gap-12 border-b border-white/8">
         <button type="button" onClick={() => setTab("research")} className={TAB_CLASS(tab === "research")} aria-selected={tab === "research"} role="tab">
           리서치
           <span className="ml-2 text-white/35">{articles.length}</span>
