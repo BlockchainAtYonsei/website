@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ArticleCard from "./article-card";
 import { summaryPreview, type NewsItem } from "@/lib/news";
@@ -34,7 +34,22 @@ export default function AuthorTabs({
   articles: Article[];
   news: NewsItem[];
 }) {
-  const [tab, setTab] = useState<"research" | "news">("research");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab") === "news" ? "news" : "research";
+
+  /* The tab rides in the URL rather than component state: a news pick from
+     this tab lands on its own /research/news/[slug] page, and back has to
+     return to the tab the reader left, not to whatever "research" resets to
+     on remount. */
+  const setTab = (next: "research" | "news") => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "research") params.delete("tab");
+    else params.set("tab", next);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
 
   return (
     <section className="mt-16 border-t border-white/8 pt-14 md:mt-20">

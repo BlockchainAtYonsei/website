@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
   GitHubIcon,
   GlobeIcon,
@@ -117,8 +118,11 @@ export default async function AuthorPage(
         )}
       </header>
 
-      {/* Written research / curated news — the profile's two tabs */}
-      <AuthorTabs articles={author.articles} news={author.news} />
+      {/* Written research / curated news — the profile's two tabs. Suspense
+          because AuthorTabs reads the active tab from the URL. */}
+      <Suspense fallback={null}>
+        <AuthorTabs articles={author.articles} news={author.news} />
+      </Suspense>
     </main>
   );
 }
