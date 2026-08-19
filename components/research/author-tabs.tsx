@@ -86,7 +86,7 @@ export default function AuthorTabs({
               <li key={item.id}>
                 <Link
                   href={`/research/news/${item.slug}`}
-                  className="group block border-b border-white/6 py-8 first:pt-0"
+                  className="group block border-b border-white/6 pt-11 pb-8 first:pt-0"
                 >
                   <div className="font-mono flex flex-wrap items-center gap-3 text-[10px] tracking-[0.18em] text-white/40 uppercase">
                     <span>{formatDate(item.date)}</span>
