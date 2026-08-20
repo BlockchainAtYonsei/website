@@ -51,7 +51,7 @@ export default function Pillars() {
         </p>
         <BlurText
           justify="start"
-          text="The BAY at work"
+          text={lang === "KR" ? "BAY 활동" : "The BAY at work"}
           className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
         />
         <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
