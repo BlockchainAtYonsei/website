@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { TEAMS, type TeamCopy } from "@/lib/teams";
 import BlurText from "./blur-text";
 import Modal from "./modal";
+import TeamModal from "./team-modal";
 import {
   ArrowUpRight,
+  ChevronRight,
   GitHubIcon,
   GlobeIcon,
   InstagramIcon,
@@ -234,21 +237,43 @@ function MemberChip({
   );
 }
 
+/* The roster header doubles as the way into the team's introduction — but only
+   for teams that have one written (lib/teams). Without an entry it stays plain
+   text, so 홍보 and 온보딩 do not offer a button that opens nothing. */
 function Roster({
   team,
   members,
   onSelect,
+  onOpenTeam,
 }: {
   team: string;
   members: Member[];
   onSelect: (m: Member) => void;
+  onOpenTeam?: () => void;
 }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-white/10 px-1 pb-2.5">
-        <span className="font-mono text-[11px] tracking-[0.25em] text-bay-200">
-          {team}
-        </span>
+        {onOpenTeam ? (
+          <button
+            type="button"
+            onClick={onOpenTeam}
+            aria-haspopup="dialog"
+            className="group flex cursor-pointer items-baseline gap-1.5 text-left"
+          >
+            <span className="font-mono text-[11px] tracking-[0.25em] text-bay-200 underline decoration-bay-200/30 decoration-1 underline-offset-[5px] transition-colors group-hover:text-bay-100 group-hover:decoration-bay-100/60">
+              {team}
+            </span>
+            <ChevronRight
+              aria-hidden
+              className="h-3 w-3 shrink-0 translate-y-px text-bay-200/60 transition-all group-hover:translate-x-0.5 group-hover:text-bay-100"
+            />
+          </button>
+        ) : (
+          <span className="font-mono text-[11px] tracking-[0.25em] text-bay-200">
+            {team}
+          </span>
+        )}
         <span className="font-mono text-[11px] tracking-[0.2em] text-white/60">
           {members.length}
         </span>
@@ -323,6 +348,12 @@ export default function OrgChart({
   teams: Team[];
 }) {
   const [person, setPerson] = useState<Person | null>(null);
+  const [teamCopy, setTeamCopy] = useState<TeamCopy | null>(null);
+
+  /* Undefined for a team with no write-up, which is what Roster reads to decide
+     whether its header is a button at all. */
+  const openTeam = (team: string) =>
+    TEAMS[team] ? () => setTeamCopy(TEAMS[team]) : undefined;
 
   const tierWeights = teams.map((t) => t.weight);
   const tierCentres = columnCentres(tierWeights);
@@ -388,6 +419,7 @@ export default function OrgChart({
                     team={team}
                     members={members}
                     onSelect={pickMember(team)}
+                    onOpenTeam={openTeam(team)}
                   />
                 </>
               )}
@@ -431,6 +463,7 @@ export default function OrgChart({
                     team={team}
                     members={members}
                     onSelect={pickMember(team)}
+                    onOpenTeam={openTeam(team)}
                   />
                 </div>
               )}
@@ -494,6 +527,10 @@ export default function OrgChart({
           </>
         )}
       </Modal>
+
+      {/* Its own dialog rather than another branch of the one above: a team
+          write-up and a person's links share nothing but the shell. */}
+      <TeamModal team={teamCopy} onClose={() => setTeamCopy(null)} />
     </>
   );
 }

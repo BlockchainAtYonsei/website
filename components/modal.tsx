@@ -47,7 +47,9 @@ export default function Modal({
     const first = panelRef.current?.querySelector<HTMLElement>(
       "input:not([tabindex='-1']),textarea,select",
     );
-    (first ?? panelRef.current)?.focus();
+    /* preventScroll, or the browser scrolls the target into view and a panel
+       taller than the viewport opens part-way down its own content. */
+    (first ?? panelRef.current)?.focus({ preventScroll: true });
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -70,7 +72,13 @@ export default function Modal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain bg-ink/80 px-4 py-10 text-left backdrop-blur-xl md:items-center md:py-16"
+          /* Centring is done with the panel's own auto margins below, not with
+             items-center here. In a scroll container, align-items: center on a
+             child taller than the viewport pushes the overflow out both ends
+             and the top half becomes unreachable — you cannot scroll above the
+             start edge. Auto margins collapse to zero once the free space is
+             gone, so a tall panel simply starts at the top and scrolls. */
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto overscroll-contain bg-ink/80 px-4 py-10 text-left backdrop-blur-xl md:py-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -82,7 +90,7 @@ export default function Modal({
             aria-modal="true"
             aria-labelledby={labelledBy}
             tabIndex={-1}
-            className="liquid-glass-strong relative w-full max-w-2xl rounded-[1.5rem] px-7 py-9 outline-none md:px-11 md:py-12"
+            className="liquid-glass-strong relative w-full max-w-2xl rounded-[1.5rem] px-7 py-9 outline-none md:my-auto md:px-11 md:py-12"
             initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 16, filter: "blur(8px)" }}
