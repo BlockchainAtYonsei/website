@@ -1,11 +1,10 @@
-import Link from "next/link";
 import Hero from "@/components/hero";
 import ApplyTrigger from "@/components/apply-modal";
 import BlurText from "@/components/blur-text";
 import HistoryTimeline from "@/components/history-timeline";
 // import Partners from "@/components/partners";
+import Pillars from "@/components/pillars";
 import SiteFooter from "@/components/site-footer";
-import { ArrowUpRight, CodeIcon, MagnifierIcon } from "@/components/icons";
 
 /* hl: standout entries (awards, wins, marquee moments) render brighter */
 const HISTORY: {
@@ -102,25 +101,6 @@ const HISTORY: {
   },
 ];
 
-/* Each card is a door, not a pitch: the blurbs were cut on purpose, and what
-   fills the space is the oversized mark rather than any copy. */
-const PILLARS: {
-  title: string;
-  href: string;
-  /* opens in a new tab and skips the router — Build leaves the site outright,
-     Research is its own property and shouldn't take the landing page with it */
-  newTab?: true;
-  Icon: (props: { className?: string }) => React.ReactElement;
-}[] = [
-  { title: "Research", href: "/research", newTab: true, Icon: MagnifierIcon },
-  {
-    title: "Build",
-    href: "https://github.com/BlockchainAtYonsei",
-    newTab: true,
-    Icon: CodeIcon,
-  },
-];
-
 export default function Home() {
   return (
     <main>
@@ -170,72 +150,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Capabilities */}
-      <section id="activities" className="bg-ink pb-28 md:pb-36">
-        <div className="mx-auto max-w-6xl px-6">
-          <p className="font-body mb-6 text-sm font-light text-white/80">
-            {"// What we do"}
-          </p>
-          <BlurText
-            justify="start"
-            text="The BAY at work"
-            className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
-          />
-          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {PILLARS.map(({ title, href, newTab, Icon }) => {
-              const card = (
-                <>
-                  {/* Same three layers the research cover art uses — grid,
-                      glow, oversized mark — so these cards read as the same
-                      site. The mark runs off the corner on purpose: cropped,
-                      it is texture rather than a second icon competing with
-                      the real one. */}
-                  <div
-                    aria-hidden
-                    className="bg-grid absolute inset-0 opacity-60"
-                  />
-                  <Icon
-                    aria-hidden
-                    className="pointer-events-none absolute -right-8 -bottom-10 h-48 w-48 text-white/[0.045] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105"
-                  />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    style={{
-                      background:
-                        "radial-gradient(75% 90% at 10% 0%, rgba(47,107,255,0.20) 0%, transparent 70%)",
-                    }}
-                  />
-
-                  <Icon className="relative h-6 w-6 text-bay-300 transition-colors group-hover:text-bay-100" />
-                  <h3 className="font-heading relative flex items-center gap-2 text-3xl leading-none tracking-[-1px] text-white md:text-4xl">
-                    {title}
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-white/35 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-bay-200" />
-                  </h3>
-                </>
-              );
-              const cls =
-                "group liquid-glass relative flex min-h-[200px] flex-col justify-between overflow-hidden rounded-[1.25rem] p-6 transition-transform duration-300 hover:scale-[1.02] md:min-h-[220px]";
-
-              return newTab ? (
-                <a
-                  key={title}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={cls}
-                >
-                  {card}
-                </a>
-              ) : (
-                <Link key={title} href={href} className={cls}>
-                  {card}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* Capabilities — the two cards and their team dialogs */}
+      <Pillars />
 
       {/* History — pinned; vertical scroll drives the horizontal track */}
       <HistoryTimeline history={HISTORY} />

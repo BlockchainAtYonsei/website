@@ -256,3 +256,35 @@ body {
     linear-gradient(to bottom, rgba(95, 139, 255, 0.05) 1px, transparent 1px);
   background-size: 56px 56px;
 }
+
+/* Scrollbar for a dialog whose content outruns the panel. The panel keeps its
+   size and the body scrolls inside it, so this bar sits on the glass rather
+   than at the edge of the window — a default OS scrollbar reads as chrome
+   pasted onto the page and breaks the frosted surface.
+
+   Tinted with bay-300 rather than plain white so it belongs to the same blue
+   the rest of the dialog is lit by, and kept at a low alpha: it should be
+   findable when you reach for it, not a bright rail down the side. Firefox
+   gets the two-property version; the rest get the pseudo-elements. */
+.modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(157, 185, 255, 0.22) transparent;
+}
+
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: rgba(157, 185, 255, 0.2);
+  transition: background-color 200ms;
+}
+
+.modal-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(157, 185, 255, 0.38);
+}

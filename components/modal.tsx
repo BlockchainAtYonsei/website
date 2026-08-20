@@ -19,11 +19,15 @@ export default function Modal({
   open,
   onClose,
   labelledBy,
+  headerAction,
   children,
 }: {
   open: boolean;
   onClose: () => void;
   labelledBy: string;
+  /* Sits beside the close button, outside the scrolling body, so it stays put
+     while the content moves under it. */
+  headerAction?: ReactNode;
   children: ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -90,21 +94,37 @@ export default function Modal({
             aria-modal="true"
             aria-labelledby={labelledBy}
             tabIndex={-1}
-            className="liquid-glass-strong relative w-full max-w-2xl rounded-[1.5rem] px-7 py-9 outline-none md:my-auto md:px-11 md:py-12"
+            /* The panel never outgrows the window — it caps at the viewport
+               less the wrapper's own padding, and the body below scrolls
+               inside it. Long content used to stretch the panel and hand the
+               scrolling to the window behind it, which meant the close button
+               travelled off the top of the screen. */
+            className="liquid-glass-strong relative flex max-h-[calc(100svh-5rem)] w-full max-w-2xl flex-col rounded-[1.5rem] outline-none md:my-auto md:max-h-[calc(100svh-8rem)]"
             initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 16, filter: "blur(8px)" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={t.close}
-              className="absolute top-5 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <CloseIcon className="h-5 w-5" />
-            </button>
-            {children}
+            {/* In flow, not floating. Absolutely placed it sat over the body,
+                which was invisible while the panel grew to fit its content —
+                but the body scrolls under it now, and every line that passed
+                beneath came out printed through the close button. */}
+            <div className="flex shrink-0 items-center justify-end gap-1 px-5 pt-5">
+              {headerAction}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label={t.close}
+                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <CloseIcon className="h-5 w-5" />
+              </button>
+            </div>
+            {/* Padding lives here rather than on the panel so the content
+                scrolls clear of both edges instead of stopping short. */}
+            <div className="modal-scroll overflow-y-auto overscroll-contain px-7 pt-4 pb-9 md:px-11 md:pt-5 md:pb-12">
+              {children}
+            </div>
           </motion.div>
         </motion.div>
       )}

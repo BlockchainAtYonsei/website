@@ -4,11 +4,18 @@ import type { TeamCopy } from "@/lib/teams";
 import { ArrowUpRight } from "./icons";
 import Modal from "./modal";
 
-/* The team introduction behind a roster header on /organization.
+/* The team introduction behind a card in "The BAY at work" on the landing
+   page — Research opens 리서치팀, Build opens 개발팀.
 
    Long-form and read top to bottom, so nothing here collapses: someone who
    opened 개발팀 wants the whole thing, unlike the recruiting FAQ where seven
-   questions were a menu to pick one from. The dialog scrolls instead. */
+   questions were a menu to pick one from. The panel holds its size and the
+   body scrolls inside it.
+
+   `link` is where the card used to go before it started opening this instead —
+   Research to the research site, Build to the GitHub org. It rides in the
+   dialog's header so it stays reachable at any scroll position, and it is the
+   only thing here that leaves the page. */
 
 const EYEBROW = "font-mono text-[10px] tracking-[0.18em] text-white/45 uppercase";
 
@@ -34,13 +41,32 @@ function Bullets({ items }: { items: string[] }) {
 
 export default function TeamModal({
   team,
+  link,
   onClose,
 }: {
   team: TeamCopy | null;
+  link?: { label: string; href: string };
   onClose: () => void;
 }) {
   return (
-    <Modal open={team !== null} onClose={onClose} labelledBy="team-title">
+    <Modal
+      open={team !== null}
+      onClose={onClose}
+      labelledBy="team-title"
+      headerAction={
+        link && (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noreferrer"
+            className="font-body flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            {link.label}
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+        )
+      }
+    >
       {team && (
         <>
           <p className="font-mono mb-4 text-[10px] tracking-[0.18em] text-bay-300 uppercase">

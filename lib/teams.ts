@@ -1,16 +1,16 @@
-/* Team introductions, opened from the roster headers on /organization.
-   Carried over from the Notion recruiting page that this site replaces.
+/* Team introductions, opened from the two cards in "The BAY at work" on the
+   landing page (components/pillars). Carried over from the Notion recruiting
+   page that this site replaces.
 
-   Korean only, unlike the Contact and Apply dialogs. Those are reachable from
-   the landing page, which is written in English and carries the language
-   switch; this one is reachable only from the org chart, which is Korean
-   throughout — team names, roles, and its own empty state all come through in
-   Korean. An English team intro would be the one translated thing on an
-   untranslated page. Revisit when /organization itself is translated.
+   Korean only, and knowingly out of step with the page it opens from: the
+   landing page is written in English and carries the language switch, so an
+   EN reader gets a wall of Korean here. Translating two personal bios and
+   ~1,000 words of team copy was not part of moving them across, and a bad
+   translation of someone's own introduction is worse than none. This is the
+   file to add an EN table to when that is wanted.
 
-   Keyed by the column label in app/organization/page.tsx. A team with no entry
-   here simply renders its roster header as text, so adding 홍보 or 온보딩 later
-   is a matter of writing the copy — no component changes.
+   Keyed by team name. Nothing reads these keys dynamically any more —
+   pillars.tsx names both directly — so a third entry needs a card to open it.
 
    Headings carry no emoji even though the source had one on each. Nothing else
    on this site uses them, and six emoji in a row inside the dialog fought with
