@@ -63,6 +63,38 @@ export function ChevronDown({ className }: { className?: string }) {
   );
 }
 
+export function ChevronLeft({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
+export function ChevronRight({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export function Play({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">

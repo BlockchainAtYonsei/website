@@ -66,10 +66,14 @@ type DialogCopy = {
     howEyebrow: string;
     howBody: string;
     formCta: string;
-    /* The Notion recruiting FAQ. Collapsed in the dialog, so the "Q."/"A."
-       prefixes the source carried are dropped: an accordion already says which
-       half is the question. */
+    /* The Notion recruiting FAQ. It lives on the dialog's second view rather
+       than under the requirements — seven questions made the first screen long
+       enough that the closed notice fell below the fold. faqEyebrow labels
+       both the row that opens it and the view itself; faqBack is the way out. */
     faqEyebrow: string;
+    faqBack: string;
+    /* Collapsed once you are there, so the "Q."/"A." prefixes the source
+       carried are dropped: an accordion already says which half is which. */
     faq: { q: string; a: string }[];
     /* Shown while RECRUITING_OPEN is false — the notice that explains why the
        schedule above is in the past. */
@@ -117,6 +121,7 @@ const KR: DialogCopy = {
     howBody: "구글 폼에 주어진 서식대로 작성해 주시면 됩니다.",
     formCta: "지원서 작성하기",
     faqEyebrow: "자주 묻는 질문",
+    faqBack: "뒤로",
     faq: [
       {
         q: "유예생, 졸업생, 휴학생, 대학원생, 직장인 모두 지원 가능한가요?",
@@ -211,6 +216,7 @@ const EN: DialogCopy = {
     howBody: "Fill in the Google form, following the format it gives you.",
     formCta: "Open the application form",
     faqEyebrow: "Frequently asked",
+    faqBack: "Back",
     faq: [
       {
         q: "Can graduates, students on leave, postgraduates and working professionals apply?",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   APPLY_FORM_URL,
   CLOSED_COHORT,
@@ -8,7 +8,7 @@ import {
   RECRUITING_OPEN,
 } from "@/lib/cohort";
 import { copyFor } from "@/lib/i18n";
-import { ArrowUpRight, ChevronDown } from "./icons";
+import { ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight } from "./icons";
 import { useLang } from "./lang-provider";
 import Modal from "./modal";
 import SocialLinks from "./social-links";
@@ -27,6 +27,12 @@ import SocialLinks from "./social-links";
    closed notice at the bottom naming the round that just ended. True: the form
    section appears and the notice goes. Open the next cycle in lib/cohort and
    the two halves swap on their own.
+
+   Two views, not two dialogs. The FAQ runs to seven questions, which pushed
+   the closed notice off the bottom of the panel when it sat inline — so it
+   moves behind a row on the front view and comes back with a back button,
+   while the overlay itself stays open the whole time. A route would have
+   dropped the reader out of the dialog they opened.
 
    The cohort numbers live there rather than here so the Organization page can
    read them without crossing the client boundary; the wording around them
@@ -62,6 +68,73 @@ export function ApplyModal({
 }) {
   const { lang } = useLang();
   const t = copyFor(lang).apply;
+  const [view, setView] = useState<"main" | "faq">("main");
+
+  const backRef = useRef<HTMLButtonElement>(null);
+  const faqRowRef = useRef<HTMLButtonElement>(null);
+  const prevView = useRef(view);
+
+  /* Reopening starts at the front. Someone who left on the FAQ and came back
+     later is not resuming a task — they are opening the dialog again. */
+  useEffect(() => {
+    if (!open) {
+      setView("main");
+      prevView.current = "main";
+    }
+  }, [open]);
+
+  /* Focus follows the swap, or a keyboard reader is left pointing at a button
+     that no longer exists. Guarded on an actual change of view so opening the
+     dialog does not steal the focus Modal just placed. */
+  useEffect(() => {
+    if (!open || prevView.current === view) return;
+    (view === "faq" ? backRef : faqRowRef).current?.focus();
+    prevView.current = view;
+  }, [view, open]);
+
+  if (view === "faq") {
+    return (
+      <Modal open={open} onClose={onClose} labelledBy="apply-modal-title">
+        {/* Top-left, opposite the close button: one way back, one way out. */}
+        <button
+          ref={backRef}
+          type="button"
+          onClick={() => setView("main")}
+          className="font-body -ml-2.5 mb-5 inline-flex cursor-pointer items-center gap-1 rounded-[0.7rem] px-2.5 py-1.5 text-xs text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {t.faqBack}
+        </button>
+        <h2
+          id="apply-modal-title"
+          className="font-heading text-3xl leading-[1.15] tracking-[-1px] break-keep text-white md:text-4xl"
+        >
+          {t.faqEyebrow}
+        </h2>
+
+        {/* Native <details> rather than state and an animation: seven of these
+            open and close independently, and the browser already handles the
+            keyboard and the aria wiring. */}
+        <div className="mt-8 border-t border-white/8">
+          {t.faq.map(({ q, a }) => (
+            <details key={q} className="group border-b border-white/8">
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-4 py-3.5 [&::-webkit-details-marker]:hidden">
+                <span className="font-body text-sm leading-relaxed font-light break-keep text-slate-200 transition-colors group-hover:text-white">
+                  {q}
+                </span>
+                <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-white/35 transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+              {/* pr clears the chevron's column so the answer does not run
+                  under it on the last line */}
+              <p className="font-body pr-8 pb-4 text-sm leading-relaxed font-light break-keep text-slate-400">
+                {a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal open={open} onClose={onClose} labelledBy="apply-modal-title">
@@ -115,34 +188,19 @@ export function ApplyModal({
         </Section>
       )}
 
-      <Section eyebrow={t.faqEyebrow}>
-        {/* Native <details> rather than state and an animation: seven of these
-            open and close independently, the browser already handles the
-            keyboard and the aria wiring, and a dialog this size does not need
-            another motion component inside it. */}
-        {/* last:border-b-0 — the section divider below already closes the
-            list, and the two rules together read as a double line */}
-        <div className="border-t border-white/8">
-          {t.faq.map(({ q, a }) => (
-            <details
-              key={q}
-              className="group border-b border-white/8 last:border-b-0"
-            >
-              <summary className="flex cursor-pointer list-none items-start justify-between gap-4 py-3.5 [&::-webkit-details-marker]:hidden">
-                <span className="font-body text-sm leading-relaxed font-light break-keep text-slate-200 transition-colors group-hover:text-white">
-                  {q}
-                </span>
-                <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-white/35 transition-transform duration-200 group-open:rotate-180" />
-              </summary>
-              {/* pr clears the chevron's column so the answer does not run
-                  under it on the last line */}
-              <p className="font-body pr-8 pb-4 text-sm leading-relaxed font-light break-keep text-slate-400">
-                {a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </Section>
+      {/* The door to the second view. A row rather than a link, because it
+          goes nowhere — the overlay stays open and swaps what it shows. */}
+      <button
+        ref={faqRowRef}
+        type="button"
+        onClick={() => setView("faq")}
+        className="group mt-8 flex w-full cursor-pointer items-center justify-between gap-4 rounded-[0.9rem] border border-white/10 px-5 py-4 text-left transition-colors hover:border-white/20 hover:bg-white/5"
+      >
+        <span className="font-body text-sm font-medium break-keep text-white">
+          {t.faqEyebrow}
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-white/35 transition-all group-hover:translate-x-0.5 group-hover:text-bay-200" />
+      </button>
 
       <div className="mt-9 border-t border-white/10 pt-8">
         {!RECRUITING_OPEN && (
