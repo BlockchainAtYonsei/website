@@ -58,7 +58,7 @@ export default function HistoryTimeline() {
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-6">
           <p className="font-body mb-6 text-sm font-light text-white/80">
-            {lang === "KR" ? "// 연혁" : "// History"}
+            {"// History"}
           </p>
           <BlurText
             justify="start"
