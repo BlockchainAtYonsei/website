@@ -3,11 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import BlurText from "@/components/blur-text";
-
-export type HistoryYear = {
-  year: string;
-  items: { month?: string; text: string; hl?: boolean }[];
-};
+import { historyFor } from "@/lib/history";
+import { useLang } from "@/components/lang-provider";
 
 /* The timeline is a decade wide, so it scrolls sideways — but with the wheel
    the user is already turning. The section pins for as many pixels of page
@@ -15,12 +12,15 @@ export type HistoryYear = {
    progress drives translateX; when the last year lands, the pin releases and
    the page continues to the CTA. No inner scrollbar, no second gesture to
    learn. Until measurement (SSR, first paint) overflow is 0: full-height
-   section, no pin, 2017 at the left — the correct static fallback. */
-export default function HistoryTimeline({
-  history,
-}: {
-  history: HistoryYear[];
-}) {
+   section, no pin, 2017 at the left — the correct static fallback.
+
+   The data is read here rather than taken as a prop: it is bilingual, and the
+   language switch is a client hook the server-rendered page cannot reach. When
+   the language flips, the item text changes length, the track re-measures
+   (ResizeObserver below), and the scroll math follows. */
+export default function HistoryTimeline() {
+  const { lang } = useLang();
+  const history = historyFor(lang);
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [overflow, setOverflow] = useState(0);
@@ -58,11 +58,11 @@ export default function HistoryTimeline({
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-6">
           <p className="font-body mb-6 text-sm font-light text-white/80">
-            {"// History"}
+            {lang === "KR" ? "// 연혁" : "// History"}
           </p>
           <BlurText
             justify="start"
-            text="The BAY so far"
+            text={lang === "KR" ? "지금까지의 BAY" : "The BAY so far"}
             className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
           />
         </div>
