@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { TEAMS, type TeamCopy } from "@/lib/teams";
+import { teamCopy, type TeamKey } from "@/lib/teams";
 import BlurText from "./blur-text";
+import { useLang } from "./lang-provider";
 import TeamModal from "./team-modal";
 import { ArrowUpRight, CodeIcon, MagnifierIcon } from "./icons";
 
@@ -15,21 +16,24 @@ import { ArrowUpRight, CodeIcon, MagnifierIcon } from "./icons";
    this team" first and still offers the way out, rather than only being a
    doorway to somewhere else. */
 
+/* The team is held as a key, not as resolved copy: the language switch can be
+   thrown while the dialog is open, and looking the copy up at render is what
+   lets the open dialog follow it. */
 const PILLARS: {
   title: string;
-  team: TeamCopy;
+  team: TeamKey;
   link: { label: string; href: string };
   Icon: (props: { className?: string }) => React.ReactElement;
 }[] = [
   {
     title: "Research",
-    team: TEAMS.리서치팀,
+    team: "리서치팀",
     link: { label: "Research", href: "/research" },
     Icon: MagnifierIcon,
   },
   {
     title: "Build",
-    team: TEAMS.개발팀,
+    team: "개발팀",
     link: { label: "GitHub", href: "https://github.com/BlockchainAtYonsei" },
     Icon: CodeIcon,
   },
@@ -37,6 +41,7 @@ const PILLARS: {
 
 export default function Pillars() {
   const [open, setOpen] = useState<(typeof PILLARS)[number] | null>(null);
+  const { lang } = useLang();
 
   return (
     <section id="activities" className="bg-ink pb-28 md:pb-36">
@@ -93,7 +98,7 @@ export default function Pillars() {
       </div>
 
       <TeamModal
-        team={open?.team ?? null}
+        team={open ? teamCopy(lang, open.team) : null}
         link={open?.link}
         onClose={() => setOpen(null)}
       />

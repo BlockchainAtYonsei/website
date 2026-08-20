@@ -2,22 +2,23 @@
    landing page (components/pillars). Carried over from the Notion recruiting
    page that this site replaces.
 
-   Korean only, and knowingly out of step with the page it opens from: the
-   landing page is written in English and carries the language switch, so an
-   EN reader gets a wall of Korean here. Translating two personal bios and
-   ~1,000 words of team copy was not part of moving them across, and a bad
-   translation of someone's own introduction is worse than none. This is the
-   file to add an EN table to when that is wanted.
+   Both languages, keyed the same way the dialog copy in lib/i18n is: the cards
+   sit on the landing page, which carries the language switch, so an EN reader
+   who opens one has to get English back.
 
-   Keyed by team name. Nothing reads these keys dynamically any more —
-   pillars.tsx names both directly — so a third entry needs a card to open it.
+   The English is a translation, not a second original — the Korean is what the
+   two leads wrote about their own teams, and it is the version to correct if
+   the two ever drift. Personal contact details are dropped from both: the
+   source ended each PM block with a private email and mobile number. Public
+   professional links stay.
 
    Headings carry no emoji even though the source had one on each. Nothing else
    on this site uses them, and six emoji in a row inside the dialog fought with
-   the mono section labels that already do this job.
+   the mono section labels that already do this job. */
 
-   Personal contact details are dropped: the source ended both PM blocks with a
-   private email and mobile number. Public professional links stay. */
+import type { LangCode } from "@/components/lang-provider";
+
+export type TeamKey = "개발팀" | "리서치팀";
 
 export type TeamCopy = {
   title: string;
@@ -39,9 +40,11 @@ export type TeamCopy = {
   contactNote: string;
 };
 
-const CONTACT_NOTE = "팀 활동이 궁금하시면 메뉴의 Contact로 문의해 주세요.";
+const COINDESK =
+  "https://www.coindesk.com/tech/2026/05/08/ai-agents-fueled-a-frenzy-of-startup-building-at-the-consensus-miami-easya-hackathon";
+const HOJAE_X = "https://x.com/ihojae212644";
 
-export const TEAMS: Record<string, TeamCopy> = {
+const KR: Record<TeamKey, TeamCopy> = {
   개발팀: {
     title: "개발팀",
     intro: [
@@ -109,14 +112,11 @@ export const TEAMS: Record<string, TeamCopy> = {
         "여러분이 잘 적응하고 온보딩할 수 있도록 최선을 다해 돕겠습니다. 같이 하나씩 배워가며 성장하면 좋겠습니다!",
       ],
       links: [
-        {
-          label: "CoinDesk 소개",
-          href: "https://www.coindesk.com/tech/2026/05/08/ai-agents-fueled-a-frenzy-of-startup-building-at-the-consensus-miami-easya-hackathon",
-        },
-        { label: "X", href: "https://x.com/ihojae212644" },
+        { label: "CoinDesk 소개", href: COINDESK },
+        { label: "X", href: HOJAE_X },
       ],
     },
-    contactNote: CONTACT_NOTE,
+    contactNote: "팀 활동이 궁금하시면 메뉴의 Contact로 문의해 주세요.",
   },
 
   리서치팀: {
@@ -177,6 +177,151 @@ export const TEAMS: Record<string, TeamCopy> = {
       },
       closing: ["같이 하나씩 배워가며 성장하면 좋겠습니다!"],
     },
-    contactNote: CONTACT_NOTE,
+    contactNote: "팀 활동이 궁금하시면 메뉴의 Contact로 문의해 주세요.",
   },
 };
+
+const EN: Record<TeamKey, TeamCopy> = {
+  개발팀: {
+    title: "Development",
+    intro: [
+      "Hello — I'm Hojae Lee, development lead for BAY's 18th cohort.",
+      "In 2026, Web3 and blockchain are no longer a technology of the future. They are core technology driving digital change right now: stablecoins have reached real use, from remittance and payments through to DeFi, and newer currents like RWA — real-world asset tokenisation — and on-chain AI agents are building out markets fast.",
+      "The landscape of development itself has changed over the past few years. As AI tooling has improved, the act of building something has become far quicker. Real advantage now comes not from how fast you write code, but from the judgement to read where this ecosystem is empty and what ought to be built there.",
+      "BAY's development team is built around that shift: read the ecosystem closely, find the opening inside it, build it yourself and prove it. We surface insight through research, build quickly into the gaps, and prove it at hackathons. It is not a place that only writes code — it is where you grow into a builder who knows what they are making and why.",
+    ],
+    sections: [
+      {
+        heading: "What we aim for",
+        items: [
+          "Find openings through ecosystem research, then build and ship that insight as a dApp",
+          "Enter hackathons and startup programmes — and win them",
+          "Build the speed the AI era asks for alongside the judgement to read an ecosystem",
+          "Learn to combine business and engineering knowledge",
+        ],
+      },
+      {
+        heading: "Who we are looking for",
+        items: [
+          "People with Web2 development experience who want to widen into blockchain and Web3",
+          "People who enjoy working out what to build as much as building it",
+          "Developers and working engineers with a strong interest in blockchain technology",
+          "Anyone thinking about a career in Web3",
+        ],
+      },
+      {
+        heading: "How we work",
+        items: [
+          "We do not split the team up by chain. We move as small teams that mix discovery, design and build, researching the empty places in the ecosystem and turning what we find into real projects inside a single team.",
+          "The subjects we take on — RWA, DeFi, DePIN and so on — are not fixed; each team sets them fresh every cycle. If your interests change, you can move to a different subject.",
+          "The weekly session is where teams share progress, and developers go deeper on the technical side together in a separate engineering session.",
+          "Research leads to build leads to hackathon, and every team aims to enter at least one hackathon along the way.",
+        ],
+      },
+      {
+        heading: "Onboarding for new members",
+        items: [
+          "We run onboarding over the vacation, starting from the fundamentals, so that someone meeting blockchain for the first time can keep up.",
+          "You get a feel for the concepts that matter — how Bitcoin and Ethereum work, stablecoins, decentralisation — before you touch any code.",
+          "The development track then covers Solidity basics and dApp development through exercises and assignments.",
+          "Onboarding ends with you finishing one small piece of work of your own, which carries you straight into the main activity.",
+        ],
+      },
+    ],
+    pm: {
+      heading: "Meet the lead",
+      name: "Hojae Lee — Development Lead, BAY 18th",
+      bullets: [
+        "Development lead, BAY 18th cohort",
+        "Injective NinjaLabs, 2nd cohort",
+        "Founder of ChainLens (selected for EasyA Kickstart · $LENS launched on Solana mainnet)",
+        "Main-stage speaker, EasyA hackathon at Consensus Miami 2026",
+        "Invited speaker, AI Agentic Finance Forum 2026 (Injective × Ark Point)",
+        "Excellence Award, Korea University AI·SW·Blockchain Business Model Competition 2026 (VERA)",
+        "Selected for WorldLand Grants Track A 2026 (Top 10)",
+        "Student Award, Solana Startup Village 2026",
+        "ICPC Seoul Regional 2025 finalist, representing Hongik University",
+        "Bronze, SUAPC 2025",
+        "Fourth year, Computer Engineering at Hongik University · formerly on the development team at HiARC, Hongik's algorithm society",
+      ],
+      closing: [
+        "I am less the type who goes deep into code, and more the type who works on what to build and how to shape the idea.",
+        "I will do everything I can to help you settle in and get up to speed. I hope we learn and grow through it together, one thing at a time.",
+      ],
+      links: [
+        { label: "CoinDesk feature", href: COINDESK },
+        { label: "X", href: HOJAE_X },
+      ],
+    },
+    contactNote:
+      "For more about what the team does, reach us through Contact in the menu.",
+  },
+
+  리서치팀: {
+    title: "Research",
+    intro: [
+      "Hello! I'm Yerim Bae, research lead for BAY's 18th cohort.",
+      "BAY's research team studies a wide range of subjects across the blockchain and Web3 ecosystem in depth, then writes them up as clear, useful research and shares it. We monitor the latest trends and technical developments continuously, and set out to add value to the blockchain ecosystem through close analysis and insightful reporting.",
+      "We have built close working relationships with a number of blockchain foundations and innovative companies — Synfutures, Eigenlayer and Uniswap among them — and contribute actively to the growth of the industry through them. We also take part in seminars, conferences and community events to keep our knowledge current, and to build on it with everyone interested in blockchain and Web3.",
+    ],
+    sections: [
+      {
+        heading: "What we aim for",
+        items: [
+          "Run research grounded in study of the blockchain ecosystem — technology, markets, DeFi and more",
+          "Have every member publish several pieces of research and insight on Medium each semester",
+        ],
+      },
+      {
+        heading: "How we work",
+        items: [
+          "We divide the team by subject and run research individually or in groups. The subjects under consideration include on-chain infrastructure entering regulated finance, the RWA and DePIN ecosystems, crypto markets, and core and emerging blockchain technology. We plan to reflect the team's own interests in those subjects as far as we can.",
+          "Each group settles on its specific subject, takes feedback from the research lead, and submits the finished piece. Writing timelines and deadlines are agreed internally.",
+        ],
+      },
+      {
+        heading: "Who we are looking for",
+        items: [
+          "People who want to do blockchain and Web3 research as a team, within the society",
+          "People who want to study blockchain in depth but do not know where to start",
+          "People who want to share what they have studied with others",
+          "People who want to build a career on research experience",
+        ],
+      },
+      {
+        heading: "Nice to have (not required)",
+        items: [
+          "Experience writing blockchain research",
+          "Able to write research in English",
+        ],
+      },
+    ],
+    pm: {
+      heading: "Meet the lead",
+      name: "Yerim Bae — BAY 17th",
+      bullets: [
+        "Research lead, BAY",
+        "Economics, Yonsei University",
+        "58th KICPA",
+        "Dunamu Upclass Ambassador, 1st cohort (Apr – Jul 2026)",
+      ],
+      sublist: {
+        heading: "Research written in 2026",
+        items: [
+          "The evolution of oracle architecture for bringing RWAs on-chain: leaving middleware dependence behind and integrating native consensus",
+          "CBDCs as an exogenous variable: how far does private stablecoin territory reach? (Part 1)",
+          "CBDCs as an exogenous variable: how far does private stablecoin territory reach? (Part 2)",
+        ],
+      },
+      closing: ["I hope we learn and grow through it together, one thing at a time!"],
+    },
+    contactNote:
+      "For more about what the team does, reach us through Contact in the menu.",
+  },
+};
+
+const TEAMS: Record<LangCode, Record<TeamKey, TeamCopy>> = { KR, EN };
+
+export function teamCopy(lang: LangCode, key: TeamKey): TeamCopy {
+  return TEAMS[lang][key];
+}

@@ -78,8 +78,22 @@ const HISTORY: {
     year: "2025",
     items: [
       { month: "6월", text: "XRPL 2025 Korea Hackathon 1st place", hl: true },
+      {
+        month: "8월",
+        text: "Blockthon 2025 Sponsored by Sui — 1·2·3위 석권",
+        hl: true,
+      },
       { month: "11월", text: "Monad Blitz 1st place", hl: true },
       { month: "12월", text: "Backpack Endgame 1st place", hl: true },
+      {
+        text: "Creditcoin Moonshot Idea Space Ideathon in Seoul 2nd place",
+        hl: true,
+      },
+      {
+        text: "Campu3 Ideathon by BlockchainValley — Network Track 1st place",
+        hl: true,
+      },
+      { text: "Sui-mming Hackathon 2025 University Track", hl: true },
     ],
   },
   {
@@ -97,6 +111,14 @@ const HISTORY: {
         text: "BuidlHack 2026 General Track 2nd place — Challengent",
         hl: true,
       },
+      { text: "WorldLand Grants 수상", hl: true },
+      {
+        text: "Consensus 2026 Miami — Base + AWS Track 러너업",
+        hl: true,
+      },
+      { text: "Solana Startup Village 학생상 — Heist", hl: true },
+      { text: "고려대 AI × 블록체인 BM 대회 우수상 — 닌자랩스", hl: true },
+      { text: "고려대 AI × 블록체인 BM 대회 특별상 — GrowPass", hl: true },
     ],
   },
 ];
