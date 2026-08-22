@@ -8,7 +8,8 @@ GitHub main ──push──▶ Railway 프로젝트 bay-website (리전: 싱가
                        ├─ website      Next.js   ← blockchainatyonsei.com / www
                        │     │ 서버사이드 fetch (API_URL)
                        │     ▼
-                       ├─ bay-backend  NestJS    ← api.blockchainatyonsei.com
+                       ├─ bay-backend  NestJS    ← bay-backend-production.up.railway.app
+                       │                           (api.blockchainatyonsei.com은 보류 — 아래 참고)
                        │     │ Notion sync(10분) · 이미지 재호스팅 · 읽기 API
                        │     ▼
                        ├─ Postgres     (Railway DB, 볼륨)
@@ -61,13 +62,13 @@ Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. �
 | `REVALIDATE_URL` | `http://website.railway.internal:3000/api/revalidate` (내부망) |
 | `REVALIDATE_SECRET` | website의 같은 변수와 **동일해야** 함 |
 | `S3_ENDPOINT` · `S3_BUCKET` · `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` · `S3_REGION=auto` | Bucket `bay-media` → Credentials 탭 값 그대로 |
-| `S3_PUBLIC_URL` | `https://api.blockchainatyonsei.com/v1/media` — 이 값이 DB에 저장되는 이미지 URL의 접두사 |
+| `S3_PUBLIC_URL` | `https://bay-backend-production.up.railway.app/v1/media` — 이 값이 DB에 저장되는 이미지 URL의 접두사 |
 
 **website**
 
 | 변수 | 값 |
 |---|---|
-| `API_URL` | `https://api.blockchainatyonsei.com` (빌드·런타임 모두 사용) |
+| `API_URL` | `https://bay-backend-production.up.railway.app` (빌드·런타임 모두 사용) |
 | `REVALIDATE_SECRET` | bay-backend와 동일 |
 | `NEXT_TELEMETRY_DISABLED` | `1` |
 
@@ -79,7 +80,7 @@ Cloudflare DNS 레코드(모두 **DNS only**):
 |---|---|---|
 | CNAME | `@` | website 서비스의 Railway 타깃 |
 | CNAME | `www` | website 서비스의 Railway 타깃 |
-| CNAME | `api` | bay-backend 서비스의 Railway 타깃 |
+| CNAME | `api` | bay-backend 서비스의 Railway 타깃 (보류 중 — 위 "선택" 절) |
 | TXT | `_railway-verify`, `_railway-verify.www`, `_railway-verify.api` | Railway가 보여주는 값 |
 
 타깃 값은 Railway → 서비스 → Settings → Networking → Custom Domains에
@@ -87,10 +88,30 @@ Cloudflare DNS 레코드(모두 **DNS only**):
 apex(`@`)에 CNAME이 되는 건 Cloudflare의 flattening 덕분이라 DNS 호스트를
 다른 곳으로 옮기면 apex가 깨집니다.
 
+### 선택: api.blockchainatyonsei.com (2026-08-23 현재 보류)
+
+DNS(Cloudflare `api` CNAME → Railway 타깃, `_railway-verify.api` TXT)는
+정확히 들어가 있고 라우팅도 통하지만, Railway가 이 호스트용 인증서를
+발급하지 않은 채 멈춰 있다. **필수가 아니다** — 사이트는 railway.app 주소로
+완전히 동작한다. 인증서가 붙은 것이 확인되면(`curl -sI
+https://api.blockchainatyonsei.com/health` 가 200) 이렇게 옮긴다:
+
+1. bay-backend `S3_PUBLIC_URL` → `https://api.blockchainatyonsei.com/v1/media`,
+   website `API_URL` → `https://api.blockchainatyonsei.com` (둘 다 재배포됨)
+2. DB에 이미 저장된 이미지 URL 치환 (Postgres → Data 탭 또는 `railway connect Postgres`):
+   ```sql
+   UPDATE news_items SET cover_url = replace(cover_url, 'https://bay-backend-production.up.railway.app', 'https://api.blockchainatyonsei.com') WHERE cover_url LIKE 'https://bay-backend-production.up.railway.app/%';
+   UPDATE news_items SET body = replace(body::text, 'https://bay-backend-production.up.railway.app', 'https://api.blockchainatyonsei.com')::jsonb WHERE body::text LIKE '%bay-backend-production.up.railway.app%';
+   ```
+   (articles 테이블도 같은 패턴. 컬럼명은 `backend/prisma/schema.prisma` 확인.)
+3. `POST /v1/sync/all?full=1` 한 번.
+
+포기하기로 하면: Railway에서 도메인 삭제 + Cloudflare의 `api` CNAME·TXT 삭제. 코드/DB 변경 없음.
+
 ## 운영
 
 ```sh
-API=https://api.blockchainatyonsei.com
+API=https://bay-backend-production.up.railway.app
 # Notion 발행 직후 즉시 반영 (평소엔 10분 주기 자동)
 curl -i -X POST -H "x-sync-key: $SYNC_KEY" "$API/v1/sync/all"
 # 전체 리컨실 — 삭제 반영 + 깨진 이미지 재호스팅
@@ -114,8 +135,8 @@ curl -s $API/health            # {"status":"ok","db":"up","lastSync":{...}}
 - **DB 백업** — Railway Postgres는 볼륨 스냅샷을 지원하지만, 이 DB는 전부
   재생성 가능합니다(명부=레포, 뉴스=Notion, 아티클=목업). 최악의 경우 새
   Postgres + 재배포 + `sync/all?full=1`로 복구.
-- **로그** — 서비스 → Deployments → 최신 배포 → Logs. HTTP 로그의 `host`가
-  `api.blockchainatyonsei.com`으로 찍히지 않으면 도메인 연결 문제.
+- **로그** — 서비스 → Deployments → 최신 배포 → Logs. HTTP 로그의 `host`로
+  어느 주소로 들어왔는지 보인다.
 
 ## 로컬 개발
 
