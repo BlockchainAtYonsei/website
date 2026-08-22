@@ -3,11 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, ChevronLeft } from "@/components/icons";
 import Reveal from "@/components/research/reveal";
-import {
-  Materials,
-  Schedule,
-  SheetHeading,
-} from "@/components/research/study-session";
+import { Schedule, SheetHeading } from "@/components/research/study-session";
 import { PAGE_BOX, StudyHero } from "@/components/research/study-ui";
 import {
   findSession,
@@ -162,27 +158,15 @@ export default async function StudySession(
               진행 방식은 전체 회차 페이지의 공통 규칙을 따릅니다.
             </p>
           ) : (
-            <>
-              <Reveal>
-                <SheetHeading
-                  title="진행 순서"
-                  aside={`${session.assign.length}파트 · ${totalMinutes(session)}분`}
-                />
-                <Schedule session={session} />
-              </Reveal>
-
-              <Reveal className="mt-16 md:mt-20">
-                <SheetHeading
-                  title="자료"
-                  aside={
-                    session.records.length > 0
-                      ? `${session.records.length}건`
-                      : "세션 이후"
-                  }
-                />
-                <Materials records={session.records} />
-              </Reveal>
-            </>
+            /* No separate 자료 list: each part's deck is reached from its
+               underlined title in the schedule above. */
+            <Reveal>
+              <SheetHeading
+                title="진행 순서"
+                aside={`${session.assign.length}파트 · ${totalMinutes(session)}분`}
+              />
+              <Schedule session={session} />
+            </Reveal>
           )}
 
           <Pager session={session} />
