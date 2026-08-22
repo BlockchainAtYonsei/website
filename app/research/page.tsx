@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
 import ArticleThumb from "@/components/research/article-thumb";
@@ -6,30 +7,27 @@ import NewsThumb from "@/components/research/news-thumb";
 import Reveal from "@/components/research/reveal";
 import { getNews } from "@/lib/news";
 import { formatDate, getFeatured, type Accent } from "@/lib/research";
+import { findSession, nextSessionNo, SESSIONS } from "@/lib/study";
 
-/* The property's front door. The archive and the feed each own a tab; this
+/* The property's front door. Research, News and Study each own a tab; this
    page's job is to say what the team publishes and hand over the newest of
    each, so everything on it is a taster.
 
-   Two rows that mirror each other — research reads text-then-picture, news
-   picture-then-text — and both stop at the header's edge. They used to run
-   off the screen instead, which on a laptop looked like a composed front page
-   and on a 27" monitor looked like a mistake: the picture took half of 2560px
-   and stood 720px tall, the row grew taller than the viewport, and the
-   navigation sat in a 1152px band up the middle of it with the artwork
-   sailing past on both sides. A full-bleed picture has no width of its own,
-   so the bigger the display the bigger it gets — the one measurement on this
-   page that nothing bounded.
+   One centred phrase over three equal cards — the three content surfaces,
+   left to right, each showing its freshest thing. It used to be two mirrored
+   full-bleed rows instead, which read as a composed front page on a laptop
+   and as a mistake on a 27" monitor: a full-bleed picture has no width of its
+   own, so the bigger the display the bigger it got — one picture taking half
+   of 2560px and standing 720px tall, the row growing taller than the viewport.
 
-   So everything here is the header's box: mx-auto max-w-6xl px-6, the exact
-   classes research-header.tsx uses. Pictures end where the wordmark and the
-   tabs end, which is the alignment a wide screen actually shows you, and the
-   row's height stops growing at 1152px.
+   So the cards are the thing bounded now. They sit in the header's box
+   (mx-auto max-w-6xl px-6, the exact classes research-header.tsx uses) as a
+   three-column grid, which means a picture ends where the wordmark and the
+   tabs end however wide the screen is, and each card's height is its own
+   contents, not the viewport's.
 
    Glass appears exactly once, on the Medium band, because that is the only
-   thing here asking to be clicked rather than read. */
-
-const HOME_NEWS = 3; // a taste of the feed; 전체 뉴스 goes and gets the rest
+   thing here asking to be clicked-through rather than browsed into. */
 
 /* The header's own box, copied from research-header.tsx rather than
    approximated: the two are aligned or they are not, and a second formula
@@ -47,27 +45,65 @@ function accentOf(topic: string): Accent {
   return ACCENTS[h % ACCENTS.length];
 }
 
-/* Section label + its way out to the full surface. */
-function RowHead({
-  label,
+/* The study card's picture. The study surface ships no photography of its own
+   — its cards are glass and type — so this is a fixed house cover the surface
+   owns rather than a per-session figure: one image under a stable path that
+   stays put as the 주차 (next session) rolls over, wearing the same bottom
+   vignette the other two cards' pictures carry so the row reads as three real
+   pictures rather than two-and-a-placeholder. Deliberately takes no session
+   argument: do not wire this to studySession, or the cover would flip weekly. */
+function StudyCover() {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-[#0a1420]">
+      <Image
+        src="/study/cover.jpg"
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+        className="object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+    </div>
+  );
+}
+
+/* One card in the hub row. The whole card is a single link to its surface —
+   not to the taster item — because these three stand for the surfaces, and a
+   card whose picture opens one thing and whose title opens another is two
+   links wearing one box. The eyebrow says which surface; the media and the
+   line under it are the freshest thing on it, proof the surface is alive. */
+function HubCard({
   href,
-  cta,
+  label,
+  media,
+  title,
+  meta,
 }: {
-  label: string;
   href: string;
-  cta: string;
+  label: string;
+  media: React.ReactNode;
+  title: string;
+  meta: React.ReactNode;
 }) {
   return (
-    <p className="font-mono mb-5 flex items-center justify-between gap-4 text-sm tracking-[0.18em] text-bay-300 uppercase">
-      {label}
-      <Link
-        href={href}
-        className="font-body inline-flex items-center gap-1 text-xs font-light text-slate-400 normal-case transition-colors hover:text-bay-300"
-      >
-        {cta}
-        <ArrowUpRight className="h-3 w-3" />
-      </Link>
-    </p>
+    <Link
+      href={href}
+      className="group flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors hover:border-white/25"
+    >
+      <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
+      <div className="flex flex-1 flex-col p-6">
+        <p className="font-mono flex items-center justify-between text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+          {label}
+          <ArrowUpRight className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-bay-300" />
+        </p>
+        <h2 className="font-heading mt-3 line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
+          {title}
+        </h2>
+        <p className="font-mono mt-auto pt-4 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+          {meta}
+        </p>
+      </div>
+    </Link>
   );
 }
 
@@ -79,8 +115,17 @@ export default async function ResearchHome() {
      back to the newest published piece API-side, so the slot is never empty
      just because nobody has ticked the box. */
   const [article, news] = await Promise.all([getFeatured(), getNews()]);
-  const latestNews = news.slice(0, HOME_NEWS);
-  const heroNews = latestNews[0];
+  const latestNews = news[0];
+
+  /* The study card wears the next session that hasn't happened yet — the same
+     one the study page badges 다음 세션 — falling back to the last one on the
+     calendar once the series is done, so the card is never empty. */
+  const nextNo = nextSessionNo(new Date());
+  const studySession =
+    (nextNo != null ? findSession(nextNo) : undefined) ??
+    SESSIONS[SESSIONS.length - 1];
+
+  const CARD_SIZES = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
 
   return (
     <main className="overflow-x-clip">
@@ -95,134 +140,108 @@ export default async function ResearchHome() {
           }}
         />
         <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
-        <div className={`relative pt-20 pb-16 md:pt-28 md:pb-20 ${PAGE_BOX}`}>
+        <div className={`relative pt-20 pb-14 md:pt-28 md:pb-16 ${PAGE_BOX}`}>
           <HomeHero />
         </div>
       </section>
 
-      {/* Research — type left, picture right, both inside the header's box.
-          On phones the picture leads: a headline with nothing above it reads
-          as the page starting over. */}
+      {/* The hub — three surfaces, three equal cards, newest of each */}
       <section className="border-t border-white/12">
         <Reveal
-          className={`grid grid-cols-1 items-center gap-y-8 py-12 md:py-16 lg:grid-cols-2 lg:gap-x-14 ${PAGE_BOX}`}
+          className={`grid grid-cols-1 gap-6 py-12 sm:grid-cols-2 md:py-16 lg:grid-cols-3 ${PAGE_BOX}`}
         >
-          <div className="order-2 lg:order-1">
-            {/* not "Latest": this slot is pinned, and a label promising
-                recency next to a piece from three months ago reads as a
-                stale site rather than a chosen one */}
-            <RowHead
-              label="Research"
+          {/* Research — the pinned piece, so no "Latest": a label promising
+              recency next to a piece from three months ago reads as a stale
+              site rather than a chosen one. */}
+          {article ? (
+            <HubCard
               href="/research/articles"
-              cta="전체 리서치"
-            />
-            {article ? (
-              <Link href={`/research/${article.slug}`} className="group block">
-                <h2 className="font-heading text-2xl leading-[1.12] tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-4xl">
-                  {article.title}
-                </h2>
-                <p className="font-body mt-4 line-clamp-3 max-w-xl text-[15px] leading-relaxed font-light break-keep text-slate-400">
-                  {article.dek}
-                </p>
-                <p className="font-mono mt-5 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+              label="Research"
+              media={
+                <ArticleThumb
+                  article={article}
+                  sizes={CARD_SIZES}
+                  priority
+                  large
+                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              }
+              title={article.title}
+              meta={
+                <>
                   {article.tag}
-                  <span className="px-2.5 text-white/20">·</span>
-                  {formatDate(article.date)}
-                  <span className="px-2.5 text-white/20">·</span>
+                  <span className="px-2 text-white/20">·</span>
                   {article.readingMinutes} min read
-                </p>
-              </Link>
-            ) : (
-              <p className="font-body text-sm font-light text-slate-500">
+                </>
+              }
+            />
+          ) : (
+            <div className="flex min-h-[16rem] flex-col justify-end rounded-[1.25rem] border border-white/10 bg-white/[0.02] p-6">
+              <p className="font-mono text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+                Research
+              </p>
+              <p className="font-body mt-3 text-sm font-light text-slate-500">
                 아직 발행된 리서치가 없습니다.
               </p>
-            )}
-          </div>
-
-          {article && (
-            /* No credit line here, unlike the article's own header. This is a
-               taster the size of half a screen and the credit was the only
-               small grey type on it, sitting under a full-bleed panel with
-               nothing else beside it — it read as a caption for the page
-               rather than for the picture. The attribution is owed once, and
-               it is paid where the picture is actually shown, one click in. */
-            <Link
-              href={`/research/${article.slug}`}
-              className="group order-1 block overflow-hidden rounded-[1.25rem] lg:order-2"
-              tabIndex={-1}
-              aria-hidden
-            >
-              <ArticleThumb
-                article={article}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                priority
-                large
-                className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
-              />
-            </Link>
-          )}
-        </Reveal>
-      </section>
-
-      {/* News — mirrored: picture left, type right, same box. */}
-      <section className="border-t border-white/12">
-        <Reveal
-          className={`grid grid-cols-1 items-center gap-y-8 py-12 md:py-16 lg:grid-cols-2 lg:gap-x-14 ${PAGE_BOX}`}
-        >
-          {heroNews && (
-            <Link
-              href={`/research/news/${heroNews.slug}`}
-              className="group block overflow-hidden rounded-[1.25rem]"
-              tabIndex={-1}
-              aria-hidden
-            >
-              <NewsThumb
-                item={heroNews}
-                accent={accentOf(heroNews.categories[0] ?? "")}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                large
-                className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03] lg:aspect-[16/9]"
-              />
-            </Link>
+            </div>
           )}
 
-          <div>
-            <RowHead
-              label="News tracking"
+          {/* News — the freshest curated story */}
+          {latestNews ? (
+            <HubCard
               href="/research/news"
-              cta="전체 뉴스"
+              label="News tracking"
+              media={
+                <NewsThumb
+                  item={latestNews}
+                  accent={accentOf(latestNews.categories[0] ?? "")}
+                  sizes={CARD_SIZES}
+                  large
+                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              }
+              title={latestNews.title}
+              meta={
+                <>
+                  {formatDate(latestNews.date)}
+                  <span className="px-2 text-white/20">·</span>
+                  <span className="text-bay-300/70">
+                    {latestNews.sourceName}
+                  </span>
+                </>
+              }
             />
-            {latestNews.length > 0 ? (
-              <ul>
-                {latestNews.map((item) => (
-                  <li
-                    key={item.id}
-                    className="border-b border-white/8 last:border-b-0"
-                  >
-                    <Link
-                      href={`/research/news/${item.slug}`}
-                      className="group flex flex-col gap-1 py-4"
-                    >
-                      <span className="font-mono text-[10px] tracking-[0.18em] text-white/35 uppercase">
-                        {formatDate(item.date)}
-                        <span className="px-2 text-white/20">·</span>
-                        <span className="text-bay-300/70">
-                          {item.sourceName}
-                        </span>
-                      </span>
-                      <span className="font-body text-[15px] leading-snug font-medium break-keep text-white transition-colors group-hover:text-bay-100">
-                        {item.title}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="font-body text-sm font-light text-slate-500">
+          ) : (
+            <div className="flex min-h-[16rem] flex-col justify-end rounded-[1.25rem] border border-white/10 bg-white/[0.02] p-6">
+              <p className="font-mono text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+                News tracking
+              </p>
+              <p className="font-body mt-3 text-sm font-light text-slate-500">
                 아직 큐레이션된 뉴스가 없습니다.
               </p>
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Study — the next session up. It ships no photo (see StudyCover),
+              so the slot wears the study's own type-and-atmosphere identity
+              rather than art borrowed from the article idiom. */}
+          <HubCard
+            href="/research/study"
+            label="RWA Study"
+            media={
+              <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]">
+                <StudyCover />
+              </div>
+            }
+            title={`${studySession.title.accent} ${studySession.title.rest}`}
+            meta={
+              <>
+                {`${String(studySession.no).padStart(2, "0")}회차`}
+                <span className="px-2 text-white/20">·</span>
+                {studySession.topic}
+              </>
+            }
+          />
         </Reveal>
       </section>
 
