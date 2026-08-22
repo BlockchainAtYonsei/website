@@ -1,140 +1,127 @@
-# 맥미니 배포 런북
+# 배포 런북 (Railway)
 
-배포 구조는 **컨테이너 3개**입니다.
+2026-08-23부터 사이트는 **Railway**에서 돕니다. 맥미니 + Cloudflare 터널 구성은
+폐기됐습니다(옛 절차는 git 히스토리의 이전 버전 참고).
 
 ```
-[Cloudflare 터널] → bay-web 호스트 :3001 → 컨테이너 :3000 (Next.js)
-                      │ 서버사이드 fetch
-                      ▼
-                    bay-backend 호스트 :4001 → 컨테이너 :4000
-                                     (NestJS · Notion sync + API)
-                      │ bay-net (도커 내부망)
-                      ▼
-                    bay-pg (Postgres 17 · 볼륨 bay-pg-data)
+GitHub main ──push──▶ Railway 프로젝트 bay-website (리전: 싱가포르)
+                       ├─ website      Next.js   ← blockchainatyonsei.com / www
+                       │     │ 서버사이드 fetch (API_URL)
+                       │     ▼
+                       ├─ bay-backend  NestJS    ← api.blockchainatyonsei.com
+                       │     │ Notion sync(10분) · 이미지 재호스팅 · 읽기 API
+                       │     ▼
+                       ├─ Postgres     (Railway DB, 볼륨)
+                       └─ bay-media    (Railway Bucket, S3 호환 · 비공개)
+                             └ 이미지는 bay-backend의 GET /v1/media/<key>로 공개 서빙
 ```
 
-> **백엔드 호스트 포트를 믿지 말고 확인하세요 — `docker port bay-backend`.**
-> 이 저장소의 `scripts/deploy.sh`는 `-p 4000:4000`으로 띄우는데, 맥미니에서
-> 실제로 동작한 명령은 4001이었습니다(`docs/r2-setup.md`). launchd가 실행하는
-> 것은 checkout이 아니라 `/Users/Shared/srv/BAY-WEB/scripts/deploy.sh` 복사본
-> 이라, 그 복사본이 구버전이면 이렇게 갈립니다. 틀린 포트로 보내면 `curl`이
-> **조용히 아무것도 안 합니다** — 그래서 아래 명령에는 `-i`를 붙입니다.
+## 계정 (인수인계 시 이것만 넘기면 됨)
 
-## 지금 상태 (2026-08-15)
+| 무엇 | 어디 | 계정 |
+|---|---|---|
+| 코드 | github.com/BlockchainAtYonsei/website | GitHub 조직 (org owner가 Railway GitHub App 권한 관리) |
+| 호스팅 전부 | railway.com → 프로젝트 `bay-website` | 학회 Gmail (blockchainatyonsei@) |
+| DNS | Cloudflare (DNS만 사용, 프록시 OFF) | 학회 Gmail |
+| 도메인 등록 | GoDaddy (네임서버 → Cloudflare) | 학회 계정 |
+| 콘텐츠 원본 | Notion (뉴스 DB) | 리서치팀 워크스페이스 |
 
-아래 1회 셋업과 R2 연결은 **이미 끝났습니다.** 이 문서는 재구축·인수인계용
-으로 남깁니다. 현재 돌아가는 방식:
-
-- **뉴스** — Notion에서 10분 주기로 동기화되는 실제 데이터. 본문 이미지는
-  R2(버킷 `bay-media`)로 재호스팅되어 `img.blockchainatyonsei.com`으로
-  나갑니다.
-- **리서치 글** — 아직 **의도된 목업**입니다. 리서치용 Notion DB가 없어서
-  `NOTION_DB_ARTICLES`를 비워둔 채 `seed:mock`으로 채워둔 상태이고,
-  실명 바이라인이 붙습니다. 실제 DB가 생기면 아래 "리서치 Notion DB 붙이기"
-  대로 전환하세요.
-- **멤버 명단** — Notion이 아니라 저장소가 원본입니다.
-  `backend/scripts/seed-members.ts` 편집 → 머지 → 컨테이너 부팅 시 자동 반영.
+Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. 기수 교체 =
+사람 추가/삭제. 시크릿은 전부 Railway Variables에만 있습니다(채팅/문서에
+절대 적지 않기).
 
 ## 자동으로 되는 것 (할 일 아님)
 
-머지되면 맥미니의 자동 배포(60초 폴링)가 처리합니다:
+`main`에 머지되면 Railway가 두 서비스를 다시 빌드·배포합니다.
 
-- 컨테이너 3개 빌드·재기동
-- DB 스키마 마이그레이션 (부팅 시 자동, 실패하면 기존 컨테이너 유지)
-- 멤버 명단 upsert (부팅 시 자동, 실패해도 서버는 뜨고 로그만 남음)
-- Notion 동기화 (10분 주기 + 배포 직전 1회)
+- **bay-backend** 부팅 순서: `prisma migrate deploy` → `seed:members`(명부
+  upsert) → (`NOTION_DB_ARTICLES` 비어 있으면) `seed:mock` → 서버. 헬스체크
+  `/health`가 200을 줄 때까지 **이전 컨테이너가 계속 서빙**하므로 배포 중
+  502가 없습니다(`backend/railway.json`).
+- **website**는 빌드 중 백엔드(`API_URL`)를 호출해 페이지를 프리렌더합니다.
+  백엔드가 죽어 있으면 빌드가 실패하는 게 정상 — 백엔드 먼저 고치고
+  website를 Redeploy.
+- 리전은 `railway.json`/`backend/railway.json`의 `multiRegionConfig`로
+  싱가포르에 고정돼 있습니다. 대시보드에서 바꿔도 다음 배포에 되돌아오니
+  바꾸려면 파일을 고치세요.
+- Notion 동기화 10분마다, 매일 04:00 KST 전체 리컨실.
 
-## 1회 셋업 (재구축 시, 순서대로)
+## 서비스별 변수 (Railway → 서비스 → Variables)
 
-```sh
-BASE=/Users/Shared/srv/.bay-web-cicd
+**bay-backend**
 
-# 1. 새 deploy.sh 반영 — launchd는 checkout이 아니라 아래 고정 경로의
-#    복사본을 실행하므로, 스크립트 변경은 자동 반영되지 않습니다
-cp $BASE/checkout/scripts/deploy.sh /Users/Shared/srv/BAY-WEB/scripts/deploy.sh
+| 변수 | 값/출처 |
+|---|---|
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` 참조 |
+| `PORT` | `4000` |
+| `CORS_ORIGIN` | `https://blockchainatyonsei.com,https://www.blockchainatyonsei.com` |
+| `NOTION_TOKEN` · `NOTION_DB_NEWS` | Notion 인테그레이션 토큰 · 뉴스 DB id (**id만**, URL/주석 줄 섞지 않기) |
+| `NOTION_DB_ARTICLES` | 비움 — 리서치 Notion DB가 생기면 채움 (아래) |
+| `SYNC_KEY` | 수동 sync 트리거용 시크릿 |
+| `REVALIDATE_URL` | `http://website.railway.internal:3000/api/revalidate` (내부망) |
+| `REVALIDATE_SECRET` | website의 같은 변수와 **동일해야** 함 |
+| `S3_ENDPOINT` · `S3_BUCKET` · `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` · `S3_REGION=auto` | Bucket `bay-media` → Credentials 탭 값 그대로 |
+| `S3_PUBLIC_URL` | `https://api.blockchainatyonsei.com/v1/media` — 이 값이 DB에 저장되는 이미지 URL의 접두사 |
 
-# 2. 시크릿 파일 생성 (git에 절대 넣지 않음)
-PG_PW=$(openssl rand -hex 16)
-cat > $BASE/backend.env <<EOF
-POSTGRES_PASSWORD=$PG_PW
-DATABASE_URL=postgresql://bay:$PG_PW@bay-pg:5432/bay
-SYNC_KEY=$(openssl rand -hex 24)
-REVALIDATE_SECRET=$(openssl rand -hex 24)
-REVALIDATE_URL=http://host.docker.internal:3001/api/revalidate
-# Notion — 토큰과 뉴스 DB id 2개는 상현에게 받으면 됩니다. 나머지는 비워두세요.
-# 멤버는 Notion이 아니라 backend/scripts/seed-members.ts가 원본 — 부팅 시 자동 반영
-NOTION_TOKEN=
-NOTION_DB_ARTICLES=   # 비워둘 것 — 리서치용 Notion DB가 아직 없습니다(아래 참고)
-NOTION_DB_NEWS=
-# 뉴스 본문 이미지 재호스팅용 R2/S3 — 뉴스 sync를 켰다면 사실상 필수:
-# 미설정이면 Notion 서명 URL을 그대로 저장하는데, 그 URL은 1시간이면 죽는다
-# 설정 절차는 docs/r2-setup.md (운영자에게 그대로 넘기면 되는 단독 문서)
-S3_ENDPOINT=
-S3_REGION=auto
-S3_BUCKET=
-S3_ACCESS_KEY_ID=
-S3_SECRET_ACCESS_KEY=
-S3_PUBLIC_URL=
-EOF
-chmod 600 $BASE/backend.env
+**website**
 
-# 3. 다음 폴링(60초)에 자동 배포됨. 확인:
-tail -20 $BASE/deploy.log
-docker ps            # bay-pg, bay-backend, bay-web 세 개
-curl -s localhost:4001/health   # {"status":"ok","db":"up",...}
-curl -s localhost:3001/research -o /dev/null -w "%{http_code}\n"   # 200
-curl -s "localhost:4001/v1/news?size=50" | grep -c amazonaws       # 0 (R2 연결 후)
-```
+| 변수 | 값 |
+|---|---|
+| `API_URL` | `https://api.blockchainatyonsei.com` (빌드·런타임 모두 사용) |
+| `REVALIDATE_SECRET` | bay-backend와 동일 |
+| `NEXT_TELEMETRY_DISABLED` | `1` |
 
-## 리서치 Notion DB 붙이기 (나중에)
+## 도메인 / DNS
 
-리서치용 Notion DB를 만들면: 그 DB를 통합에 공유 → id를
-`NOTION_DB_ARTICLES`에 넣기 → `docker restart bay-backend`. 그 전까지
-리서치 목록은 `seed:mock`이 채운 목업입니다(운영 섹션 참고).
+Cloudflare DNS 레코드(모두 **DNS only**):
 
-## Cloudflare 주의
+| Type | Name | Target |
+|---|---|---|
+| CNAME | `@` | website 서비스의 Railway 타깃 |
+| CNAME | `www` | website 서비스의 Railway 타깃 |
+| CNAME | `api` | bay-backend 서비스의 Railway 타깃 |
+| TXT | `_railway-verify`, `_railway-verify.www`, `_railway-verify.api` | Railway가 보여주는 값 |
 
-- 터널/프록시는 **:3001(bay-web)만** 노출합니다. 백엔드 포트는 노출할 필요
-  없습니다 — 사이트가 서버사이드에서만 호출합니다.
-- 지금 main이 Cloudflare **Pages** 정적 호스팅이라면, 이 버전부터는 그
-  방식이 불가합니다(백엔드 + DB + ISR 필요). 맥미니 + 터널 구성으로
-  전환한 뒤 DNS를 터널로 돌리면 됩니다.
-
-## 전제 조건
-
-- Docker Desktop 또는 OrbStack (스크립트가 `host.docker.internal`을 씀 —
-  colima는 추가 설정 없이는 안 됨)
-- 디스크: 이미지 3개 + Postgres 볼륨, 여유 5GB면 충분
+타깃 값은 Railway → 서비스 → Settings → Networking → Custom Domains에
+표시됩니다. 도메인을 지웠다 다시 추가하면 타깃이 바뀌니 DNS도 같이 고치세요.
+apex(`@`)에 CNAME이 되는 건 Cloudflare의 flattening 덕분이라 DNS 호스트를
+다른 곳으로 옮기면 apex가 깨집니다.
 
 ## 운영
 
 ```sh
-# Notion에서 발행 직후 즉시 반영하고 싶을 때 (평소엔 10분 주기 자동)
-curl -i -X POST -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/all
-
-# 콘텐츠가 안 보일 때 — sync 런 경고 확인
-curl -H "x-sync-key: $SYNC_KEY" localhost:4001/v1/sync/runs
-
-# 데이터 백업 (가끔)
-docker exec bay-pg pg_dump -U bay bay > ~/bay-backup-$(date +%Y%m%d).sql
+API=https://api.blockchainatyonsei.com
+# Notion 발행 직후 즉시 반영 (평소엔 10분 주기 자동)
+curl -i -X POST -H "x-sync-key: $SYNC_KEY" "$API/v1/sync/all"
+# 전체 리컨실 — 삭제 반영 + 깨진 이미지 재호스팅
+curl -i -X POST -H "x-sync-key: $SYNC_KEY" "$API/v1/sync/all?full=1"
+# 콘텐츠가 안 보일 때 — 최근 런의 경고
+curl -s -H "x-sync-key: $SYNC_KEY" "$API/v1/sync/runs" | head -c 2000
+# 상태
+curl -s $API/health            # {"status":"ok","db":"up","lastSync":{...}}
 ```
 
-- 배포 로그: `$BASE/deploy.log` — `BLOCKED:`로 시작하는 줄이 있으면 위
-  셋업이 안 된 것입니다.
-- 마이그레이션은 bay-backend 부팅 시 자동 적용되고, 실패하면 기존
-  컨테이너가 유지됩니다.
-- **멤버 명단 수정** = `backend/scripts/seed-members.ts` 편집 → 머지.
-  부팅 시 자동으로 upsert됩니다(실패해도 서버는 뜨고 로그만 남음).
-- **아티클 목업 갱신** — 목업 내용이 바뀌었으면(개수, 참고자료, 커버) 배포
-  만으로는 반영되지 않습니다. 아티클 행은 부팅 시 자동 시드되지 않고, 이
-  명령을 손으로 돌려야 갈립니다:
+- **멤버 명단 수정** = `backend/scripts/seed-members.ts` 편집 → 머지. 부팅 시
+  자동 upsert.
+- **아티클 목업 갱신** — 부팅 시 자동 시드되지 않음. Railway → bay-backend →
+  우상단 ⋯ → *Shell*(또는 `railway ssh`)에서:
+  `SEED_ALLOW_REMOTE=1 npm run seed:mock`
+- **리서치 Notion DB 붙이기** — DB를 인테그레이션에 공유 → id를
+  `NOTION_DB_ARTICLES`에 → 재배포. 그 순간부터 목업 시드는 자동으로 꺼집니다.
+- **이미지가 안 뜰 때** — `/v1/sync/runs`에 `image re-host failed (The access
+  key ID you provided does not exist…)`가 보이면 `S3_ACCESS_KEY_ID`/`SECRET`이
+  Bucket Credentials와 다른 것. 값 교체 후 `sync/all?full=1`.
+- **DB 백업** — Railway Postgres는 볼륨 스냅샷을 지원하지만, 이 DB는 전부
+  재생성 가능합니다(명부=레포, 뉴스=Notion, 아티클=목업). 최악의 경우 새
+  Postgres + 재배포 + `sync/all?full=1`로 복구.
+- **로그** — 서비스 → Deployments → 최신 배포 → Logs. HTTP 로그의 `host`가
+  `api.blockchainatyonsei.com`으로 찍히지 않으면 도메인 연결 문제.
 
-  ```sh
-  docker exec -e SEED_ALLOW_REMOTE=1 bay-backend npm run seed:mock
-  ```
+## 로컬 개발
 
-  `SEED_ALLOW_REMOTE=1`이 필요한 이유: 이 스크립트는 아티클 테이블을 통째로
-  지우고 다시 만들기 때문에, 로컬이 아닌 DB(여기서는 `bay-pg`)를 향하면
-  기본적으로 거부합니다 — 예전에 같은 계열 스크립트가 프로덕션에 지어낸
-  뉴스 서른 건을 실명 바이라인으로 몇 주간 올려둔 적이 있어서입니다.
-  멤버·뉴스는 건드리지 않습니다.
+`backend/README.md` 참고. 로컬에선 S3 미설정 상태로 돌려도 됩니다(경고만 남음).
+
+## 비용 감
+
+Hobby 플랜 + 사용량. 컨테이너 2개(소형) + Postgres + Bucket 수 GB ≈ 월 $8~15.
+프로젝트 → Settings → Usage에서 확인, Billing에서 한도 알림 설정 권장.
