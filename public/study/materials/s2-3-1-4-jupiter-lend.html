@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3-1(4)Jupiter Lend</title>
+<!-- 라이트가 기본. 이전에 다크를 골랐던 경우에만 렌더 전에 해제해 깜빡임 방지 -->
+<script>
+try{
+  if(localStorage.getItem('jl-lend-theme') === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  }
+}catch(e){}
+</script>
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS
+   ══════════════════════════════════════════════════════ */
+:root{
+  color-scheme: dark;
+
+  --plane:#0a0a0a;
+  --surface:#161615;
+  --surface-2:#1e1e1d;
+
+  --ink:#ffffff;
+  --ink-2:#c9c8be;
+  --muted:#8b8983;
+  --faint:#5f5e59;
+
+  --hair:rgba(255,255,255,.09);
+  --hair-2:rgba(255,255,255,.16);
+  --grid:#2c2c2a;
+
+  --blue:#3987e5;
+  --blue-d:#1c5cab;
+  --blue-wash:rgba(57,135,229,.12);
+  --blue-border:rgba(57,135,229,.42);
+  --blue-halo:rgba(57,135,229,.16);
+  --orange:#d95926;
+  --orange-wash:rgba(217,89,38,.12);
+  --orange-border:rgba(217,89,38,.45);
+  --red:#e66767;
+  --red-wash:rgba(230,103,103,.10);
+  --red-border:rgba(230,103,103,.4);
+  --green:#0ca30c;
+  --crit:#d03b3b;
+
+  /* chip / tag fills */
+  --chip-bg:rgba(255,255,255,.07);
+  --chip-blue-bg:rgba(57,135,229,.24);
+  --chip-blue-fg:#bcdcff;
+  --chip-red-bg:rgba(230,103,103,.20);
+  --chip-red-fg:#ffc9c9;
+
+  /* misc component tokens */
+  --hover-wash:rgba(255,255,255,.03);
+  --idle-arrow:rgba(255,255,255,.36);
+  --cmp-idle:#a9a79d;
+  --ltv-a-fg:#04203f;
+  --ltv-b-bg:rgba(230,103,103,.42);
+  --ltv-b-fg:#ffdada;
+  --pane-flow-bg:rgba(0,0,0,.28);
+  --glow-1:rgba(57,135,229,.32);
+  --glow-2:rgba(217,89,38,.13);
+  --card-shadow:none;
+
+  --pad:44px;
+  --r:18px;
+}
+
+/* ══════════════════════════════════════════════════════
+   LIGHT THEME — 토글로 전환 (localStorage로 기억)
+   ══════════════════════════════════════════════════════ */
+:root[data-theme="light"]{
+  color-scheme: light;
+
+  --plane:#eeede8;
+  --surface:#ffffff;
+  --surface-2:#f6f5f2;
+
+  --ink:#14151a;
+  --ink-2:#3f414a;
+  --muted:#52545a;
+  --faint:#64666c;
+
+  --hair:rgba(0,0,0,.08);
+  --hair-2:rgba(0,0,0,.14);
+  --grid:#e6e5e0;
+
+  --blue:#1c5cab;
+  --blue-d:#123f79;
+  --blue-wash:rgba(28,92,171,.07);
+  --blue-border:rgba(28,92,171,.35);
+  --blue-halo:rgba(28,92,171,.14);
+  --orange:#b8501f;
+  --orange-wash:rgba(168,70,28,.08);
+  --orange-border:rgba(168,70,28,.4);
+  --red:#c23b3b;
+  --red-wash:rgba(194,59,59,.07);
+  --red-border:rgba(194,59,59,.35);
+  --green:#0a7d0a;
+  --crit:#a82c2c;
+
+  --chip-bg:rgba(0,0,0,.05);
+  --chip-blue-bg:rgba(28,92,171,.12);
+  --chip-blue-fg:#123f79;
+  --chip-red-bg:rgba(194,59,59,.12);
+  --chip-red-fg:#7a1f1f;
+
+  --hover-wash:rgba(0,0,0,.035);
+  --idle-arrow:rgba(0,0,0,.32);
+  --cmp-idle:#55575d;
+  --ltv-a-fg:#eef5ff;
+  --ltv-b-bg:rgba(194,59,59,.28);
+  --ltv-b-fg:#7a1f1f;
+  --pane-flow-bg:rgba(0,0,0,.045);
+  --glow-1:rgba(28,92,171,.14);
+  --glow-2:rgba(184,80,31,.08);
+  --card-shadow:0 1px 2px rgba(20,21,26,.05), 0 10px 28px rgba(20,21,26,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--plane);
+  color:var(--ink);
+  font-family:Pretendard,"Apple SD Gothic Neo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.01em;
+}
+.deck{width:min(1240px,calc(100% - 28px));margin:26px auto 90px}
+
+/* ══════════════════════════════════════════════════════
+   SLIDE SHELL
+   ══════════════════════════════════════════════════════ */
+.slide{
+  margin-top:14px;
+  padding:var(--pad);
+  background:var(--surface);
+  border:1px solid var(--hair);
+  border-radius:var(--r);
+  box-shadow:var(--card-shadow);
+}
+.slide-head{margin-bottom:34px}
+.slide-title{
+  margin:0;
+  font-size:37px;line-height:1.24;letter-spacing:-.045em;font-weight:850;
+}
+.slide-title em{font-style:normal;color:var(--blue)}
+.slide-note{margin:12px 0 0;font-size:15px;color:var(--muted)}
+
+/* source / caveat chips */
+.tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:3px 9px;border-radius:6px;
+  font-size:11px;font-weight:750;letter-spacing:0;
+  border:1px solid var(--hair-2);color:var(--muted);
+  vertical-align:middle;white-space:nowrap;
+}
+.tag.src{color:var(--blue);border-color:var(--blue-border)}
+.tag.doc{color:var(--ink-2)}
+.tag.ex{color:var(--orange);border-color:var(--orange-border);background:var(--orange-wash)}
+
+/* one-line takeaway strip under a slide */
+.punch{
+  margin-top:34px;padding-top:24px;
+  border-top:1px solid var(--hair);
+  font-size:19px;font-weight:750;color:var(--ink-2);letter-spacing:-.02em;
+}
+.punch b{color:var(--ink)}
+.punch .lead{color:var(--blue);font-weight:850;margin-right:10px}
+
+/* ══════════════════════════════════════════════════════
+   01 · WHAT IS IT — 결론 문장을 헤드라인급으로
+   ══════════════════════════════════════════════════════ */
+#what .punch{
+  margin-top:24px;padding-top:22px;
+  font-size:30px;line-height:1.4;font-weight:750;letter-spacing:-.03em;color:var(--ink-2);
+}
+#what .punch .lead{color:var(--blue);font-weight:850;margin-right:14px}
+#what .punch b{color:var(--ink);font-weight:850}
+@media(max-width:820px){
+  #what .punch{font-size:23px}
+}
+
+/* minimal bullets — 1 line each */
+.pts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px}
+.pts li{position:relative;padding-left:19px;font-size:16px;color:var(--ink-2)}
+.pts li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.pts b{color:var(--ink);font-weight:800}
+
+.fine{margin:18px 0 0;font-size:12.5px;color:var(--faint);line-height:1.7}
+
+/* ══════════════════════════════════════════════════════
+   HERO
+   ══════════════════════════════════════════════════════ */
+.hero{
+  position:relative;overflow:hidden;
+  padding:46px var(--pad) 44px;
+  border-radius:22px;border:1px solid var(--hair);
+  background:
+    radial-gradient(880px 380px at 82% -25%, var(--glow-1), transparent 62%),
+    radial-gradient(520px 300px at 0% 120%, var(--glow-2), transparent 62%),
+    var(--surface);
+  box-shadow:var(--card-shadow);
+}
+/* 상단 메타 : 두 줄을 바짝 붙여 하나의 정보 덩어리로 */
+.hero .meta{margin:0 0 18px}
+.hero .meta span{
+  display:block;
+  font-size:14px;font-weight:800;letter-spacing:-.01em;line-height:1.5;
+  color:var(--blue);
+}
+.hero .meta span + span{color:var(--muted);font-weight:700}
+.hero h1{margin:0;font-size:54px;line-height:1.14;letter-spacing:-.05em;font-weight:850}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.hero .by{margin:22px 0 0;font-size:14px;font-weight:700;color:var(--muted);letter-spacing:-.01em}
+.hero .by i{font-style:normal;color:var(--hair-2);margin:0 8px}
+@media(max-width:820px){
+  .hero{padding:36px var(--pad) 34px}
+}
+
+/* ══════════════════════════════════════════════════════
+   KPI STRIP  (카드 대신 구분선 기반)
+   ══════════════════════════════════════════════════════ */
+/* 슬라이드 01 안으로 통합된 KPI 줄 */
+.kpi-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  margin-top:36px;padding-top:32px;
+  border-top:1px solid var(--hair);
+}
+/* 4칸 모두 동일 폭·동일 padding·가운데 정렬 (첫 칸 예외 없음) */
+.kpi{padding:0 20px;border-left:1px solid var(--hair);text-align:center}
+.kpi:first-child{border-left:0}
+.kpi .k{margin:0 0 12px;font-size:12.5px;color:var(--muted);font-weight:700}
+.kpi .v{font-size:44px;font-weight:850;letter-spacing:-.05em;line-height:1}
+.kpi .v small{font-size:19px;font-weight:800;color:var(--ink-2);margin-left:3px;letter-spacing:-.02em}
+.kpi.hi .v{color:var(--blue)}
+.kpi .f{margin-top:11px;font-size:12.5px;color:var(--faint)}
+
+/* ══════════════════════════════════════════════════════
+   TIMELINE
+   ══════════════════════════════════════════════════════ */
+.tl{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:6px}
+.tl::before{
+  content:"";position:absolute;left:8%;right:8%;top:11px;height:2px;
+  background:linear-gradient(90deg,var(--blue-d),var(--blue));
+}
+.tl .node{position:relative;text-align:center;padding:0 14px}
+.tl .dot{
+  position:relative;z-index:1;
+  width:24px;height:24px;margin:0 auto;border-radius:50%;
+  background:var(--surface);border:3px solid var(--blue-d);
+}
+.tl .node:last-child .dot{border-color:var(--blue);box-shadow:0 0 0 6px var(--blue-halo)}
+.tl .when{margin-top:18px;font-size:13px;font-weight:800;color:var(--blue);letter-spacing:.02em}
+.tl .what{margin-top:7px;font-size:20px;font-weight:800;letter-spacing:-.03em}
+.tl .sub{margin-top:6px;font-size:13.5px;color:var(--muted)}
+
+/* ══════════════════════════════════════════════════════
+   PAIRED PANES — 좌우 완전 대칭
+   ══════════════════════════════════════════════════════ */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.pair.wide-gap{gap:22px}
+.pane{
+  display:flex;flex-direction:column;
+  height:100%;
+  padding:30px;
+  border:1px solid var(--hair);border-radius:14px;
+  background:var(--surface-2);
+}
+.pane.blue{border-color:var(--blue-border);background:var(--blue-wash)}
+.pane.red{border-color:var(--red-border);background:var(--red-wash)}
+.pane-tag{
+  display:inline-block;align-self:flex-start;
+  margin:0 0 16px;padding:5px 11px;border-radius:7px;
+  font-size:11.5px;font-weight:800;letter-spacing:.06em;
+  background:var(--chip-bg);color:var(--ink-2);
+}
+.pane.blue .pane-tag{background:var(--chip-blue-bg);color:var(--chip-blue-fg)}
+.pane.red .pane-tag{background:var(--chip-red-bg);color:var(--chip-red-fg)}
+.pane h3{margin:0 0 4px;font-size:23px;font-weight:850;letter-spacing:-.035em;line-height:1.3}
+.pane .h-sub{margin:0 0 22px;font-size:13.5px;color:var(--muted)}
+.pane .grow{flex:1}
+
+/* value ledger inside a pane */
+.ledger{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.ledger li{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px 0;border-top:1px solid var(--hair);
+  font-size:15px;color:var(--muted);
+}
+.ledger li:first-child{border-top:0;padding-top:0}
+.ledger li b{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.ledger li .yes{color:var(--blue);font-weight:850}
+.ledger li .no{color:var(--faint);font-weight:800}
+
+/* the step arrow inside a pane */
+.pane-flow{display:flex;flex-direction:column;align-items:center;gap:12px;margin:6px 0 20px}
+.pane-flow .box{
+  width:100%;padding:15px 18px;border-radius:11px;text-align:center;
+  border:1px solid var(--hair);background:var(--pane-flow-bg);
+}
+.pane-flow .box .t{font-size:12px;font-weight:750;color:var(--muted)}
+.pane-flow .box .v{margin-top:5px;font-size:24px;font-weight:850;letter-spacing:-.035em}
+.pane.blue .pane-flow .box .v{color:var(--blue)}
+
+/* ══════════════════════════════════════════════════════
+   02 · WHY IT MATTERS — 하나의 비교 패널 (좌우 분할, 카드 아님)
+   ══════════════════════════════════════════════════════ */
+.vs{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  margin-top:8px;
+}
+.vs-col{padding:4px 40px 0 0}
+.vs-col.right{padding:4px 0 0 40px}
+.vs-line{background:var(--hair-2)}
+
+.vs-h{margin:0 0 18px;font-size:21px;font-weight:850;letter-spacing:-.03em;color:var(--ink-2)}
+.vs-col.right .vs-h{color:var(--blue)}
+.vs-h.plain{color:var(--ink-2)}
+
+/* TSLAx 100달러 → 결과: 한 줄 플로우 */
+.vs-flow{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:10px 13px;
+  padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--hair-2);
+}
+.vs-from{font-size:22px;font-weight:800;color:var(--ink-2);letter-spacing:-.03em;white-space:nowrap}
+.vs-arrow{font-size:20px;font-weight:900;color:var(--faint)}
+.vs-arrow.accent{color:var(--blue)}
+.vs-to{font-size:29px;font-weight:850;letter-spacing:-.04em;color:var(--ink);white-space:nowrap}
+.vs-to.accent{color:var(--blue)}
+
+/* 비교 행 4개 */
+.vs-rows{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.vs-rows li{
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding:12px 0;border-top:1px solid var(--hair);
+}
+.vs-rows li:first-child{border-top:0;padding-top:0}
+.vs-rows li:last-child{padding-bottom:0}
+.vs-rows li>span{font-size:16.5px;font-weight:700;color:var(--ink-2)}
+.vs-rows li>b{font-size:21px;font-weight:850;letter-spacing:-.03em}
+/* 여유로운 2행짜리 비교(슬라이드 04)용 */
+.vs-rows.airy li{padding:17px 0}
+.vs-rows li>b.dim{color:var(--faint)}
+.vs-rows li>b.keep{color:var(--blue)}
+.vs-rows li>b.cost{color:var(--red)}
+
+@media(max-width:820px){
+  .vs{grid-template-columns:1fr}
+  .vs-line{display:none}
+  .vs-col{padding:0 0 26px;border-bottom:1px solid var(--hair-2)}
+  .vs-col.right{padding:26px 0 0;border-bottom:0}
+  .vs-h{font-size:20px}
+  .vs-from{font-size:19px}
+  .vs-to{font-size:24px}
+  .vs-rows li>b{font-size:19px}
+}
+
+/* ══════════════════════════════════════════════════════
+   BIG ARROWS  (선 + 화살촉 + 라벨)
+   ══════════════════════════════════════════════════════ */
+.arrow-down{
+  display:flex;flex-direction:column;align-items:center;
+  color:var(--muted);font-size:12.5px;font-weight:750;
+}
+.arrow-down .stem{width:3px;height:26px;background:var(--hair-2);border-radius:2px}
+.arrow-down .head{
+  width:0;height:0;margin-top:-1px;
+  border-left:9px solid transparent;border-right:9px solid transparent;
+  border-top:12px solid var(--hair-2);
+}
+.arrow-down.strong .stem{background:var(--blue)}
+.arrow-down.strong .head{border-top-color:var(--blue)}
+.arrow-down .lb{margin-top:8px}
+
+/* horizontal connector used in the architecture slide */
+.conn{
+  display:flex;flex-direction:column;justify-content:center;gap:40px;
+  padding:0 4px;
+}
+.conn-row{display:flex;flex-direction:column;align-items:center;gap:10px}
+.conn-line{position:relative;width:100%;height:4px;border-radius:2px}
+.conn-line::after{
+  content:"";position:absolute;top:50%;width:0;height:0;
+  border-top:11px solid transparent;border-bottom:11px solid transparent;
+}
+.conn-line.to-left{background:linear-gradient(270deg,var(--orange),rgba(217,89,38,.25))}
+.conn-line.to-left::after{
+  left:-2px;transform:translateY(-50%);
+  border-right:16px solid var(--orange);
+}
+.conn-line.to-right{background:linear-gradient(90deg,rgba(57,135,229,.25),var(--blue))}
+.conn-line.to-right::after{
+  right:-2px;transform:translateY(-50%);
+  border-left:16px solid var(--blue);
+}
+.conn-lb{font-size:14.5px;font-weight:850;letter-spacing:-.02em}
+.conn-row.left .conn-lb{color:var(--orange)}
+.conn-row.right .conn-lb{color:var(--blue)}
+
+/* ══════════════════════════════════════════════════════
+   ARCHITECTURE SLIDE
+   ══════════════════════════════════════════════════════ */
+.arch{display:grid;grid-template-columns:1fr 200px 1fr;gap:0;align-items:stretch}
+.arch-box{
+  display:flex;flex-direction:column;height:100%;
+  padding:30px;border-radius:14px;border:1px solid var(--hair);background:var(--surface-2);
+}
+.arch-box.pool{border-color:var(--blue-border);background:var(--blue-wash)}
+.arch-box h3{margin:0 0 4px;font-size:24px;font-weight:850;letter-spacing:-.035em}
+.arch-box .h-sub{margin:0 0 24px;font-size:13px;color:var(--muted)}
+.duty{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:0}
+.duty li{
+  padding:14px 0;border-top:1px solid var(--hair);
+  font-size:16px;color:var(--ink-2);font-weight:650;
+}
+.duty li:first-child{border-top:0;padding-top:0}
+.vault-row{
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+  padding:15px 0;border-top:1px solid var(--hair);
+}
+.vault-row:first-of-type{border-top:0;padding-top:0}
+.vault-row .tk{font-size:18px;font-weight:850;letter-spacing:-.02em;color:var(--blue)}
+.vault-row .tk span{display:block;margin-top:3px;font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0}
+.risk-chip{
+  padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:800;white-space:nowrap;
+  border:1px solid var(--hair-2);color:var(--ink-2);
+}
+.risk-chip.mid{border-color:var(--blue-border);color:var(--chip-blue-fg)}
+.risk-chip.high{border-color:var(--red-border);color:var(--chip-red-fg)}
+
+/* 볼트별 조건 (LTV · 청산) */
+.vault-row .vcond{
+  display:flex;gap:14px;align-items:baseline;white-space:nowrap;
+  font-size:14px;font-weight:700;color:var(--muted);
+}
+.vault-row .vcond b{font-size:19px;font-weight:850;color:var(--ink);letter-spacing:-.03em;margin-left:5px}
+.vault-row .vcond .lt b{color:var(--red)}
+.vnote{margin:18px 0 0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.vnote.ex::before{
+  content:"예시";
+  display:inline-block;margin-right:8px;padding:2px 8px;border-radius:5px;
+  font-size:11px;font-weight:800;
+  color:var(--orange);border:1px solid var(--orange-border);background:var(--orange-wash);
+}
+
+/* 배당 = 토큰 개수 증가 : 한 줄 플로우 */
+/* 배당 반영 방식 — 비교 영역 아래 가로 구분선 + 중앙 정렬 */
+.dvd{margin-top:30px;padding-top:28px;border-top:1px solid var(--hair);text-align:center}
+.dvd-t{margin:0 0 20px;font-size:15px;font-weight:800;color:var(--muted);letter-spacing:-.01em}
+.dvd-flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px 26px}
+.dvd-n{font-size:34px;font-weight:850;letter-spacing:-.045em;color:var(--ink-2)}
+.dvd-n.accent{color:var(--blue)}
+.dvd-sub{margin:14px 0 0;font-size:14.5px;font-weight:700;color:var(--muted)}
+@media(max-width:900px){
+  .dvd-n{font-size:26px}
+}
+
+/* ══════════════════════════════════════════════════════
+   담보로 받는 xStocks — 상위(xStocks) → 하위 2갈래 트리
+   ══════════════════════════════════════════════════════ */
+.tree{margin-top:4px}
+
+/* 상위 개념 */
+.tree-root{text-align:center}
+.tr-name{
+  display:block;
+  font-size:36px;font-weight:850;letter-spacing:-.05em;line-height:1.1;
+  color:var(--blue);
+}
+.tr-desc{display:block;margin-top:9px;font-size:15px;font-weight:700;color:var(--muted)}
+
+/* 분기 커넥터 (세로줄 → 가로바 → 두 갈래 내림) */
+.tree-connect{position:relative;height:48px}
+.tc-stem{
+  position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:2px;height:22px;background:var(--hair-2);
+}
+.tc-bar{position:absolute;left:25%;right:25%;top:22px;height:2px;background:var(--hair-2)}
+.tc-drop{position:absolute;top:22px;width:2px;height:26px;background:var(--hair-2)}
+.tc-drop.left{left:25%}
+.tc-drop.right{right:25%}
+
+/* 하위 두 갈래 */
+.tree-branches{display:grid;grid-template-columns:1fr 1fr}
+.branch{padding:0 30px;text-align:center}
+.br-h{margin:0 0 22px;font-size:19px;font-weight:850;letter-spacing:-.03em;color:var(--ink-2)}
+
+.tick-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+.tick b{
+  display:block;
+  font-size:37px;font-weight:850;letter-spacing:-.05em;line-height:1.1;
+  color:var(--blue);
+}
+.tick span{display:block;margin-top:9px;font-size:15px;font-weight:700;color:var(--muted)}
+
+@media(max-width:820px){
+  .tr-name{font-size:29px}
+  .tree-connect{height:26px}
+  .tc-stem{height:26px}
+  .tc-bar,.tc-drop{display:none}
+  .tree-branches{grid-template-columns:1fr}
+  .branch{padding:0}
+  .branch + .branch{border-top:1px solid var(--hair);margin-top:26px;padding-top:26px}
+  .tick b{font-size:29px}
+  .tick span{font-size:14px}
+}
+.dvd-arrow{
+  position:relative;width:86px;height:3px;border-radius:2px;flex:none;
+  background:linear-gradient(90deg,rgba(57,135,229,.28),var(--blue));
+}
+.dvd-arrow::after{
+  content:"";position:absolute;right:-2px;top:50%;transform:translateY(-50%);
+  width:0;height:0;border-top:9px solid transparent;border-bottom:9px solid transparent;
+  border-left:14px solid var(--blue);
+}
+.dvd-lb{font-size:13.5px;font-weight:750;color:var(--muted)}
+
+/* ══════════════════════════════════════════════════════
+   BEFORE → AFTER (배당)
+   ══════════════════════════════════════════════════════ */
+.ba{display:grid;grid-template-columns:1fr 150px 1fr;gap:0;align-items:stretch;margin-top:4px}
+.ba-box{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;min-height:132px;padding:26px;
+  border:1px solid var(--hair);border-radius:14px;background:var(--surface-2);
+}
+.ba-box.after{border-color:var(--blue-border);background:var(--blue-wash)}
+.ba-box .k{font-size:12.5px;font-weight:750;color:var(--muted)}
+.ba-box .v{margin-top:10px;font-size:34px;font-weight:850;letter-spacing:-.045em}
+.ba-box.after .v{color:var(--blue)}
+.ba-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:0 16px}
+.ba-mid .lb{font-size:13.5px;font-weight:800;color:var(--ink-2)}
+
+/* ══════════════════════════════════════════════════════
+   NUMBER LADDER (루핑)
+   ══════════════════════════════════════════════════════ */
+.chart-head{margin-bottom:22px}
+.chart-head .t{margin:0;font-size:18px;font-weight:800;letter-spacing:-.025em}
+.chart-head .s{margin:5px 0 0;font-size:13px;color:var(--muted)}
+.legend{display:flex;gap:22px;margin:0 0 20px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2)}
+.legend i{width:12px;height:12px;border-radius:3px;flex:none}
+
+[data-tip]{position:relative}
+[data-tip]:hover::after,[data-tip]:focus-visible::after{
+  content:attr(data-tip);
+  position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);
+  padding:9px 13px;border-radius:10px;white-space:pre;
+  background:#14151a;border:1px solid rgba(255,255,255,.16);
+  color:#ffffff;font-size:13px;font-weight:650;line-height:1.55;
+  pointer-events:none;z-index:30;
+  box-shadow:0 6px 20px rgba(0,0,0,.28);
+}
+[data-tip]:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
+
+.colchart{display:grid;grid-template-columns:56px 1fr;gap:14px}
+.yaxis{position:relative;height:280px}
+.yaxis span{position:absolute;right:0;transform:translateY(-50%);font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.plot{position:relative;height:280px;border-bottom:1px solid var(--grid)}
+.gl{position:absolute;left:0;right:0;height:1px;background:var(--grid)}
+.cols{position:absolute;inset:0;display:flex;align-items:flex-end}
+.col{
+  flex:1;height:100%;padding:0 10px;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;
+}
+.seg{width:100%;max-width:48px;background:var(--orange)}
+.seg.own{background:var(--blue)}
+.seg.top{border-radius:5px 5px 0 0}
+.caps{position:absolute;inset:0;display:flex;pointer-events:none}
+.caps .slot{flex:1;position:relative}
+.caps .slot b{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-size:15px;font-weight:850;color:var(--ink);white-space:nowrap;letter-spacing:-.02em;
+}
+.xaxis{display:flex;margin-top:12px}
+.xaxis span{flex:1;text-align:center;font-size:13px;color:var(--muted);font-weight:650}
+.colwrap{position:relative}
+
+/* ══════════════════════════════════════════════════════
+   DIVERGING BARS
+   ══════════════════════════════════════════════════════ */
+.dbars{display:flex;flex-direction:column;gap:6px}
+.dbar{display:grid;grid-template-columns:118px 1fr 108px;gap:18px;align-items:center;padding:7px 0;border-radius:8px}
+.dbar:hover{background:var(--hover-wash)}
+.dbar .px{font-size:15px;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.dbar .lane{position:relative;height:24px}
+.dbar .zero{position:absolute;left:50%;top:-6px;bottom:-6px;width:1px;background:var(--grid)}
+.dbar .m{position:absolute;top:0;height:24px}
+.dbar .m.neg{right:50%;background:var(--red);border-radius:5px 0 0 5px}
+.dbar .m.pos{left:50%;background:var(--blue);border-radius:0 5px 5px 0}
+.dbar .out{font-size:19px;font-weight:850;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.dzero{display:grid;grid-template-columns:118px 1fr 108px;gap:18px;margin-top:8px}
+.dzero .c{text-align:center;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* ══════════════════════════════════════════════════════
+   LTV SCALE
+   ══════════════════════════════════════════════════════ */
+.ltv{margin-top:6px}
+.ltv-bar{display:flex;height:26px;border-radius:7px;overflow:hidden;gap:2px}
+.ltv-seg{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:-.01em}
+.ltv-seg.a{flex:0 0 75%;background:var(--blue);color:var(--ltv-a-fg)}
+.ltv-seg.b{flex:0 0 10%;background:var(--ltv-b-bg);color:var(--ltv-b-fg)}
+.ltv-seg.c{flex:1;background:var(--crit);color:#fff}
+.ltv-marks{display:flex;margin-top:10px;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.ltv-marks .m1{flex:0 0 75%;text-align:right;color:var(--ink-2);font-weight:800}
+.ltv-marks .m2{flex:0 0 10%;text-align:right;padding-left:6px}
+.ltv-marks .m3{flex:1;text-align:right}
+
+/* ══════════════════════════════════════════════════════
+   RISK GRID
+   ══════════════════════════════════════════════════════ */
+.risks{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:6px}
+.risk{padding:0 26px;border-left:1px solid var(--hair)}
+.risk:first-child{border-left:0;padding-left:0}
+.risk .n{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--red)}
+.risk h4{margin:12px 0 9px;font-size:19px;font-weight:850;letter-spacing:-.03em;line-height:1.35}
+.risk p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.65}
+
+/* ══════════════════════════════════════════════════════
+   TABLE VIEW
+   ══════════════════════════════════════════════════════ */
+details.tv{margin-top:26px;border-top:1px solid var(--hair);padding-top:16px}
+details.tv summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:700;list-style:none}
+details.tv summary::-webkit-details-marker{display:none}
+details.tv summary::before{content:"▸ ";color:var(--blue)}
+details.tv[open] summary::before{content:"▾ "}
+details.tv table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+details.tv th,details.tv td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--hair);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+details.tv th{color:var(--faint);font-weight:700;font-size:12px}
+details.tv th:first-child,details.tv td:first-child{text-align:left}
+details.tv tr.hl td{color:var(--ink);font-weight:850}
+
+/* ══════════════════════════════════════════════════════
+   GLOSSARY / SUMMARY / SOURCES
+   ══════════════════════════════════════════════════════ */
+.gloss{display:flex;flex-direction:column}
+.gitem{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:24px 0;border-top:1px solid var(--hair);align-items:baseline}
+.gitem:first-child{border-top:0;padding-top:0}
+.gname{font-size:24px;font-weight:850;letter-spacing:-.035em}
+.gname span{display:block;margin-top:4px;font-size:15px;font-weight:750;color:var(--blue);letter-spacing:-.01em}
+.gdesc{font-size:16.5px;color:var(--ink-2)}
+.gbul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.gbul li{position:relative;padding-left:18px;font-size:18px;line-height:1.5;color:var(--ink-2);font-weight:650}
+.gbul li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.gbul b{color:var(--ink);font-weight:850}
+
+.sum .row{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:18px 0;border-top:1px solid var(--hair);font-size:16.5px;color:var(--ink-2)}
+.sum .row .n{font-size:15px;color:var(--blue);font-weight:850;letter-spacing:.02em}
+.sum .row b{color:var(--ink);font-weight:800}
+
+.srcbox{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:20px 0;border-top:1px solid var(--hair);font-size:14px;color:var(--muted)}
+.srcbox:first-of-type{border-top:0}
+.srcbox .kind{font-size:13px;font-weight:800;color:var(--ink-2)}
+.srcbox ul{margin:0;padding-left:18px}
+.srcbox li + li{margin-top:6px}
+.srcbox a{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue-border)}
+
+/* ══════════════════════════════════════════════════════
+   THEME TOGGLE — 다크/라이트 전환 버튼 (화면 우상단 고정)
+   ══════════════════════════════════════════════════════ */
+.theme-toggle{
+  position:fixed;top:20px;right:20px;z-index:500;
+  display:inline-flex;align-items:center;gap:9px;
+  padding:11px 18px 11px 14px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--hair-2);
+  color:var(--ink-2);font-family:inherit;font-size:13px;font-weight:750;letter-spacing:-.01em;
+  cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.22);
+  transition:border-color .15s ease, color .15s ease, transform .1s ease;
+}
+.theme-toggle:hover{border-color:var(--blue-border);color:var(--ink)}
+.theme-toggle:active{transform:scale(.96)}
+.theme-toggle .ico{width:16px;height:16px;flex:none;display:flex;color:var(--blue)}
+.theme-toggle .ico svg{width:100%;height:100%}
+.theme-toggle .ico.moon{display:none}
+:root[data-theme="light"] .theme-toggle .ico.sun{display:none}
+:root[data-theme="light"] .theme-toggle .ico.moon{display:flex}
+@media(max-width:640px){
+  .theme-toggle{top:12px;right:12px;padding:10px;border-radius:50%}
+  .theme-toggle .tt-label{display:none}
+}
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════ */
+@media(max-width:1080px){
+  :root{--pad:32px}
+  .hero h1{font-size:42px}
+  .slide-title{font-size:31px}
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:26px 0}
+  .kpi{padding:0 20px}
+  .kpi:nth-child(3){border-left:0}
+  .arch{grid-template-columns:1fr}
+  .conn{flex-direction:row;gap:30px;padding:26px 0}
+  .conn-row{flex:1}
+  .risks{grid-template-columns:1fr;gap:24px}
+  .risk{padding:24px 0 0;border-left:0;border-top:1px solid var(--hair)}
+  .risk:first-child{padding-top:0;border-top:0}
+}
+@media(max-width:820px){
+  .pair,.ba{grid-template-columns:1fr}
+  .ba-mid{padding:18px 0}
+  .tl{grid-template-columns:1fr;gap:30px}
+  .tl::before{display:none}
+  .gitem{grid-template-columns:1fr;gap:10px}
+  .hero h1{font-size:33px}
+  .hero .one{font-size:18px}
+  .slide-title{font-size:26px}
+  .kpi .v{font-size:36px}
+  .dbar,.dzero{grid-template-columns:88px 1fr 80px;gap:11px}
+  .colchart{grid-template-columns:40px 1fr}
+}
+</style>
+</head>
+<body>
+<a href="/research/study/2" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 2회차 진행안으로</a>
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="다크·라이트 모드 전환">
+  <span class="ico sun" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+  </span>
+  <span class="ico moon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.6A8.6 8.6 0 1 1 9.4 4a7 7 0 0 0 10.6 10.6Z"/></svg>
+  </span>
+  <span class="tt-label">라이트 모드</span>
+</button>
+<main class="deck">
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <p class="meta">
+    <span>RWA 스터디 2회차</span>
+    <span>Xangle DeFi · 렌딩</span>
+  </p>
+  <h1>3-1 <em>Jupiter Lend</em></h1>
+  <p class="by">발표 <i>|</i> 이성재</p>
+</header>
+
+<!-- ══════════ 01 · 이게 뭐지 (타임라인 + 핵심 수치 통합) ══════════ -->
+<section class="slide" id="what">
+  <div class="slide-head">
+    <h2 class="slide-title">Jupiter, <em>거래를 넘어 대출</em>까지 시작</h2>
+  </div>
+
+  <div class="tl">
+    <div class="node">
+      <div class="dot"></div>
+      <div class="when">이전</div>
+      <div class="what">Jupiter</div>
+      <p class="sub">솔라나 최대 거래 플랫폼<br>여러 DEX 가격을 비교해 주는 곳</p>
+    </div>
+    <div class="node">
+      <div class="dot"></div>
+      <div class="when">2025. 08</div>
+      <div class="what">Jupiter Lend 출시</div>
+      <p class="sub">자산을 맡기고<br>다른 자산을 빌리는 대출 서비스</p>
+    </div>
+    <div class="node">
+      <div class="dot"></div>
+      <div class="when">2026. 04</div>
+      <div class="what">토큰화 주식 담보 편입</div>
+      <p class="sub">xStocks를 담보로 받기 시작<br>담보 규모 약 2천만 달러</p>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <p class="k">Jupiter Lend 전체 예치자산</p>
+      <div class="v">9억<small> 달러</small></div>
+      <p class="f">프로토콜 전체 기준</p>
+    </div>
+    <div class="kpi hi">
+      <p class="k">그 중 토큰화 주식 담보</p>
+      <div class="v">2천만<small> 달러</small></div>
+      <p class="f">2026년 4월 편입 · 전체의 약 2%</p>
+    </div>
+    <div class="kpi">
+      <p class="k">LTV 담보인정비율 상한</p>
+      <div class="v">75<small>%</small></div>
+      <p class="f">담보 100 → 최대 75 차입</p>
+    </div>
+    <div class="kpi">
+      <p class="k">Looping 최대 노출</p>
+      <div class="v">3.8<small>배</small></div>
+      <p class="f">내 돈 100 → 380 효과</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 03 · 구조 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">돈은 공용 풀, <em>대출 조건은 담보별로</em></h2>
+  </div>
+
+  <div class="arch">
+    <div class="arch-box pool">
+      <h3>공용 USDC 풀</h3>
+      <p class="h-sub">빌려줄 돈이 모여 있는 단 하나의 창고</p>
+      <ul class="duty">
+        <li>예치 · 차입 기록</li>
+        <li>부채 상한 관리</li>
+        <li>인출 한도 관리</li>
+      </ul>
+      <div class="grow"></div>
+      <p class="vnote">모든 Vault(볼트)가 여기서 자금을 조달</p>
+    </div>
+
+    <div class="conn">
+      <div class="conn-row left">
+        <div class="conn-line to-left"></div>
+        <div class="conn-lb">차입 요청</div>
+      </div>
+      <div class="conn-row right">
+        <div class="conn-line to-right"></div>
+        <div class="conn-lb">USDC 공급</div>
+      </div>
+    </div>
+
+    <div class="arch-box">
+      <h3>종목별 Vault(볼트)</h3>
+      <p class="h-sub">담보를 맡기고 조건을 적용받는 전용 구조</p>
+      <div class="vault-row">
+        <span class="tk">TSLAx Vault<span>테슬라 토큰화 주식</span></span>
+        <span class="vcond"><span>LTV<b>70%</b></span><span class="lt">청산<b>80%</b></span></span>
+      </div>
+      <div class="vault-row">
+        <span class="tk">NVDAx Vault<span>엔비디아 토큰화 주식</span></span>
+        <span class="vcond"><span>LTV<b>65%</b></span><span class="lt">청산<b>75%</b></span></span>
+      </div>
+      <div class="grow"></div>
+      <p class="vnote ex">Vault(볼트)마다 조건이 다름· 수치는 이해를 위한 예시</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 03-2 · 담보로 받는 xStocks ══════════ -->
+<section class="slide" id="assets">
+  <div class="slide-head">
+    <h2 class="slide-title">담보로 받는 자산은 <em>xStocks</em></h2>
+    <p class="slide-note">xStocks 안에는 개별 주식형과 ETF형이 있다</p>
+  </div>
+
+  <div class="tree">
+    <div class="tree-root">
+      <span class="tr-name">xStocks</span>
+      <span class="tr-desc">미국 주식·ETF를 토큰화한 자산군</span>
+    </div>
+
+    <div class="tree-connect" aria-hidden="true">
+      <span class="tc-stem"></span>
+      <span class="tc-bar"></span>
+      <span class="tc-drop left"></span>
+      <span class="tc-drop right"></span>
+    </div>
+
+    <div class="tree-branches">
+      <div class="branch">
+        <h3 class="br-h">개별 주식형</h3>
+        <div class="tick-grid">
+          <div class="tick"><b>TSLAx</b><span>Tesla</span></div>
+          <div class="tick"><b>NVDAx</b><span>NVIDIA</span></div>
+        </div>
+      </div>
+      <div class="branch">
+        <h3 class="br-h">ETF형</h3>
+        <div class="tick-grid">
+          <div class="tick"><b>SPYx</b><span>S&amp;P 500 ETF</span></div>
+          <div class="tick"><b>QQQx</b><span>Nasdaq-100 ETF</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 04 · 담보 자산 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">주주 권리는 없지만, <em>주가와 배당은 반영</em></h2>
+  </div>
+
+  <div class="vs">
+    <div class="vs-col">
+      <h3 class="vs-h plain">주주 권리 X</h3>
+      <ul class="vs-rows airy">
+        <li><span>의결권</span><b class="dim">없음</b></li>
+        <li><span>배당 청구권</span><b class="dim">없음</b></li>
+      </ul>
+    </div>
+
+    <div class="vs-line" aria-hidden="true"></div>
+
+    <div class="vs-col right">
+      <h3 class="vs-h">xStocks에 반영 O</h3>
+      <ul class="vs-rows airy">
+        <li><span>주가 변동</span><b class="keep">반영</b></li>
+        <li><span>배당 상당분</span><b class="keep">반영</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dvd">
+    <p class="dvd-t">배당 반영 방식</p>
+    <div class="dvd-flow">
+      <span class="dvd-n">TSLAx 10.0개</span>
+      <span class="dvd-arrow" aria-hidden="true"></span>
+      <span class="dvd-n accent">TSLAx 10.1개</span>
+    </div>
+    <p class="dvd-sub">현금 지급 대신 토큰 잔액 증가</p>
+  </div>
+</section>
+
+<!-- ══════════ 05 · 비허가형 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">왜 <em>비허가형 자산</em>만 활용?</h2>
+    <p class="slide-note">담보가 위험해졌을 때 &lsquo;즉시 처분할 수 있는지?&rsquo;</p>
+  </div>
+
+  <div class="pair wide-gap">
+    <div class="pane red">
+      <span class="pane-tag">허가형</span>
+      <h3>허가형 RWA</h3>
+      <p class="h-sub">적격투자자만 보유 가능, 이전 제한이 걸린 자산</p>
+      <div class="grow"></div>
+      <ul class="ledger">
+        <li><span>① 담보 가격 하락</span><b>청산 발동</b></li>
+        <li><span>② 청산자 자격·KYC·이전 허용 확인</span><b>매번 검증 필요</b></li>
+        <li><span>③ 결과</span><b class="no">청산 절차 복잡</b></li>
+      </ul>
+    </div>
+    <div class="pane blue">
+      <span class="pane-tag">비허가형</span>
+      <h3>xStocks</h3>
+      <p class="h-sub">KYC나 적격투자자 요건 없이 누구나 보유·전송 가능</p>
+      <div class="grow"></div>
+      <ul class="ledger">
+        <li><span>① 담보 가격 하락</span><b>청산 발동</b></li>
+        <li><span>② 청산자가 담보를 받아감</span><b>자격 확인 불필요</b></li>
+        <li><span>③ 결과</span><b class="yes">자동 청산 성립</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="punch"><span class="lead">정리</span><b>담보 청산 시 </b>자산이 청산자에게 넘어가야 하는데, 허가형이라면 아무한테나 넘길 수 없어 구조가 복잡 </p>
+</section>
+
+<!-- ══════════ 06 · 루핑 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">담보, 차입 <em>반복하여 투자 규모 키움</em></h2>
+    <p class="slide-note">담보 → 차입 → 재매수 → 다시 담보 반복</p>
+  </div>
+
+  <div class="chart-head">
+    <p class="t">Looping 횟수에 따른 규모 변화</p>
+    <p class="s"> <span class="tag ex">LTV 75%, 자본 100달러 기준</span></p>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--blue)"></i>내 자본</span>
+    <span><i style="background:var(--orange)"></i>빌린 돈</span>
+  </div>
+
+  <div class="colchart">
+    <div class="yaxis">
+      <span style="top:0">400</span>
+      <span style="top:25%">300</span>
+      <span style="top:50%">200</span>
+      <span style="top:75%">100</span>
+      <span style="top:100%">0</span>
+    </div>
+    <div class="colwrap">
+      <div class="plot">
+        <div class="gl" style="top:0"></div>
+        <div class="gl" style="top:25%"></div>
+        <div class="gl" style="top:50%"></div>
+        <div class="gl" style="top:75%"></div>
+        <div class="cols">
+          <div class="col" tabindex="0" data-tip="시작&#10;내 자본 100 · 빌린 돈 0&#10;노출 100달러 (1.0배)">
+            <i class="seg own top" style="height:70px"></i>
+          </div>
+          <div class="col" tabindex="0" data-tip="1회 루프&#10;내 자본 100 · 빌린 돈 75&#10;노출 175달러 (1.75배)">
+            <i class="seg top" style="height:52.5px"></i>
+            <i class="seg own" style="height:70px"></i>
+          </div>
+          <div class="col" tabindex="0" data-tip="2회 루프&#10;내 자본 100 · 빌린 돈 131&#10;노출 231달러 (2.31배)">
+            <i class="seg top" style="height:91.9px"></i>
+            <i class="seg own" style="height:70px"></i>
+          </div>
+          <div class="col" tabindex="0" data-tip="3회 루프&#10;내 자본 100 · 빌린 돈 173&#10;노출 273달러 (2.73배)">
+            <i class="seg top" style="height:121.4px"></i>
+            <i class="seg own" style="height:70px"></i>
+          </div>
+          <div class="col" tabindex="0" data-tip="4회 루프&#10;내 자본 100 · 빌린 돈 205&#10;노출 305달러 (3.05배)">
+            <i class="seg top" style="height:143.6px"></i>
+            <i class="seg own" style="height:70px"></i>
+          </div>
+          <div class="col" tabindex="0" data-tip="최대&#10;내 자본 100 · 빌린 돈 280&#10;노출 380달러 (3.8배)">
+            <i class="seg top" style="height:196px"></i>
+            <i class="seg own" style="height:70px"></i>
+          </div>
+        </div>
+        <div class="caps">
+          <div class="slot"><b style="bottom:80px">100</b></div>
+          <div class="slot"></div>
+          <div class="slot"></div>
+          <div class="slot"></div>
+          <div class="slot"></div>
+          <div class="slot"><b style="bottom:276px">380</b></div>
+        </div>
+      </div>
+      <div class="xaxis">
+        <span>시작</span><span>1회</span><span>2회</span><span>3회</span><span>4회</span><span>최대</span>
+      </div>
+    </div>
+  </div>
+
+  <details class="tv">
+    <summary>표로 보기</summary>
+    <table>
+      <thead><tr><th>단계</th><th>내 자본</th><th>빌린 돈</th><th>총 노출</th><th>배수</th></tr></thead>
+      <tbody>
+        <tr><td>시작</td><td>100</td><td>0</td><td>100</td><td>1.00배</td></tr>
+        <tr><td>1회 루프</td><td>100</td><td>75</td><td>175</td><td>1.75배</td></tr>
+        <tr><td>2회 루프</td><td>100</td><td>131</td><td>231</td><td>2.31배</td></tr>
+        <tr><td>3회 루프</td><td>100</td><td>173</td><td>273</td><td>2.73배</td></tr>
+        <tr><td>4회 루프</td><td>100</td><td>205</td><td>305</td><td>3.05배</td></tr>
+        <tr class="hl"><td>최대</td><td>100</td><td>280</td><td>380</td><td>3.80배</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <p class="punch"><span class="lead">정리</span>100달러로 <b>380달러(3.8배)</b> 보유한 것처럼 사용 가능</p>
+</section>
+
+<!-- ══════════ 07 · 리스크 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">레버리지 <em>리스크</em></h2>
+  </div>
+
+  <div class="chart-head">
+    <p class="t">주가가 움직이면 내 자본은 얼마나 변할까</p>
+    <p class="s"> <span class="tag ex">계산 예시</span> 3.8배 기준 · 이자, 수수료 제외 </p>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--blue)"></i>이익</span>
+    <span><i style="background:var(--red)"></i>손실</span>
+  </div>
+
+  <div class="dbars">
+    <div class="dbar" tabindex="0" data-tip="주가 +20% → 내 자본 +76%">
+      <span class="px">주가 +20%</span>
+      <span class="lane"><i class="zero"></i><i class="m pos" style="width:46%"></i></span>
+      <span class="out" style="color:var(--blue)">+76%</span>
+    </div>
+    <div class="dbar" tabindex="0" data-tip="주가 +10% → 내 자본 +38%">
+      <span class="px">주가 +10%</span>
+      <span class="lane"><i class="zero"></i><i class="m pos" style="width:23%"></i></span>
+      <span class="out" style="color:var(--blue)">+38%</span>
+    </div>
+    <div class="dbar" tabindex="0" data-tip="주가 -10% → 내 자본 -38%">
+      <span class="px">주가 −10%</span>
+      <span class="lane"><i class="zero"></i><i class="m neg" style="width:23%"></i></span>
+      <span class="out" style="color:var(--red)">−38%</span>
+    </div>
+    <div class="dbar" tabindex="0" data-tip="주가 -20% → 내 자본 -76%">
+      <span class="px">주가 −20%</span>
+      <span class="lane"><i class="zero"></i><i class="m neg" style="width:46%"></i></span>
+      <span class="out" style="color:var(--red)">−76%</span>
+    </div>
+  </div>
+  <div class="dzero"><span></span><span class="c">0</span><span></span></div>
+
+  <div style="margin-top:40px">
+    <div class="chart-head">
+      <p class="t">부채가 담보의 몇 퍼센트까지 차오르면 청산될까</p>
+      <p class="s">담보 가치를 100으로 봤을 때</p>
+    </div>
+    <div class="ltv">
+      <div class="ltv-bar" role="img" aria-label="0에서 75퍼센트까지는 차입 가능, 75에서 85퍼센트 사이에 볼트별 청산선이 있고, 그 위는 청산 구간">
+        <div class="ltv-seg a">차입 가능</div>
+        <div class="ltv-seg b">청산선 구간</div>
+        <div class="ltv-seg c">청산</div>
+      </div>
+      <div class="ltv-marks">
+        <span class="m1">75%</span>
+        <span class="m2">85%</span>
+        <span class="m3">100%</span>
+      </div>
+      <p class="fine">
+        
+      </p>
+    </div>
+  </div>
+
+  <p class="punch"><span class="lead">정리</span>투자 규모 키운 만큼 <b>수익과 손실도 크게 확대</b>가 됨</p>
+</section>
+
+<!-- ══════════ 08 · 구조적 위험 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">가격 말고도 <em>봐야 할 3 가지</em></h2>
+  </div>
+
+  <div class="risks">
+    <div class="risk">
+      <div class="n">RISK 01</div>
+      <h4>한 종목에만 Looping </h4>
+      <p>같은 종목 재매입하는 Looping으로 최대 3.8배까지 가능 <br> 완충장치 필요성</p>
+    </div>
+    <div class="risk">
+      <div class="n">RISK 02</div>
+      <h4>미국장 닫혀 있을 시</h4>
+      <p>미국 장이 쉬는 동안 담보 가격 정보가 멈출 수 있음 <br>재개장 후 가격 크게 벌어지면 즉시 청산으로 이어질 수 있음</p>
+    </div>
+    <div class="risk">
+      <div class="n">RISK 03</div>
+      <h4>한쪽 담보 부실이 공용 풀에 영향</h4>
+      <p>자금 풀이 하나이므로, 특정 담보에서 생긴 부실이 예치자 전체에 영향을 줄 수 있음 </p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ 09 · 용어 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">새로 알게 된 <em>용어</em></h2>
+  </div>
+  <div class="gloss">
+    <div class="gitem">
+      <div class="gname">xStocks<span>토큰화 주식</span></div>
+      <ul class="gbul">
+        <li>미국 주식·ETF의 경제적 가치를 따라가는 토큰</li>
+        <li>테슬라는 <b>TSLAx</b>, S&amp;P 500은 <b>SPYx</b></li>
+      </ul>
+    </div>
+    <div class="gitem">
+      <div class="gname">Vault<span>볼트 · 담보 금고</span></div>
+      <ul class="gbul">
+        <li>담보를 맡기고 대출 조건을 적용받는 전용 구조</li>
+        <li>종목마다 따로 열리고, <b>LTV·청산 기준도 따로</b></li>
+      </ul>
+    </div>
+    <div class="gitem">
+      <div class="gname">Looping<span>루핑 · 반복 레버리지</span></div>
+      <ul class="gbul">
+        <li>담보 → 차입 → 재매수 → 재담보를 반복</li>
+        <li>노출은 커지지만 <b>청산 위험도 함께 커진다</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 09 · 정리 ══════════ -->
+<section class="slide sum">
+  <div class="slide-head">
+    <h2 class="slide-title">최종 요약</h2>
+  </div>
+  <div class="row"><span class="n">01</span><span>Jupiter Lend는 <b>주식을 팔지 않고 유동성을 만드는</b> 대출 프로토콜</span></div>
+  <div class="row"><span class="n">02</span><span>자금은 <b>공용 유동성에서 공유</b>하고, 대출 조건은 <b>담보별 Vault(볼트)</b>에서 나눈다.</span></div>
+  <div class="row"><span class="n">03</span><span>담보로 맡겨도 <b>주가 노출과 배당 상당액은 유지</b>되지만, <b>의결권은 없음</b></span></div>
+  <div class="row"><span class="n">04</span><span>담보는 <b>즉시 처분 가능한 비허가형 자산</b>만 받음. 자동 청산이 성립해야 하기 때문</span></div>
+  <div class="row"><span class="n">05</span><span>Looping(루핑)으로 <b>최대 3.8배</b>까지 키울 수 있고, 그만큼 위험도 비례</span></div>
+</section>
+
+<!-- ══════════ 10 · 출처 ══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <h2 class="slide-title">자료 출처</h2>
+  </div>
+  <div class="srcbox">
+    <div class="kind">원문 아티클</div>
+    <ul>
+      <li><a href="https://xangle.io/research/detail/2521" target="_blank" rel="noopener">Xangle · [RWA Series] 디파이 : 렌딩</a></li>
+    </ul>
+  </div>
+  <div class="srcbox">
+    <div class="kind">추가 조사</div>
+    <ul>
+      <li><a href="https://dev.jup.ag/docs/lend/borrow/liquidation" target="_blank" rel="noopener">Jupiter Developer Docs · Lend</a> — 볼트 구조, 청산 방식</li>
+      <li>Jupiter 사용자 문서 · xStocks — 지원 담보 종류, 위험 등급, 증시 휴장 시 가격 반영 이슈</li>
+      <li>Fluid 통합 유동성(Liquidity Layer) 구조 — 유동성 공유 방식 확인</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var KEY = 'jl-lend-theme';   /* 기본값 = 라이트. head의 선행 스크립트에서 이미 반영됨 */
+
+  function isLight(){ return root.getAttribute('data-theme') === 'light'; }
+  function paint(){
+    var label = document.querySelector('#themeToggle .tt-label');
+    if(label) label.textContent = isLight() ? '다크 모드' : '라이트 모드';
+  }
+  function toggle(){
+    if(isLight()){ root.removeAttribute('data-theme'); }
+    else{ root.setAttribute('data-theme','light'); }
+    try{ localStorage.setItem(KEY, isLight() ? 'light' : 'dark'); }catch(e){}
+    paint();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    paint();
+    var btn = document.getElementById('themeToggle');
+    if(btn) btn.addEventListener('click', toggle);
+  });
+})();
+</script>
+</body>
+</html>

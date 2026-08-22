@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>디파이 렌딩 — 가상자산 담보와 실물자산 담보 (쉬운 버전)</title>
+<style>
+:root{--navy:#102b46;--blue:#176db2;--sky:#edf7ff;--ink:#172536;--muted:#5d6d7e;--line:#dce6ef;--bg:#f5f8fb;--paper:#fff;--mint:#e9f7f1}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;line-height:1.82;word-break:keep-all}
+.shell{max-width:1160px;margin:auto;padding:42px 24px 72px}
+.hero{background:linear-gradient(125deg,#102b46,#1a6aa8);color:white;padding:46px 50px;border-radius:24px;box-shadow:0 14px 34px #102b4626}
+.kicker{font-weight:800;font-size:12px;letter-spacing:.13em;color:#b9e2ff}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.2;letter-spacing:-.05em;margin:13px 0}
+.hero p{font-size:18px;max-width:820px;color:#e6f4ff;margin:0}
+.toc{margin-top:22px;padding:16px 20px;background:white;border:1px solid var(--line);border-radius:14px;display:flex;gap:11px;flex-wrap:wrap}
+.toc a{font-size:13px;color:#275c85;text-decoration:none;background:#edf5fb;padding:5px 10px;border-radius:20px;font-weight:700}
+section{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px;margin-top:24px}
+.label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.1em}
+.title{margin:4px 0 18px;font-size:27px;line-height:1.35;letter-spacing:-.04em}
+.intro{font-size:17px;color:#294056}
+.box{background:var(--sky);border-left:4px solid var(--blue);border-radius:8px;padding:17px 20px;margin:20px 0}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+.type{border:1px solid var(--line);border-radius:14px;padding:20px}
+.type h3{margin:0 0 8px;font-size:18px;color:#164b76}
+.type p{margin:0;font-size:14px;color:var(--muted)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.compare article{padding:23px;border:1px solid var(--line);border-radius:14px}
+.compare h3{margin:0 0 12px;font-size:20px}
+.compare p{margin:0;color:#425568}
+.direct{border-top:4px solid #217abe}
+.indirect{border-top:4px solid #8b65b0}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:13px}
+table{width:100%;min-width:810px;border-collapse:collapse;font-size:14px;line-height:1.65}
+th{background:#edf4f9;text-align:left;padding:14px;color:#23435e;font-size:13px}
+td{padding:15px 14px;vertical-align:top;border-top:1px solid var(--line)}
+td:first-child{width:16%;font-weight:800;color:#17619c}
+.layer{display:grid;grid-template-columns:76px minmax(0,1fr);gap:20px;padding:25px 0;border-bottom:1px solid var(--line)}
+.layer:last-child{border-bottom:0;padding-bottom:0}
+.num{width:54px;height:54px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800}
+.layer h3{margin:0 0 9px;font-size:21px;letter-spacing:-.03em}
+.layer p{margin:0;color:#3e5063}
+.chips{margin-top:12px;display:flex;gap:7px;flex-wrap:wrap}
+.chip{background:var(--mint);border:1px solid #cbe9da;color:#227056;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:700}
+.caution{margin-top:22px;background:#fff7e9;border:1px solid #efd8a8;border-radius:12px;padding:18px 20px;color:#654400}
+.end{background:#102b46;color:#eaf5ff}
+.end .label{color:#a9d8fc}
+.end h2{color:#fff}
+.end p{font-size:18px;margin:0}
+.foot{font-size:13px;color:#6c7c8c;margin-top:23px}
+.base ul,.section-list,.compare ul{margin:0;padding-left:19px;color:#3e5063}
+.base li,.section-list li,.compare li{margin:0 0 9px;padding-left:2px}
+.base li:last-child,.section-list li:last-child,.compare li:last-child{margin-bottom:0}
+.section-list{font-size:16px;margin:0 0 18px}
+.compare ul{font-size:14px;color:#425568}
+.buidl-subnav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.buidl-subnav a{color:#275c85;text-decoration:none;background:#edf5fb;padding:5px 10px;border-radius:20px;font-weight:700;font-size:13px}
+.buidl-block{margin-top:18px;padding:28px;border:1px solid var(--line);border-radius:15px;background:#fbfdff}
+.buidl-block h3{margin:0 0 12px;color:#174e7c;font-size:21px;letter-spacing:-.03em}
+.buidl-block>p{margin:0;color:#3e5063}
+.buidl-block ul{margin:0;padding-left:19px;color:#3e5063;font-size:15.5px}
+.buidl-block li{margin:0 0 9px}
+.buidl-block li:last-child{margin-bottom:0}
+.buidl-notice,.buidl-detail{margin:20px 0 0;padding:18px 20px;border-radius:12px}
+.buidl-notice{background:#fff7e9;border:1px solid #efd8a8;color:#634300}
+.buidl-notice strong{color:#845100}
+.buidl-detail{background:var(--sky);border-left:4px solid var(--blue);color:#294056}
+.buidl-detail p{margin:0}
+.buidl-diagram{margin:22px 0 8px;padding:24px;background:#f9fcfe;border:1px solid var(--line);border-radius:14px}
+.buidl-lane{padding:20px;border-radius:12px}
+.buidl-lane+.buidl-lane{margin-top:14px}
+.buidl-asset-lane{background:#f0faf5;border:1px solid #c7e7d5}
+.buidl-token-lane{background:#eef7fe;border:1px solid #c6e2f5}
+.buidl-lane-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;margin-bottom:15px}
+.buidl-lane-label i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.buidl-asset-lane .buidl-lane-label{color:#166449}
+.buidl-asset-lane .buidl-lane-label i{background:#29805d}
+.buidl-token-lane .buidl-lane-label{color:#135587}
+.buidl-token-lane .buidl-lane-label i{background:#217abe}
+.buidl-flow{display:flex;align-items:stretch;gap:10px}
+.buidl-flow .buidl-node{flex:1}
+.buidl-node{padding:15px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;position:relative;min-width:0}
+.buidl-node b{display:block;font-size:15px;color:#164b76;line-height:1.35}
+.buidl-node span{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:5px}
+.buidl-node.primary{background:#fbfdff;border-color:#a8d4f3}
+.buidl-node.asset{background:#fbfffc;border-color:#b8dfcd}
+.buidl-node.circle{background:#fdfaff;border-color:#d8c3e8}
+.buidl-arrow{display:flex;align-items:center;justify-content:center;color:#4d87b5;font-size:23px;flex:0 0 25px}
+.buidl-bridge{display:flex;align-items:center;justify-content:center;gap:8px;margin:9px 0;color:#2c678f;font-size:13px;font-weight:800}
+.buidl-bridge::before,.buidl-bridge::after{content:"";height:1px;background:#a9cde6;flex:1}
+.buidl-caption{font-size:13px;color:var(--muted);margin:12px 0 0}
+.buidl-facts-table{margin-top:18px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.buidl-facts-head,.buidl-fact-row{display:grid;grid-template-columns:.9fr 1.5fr 1.5fr}
+.buidl-facts-head{background:#edf5fb;color:#275c85;font-size:13px;font-weight:800}
+.buidl-facts-head div,.buidl-fact-row div{padding:13px 15px;border-right:1px solid var(--line)}
+.buidl-facts-head div:last-child,.buidl-fact-row div:last-child{border-right:0}
+.buidl-fact-row{background:#fff;border-top:1px solid var(--line);font-size:14px;line-height:1.58}
+.buidl-fact-key{font-weight:800;color:#174e7c;background:#fbfdff}
+.buidl-fact-note{color:var(--muted)}
+.buidl-layer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:18px}
+.buidl-layer{padding:20px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.buidl-layer-no{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:800;margin-bottom:10px}
+.buidl-layer h4{font-size:17px;margin:0 0 7px;color:#174e7c;letter-spacing:-.02em}
+.buidl-layer p{font-size:14px;line-height:1.65;color:var(--muted);margin:0}
+.buidl-check{margin:0;padding:0;list-style:none}
+.buidl-check li{padding:17px 0 17px 46px;position:relative;border-bottom:1px solid var(--line);color:#3e5063}
+.buidl-check li:last-child{border-bottom:0}
+.buidl-check li::before{content:"✓";position:absolute;left:0;top:17px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:#176d52;font-weight:800}
+.buidl-takeaway{margin-top:18px;padding:28px;border-radius:15px;background:var(--navy);color:#eaf5ff}
+.buidl-takeaway .label{color:#a9d8fc}
+.buidl-takeaway h3{margin:4px 0 14px;color:#fff;font-size:24px;letter-spacing:-.03em}
+.buidl-takeaway p{margin:0;font-size:17px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:20px 0}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px 18px}
+.stat b{display:block;font-size:25px;color:#164b76;letter-spacing:-.04em;line-height:1.2}
+.stat span{display:block;font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+.stat i{display:block;font-style:normal;font-size:11px;color:#8fa1b1;margin-top:4px}
+.chart-fig{margin:22px 0 8px;padding:24px 24px 16px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.chart-fig h4{margin:0 0 3px;font-size:16.5px;color:#174e7c;letter-spacing:-.02em}
+.chart-fig .sub{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.chart-fig svg{width:100%;height:auto;display:block}
+.chart-fig .axis{font-size:11.5px;fill:#7d8fa0}
+.chart-fig .vlab{font-size:12.5px;font-weight:800;fill:#20435f}
+.chart-fig .vsub{font-size:10.5px;fill:#7d8fa0}
+.chart-fig .gline{stroke:#e7eef5;stroke-width:1}
+.chart-fig .baseline{stroke:#c9d6e2;stroke-width:1.5}
+.chart-note{font-size:12px;color:#8fa1b1;margin:10px 0 0}
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
+.sc{border-radius:14px;padding:18px;border:1px solid var(--line);background:#fff}
+.sc .tag{display:inline-block;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:20px;margin-bottom:10px}
+.sc h4{margin:0 0 7px;font-size:15.5px;color:#22405c;letter-spacing:-.02em;line-height:1.4}
+.sc p{margin:0;font-size:13px;color:var(--muted);line-height:1.62}
+.sc.good{border-top:4px solid #29805d}.sc.good .tag{background:var(--mint);color:#227056}
+.sc.mid{border-top:4px solid #217abe}.sc.mid .tag{background:#edf5fb;color:#275c85}
+.sc.warn{border-top:4px solid #d99a26}.sc.warn .tag{background:#fff7e9;color:#845100}
+.sc.bad{border-top:4px solid #c05252}.sc.bad .tag{background:#fdefef;color:#a03636}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:18px 0 0}
+.why{border:1px solid var(--line);border-radius:14px;padding:19px;background:#fbfdff}
+.why b{display:block;font-size:15.5px;color:#164b76;margin-bottom:7px}
+.why p{margin:0;font-size:13px;color:var(--muted);line-height:1.62}
+.mini-case{margin:20px 0 0;padding:22px 24px;border:1px solid #d8c9e6;border-radius:14px;background:#fdfbff}
+.mini-case h4{margin:0 0 9px;color:#5d3f7e;font-size:17px}
+.mini-case p{margin:0 0 8px;font-size:14px;color:#42566a}.mini-case p:last-child{margin:0}
+.gchip{background:#fdf6e3;border:1px solid #ecd9a8;color:#8a6510;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:700}
+h3.sub-h{margin:28px 0 6px;font-size:20px;color:#164b76}
+@media(max-width:720px){
+.shell{padding:18px 13px 50px}
+.hero,section{padding:26px 21px;border-radius:16px}
+.hero p{font-size:16px}
+.type-grid,.compare{grid-template-columns:1fr}
+.layer{grid-template-columns:54px minmax(0,1fr);gap:13px}
+.title{font-size:24px}
+.buidl-block{padding:22px 18px}
+.buidl-block h3{font-size:19px}
+.buidl-diagram{padding:14px}
+.buidl-flow{display:flex;flex-direction:column}
+.buidl-arrow{height:22px;transform:rotate(90deg);align-self:center}
+.buidl-facts-head{display:none}
+.buidl-fact-row{grid-template-columns:1fr}
+.buidl-fact-row div{border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}
+.buidl-fact-row div:last-child{border-bottom:0}
+.buidl-layer-grid{grid-template-columns:1fr}
+.buidl-takeaway{padding:23px 19px}
+.stat-grid,.sc-grid,.why-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.stat-grid,.sc-grid,.why-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a href="/research/study/2" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 2회차 진행안으로</a><main class="shell">
+
+<header class="hero">
+<div class="kicker">DEFI LENDING · 담보 구조 해설 · 쉬운 버전</div>
+<h1>가상자산 담보에서<br>실물자산 담보까지</h1>
+<p>온체인 대출은 상대를 믿지 못하는 대신 넉넉한 담보와 실시간 가격, 즉각적인 실행을 믿는 구조다. 이 문서는 렌딩 프로토콜의 기본 작동 원리부터, 실물자산을 담보로 받을 때 추가로 통과해야 하는 세 겹의 판단, 그리고 그 판단을 대신 수행하는 큐레이터의 등장까지를 순서대로 정리한다.</p>
+</header>
+
+<nav class="toc">
+<a href="#lending">2-1 렌딩 프로토콜</a>
+<a href="#bot">참고: 스마트컨트랙트 vs Bot</a>
+<a href="#rwa">2-2 실물자산 담보</a>
+<a href="#curator">큐레이터란 무엇인가</a>
+<a href="#agg">큐레이터는 애그리게이터인가</a>
+<a href="#summary">핵심 정리</a>
+</nav>
+
+<!-- ══════════ 2-1 ══════════ -->
+<section id="lending">
+<div class="label">01 · LENDING</div>
+<h2 class="title">2-1. 가상자산을 담보로 활용하는 렌딩 프로토콜</h2>
+
+<ul class="section-list">
+<li>전통 금융에서는 자금을 조달하는 주체가 누구인지 아는 상태에서 자금조달이 이뤄진다. </li>
+<li>그러나 온체인에는 확인할 상대가 존재하지 않는다. </li>
+<li>자금을 조달하는 주체는 신원이 드러나지 않는 지갑 주소다.</li>
+<li>지갑은 누구나 즉시 개설할 수 있고, 상환이 이뤄지지 않아도 책임을 묻기 어렵다.</li>
+<li>심사할 신용이 없으니, 온체인 대출은 담보 가치가 차입액을 넘는 <b>과담보</b> 방식으로 이뤄진다.</li>
+<li>과담보란 내가 빌리려는 돈보다 더 큰 가치의 자산을 담보로 맡기는 것을 말한다.</li>
+<li>사람을 심사할 수 없다면, 이처럼 담보를 넉넉히 잡아두고 담보를 얼마나 인정할지 미리 정해두는 수밖에 없다.</li>
+</ul>
+
+<h3 class="sub-h">프로토콜이 자산마다 정해두는 두 개의 비율</h3>
+<div class="compare" style="margin-top:14px">
+<article class="direct">
+<h3>① 담보인정비율 (LTV)</h3>
+<ul>
+<li>조달 가능한 금액을 정하는 비율이다(Loan to Value).</li>
+<li>현실에서 주택담보대출을 받을 때, 예를 들어 10억 원짜리 집을 담보로 맡길 때 LTV가 50%라면 최대 5억 원까지만 대출을 받을 수 있는 것과 같은 원리다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>② 청산 기준</h3>
+<ul>
+<li>담보를 강제로 처분하는 시점을 정하는 기준이다.</li>
+<li>빌린 돈이 담보 가치 대비 이 비율에 도달하는 순간 담보가 처분된다.</li>
+</ul>
+</article>
+</div>
+
+<div class="chart-fig">
+<h4>LTV 60% · 청산 기준 75%일 때의 숫자</h4>
+<p class="sub">담보 10,000달러어치 가상자산을 맡긴 경우</p>
+<div class="stat-grid" style="margin:0">
+<div class="stat"><b>$10,000</b><span>맡긴 담보 가치</span><i>가상자산 시가</i></div>
+<div class="stat"><b>$6,000</b><span>최대 조달 금액</span><i>10,000의 60%</i></div>
+<div class="stat"><b>75%</b><span>청산이 발동되는 부채 비중</span><i>담보가치 * 청산기준 (0.75) = 부채</i></div>
+<div class="stat"><b>$8,000</b><span>강제 처분이 시작되는 담보 가치</span><i>부채 ÷ 담보 가치 = 6,000 ÷ 0.75</i></div>
+</div>
+<p class="chart-note">담보 가격이 떨어져서 내가 빌린 6,000달러가 전체 담보 가치의 75%에 도달하면 담보는 청산된다. 즉, 담보 가치가 8,000달러로 떨어지는 순간 강제 처분이 시작된다.</p>
+</div>
+
+<div class="box"><b>오라클(oracle)이 필요한 이유</b> — 1 이더리움(ETH)을 맡겼을 때 얼마를 빌릴 수 있는지, 혹은 언제 담보를 처분해야 할지 알려면 외부 시장에서 거래되는 실시간 가격을 알아야 한다. 이처럼 외부의 가격 데이터를 온체인으로 전달해주는 장치를 오라클이라고 한다.</div>
+
+<h3 class="sub-h">'시장'이라는 단위와 두 가지 개설 방식</h3>
+<ul class="section-list">
+<li>내가 어떤 자산을 담보로 맡길 것인지(담보 자산), 그 대가로 어떤 자산을 빌려올 것인지(차입 자산), 그리고 어떤 조건으로 대출이 실행될지를 정해둔 단위를 <b>시장</b>이라고 한다.</li>
+<li>시장을 만드는 일은 <b>개설</b>이라고 부른다.</li>
+</ul>
+
+<div class="compare">
+<article class="direct">
+<h3>종합 창구형 (하나의 큰 시장)</h3>
+<ul>
+<li>이더리움, 비트코인 등 여러 종류의 자산을 하나의 큰 바구니에 다 같이 담보로 받고, 공통의 금고에서 자금을 내어주는 방식이다.</li>
+<li>모든 자금이 하나의 큰 금고에 모여 있어서 누구나 쉽게 큰돈을 빌릴 수 있을 만큼 금고가 넉넉하다.</li>
+<li>대신 불량 담보 하나가 전체 시장을 위험에 빠뜨릴 수 있다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>개별 창구형 (페어마다 분리)</h3>
+<ul>
+<li>담보 자산과 차입 자산의 짝(페어)마다 창구를 따로 개설한다.</li>
+<li>'이더리움을 맡기고 USDC를 빌리는 창구'와 '비트코인을 맡기고 USDC를 빌리는 창구'를 완전히 분리해 독립적으로 운영하는 식이다.</li>
+<li>창구별로 자금이 쪼개져 있는 대신, 특정 담보 가격이 폭락하더라도 그 피해가 다른 창구로 번지지 않고 차단된다.</li>
+</ul>
+</article>
+</div>
+
+<h3 class="sub-h">자금이 흐르는 순서</h3>
+<div class="buidl-diagram">
+<div class="buidl-lane buidl-token-lane">
+<div class="buidl-lane-label"><i></i>공급 → 차입 → 상환</div>
+<div class="buidl-flow">
+<div class="buidl-node primary"><b>자금 공급자</b><span>대출의 재원이 될 자산을 예치</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node primary"><b>유동성 풀(Pool)</b><span>언제든 대출을 내어줄 수 있는 '대기 자금'</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node"><b>차입자</b><span>담보를 예치하고 풀에서 자금을 차입</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node asset"><b>이자 · 담보 반환</b><span>이자는 공급자의 수익, 상환이 끝나면 담보는 반환</span></div>
+</div>
+</div>
+<div class="buidl-bridge">담보 가치가 청산 기준에 도달하면</div>
+<div class="buidl-lane buidl-asset-lane">
+<div class="buidl-lane-label"><i></i>청산의 흐름</div>
+<div class="buidl-flow">
+<div class="buidl-node"><b>청산 기준 도달</b><span>오라클 가격이 기준선에 닿는 순간</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node circle"><b>청산자(제3자)</b><span>차입자의 빚을 대신 갚아주는 차익거래자·봇</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node asset"><b>담보를 할인 인수</b><span>시장 가격보다 5~10% 싸게 넘겨받음</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node asset"><b>즉시 매각 차익</b><span>거래소에 팔아 무위험 수익 확보</span></div>
+</div>
+</div>
+<p class="buidl-caption">담보 가치가 청산 기준에 이르면, 차입자의 빚을 대신 갚아주는 대가로 시세차익을 노리는 외부의 제3자, 즉 '청산자'가 개입한다.</p>
+</div>
+
+<div class="caution">
+<b>유의할 점: 청산자는 렌딩 프로토콜 그 자체가 아니다.</b> 프로토콜(스마트 컨트랙트)은 규칙을 정해둔 시스템일 뿐 스스로 행동할 수 없고, 담보를 직접 떠안아 시장에 내다 팔 자본이나 여력도 없다. 그래서 프로토콜은 "누구든 저 빚을 대신 갚아주면, 담보를 시세보다 싸게 넘겨주겠다"는 규칙을 만들어 '외주'를 주는 것이다. 
+</div>
+
+<div class="box"><b>사람의 심사나 승인 절차가 없다</b> — 이 모든 과정은 스마트 컨트랙트로 처리되므로, 담보 가격이 청산 기준에 닿는 순간 곧바로 청산이 이뤄진다. 전통 금융에서 며칠이 걸리는 절차가 온체인에서는 거래 한 건으로 끝나는 것이다.</div>
+
+<h3 class="sub-h">금리와 만기는 전통 금융과 다르게 작동한다</h3>
+<div class="buidl-layer-grid">
+<div class="buidl-layer"><span class="buidl-layer-no">1</span><h4>차입 비중이 오르면</h4><p>예치된 전체 자금 대비 차입된 돈의 비중이 높아졌다는 것은, 대출을 받으려는 수요가 늘어나 시장에 돈이 귀해졌다는 뜻이다.</p></div>
+<div class="buidl-layer"><span class="buidl-layer-no">2</span><h4>금리가 자동으로 오른다</h4><p>돈이 귀해지면 자금을 빌려 쓰는 대가라고 할 수 있는 금리(이자율)가 자동으로 높아진다. 금리가 높아지면 이자 수익을 노리는 투자자들의 예치가 늘어나고 차입은 줄어들면서 수요와 공급이 다시 균형을 찾는다. 이렇게 차입 비중에 따라 금리를 자동으로 산출하도록 만들어진 공식을 <b>금리 모델</b>이라고 한다.</p></div>
+<div class="buidl-layer"><span class="buidl-layer-no">3</span><h4>만기는 아예 없다</h4><p>만기(대출을 갚아야 하는 정해진 기한)는 설정되지 않는다. 예치자는 언제든 자금을 인출하고, 차입자는 언제든 상환하는 구조다.</p></div>
+</div>
+
+<h3 class="sub-h">두 비율의 상한은 무엇으로 정해지는가</h3>
+<ul class="section-list">
+<li>두 비율(LTV와 청산 기준)의 상한은 자산마다, 렌딩 프로토콜마다 다르게 설정된다.</li>
+<li>기준은 하나다.</li>
+<li><b>담보를 처분해 부채만큼의 자금을 무사히 회수할 수 있느냐다.</b></li>
+<li>청산 조건이 충족된 시점과 담보가 실제로 매각되는 시점 사이에 가격이 더 하락할 수 있다.</li>
+<li>게다가 청산을 위해 대규모 담보 물량이 시장에 갑자기 쏟아지면(공급 증가), 이를 받아줄 매수세(수요)가 부족해 시장 가격 자체가 곤두박질치기도 한다.</li>
+</ul>
+
+<div class="chart-fig">
+<h4>안전마진(Margin of Safety)은 누구의 몫인가</h4>
+<p class="sub">청산 발동 시점 담보 가치 8,000달러가 어떻게 쓰이는가</p>
+<div class="buidl-facts-table" style="margin-top:0">
+<div class="buidl-facts-head"><div>구분</div><div>금액</div><div>용도</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">부채 상환</div><div>$6,000</div><div class="buidl-fact-note">차입자가 빌린 원금을 갚는 데 쓰인다</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">청산자 보너스</div><div>$300</div><div class="buidl-fact-note">빚을 대신 갚아준 대가로 지급되는 할인분</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">차입자 반환</div><div>$1,700</div><div class="buidl-fact-note">남은 금액은 원래 차입자에게 돌려준다</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">안전마진 총액</div><div>$2,000</div><div class="buidl-fact-note">청산 발동 담보 가치(8,000)에서 부채(6,000)를 뺀 차액. 매각 과정의 가격 하락 충격을 흡수하는 완충 장치다</div></div>
+</div>
+<p class="chart-note">청산이 발동된 시점의 담보 가치에서 갚아야 할 부채를 뺀 나머지 금액은 온전히 청산자의 몫이 아니다. 이 금액은 매각 과정의 가격 하락 충격을 흡수하고 청산자에게 줄 보너스를 지급한 뒤, 남은 금액을 원래 차입자에게 돌려주기 위한 안전마진 역할을 한다.</p>
+</div>
+
+<div class="caution">
+<b>안전마진이 없다면</b> — 만약 이 2,000달러의 차액이 없었다면, 처분하는 그 짧은 시간 동안 가격이 폭락할 경우 프로토콜이 원금조차 회수하지 못하는 <b>악성 부채</b>를 떠안게 된다. 그래서 가격 변동성이 크고 거래량이 적어 사고파는 사람이 부족한 자산일수록, 이 안전마진을 더 두껍게 쌓아야 한다. 담보를 덜 쳐주고(LTV 하향) 더 빨리 청산(청산 기준 하향)시킴으로써 프로토콜에 악성 부채가 남지 않도록 설계하는 것이다.
+</div>
+
+<div class="buidl-takeaway">
+<div class="label">SECTION TAKEAWAY</div>
+<h3>신용 심사가 사라진 자리를 무엇이 채우는가</h3>
+<p>온체인 렌딩은 상대를 믿지 못하는 대신, 확실한 담보와 실시간 가격 데이터, 그리고 즉각적인 실행 속도를 믿는 구조다. '넉넉한 담보'를 잡아두고, 오라클이 24시간 '가격'을 제공하며, 위험해지는 순간 사람이 개입할 틈 없이 스마트 컨트랙트가 처분해버린다. 신용 심사가 사라진 자리를 오라클이 전달하는 가격과 외부 청산자의 기계적인 실행이 대신 채우고 있는 셈이다.</p>
+</div>
+</section>
+
+<!-- ══════════ 참고 ══════════ -->
+<section id="bot">
+<div class="label">02 · REFERENCE</div>
+<h2 class="title">참고 | 스마트컨트랙트 vs Bot</h2>
+
+<ul class="section-list">
+<li>스마트 컨트랙트라는 이름은 종종 오해를 불러일으킨다. '스마트'하다는 수식어 때문에 코드가 스스로 판단하고 능동적으로 움직일 것이라 착각하기 쉽다.</li>    
+<li>하지만 스마트 컨트랙트는 스스로 눈을 떠서 움직이지 못한다.</li>
+<li>누군가 밖에서 수수료(가스비)를 내고 실행 버튼을 눌러주기 전까지는 가만히 잠들어 있는 수동적인 코드 덩어리에 불과하다.</li>
+<li>온체인 대출 시장에서 담보 가격이 청산 기준 밑으로 떨어졌을 때, 이를 즉각적으로 처분하는 주체는 스마트 컨트랙트가 아니다.</li>
+<li>그 방아쇠를 당기는 것은 블록체인 외부에 존재하는 봇(Bot)들이다.</li>
+</ul>
+
+<div class="compare">
+<article class="direct">
+<h3>스마트 컨트랙트 — 무인 현상금 자판기</h3>
+<ul>
+<li>블록체인 내부(온체인)에 기록되어 영구적으로 존재하는, 변하지 않는 규칙이다.</li>
+<li>렌딩 프로토콜에서 청산 관련 스마트 컨트랙트는 특정 조건이 맞으면 보상을 내어주도록 설계된 거대한 무인 현상금 자판기다.</li>
+<li>"불량(부실) 대출을 대신 갚을 돈을 넣고 버튼을 누르면, 할인된 담보(보상)를 내어주겠다"는 규칙을 가지고 있다.</li>
+<li>자판기는 아무리 청산 물량이 쌓여도 스스로 거리를 돌아다니며 담보를 팔지 못한다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>봇 — 발 빠른 사냥꾼</h3>
+<ul>
+<li>누군가의 개인 컴퓨터나 클라우드 서버 등 블록체인 외부(오프체인)에서 돌아가는 일반적인 소프트웨어 프로그램이다.</li>
+<li>이 자판기 앞을 24시간 내내 지키고 서 있는 발 빠른 사냥꾼이다.</li>
+<li>온체인의 장부와 외부 거래소 시세를 쉴 새 없이 감시하다가, 자판기에 현상금 버튼의 불이 들어오는 순간 누구보다 먼저 동전을 넣고 물건을 채간다.</li>
+<li>트랜잭션을 발생시켜 잠들어 있던 자판기를 실제로 작동시키는 주체는 결국 봇이다.</li>
+</ul>
+</article>
+</div>
+
+<h3 class="sub-h">사냥꾼이 온체인에 '행동 대장'을 심어두는 이유</h3>
+<p style="margin:0 0 6px;color:#3e5063">똑똑한 사냥꾼들은 남들보다 더 빨리 버튼을 누르기 위해, 블록체인 위에 자신만의 맞춤형 부품(개인용 스마트 컨트랙트)을 미리 설치해 두고 봇과 연동하기도 한다. 핵심 이유는 <b>무자본</b>과 <b>속도</b>에 있다.</p>
+
+<div class="compare" style="margin-top:16px">
+<article class="direct">
+<h3>① 무자본 — 플래시론</h3>
+<ul>
+<li>수십, 수백억 원짜리 불량 대출을 청산하여 보너스를 얻으려면 봇 역시 그만큼의 막대한 현금을 들고 있어야 한다.</li>
+<li>하지만 온체인 생태계에는 단 한 번의 거래(트랜잭션) 안에서 즉시 갚기만 한다면 담보 없이 거액을 빌려주는 '플래시론(Flash Loan)'이라는 초단기 대출이 존재한다.</li>
+<li>이 무담보 대출은 외부의 봇이 직접 받을 수 없고 오직 온체인 상의 스마트 컨트랙트를 통해서만 이용할 수 있다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>② 속도 — 원자적 실행</h3>
+<ul>
+<li>자금 대출, 부채 상환, 담보 수령, 거래소 매각, 대출금 상환, 수익 회수라는 복잡한 과정을 밖에서 하나씩 따로 실행하면 중간에 다른 경쟁자 봇에게 물건을 뺏기게 된다.</li>
+<li>그래서 사냥꾼들은 이 모든 과정을 하나의 패키지로 묶어둔 개인용 스마트 컨트랙트를 온체인에 미리 심어둔다.</li>
+<li>외부의 봇이 감시를 거쳐 단 하나의 신호(트랜잭션)만 쏘면, 대기 중이던 개인용 컨트랙트가 깨어난다.</li>
+<li>거액을 빌려 청산 차익을 얻고 빚을 갚는 모든 과정이 단 하나의 블록 안에서 남들이 끼어들 틈 없이 동시에(원자적으로) 처리된다.</li>
+</ul>
+</article>
+</div>
+
+<div class="box"><b>결과</b> — 내 돈 한 푼 들이지 않고 거액의 청산 차익을 가져가는 자동화 시스템이 완성되는 것이다. 하지만 수많은 데이터를 분석해 언제 동전을 넣을지 결정하고 "지금 당장 실행해"라고 판단을 내리는 뇌(Brain)의 역할은 언제나 블록체인 밖에 있는 봇의 몫이다.</div>
+</section>
+
+<!-- ══════════ 2-2 ══════════ -->
+<section id="rwa">
+<div class="label">03 · REAL-WORLD ASSETS</div>
+<h2 class="title">2-2. 가상자산이 아닌 실물자산을 담보로 활용한다면</h2>
+
+<div class="compare">
+<article class="direct">
+<h3>가상자산 담보 — 판단할 것은 두 가지</h3>
+<ul>
+<li>프로토콜이 판단할 것은 <b>변동성</b>과 <b>유동성</b>, 두 가지다.</li>
+<li>어느 가상자산이든 누구나 보유할 수 있고, 거래소에서 같은 방식으로 가격이 형성되며, 청산할 때 처분하는 시장도 같다.</li>
+<li>두 요인을 담보인정비율과 청산 기준에 반영하기만 하면 담보 관리는 동일한 절차로 끝난다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>토큰화 자산 — 하나하나 따로 판단</h3>
+<ul>
+<li>일부는 적격 투자자만 보유할 수 있다.</li>
+<li>가격을 산정하는 방식도, 현금화에 걸리는 시간도 자산마다 다르다.</li>
+<li>그래서 프로토콜은 토큰화 자산을 하나하나 따로 판단한다.</li>
+<li>판단하는 절차도, 그 결과를 담보 조건에 반영하는 방식도 프로토콜마다 다르다.</li>
+<li>같은 토큰화 자산이라도 어느 프로토콜에서는 담보로 활용되고 다른 프로토콜에서는 활용되지 못하는 이유가 여기에 있다.</li>
+</ul>
+</article>
+</div>
+
+<div class="box"><b>프로토콜을 세 가지 기준으로 나눠보면 그 차이가 드러난다.</b> ① 조달하는 자금이 어디서 나오는가 ② 담보 조건을 누가 정하는가 ③ 그 자산을 누가 보유할 수 있는가.</div>
+
+<!-- 기준 1 -->
+<div class="layer">
+<div class="num">1</div>
+<div>
+<h3>조달하는 자금이 어디서 나오는가</h3>
+<div class="compare" style="margin-top:12px">
+<article class="direct">
+<h3>렌딩</h3>
+<ul>
+<li>다른 참여자가 예치한 자금을 차입하는 구조다.</li>
+<li>자금을 공급하는 이용자가 스테이블코인을 예치하면, 차입자가 담보를 제공하고 그 자금을 조달한다.</li>
+<li>차입자가 지급하는 이자는 예치자의 수익이 된다.</li>
+<li>조달 규모는 예치된 자금의 범위 안에서 정해진다.</li>
+<li>담보를 아무리 충분히 제공해도 남은 예치금이 없으면 차입은 이뤄지지 않는다.</li>
+<li>가상자산은 이미 예치금이 형성된 시장에서 조달하지만(DeFi), 토큰화 실물 자산은 그 자산을 담보로 인정하고 자금을 공급할 예치자를 새로 확보해야 하는 경우가 생긴다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>CDP</h3>
+<ul>
+<li>담보를 예치해 자금을 조달하고 상환하면 담보를 회수한다는 점에서 렌딩과 같다.</li>
+<li>다만 조달하는 자금이 프로토콜이 새로 발행하는 스테이블코인이다.</li>
+<li>담보를 예치하면 그에 비례해 스테이블코인이 발행되고, 상환하면 그만큼 소각되며 담보가 반환된다.</li>
+<li>자금을 공급하는 상대가 없으므로 조달 한도는 담보 가치만으로 정해진다.</li>
+<li>대신 발행된 스테이블코인이 시장에서 통용되어야 조달한 자금을 실제로 쓸 수 있다.</li>
+</ul>
+</article>
+</div>
+</div>
+</div>
+
+<!-- 기준 2 -->
+<div class="layer">
+<div class="num">2</div>
+<div>
+<h3>담보 조건을 누가 정하는가</h3>
+<ul class="section-list" style="margin-top:10px">
+<li>담보인정비율과 청산 기준은 담보를 처분해 부채만큼 회수할 수 있는지를 기준으로 산정한다.</li>
+<li>그런데 실물자산은 현금화 경로가 자산마다 다르다.</li>
+</ul>
+
+<div class="buidl-facts-table" style="margin-top:6px">
+<div class="buidl-facts-head"><div>자산</div><div>현금화 경로</div><div>유의점</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">토큰화 주식</div><div>거래소에서 매도할 수 있다</div><div class="buidl-fact-note">기초 시장이 마감되면 참고할 가격이 사라진다</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">금</div><div>거래소에서 매도할 수 있다</div><div class="buidl-fact-note">실물 인출에 최소 수량과 투자자 검증이 요구된다</div></div>
+<div class="buidl-fact-row"><div class="buidl-fact-key">국채 펀드</div><div>발행사에 상환을 청구하는 절차를 거친다</div><div class="buidl-fact-note">즉시 정산되는 상품과 하루 이상 걸리는 상품으로 나뉜다</div></div>
+</div>
+
+<ul class="section-list" style="margin-top:16px">
+<li>토큰화 자산을 담보로 받을 때에는 가격 변동성뿐 아니라 <b>환매에 드는 시간과 비용</b>까지 비율을 결정하는 요소에 들어간다는 뜻이다.</li>
+<li>여기서 <b>환매</b>란 보유한 토큰을 발행사에 반환하고, 오프체인 절차를 거쳐 그에 상응하는 현금이나 기초 실물자산으로 정산받는 과정을 뜻한다.</li>
+<li>자산마다 비율을 따로 정해야 하니, 이를 누가 정하는지가 곧 문제가 된다.</li>
+<li>렌딩 프로토콜은 예치금을 어떻게 운용하는지에 따라 <b>통합 시장</b>과 <b>격리 시장</b>으로 나뉜다.</li>
+<li>여기서 예치금이란 이용자들이 이자 수익을 얻기 위해 프로토콜에 제공하여, 실제 대출의 재원이 되는 자금을 말한다.</li>
+</ul>
+
+<div class="compare">
+<article class="direct">
+<h3>통합 시장 — 거버넌스가 정한다</h3>
+<ul>
+<li>시장 하나에 여러 담보 자산을 담는 구조다.</li>
+<li>자산마다 담보인정비율과 청산 기준은 따로 정하되, 예치금은 공유하므로 어느 자산을 담보로 제공했든 같은 자금에서 조달한다.</li>
+<li>예치금이 한곳에 모이므로 조달할 수 있는 규모가 크고, 담보 여러 개를 함께 제공해 하나의 포지션으로 관리할 수도 있다.</li>
+<li>이는 차입자가 내 지갑에 있는 여러 종류의 자산을 한곳에 몽땅 밀어 넣고, 하나의 통합된 계좌(포지션)로 유연하게 대출을 관리한다는 뜻이다.</li>
+<li>새로 편입된 담보 자산도 자금을 따로 모을 필요 없이 이미 쌓인 예치금에서 조달하므로, 승인받는 시점부터 즉시 차입이 가능하다.</li>
+<li>다만 모든 예치금이 하나의 큰 풀(Pool)에 섞여 있어 특정 자산이 청산에 실패하면 그 손실(Bad Debt)을 예치자 전체가 떠안게 된다.</li>
+<li>따라서 어떤 자산을 담보로 받아줄지, 담보인정비율은 몇 %로 할지를 엄격하게 통제해야 한다.</li>
+<li>위험 관리 기관이 자산별 비율과 한도를 제안하고, 토큰 보유자(커뮤니티)들이 투표를 통해 이를 승인하는 온체인 상의 통제 절차인 <b>거버넌스(Governance)</b>가 이 역할을 맡는다.</li>
+<li>거버넌스는 프로토콜의 '이사회'이자 '위험관리위원회'로 기능하는 것이다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>격리 시장 — 개설 주체·큐레이터가 정한다</h3>
+<ul>
+<li>담보 자산과 차입 자산의 조합마다 시장을 따로 개설하는 구조다.</li>
+<li>담보가 같아도 차입 자산이 다르면 별개의 시장이고 예치금도 분리되므로, 부실은 각 시장 안에 갇힌다.</li>
+<li>시장 개설은 누구에게나 열려 있고, 조건은 개설한 주체가 생성 시점에 정하며 이후 고정된다.</li>
+<li>개설과 조건 설정은 발행사나 파트너가 직접 하기도 하고, 위험 관리를 전문으로 하는 외부 운용사가 맡기도 한다.</li>
+<li>이 운용사를 <b>큐레이터(curator)</b>라고 하며, 시장에 자금을 공급하는 볼트 운영도 함께 담당한다.</li>
+<li>거버넌스 심의를 생략하는 만큼 자산이 담보로 채택되는 속도는 빠르다.</li>
+<li>대신 시장을 개설한 뒤에는 그 시장에 자금을 공급할 유동성을 따로 확보해야 한다.</li>
+<li>자금은 대부분 큐레이터를 거쳐 각 개별 시장으로 들어간다.</li>
+<li>이는 개별 이용자가 파편화된 대출 시장의 위험을 일일이 분석하는 대신, 자산을 전문적으로 배분하는 주체에게 펀드처럼 자금을 맡기는 구조다.</li>
+<li>이때 큐레이터가 자금을 모으기 위해 개설하는 스마트 컨트랙트가 <b>볼트(vault)</b>다.</li>
+<li>볼트는 본래 예치금을 안전하게 잠가두는 '온체인 금고' 역할을 하지만, 격리 시장에서는 여기에 모인 거대한 유동성을 여러 시장에 전략적으로 배분하는 '자산 운용 풀(Pool)'의 기능까지 겸한다.</li>
+<li>따라서 이용자는 수많은 개별 시장을 직접 고를 필요 없이 이 볼트에 스테이블코인을 예치하기만 하면 된다.</li>
+<li>큐레이터는 각 시장의 담보 자산과 청산 기준, 오라클 데이터를 검토해 시장별 위험과 수익률을 평가하고, 최적의 비율로 자금을 분배한다.</li>
+<li>차입자가 낸 이자는 볼트로 돌아와 예치한 이용자에게 배분되며, 큐레이터는 그중 일부를 보수로 받는다.</li>
+</ul>
+</article>
+</div>
+</div>
+</div>
+
+<!-- 기준 3 -->
+<div class="layer">
+<div class="num">3</div>
+<div>
+<h3>그 자산을 누가 보유할 수 있는가</h3>
+<p>토큰화 자산은 보유 자격을 기준으로 <b>비허가형</b>과 <b>허가형</b>으로 나뉜다.</p>
+
+<div class="compare" style="margin-top:14px">
+<article class="direct">
+<h3>비허가형 — 누구나</h3>
+<ul>
+<li>누구나 보유하고 전송할 수 있다.</li>
+<li>기초 주식을 수탁기관에 보관해 뒷받침되는 토큰화 주식과, 실물 금의 소유권을 담은 금 토큰이 대표적이다.</li>
+<li>누구나 담보로 예치하고 청산으로 인수할 수 있으므로 일반 가상자산과 동일하게 활용된다.</li>
+</ul>
+</article>
+<article class="indirect">
+<h3>허가형 — 적격 투자자만</h3>
+<ul>
+<li>검증된 적격 투자자만 보유할 수 있다.</li>
+<li>일부 펀드와 사모신용, 법적 주주 지위를 담은 일부 토큰화 주식이 여기에 속한다.</li>
+<li>담보를 예치할 때도, 청산으로 인수할 때도 자산이 이전되므로 자산을 수신하는 지갑의 자격을 확인한다.</li>
+<li>검증은 발행사나 토큰화 인프라 기업이 담당하며, 신원과 적격성을 심사해 통과한 투자자에게만 보유와 전송을 허가한다.</li>
+<li>그래서 허가형 자산을 수용하는 렌딩 프로토콜은 담보를 예치하는 투자자에게도, 담보를 매입하려는 청산자에게도 적격 투자자 자격을 요구한다.</li>
+</ul>
+</article>
+</div>
+
+<h3 class="sub-h">허가형 자산을 비허가형 디파이로 들여오는 방법: 래핑(Wrapping)</h3>
+<ul class="section-list">
+<li>미국 국채 토큰처럼 적격 투자자(KYC 완료)만 보유할 수 있는 허가형 자산은, 지갑 주인의 신원을 알 수 없는 일반 디파이(비허가형 프로토콜)에서는 원칙적으로 담보로 쓸 수 없다.</li>
+<li>그러나 이 자산을 전송 제한이 없는 토큰으로 <b>래핑(Wrapping)</b>하면 비허가형 프로토콜에서도 활용할 수 있다.</li>
+<li>이는 전통 금융의 특수목적법인(SPV)을 활용한 간접 투자 구조를 디파이에 맞게 옮겨온 것이다.</li>
+<li>규제를 받는 기초 실물자산을 직접 거래할 수 없으니, 그 자산을 담은 '껍데기'를 만들어 거래하게 하는 원리다.</li>
+</ul>
+
+<div class="buidl-diagram">
+<div class="buidl-lane buidl-asset-lane">
+<div class="buidl-lane-label"><i></i>래핑 구조의 흐름</div>
+<div class="buidl-flow">
+<div class="buidl-node asset"><b>허가형 토큰</b><span>적격 투자자(KYC 완료)만 보유 가능</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node circle"><b>SPV · 적격 지갑</b><span>법적으로 KYC를 통과할 수 있는 특수목적법인이 수탁·독점 보유</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node primary"><b>Wrapped Token 발행</b><span>'보관 중인 허가형 토큰에 대한 청구권(지분)'을 증명</span></div>
+<div class="buidl-arrow">→</div>
+<div class="buidl-node primary"><b>비허가형 디파이</b><span>KYC 조건 없는 일반 토큰이므로 누구나 담보로 사용</span></div>
+</div>
+</div>
+<p class="buidl-caption">결국 일반 디파이 이용자들은 기초 실물자산을 직접 만지는 게 아니라, 그 자산을 쥐고 있는 법인의 수익증권 내지는 지분을 거래하는 셈이다.</p>
+</div>
+
+<div class="caution"><b>임의 우회는 불가능하다</b> — 법적인 리스크가 따르기 때문에 일반 이용자가 임의로 스마트 컨트랙트를 짜서 전송 제한을 우회할 수는 없으며, 발행사나 전문 인프라 기업이 법적 검토를 거쳐 승인한 통로를 통해서만 이루어진다.</div>
+</div>
+</div>
+
+<div class="buidl-takeaway">
+<div class="label">SECTION TAKEAWAY</div>
+<h3>두 개의 숫자 vs 세 겹의 판단</h3>
+<p>정리하면 가상자산 담보는 LTV, 청산비율 두 개의 숫자로 관리되지만, 실물자산 담보는 자금의 출처와 조건을 정하는 주체, 그리고 보유 자격이라는 세 겹의 판단을 통과해야 한다. 온체인이 실물자산을 담보로 받는다는 것은 결국 오프체인의 제약을 어디까지, 어떤 방식으로 안으로 들여올지를 정하는 문제다.</p>
+</div>
+</section>
+
+<!-- ══════════ 큐레이터 ══════════ -->
+<section id="curator">
+<div class="label">04 · CURATOR</div>
+<h2 class="title">큐레이터란 무엇인가</h2>
+
+<ul class="section-list">
+<li>디파이 렌딩 프로토콜이 격리 시장 구조를 택하면 부실 위험의 전이는 막을 수 있다.</li>
+<li>담보와 차입 자산의 조합마다 개별 시장이 독립적으로 운영되기 때문이다.</li>
+<li>하지만 이 구조는 필연적으로 <b>유동성의 파편화</b>라는 새로운 문제를 낳는다.</li>
+<li>수많은 개별 시장 중에서 어디에 자금을 예치해야 할지, 이용자가 일일이 분석하고 선택해야 하기 때문이다.</li>
+<li>이 문제를 해결하고 파편화된 시장들에 유동성을 공급하는 주체가 바로 <b>큐레이터(Curator)</b>다.</li>
+</ul>
+
+<h3 class="sub-h">'볼트(Vault)' 개념의 진화</h3>
+<div class="buidl-layer-grid">
+<div class="buidl-layer"><span class="buidl-layer-no">1</span><h4>온체인 금고</h4><p>초기 디파이에서 볼트는 이용자가 자신의 자산을 예치(Lock-up)해 두는, 말 그대로 단단한 '온체인 금고'를 의미했다. 코드에 의해서만 입출금이 통제되어 누구도 자금을 횡령할 수 없는 안전한 보관소라는 성격이 강했다.</p></div>
+<div class="buidl-layer"><span class="buidl-layer-no">2</span><h4>수익 창출 로직 추가</h4><p>그러나 점차 이 금고에 스마트한 로직이 추가되면서, 단순히 자산을 보관하는 것을 넘어 모인 자금을 외부 시장에 자동으로 배분해 수익을 창출하는 기능이 더해졌다.</p></div>
+<div class="buidl-layer"><span class="buidl-layer-no">3</span><h4>자산 운용 풀</h4><p>그 결과 오늘날 격리 시장 생태계에서의 볼트는 자산을 지키는 금고인 동시에, 거대한 유동성을 여러 시장에 전략적으로 배분하는 '자산 운용 풀(Pool)'로 발전했다.</p></div>
+</div>
+
+<div class="box"><b>큐레이터 = 온체인 펀드매니저</b> — 큐레이터는 바로 이 진화된 볼트를 개설하고 자금 배분 전략을 지휘하는 온체인 펀드매니저다. 프라이빗 에쿼티(PE) 투자의 무한책임사원(GP)과 완벽히 같은 역할을 수행한다.</div>
+
+<h3 class="sub-h">큐레이터가 하는 일</h3>
+<ul class="buidl-check">
+<li>이용자는 복잡한 대출 시장을 개별적으로 실사할 필요 없이, 자신의 투자 성향에 맞는 볼트에 스테이블코인을 예치하기만 하면 된다.</li>
+<li>자금이 모이면 큐레이터는 각 격리 시장의 담보 자산, 청산 기준, 가격을 읽는 오라클의 정확성 등을 심사해 자금을 배분한다.</li>
+<li>위험 대비 수익률을 평가해 가장 효율적인 시장들의 조합을 찾고, 각 시장에 공급할 유동성의 한도를 설정한다.</li>
+<li>시장 상황이 변하여 특정 담보의 가격 변동성이 커지면, 자금을 회수해 더 안전한 시장으로 옮기는 리밸런싱도 큐레이터가 전담한다.</li>
+<li>차입자가 지불한 이자는 볼트로 돌아와 예치자들에게 수익으로 분배되며, 큐레이터는 운용의 대가로 성과 보수를 수취한다.</li>
+</ul>
+
+<h3 class="sub-h">전통 금융과 같은 구조, 다른 통제 환경</h3>
+<div class="compare">
+<article class="indirect">
+<h3>전통 금융의 통제</h3>
+<ul>
+<li>펀드매니저가 자금을 규정대로 운용하는지 확인하기 위해 수탁 은행의 잔고와 장부를 대사(Reconciliation)해야 한다.</li>
+<li>무거운 기말 감사 절차를 거쳐야 한다.</li>
+</ul>
+</article>
+<article class="direct">
+<h3>큐레이터의 통제</h3>
+<ul>
+<li>투자 가이드라인이 볼트의 스마트 컨트랙트 코드에 하드코딩되어 있다.</li>
+<li>큐레이터가 사전에 약정되지 않은 위험한 시장으로 자금을 임의로 빼돌리는 것은 원천적으로 차단된다.</li>
+<li>모든 자금의 흐름과 배분 비율은 블록체인에 실시간으로 기록되므로, 별도의 실증 절차 없이 온체인 데이터 자체가 조작 불가능한 완벽한 감사 증적(Audit Trail)이 된다.</li>
+</ul>
+</article>
+</div>
+
+<div class="mini-case">
+<h4>실물자산(RWA) 프로젝트에게 큐레이터가 각별한 이유</h4>
+<p>과거 통합 시장 구조에서는 새로운 실물자산을 담보로 승인받기 위해 거버넌스 투표를 거치며 수개월을 설득해야 했다.</p>
+<p>이제는 유력한 큐레이터의 리스크 심사만 통과하여 그들의 볼트 배분 리스트에 오르기만 하면 즉각적이고 대규모의 자금 조달이 가능하다.</p>
+<p><b>실물자산 담보화의 성패를 가르는 권력이 프로토콜 거버넌스에서 자본 배분자인 큐레이터로 이동하고 있는 것이다.</b></p>
+</div>
+</section>
+
+<!-- ══════════ 애그리게이터 ══════════ -->
+<section id="agg">
+<div class="label">05 · COMPARISON</div>
+<h2 class="title">큐레이터는 애그리게이터인가?</h2>
+<p class="intro">격리 시장 구조를 채택한 디파이 렌딩 프로토콜은 자산 조합별로 시장이 분리되어 부실 전이를 막는다. 하지만 이 구조는 필연적으로 수많은 개별 시장으로 유동성이 파편화되는 문제를 낳는다. 이 파편화된 환경 속에서 큐레이터가 수행하는 역할을 두고 간혹 단순한 애그리게이터로 오인하거나 혼동하는 시선이 존재한다.</p>
+
+<h3 class="sub-h">애그리게이터처럼 보이는 이유</h3>
+<div class="why-grid" style="grid-template-columns:repeat(3,1fr)">
+<div class="why"><b>번거로움을 덜어준다</b><p>애그리게이터가 사용자가 일일이 찾아다니기 번거로운 여러 갈래의 금융 서비스나 수익처를 하나로 모아주는 것과 유사하다. 큐레이터 역시 수십 개로 쪼개진 격리 시장 중에서 유익한 곳을 골라 자금을 공급해야 하는 이용자의 번거로움을 덜어준다.</p></div>
+<div class="why"><b>하나의 그릇으로 통합한다</b><p>이들이 운영하는 볼트(Vault)는 파편화된 유동성 공급처들을 하나의 그릇 아래로 통합·집약해 주는 역할을 한다.</p></div>
+<div class="why"><b>자동 분산 효과</b><p>따라서 이용자는 개별 시장을 일일이 분석할 필요 없이, 볼트 하나에 자금을 예치하는 것만으로 알아서 분산 투자되는 효과를 얻는다.</p></div>
+</div>
+
+<h3 class="sub-h">그러나 역할과 책임의 결이 다르다</h3>
+<div class="compare">
+<article class="indirect">
+<h3>일반적인 디파이 애그리게이터</h3>
+<ul>
+<li>알고리즘이나 단순 수익률 극대화 로직에 따라 가장 이자가 높은 곳을 기계적으로 쫓아다닌다.</li>
+</ul>
+</article>
+<article class="direct">
+<h3>큐레이터 — 능동적 리스크 관리자</h3>
+<ul>
+<li>훨씬 깊은 수준의 개입과 책임을 진다.</li>
+<li>단순히 남이 만든 시장에 자금을 배분하는 데 그치지 않고, 직접 마켓을 개설하거나 오라클의 신뢰성, 담보인정비율(LTV) 등을 검토해 리스크의 경계를 설계한다.</li>
+<li>특히 실물자산(RWA)이나 신생 토큰이 담보로 들어올 때, 그 자산이 오프체인 상에서 실제로 안전한지 신용 평가와 실사를 거친다.</li>
+<li>그후 포트폴리오의 공급 한도(Cap)를 꽉 틀어쥐고 통제하며 자산의 건전성을 적극적으로 관리한다.</li>
+<li>무조건 이자율이 높은 곳을 좇기보다는 "이 시장은 위험하므로 유동성 공급 한도를 낮추겠다"며 수익과 위험의 균형을 능동적으로 조율한다.</li>
+</ul>
+</article>
+</div>
+
+<div class="box"><b>결론</b> — 결국 큐레이터는 파편화된 시장을 하나로 묶어준다는 외형적 측면에서 애그리게이터의 성격을 띤다. 그러나 내부를 들여다보면 위험을 면밀히 평가하고 포트폴리오 비중을 조절하는 온체인 자산운용사, 즉 펀드매니저의 역할에 훨씬 가깝다.</div>
+</section>
+
+<!-- ══════════ 정리 ══════════ -->
+<section id="summary" class="end">
+<div class="label">SUMMARY</div>
+<h2 class="title">핵심 정리</h2>
+<p>온체인 렌딩은 신용 심사가 사라진 자리를 넉넉한 담보, 오라클이 전달하는 실시간 가격, 그리고 외부 청산자(봇)의 기계적인 실행으로 채운다. 가상자산 담보는 LTV와 청산 기준이라는 두 개의 숫자로 관리되지만, 실물자산 담보는 자금의 출처, 조건을 정하는 주체, 보유 자격이라는 세 겹의 판단을 통과해야 한다. 그리고 그 판단을 거버넌스 대신 수행하며 파편화된 격리 시장에 유동성을 공급하는 주체로 큐레이터가 등장했다. 실물자산 담보화의 성패를 가르는 권력은 프로토콜 거버넌스에서 자본 배분자인 큐레이터로 이동하고 있다.</p>
+<p class="foot">본 문서는 Xangle RWA Series: DeFi Lending protocol을 기반으로 배예림이 작성하였습니다.</p>
+</section>
+
+</main></body>
+</html>

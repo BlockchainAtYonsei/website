@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>DeFi의 진화 — V1~V4, Pendle Yield Trading, Stablecoin, Lending·CDP, Sky vs Falcon</title>
+<style>
+  :root{
+    --blue:#3768f5;
+    --blue2:#2d5eea;
+    --ink:#151b2a;
+    --muted:#667085;
+    --line:#e8ecf4;
+    --soft:#f6f8fc;
+    --soft-blue:#eef3ff;
+    --green:#138a63;
+    --orange:#c66a15;
+    --red:#c43c4d;
+    --purple:#7357d8;
+    --shadow:0 14px 38px rgba(24,39,75,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:#fff; color:var(--ink);
+    font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Apple SD Gothic Neo",Arial,sans-serif;
+    line-height:1.68;
+  }
+  a{color:var(--blue2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .page{max-width:1220px;margin:0 auto;padding:28px 28px 80px}
+  .topline{display:grid;grid-template-columns:110px 125px minmax(0,1fr);gap:18px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}
+  .pill{display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:10px 14px;font-weight:800;font-size:16px;width:max-content}
+  .pill.part{background:var(--soft-blue);color:#3158c9}
+  .pill.author{background:var(--blue);color:white}
+  .headline{display:flex;gap:26px;justify-content:space-between;align-items:flex-start}
+  .headline h1{margin:0;font-size:30px;line-height:1.32;letter-spacing:-.035em}
+  .headline .subtitle{font-size:17px;color:#46516a;max-width:460px;text-align:right;line-height:1.5}
+  .num{color:var(--blue);font-weight:900;margin-right:7px}
+  .hero{padding:58px 0 20px;display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:stretch}
+  .hero-card{border:1px solid var(--line);border-radius:22px;padding:34px;background:linear-gradient(145deg,#fff 20%,#f7f9ff 100%);box-shadow:var(--shadow)}
+  .eyebrow{font-weight:900;color:var(--blue);letter-spacing:.02em;font-size:14px;margin-bottom:12px}
+  .hero h2{font-size:42px;line-height:1.2;letter-spacing:-.045em;margin:0 0 18px}
+  .hero p{font-size:18px;color:#4c566d;margin:0}
+  .thesis{display:flex;flex-direction:column;justify-content:center;border-radius:22px;padding:30px;background:#111827;color:#fff;box-shadow:var(--shadow)}
+  .thesis b{font-size:15px;color:#aac0ff;margin-bottom:12px}
+  .thesis strong{font-size:23px;line-height:1.55;letter-spacing:-.02em}
+  .thesis small{color:#b8c0cf;margin-top:16px}
+  .toc{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 46px}
+  .toc a{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;color:#4c566d;font-size:14px;font-weight:700}
+  .toc a:hover{background:var(--soft-blue);border-color:#d8e2ff;text-decoration:none;color:var(--blue2)}
+  section{padding:34px 0;border-top:1px solid var(--line)}
+  .section-head{display:grid;grid-template-columns:88px 1fr;gap:16px;margin-bottom:24px}
+  .section-index{color:var(--blue);font-weight:900;font-size:20px;padding-top:5px}
+  h3{font-size:30px;line-height:1.3;margin:0 0 6px;letter-spacing:-.035em}
+  .lead{color:#586176;margin:0;font-size:17px}
+  .callout{padding:20px 22px;background:var(--soft-blue);border-left:4px solid var(--blue);border-radius:0 14px 14px 0;margin:18px 0 26px}
+  .callout strong{color:#243b83}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .card{border:1px solid var(--line);border-radius:18px;padding:22px;background:#fff}
+  .card.soft{background:var(--soft)}
+  .card h4{margin:0 0 10px;font-size:19px;letter-spacing:-.02em}
+  .card p{margin:0;color:#5d667a;font-size:15px}
+  .tag{display:inline-block;font-size:12px;font-weight:800;border-radius:999px;padding:5px 9px;margin-bottom:12px;background:var(--soft-blue);color:#365bd1}
+  .tag.green{background:#eaf8f3;color:var(--green)} .tag.orange{background:#fff2e6;color:var(--orange)} .tag.purple{background:#f0edff;color:var(--purple)}
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:25px;position:relative}
+  .timeline:before{content:"";position:absolute;left:7%;right:7%;top:22px;height:2px;background:#dce3f2}
+  .era{position:relative;padding:0 11px}
+  .era .dot{width:44px;height:44px;border-radius:50%;background:#fff;border:8px solid var(--soft-blue);box-shadow:inset 0 0 0 3px var(--blue);margin:0 auto 18px;position:relative;z-index:1}
+  .era .era-card{border:1px solid var(--line);border-radius:18px;padding:18px;height:100%;background:#fff}
+  .era h4{margin:0 0 2px;font-size:19px}.era .years{font-size:12px;color:var(--blue);font-weight:800;margin-bottom:10px}
+  .era ul{padding-left:18px;margin:10px 0 0;color:#5d667a;font-size:14px}
+  .era li{margin:5px 0}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+  table{border-collapse:collapse;width:100%;min-width:790px;background:#fff}
+  th,td{padding:15px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}
+  th{background:#f8faff;color:#38445b;font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:26px;border:1px solid var(--line);background:#fbfcff;border-radius:18px}
+  .node{min-width:145px;border:1px solid #dfe5f2;border-radius:14px;padding:13px 14px;background:#fff;text-align:center;font-weight:800;font-size:14px}
+  .node small{display:block;font-weight:500;color:#6c7588;margin-top:3px}.arrow{color:#8b97ae;font-weight:900;font-size:22px}
+  .metric{border:1px solid var(--line);border-radius:17px;padding:18px;background:#fff}
+  .metric b{display:block;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .metric strong{display:block;font-size:25px;letter-spacing:-.03em}.metric span{font-size:12px;color:#8a94a8}
+  .volume-reasons{counter-reset:item;display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+  .reason{position:relative;border:1px solid var(--line);border-radius:17px;padding:18px 18px 18px 54px;background:#fff}
+  .reason:before{counter-increment:item;content:counter(item);position:absolute;left:16px;top:17px;width:27px;height:27px;border-radius:9px;background:var(--soft-blue);color:var(--blue);font-weight:900;display:grid;place-items:center}
+  .reason b{display:block;margin-bottom:3px}.reason p{margin:0;color:#626b7f;font-size:14px}
+  .compare{display:grid;grid-template-columns:1fr 74px 1fr;gap:18px;align-items:stretch}
+  .brandcard{border:1px solid var(--line);border-radius:20px;padding:25px;background:#fff}
+  .brandcard h4{font-size:24px;margin:0 0 6px}.brandcard .desc{color:#6a7285;font-size:14px;margin-bottom:18px}
+  .brandcard ul{padding-left:18px;color:#505a6f;margin-bottom:0}.brandcard li{margin:7px 0}
+  .versus{display:grid;place-items:center;font-weight:900;color:#8a94aa;font-size:13px}
+  .warning{border:1px solid #f2dfb9;background:#fffaf0;color:#72531b;border-radius:15px;padding:16px 18px;font-size:14px}
+  .risk{border-left:3px solid #e3e8f2;padding-left:14px}.risk b{display:block}.risk span{color:#667085;font-size:14px}
+  .sources{font-size:13px;color:#6d7588}.sources li{margin:8px 0}.sources a{word-break:break-all}
+  .footer{margin-top:30px;padding:24px;border-radius:18px;background:#111827;color:#d5d9e2;font-size:13px}
+  .footer strong{color:#fff}
+  @media(max-width:900px){
+    .topline{grid-template-columns:auto auto 1fr}.headline{display:block}.headline .subtitle{text-align:left;margin-top:12px}.hero{grid-template-columns:1fr}.grid4,.grid3{grid-template-columns:1fr 1fr}.timeline{grid-template-columns:1fr 1fr;gap:18px}.timeline:before{display:none}.era{padding:0}.compare{grid-template-columns:1fr}.versus{height:30px}.volume-reasons{grid-template-columns:1fr}
+  }
+  @media(max-width:620px){
+    .page{padding:20px 16px 60px}.topline{grid-template-columns:1fr 1fr}.headline{grid-column:1/-1}.hero h2{font-size:33px}.section-head{grid-template-columns:1fr}.grid2,.grid3,.grid4,.timeline{grid-template-columns:1fr}.hero-card,.thesis{padding:24px}
+  }
+  @media print{body{font-size:11pt}.page{max-width:none;padding:0}.toc{display:none}.card,.brandcard,.table-wrap,.hero-card,.thesis{break-inside:avoid;box-shadow:none}a{color:inherit}}
+</style>
+</head>
+<body>
+<a href="/research/study/2" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 2회차 진행안으로</a>
+<div class="page">
+<header class="topline">
+<div class="pill part">Part 6</div>
+<div class="pill author">DeFi Research</div>
+<div class="headline">
+<h1><span class="num">3-1.</span> DeFi의 진화: 금융 프리미티브에서 RWA 담보·프로그래머블 유동성으로</h1>
+<div class="subtitle">DeFi 1.0~4.0 · Pendle Yield Trading · Stablecoin 진화 · Lending/CDP · Sky vs Falcon Finance · RWA</div>
+</div>
+</header>
+<div class="hero">
+<div class="hero-card">
+<div class="eyebrow">CORE QUESTION</div>
+<h2>토큰화의 다음 단계는<br/>“거래”가 아니라 <span style="color:var(--blue)">활용</span>이다.</h2>
+<p>자산이 온체인에 올라오면 단순히 사고파는 것에 그치지 않고, 담보·차입·레버리지·유동성 공급·파생상품의 기초자산으로 재사용된다. DeFi는 이 활용 과정을 코드로 연결하는 금융 레이어다.</p>
+</div>
+<div class="thesis">
+<b>한 문장 요약</b>
+<strong>DeFi가 강한 이유는 “자산 → 거래 → 담보 → 차입 → 재투자”가 24시간 하나의 공개된 결제 레이어 위에서 연속적으로 이어지기 때문이다.</strong>
+<small>※ 다만 “DeFi가 전체 크립토 시장에서 항상 가장 큰 거래량을 가진다”는 표현은 정확하지 않다. CEX 현물·파생을 포함하면 중앙화 거래소의 거래량이 더 큰 구간이 많다. 여기서는 ‘온체인 애플리케이션 활동의 중심’이라는 의미로 설명한다.</small>
+</div>
+</div>
+<nav class="toc"><a href="#s1">01. DeFi란 무엇인가</a><a href="#s2">02. DeFi 1.0~4.0</a><a href="#s3">03. Pendle · Yield Trading</a><a href="#s4">04. Stablecoin 진화</a><a href="#s5">05. 왜 거래량이 큰가</a><a href="#s6">06. Lending vs CDP</a><a href="#s7">07. RWA 담보화</a><a href="#s8">08. Sky vs Falcon</a><a href="#s9">09. 시장 구조 변화</a><a href="#s10">10. 리스크</a></nav>
+<section id="s1">
+<div class="section-head"><div class="section-index">3-1.</div><div><h3>DeFi는 “은행 없는 금융”보다 “코드로 조합되는 금융”에 가깝다</h3><p class="lead">DEX, 렌딩, 스테이블코인, 파생상품은 각각 독립 서비스가 아니라 서로 호출되고 연결되는 금융 프리미티브다.</p></div></div>
+<div class="flow">
+<div class="node">자산 보유<small>ETH · BTC · Stablecoin · RWA</small></div><div class="arrow">→</div>
+<div class="node">거래 / Swap<small>DEX · Aggregator</small></div><div class="arrow">→</div>
+<div class="node">담보화<small>Lending · CDP</small></div><div class="arrow">→</div>
+<div class="node">차입 / 레버리지<small>Stablecoin · Looping</small></div><div class="arrow">→</div>
+<div class="node">재투자<small>LP · Perp · Yield</small></div>
+</div>
+<div class="callout"><strong>쟁글 리포트의 핵심:</strong> 토큰화는 자산을 블록체인에 “올리는 것”으로 끝나지 않는다. 토큰이 예치·정산·청산의 입력값이 되면 자산 활용이 자동화되고, 이때 DeFi가 토큰화 자산의 활용 인프라가 된다.</div>
+<div class="grid3">
+<div class="card"><span class="tag">DEX</span><h4>교환</h4><p>AMM·CLOB·Aggregator를 통해 자산을 즉시 교환한다. 유동성이 가격 발견의 기반이 된다.</p></div>
+<div class="card"><span class="tag green">LENDING</span><h4>자금 조달</h4><p>담보를 맡기고 다른 사용자가 공급한 자산을 차입한다. 금리는 대체로 시장의 자금 이용률에 따라 움직인다.</p></div>
+<div class="card"><span class="tag purple">CDP</span><h4>화폐 발행</h4><p>담보를 예치하고 프로토콜이 스테이블코인을 새로 발행한다. 상대 예치자의 유동성보다 담보가치와 발행화폐의 신뢰가 중요하다.</p></div>
+</div>
+</section>
+<section id="s2">
+<div class="section-head"><div class="section-index">3-2.</div><div><h3>DeFi 1.0 → 4.0: 무엇이 달라졌나</h3><p class="lead">‘DeFi 1.0~4.0’은 업계에 통일된 공식 분류가 아니다. 아래는 시장 구조의 변화를 이해하기 위한 분석용 세대 구분이다.</p></div></div>
+<div class="timeline">
+<div class="era"><div class="dot"></div><div class="era-card"><h4>DeFi 1.0</h4><div class="years">2017~2020 · PRIMITIVES</div><b>금융 기능을 온체인으로 옮기다</b><ul><li>CDP형 스테이블코인</li><li>AMM 기반 DEX</li><li>과담보 렌딩</li><li>Permissionless 접근</li></ul><p><b>예:</b> Maker, Compound, Uniswap v1/v2</p></div></div>
+<div class="era"><div class="dot"></div><div class="era-card"><h4>DeFi 2.0</h4><div class="years">2020~2022 · LIQUIDITY</div><b>유동성과 자본효율을 경쟁하다</b><ul><li>Liquidity Mining</li><li>Yield Aggregator</li><li>veTokenomics / Curve Wars</li><li>Protocol-Owned Liquidity</li><li>Concentrated Liquidity</li></ul><p><b>예:</b> Curve, Yearn, Convex, Olympus, Uniswap v3</p></div></div>
+<div class="era"><div class="dot"></div><div class="era-card"><h4>DeFi 3.0</h4><div class="years">2022~2024 · MARKET STRUCTURE</div><b>확장성과 전문 시장으로 분화되다</b><ul><li>L2·멀티체인 확장</li><li>Perp DEX / 온체인 오더북</li><li>Isolated Lending Market</li><li>LST/LRT 활용</li><li>Aggregator·Solver UX</li><li>Yield Trading / 만기·고정금리 시장</li></ul><p><b>예:</b> Aave v3, Morpho Blue, Pendle, Hyperliquid</p></div></div>
+<div class="era"><div class="dot"></div><div class="era-card"><h4>DeFi 4.0</h4><div class="years">2024~현재 · PROGRAMMABLE FINANCE</div><b>유동성이 ‘프로그래밍’되고 전통자산과 연결되다</b><ul><li>Hooks / Custom AMM</li><li>Intent·Solver·Chain Abstraction</li><li>RWA 담보 및 기관 유동성</li><li>허가형+비허가형 혼합</li><li>고정금리·만기·구조화 신용</li><li>Synthetic Dollar / 수익형 Stablecoin</li></ul><p><b>예:</b> Uniswap v4, Sky, Ethena, Falcon, Aave Horizon, Morpho</p></div></div>
+</div>
+<div class="callout"><strong>포인트:</strong> 세대가 올라갈수록 “새로운 금융 기능” 자체보다 <b>자본 효율, 유동성의 질, 실행 경로, 규제·신원 레이어, 담보의 범위</b>가 경쟁 요소가 된다.</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>구분</th><th>핵심 질문</th><th>대표 혁신</th><th>한계/다음 과제</th></tr></thead>
+<tbody>
+<tr><td><b>1.0</b></td><td>금융을 스마트컨트랙트로 구현할 수 있는가?</td><td>AMM, CDP, Lending</td><td>비싼 가스, 낮은 자본효율, 제한적 UX</td></tr>
+<tr><td><b>2.0</b></td><td>유동성을 어떻게 확보·유지할 것인가?</td><td>Liquidity Mining, veTokenomics, Concentrated Liquidity</td><td>인센티브 의존, 복잡한 LP 리스크</td></tr>
+<tr><td><b>3.0</b></td><td>CEX 수준의 실행·확장성을 온체인에서 만들 수 있는가?</td><td>L2, Perp DEX, CLOB/Hybrid, Isolated Market</td><td>체인 파편화, 브리지·오라클·MEV 리스크</td></tr>
+<tr><td><b>4.0</b></td><td>온체인 금융을 전통자산·기관·맞춤형 로직과 연결할 수 있는가?</td><td>Hooks, Intent, RWA Collateral, Permissioning</td><td>법적 권리, 환매 시간, 규제, 오프체인 신용 리스크</td></tr>
+</tbody>
+</table>
+</div>
+</section><section id="s3">
+<div class="section-head"><div class="section-index">3-3.</div><div><h3>Pendle: 이제 DeFi는 ‘자산’이 아니라 ‘미래 수익률’을 거래한다</h3><p class="lead">스테이킹·렌딩 자산에서 발생하는 미래 수익을 원금(PT)과 수익(YT)으로 분리하면서, DeFi에 만기와 금리 시장이 생겼다.</p></div></div>
+<div class="flow">
+<div class="node">Yield-bearing Asset<small>stETH · sUSDe · sUSDS · aUSDC</small></div><div class="arrow">→</div>
+<div class="node">SY<small>Standardized Yield wrapper</small></div><div class="arrow">→</div>
+<div class="node">PT<small>Principal Token · 원금 청구권</small></div><div class="arrow">+</div>
+<div class="node">YT<small>Yield Token · 만기 전 수익 청구권</small></div><div class="arrow">→</div>
+<div class="node">Pendle AMM<small>PT·YT 가격 / Implied APY 발견</small></div>
+</div>
+<div class="grid3" style="margin-top:18px">
+<div class="card"><span class="tag">PT · PRINCIPAL</span><h4>원금을 할인해서 산다</h4><p>PT는 기초 수익자산의 원금 부분을 나타낸다. 만기에는 기준 자산으로 1:1 상환되는 구조이므로, 시장에서 할인된 PT를 매수해 만기까지 보유하면 할인폭이 사실상 고정수익의 원천이 된다. 전통금융의 제로쿠폰채와 유사하다.</p></div>
+<div class="card"><span class="tag orange">YT · YIELD</span><h4>미래 수익률을 Long 한다</h4><p>YT는 만기까지 발생하는 수익·보상에 대한 권리다. 투자자는 원금 전체를 매수하지 않고도 미래 수익 흐름에 노출될 수 있다. 실제 발생 수익이 YT 매수가격과 시장이 기대한 수익률을 웃도는지가 핵심이다.</p></div>
+<div class="card"><span class="tag purple">AMM · RATE MARKET</span><h4>금리 자체가 가격을 가진다</h4><p>PT와 YT가 24/7 거래되면서 시장가격에서 Implied APY가 형성된다. DeFi가 단순 ‘코인 가격 시장’에서 만기·고정금리·수익률 전망을 거래하는 금리시장으로 확장되는 지점이다.</p></div>
+</div>
+<div class="callout"><strong>핵심 식:</strong> 만기 전에는 <b>PT 가격 + YT 가격 ≈ 기준 자산 가격</b>의 관계가 형성된다. 시간이 지나 만기에 가까워질수록 PT는 상환가치에 수렴하고, YT는 남은 수익 기간이 줄어들면서 가치가 소멸하는 구조다.</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>포지션</th><th>무엇에 베팅하나</th><th>수익의 핵심</th><th>주의할 리스크</th></tr></thead>
+<tbody>
+<tr><td><b>PT 매수</b></td><td>고정수익 / 만기 상환</td><td>할인가 매수 → 만기 1:1 상환가치로 수렴</td><td>기초 프로토콜·스테이블코인 리스크, 만기 전 매도 시 시장가격 변동</td></tr>
+<tr><td><b>YT 매수</b></td><td>미래 APY 상승 / 보상 증가</td><td>만기 전 실제 수익·보상이 YT 가격을 상회</td><td>수익률 하락, 시간가치 감소, 만기 시 YT 가치 소멸</td></tr>
+<tr><td><b>LP</b></td><td>금리시장의 거래량·유동성</td><td>AMM 수수료 + 프로토콜 인센티브 + 기초 수익</td><td>AMM 가격변동, 유동성 조건, 기초자산 리스크</td></tr>
+</tbody>
+</table>
+</div>
+<div class="warning" style="margin-top:18px"><b>왜 DeFi 진화에서 중요할까?</b> 초기 DeFi가 ‘자산을 빌리고 교환하는 시장’이었다면 Pendle은 <b>미래 현금흐름을 분리하고 가격화</b>한다. 즉 전통 금융의 채권 스트리핑·금리 파생상품과 유사한 기능이 permissionless 시장으로 들어오는 사례다. sUSDe·sUSDS 같은 스테이블코인 수익도 PT/YT로 분해할 수 있어 Stablecoin → Yield → Fixed Rate로 이어지는 조합성이 생긴다.</div>
+</section><section id="s4">
+<div class="section-head"><div class="section-index">3-4.</div><div><h3>Stablecoin의 진화: 준비자산 → 온체인 담보 → Delta-neutral 합성달러</h3><p class="lead">스테이블코인의 차이는 ‘$1을 어떻게 유지하는가’에 있다. USDC, Sky의 USDS, Ethena의 USDe는 서로 다른 대차대조표와 페그 엔진을 사용한다.</p></div></div>
+<div class="flow">
+<div class="node">USDC<small>현금·현금성 준비자산<br/>Issuer Mint / Redeem</small></div><div class="arrow">→</div>
+<div class="node">Sky · USDS<small>Protocol Collateral<br/>Vault + PSM</small></div><div class="arrow">→</div>
+<div class="node">Ethena · USDe<small>Crypto Backing + Short Futures<br/>Delta-neutral</small></div>
+</div>
+<div class="callout"><strong>중요:</strong> 이 흐름은 ‘구형 → 신형으로 대체된다’는 의미가 아니다. <b>달러 안정성을 만드는 방법이 준비금 보관, 과담보·프로토콜 회계, 파생상품 헤지로 다양해졌다</b>는 의미에 가깝다.</div>
+<div class="grid3">
+<div class="card"><span class="tag green">FIAT-BACKED</span><h4>USDC — 준비자산 모델</h4><p>발행사가 현금 및 고유동성 현금성 자산을 준비금으로 보유하고 1 USDC를 1달러로 상환하는 구조다. 구조가 직관적이고 결제자산으로 쓰기 쉽지만, 발행사·은행·수탁·규제 레이어에 대한 의존이 존재한다.</p></div>
+<div class="card"><span class="tag purple">CDP / BALANCE SHEET</span><h4>Sky — USDS</h4><p>Sky Protocol의 담보와 Vault·프로토콜 회계를 기반으로 USDS가 발행된다. PSM은 외부 스테이블코인과의 1:1 교환 경로를 제공해 달러 페그를 보조한다. 담보 수익·자본 배분이 프로토콜 수익과 Savings Rate의 기반이 된다.</p></div>
+<div class="card"><span class="tag orange">SYNTHETIC DOLLAR</span><h4>Ethena — USDe</h4><p>암호자산 등 backing asset의 가격 노출을 대응하는 선물·Perp 숏 포지션으로 헤지한다. 예를 들어 현물 ETH의 +Δ와 동일 명목의 ETH 선물 숏 −Δ를 결합해 포트폴리오의 순방향 가격 노출을 0에 가깝게 만든다.</p></div>
+</div>
+<div class="flow" style="margin-top:18px;background:#f8faff">
+<div class="node">Backing Asset<small>ETH / BTC / SOL / Stable</small></div><div class="arrow">+</div>
+<div class="node">Short Derivative<small>동일 명목의 Futures / Perp</small></div><div class="arrow">≈</div>
+<div class="node">Δ ≈ 0<small>기초자산 가격 변동 민감도 축소</small></div><div class="arrow">→</div>
+<div class="node">USDe<small>Synthetic Dollar</small></div>
+</div>
+<div class="table-wrap" style="margin-top:18px">
+<table>
+<thead><tr><th>구분</th><th>USDC</th><th>Sky · USDS</th><th>Ethena · USDe</th></tr></thead>
+<tbody>
+<tr><td><b>$1 안정성의 원천</b></td><td>현금·고유동성 준비자산과 1:1 상환</td><td>프로토콜 담보 + Vault 회계 + PSM</td><td>Backing asset + 대응 Short derivative의 Delta hedge</td></tr>
+<tr><td><b>핵심 중개/인프라</b></td><td>발행사·은행·수탁기관</td><td>스마트컨트랙트·거버넌스·오라클·담보 관리자</td><td>수탁/OES 제공자·파생상품 거래소·헤지 엔진</td></tr>
+<tr><td><b>수익 발생 구조</b></td><td>준비자산 이자 — 보유자에게 자동 귀속되는 구조는 아님</td><td>담보·대출·자본배분에서 발생한 프로토콜 수익 → Savings 구조</td><td>기초자산 수익 + 선물/Perp funding·basis 등 헤지 포트폴리오 수익</td></tr>
+<tr><td><b>대표 리스크</b></td><td>발행사·은행·규제·상환 접근성</td><td>담보가치·오라클·청산·거버넌스·RWA/수탁 리스크</td><td>Funding 장기 음수, 거래소 장애/실패, 수탁·헤지 실행·유동성 리스크</td></tr>
+<tr><td><b>DeFi에서의 의미</b></td><td>공통 결제·담보 단위</td><td>온체인 신용창출과 프로토콜 대차대조표</td><td>파생상품 시장을 이용한 자본효율적 합성달러</td></tr>
+</tbody>
+</table>
+</div>
+<div class="warning" style="margin-top:18px"><b>Ethena를 설명할 때 주의:</b> USDe는 단순 ‘알고리즘 스테이블코인’이라기보다 <b>실제 backing asset과 파생상품 숏 포지션을 결합한 synthetic dollar</b>로 보는 편이 정확하다. 또한 일반 사용자는 외부 AMM에서 permissionless하게 취득할 수 있지만, 프로토콜과 직접 Mint/Redeem하는 경로는 승인된 상대방과 KYC/KYB 요건이 적용될 수 있다.</div>
+</section>
+<section id="s5">
+<div class="section-head"><div class="section-index">3-5.</div><div><h3>왜 크립토에서 DeFi가 가장 큰 ‘온체인 경제 활동’을 만든다고 보는가</h3><p class="lead">DeFi의 볼륨은 단순 매수·매도만이 아니라 스왑, 차입, 청산, 레버리지, 차익거래가 서로 연결되면서 반복적으로 발생한다.</p></div></div>
+<div class="grid4">
+<div class="metric"><b>DeFi TVL</b><strong>약 $79.7B</strong><span>DefiLlama 최근 스냅샷</span></div>
+<div class="metric"><b>DEX 24H</b><strong>약 $4.8B</strong><span>Spot swaps</span></div>
+<div class="metric"><b>Perps 24H</b><strong>약 $15.3B</strong><span>Leverage 포함 notional</span></div>
+<div class="metric"><b>Stablecoin MCap</b><strong>약 $320B</strong><span>온체인 결제·담보 기반</span></div>
+</div>
+<p style="font-size:12px;color:#8a94a8;margin-top:8px">※ 수치는 DefiLlama 검색 스냅샷 기준이며 실시간 변동한다. DEX vs CEX 비중도 시장 상황에 따라 크게 달라진다.</p>
+<div class="volume-reasons">
+<div class="reason"><b>24/7 글로벌 시장</b><p>은행 영업시간·국가별 결제망과 무관하게 지갑만 있으면 거래·차입·청산이 계속된다.</p></div>
+<div class="reason"><b>스테이블코인이 공통 결제자산 역할</b><p>USDT·USDC·USDS·USDf 같은 달러형 자산이 거래의 기준통화이자 담보·차입 자산으로 반복 사용된다.</p></div>
+<div class="reason"><b>레버리지가 명목 거래량을 증폭</b><p>현물 매수 → 담보 → 차입 → 재매수(Looping), 또는 Perp 포지션으로 같은 원금이 더 큰 notional을 만든다.</p></div>
+<div class="reason"><b>Composability</b><p>한 프로토콜의 출력 토큰이 다른 프로토콜의 입력 담보가 된다. 금융 기능이 API처럼 연결되어 자본 회전율을 높인다.</p></div>
+<div class="reason"><b>Arbitrage·MEV·Bot 활동</b><p>여러 DEX·체인·오라클 가격을 맞추는 자동 거래가 지속적으로 발생한다. 이는 유동성 효율을 높이지만 ‘실수요 거래량’과는 구분해야 한다.</p></div>
+<div class="reason"><b>신규 자산의 초기 유동성 시장</b><p>토큰은 CEX 상장 전후로 온체인 풀에서 가격 발견과 유동성 형성이 먼저 일어나는 경우가 많다.</p></div>
+<div class="reason"><b>낮아진 실행 비용</b><p>L2·Solana 계열 등 저비용 체인의 확장으로 소액·고빈도 전략이 경제적으로 가능해졌다.</p></div>
+<div class="reason"><b>금융이 거래 안에서 끝나지 않음</b><p>거래한 자산을 다시 LP·담보·파생 포지션에 사용할 수 있어 거래량이 ‘한 번의 매매’보다 긴 수명주기를 가진다.</p></div>
+</div>
+</section>
+<section id="s6">
+<div class="section-head"><div class="section-index">3-6.</div><div><h3>Lending과 CDP: 둘 다 담보 대출이지만 ‘돈의 출처’가 다르다</h3><p class="lead">쟁글 리포트가 구분한 핵심은 자금을 공급하는 상대방의 존재 여부다.</p></div></div>
+<div class="compare">
+<div class="brandcard"><span class="tag green">LENDING</span><h4>예치자 → 차입자</h4><div class="desc">다른 참여자가 공급한 USDC/USDT 등을 차입</div><ul><li>차입 한도 = 담보가치 + 시장의 남은 유동성</li><li>이자 = 차입자가 예치자에게 지불</li><li>금리 = 자금 이용률에 따라 자동 변화하는 경우가 일반적</li><li>예: Aave, Morpho, Kamino</li></ul></div>
+<div class="versus">VS</div>
+<div class="brandcard"><span class="tag purple">CDP</span><h4>프로토콜 → 신규 스테이블코인</h4><div class="desc">담보를 넣으면 프로토콜이 자체 달러형 자산을 발행</div><ul><li>차입 한도 = 담보가치·담보비율 중심</li><li>상대 예치자의 자금이 없어도 발행 가능</li><li>대신 발행 스테이블코인의 유통·페그 신뢰가 중요</li><li>예: Sky(USDS), Falcon Finance(USDf)</li></ul></div>
+</div>
+<div class="callout"><strong>왜 과담보인가?</strong> 온체인에서는 지갑 주소의 신용을 전통 은행처럼 심사하기 어렵다. 그래서 담보가 차입액보다 더 큰 과담보 구조와 LTV·청산 기준·오라클이 신용심사 역할을 대신한다.</div>
+</section>
+<section id="s7">
+<div class="section-head"><div class="section-index">3-7.</div><div><h3>RWA가 담보가 되면 DeFi의 리스크 모델도 바뀐다</h3><p class="lead">ETH와 토큰화 국채는 둘 다 ‘토큰’이지만, 청산 가능한 시간과 법적 권리 구조가 다르다.</p></div></div>
+<div class="grid2">
+<div class="card soft"><h4>Crypto-native 담보</h4><div class="risk"><b>핵심 변수</b><span>변동성 · 온체인 유동성 · 오라클 가격 · 슬리피지</span></div><br/><div class="risk"><b>청산</b><span>24/7 DEX에서 자동 매각 가능</span></div><br/><div class="risk"><b>보유 자격</b><span>대체로 permissionless</span></div></div>
+<div class="card soft"><h4>Tokenized RWA 담보</h4><div class="risk"><b>추가 변수</b><span>시장 개장시간 · 환매 소요기간 · 발행사/수탁사 · 적격투자자 요건 · 법적 청구권</span></div><br/><div class="risk"><b>청산</b><span>즉시 매각이 안 되거나, 환매·정산에 하루 이상 걸릴 수 있음</span></div><br/><div class="risk"><b>보유 자격</b><span>허가형(whitelist/KYC)일 수 있음</span></div></div>
+</div>
+<div class="flow" style="margin-top:18px">
+<div class="node">Tokenized Treasury / Credit</div><div class="arrow">→</div><div class="node">담보 적격성 심사<small>Liquidity · Redemption · Legal</small></div><div class="arrow">→</div><div class="node">LTV / Liquidation 설계</div><div class="arrow">→</div><div class="node">Borrow / Mint</div>
+</div>
+<div class="warning"><b>핵심 전환:</b> RWA가 들어오면 “코드가 완전히 중개자를 제거한다”기보다, 발행사·수탁기관·검증기관·법적 청구권을 스마트컨트랙트와 어떻게 연결할지가 중요해진다.</div>
+</section>
+<section id="s8">
+<div class="section-head"><div class="section-index">3-8.</div><div><h3>CDP 두 방식 비교 — 배분자를 거치는 Sky vs 직접 담보로 받는 Falcon Finance</h3><p class="lead">둘 다 스테이블코인을 발행하지만 토큰화 자산이 프로토콜에 들어오는 경로가 다르다.</p></div></div>
+<div class="compare">
+<div class="brandcard">
+<span class="tag">SKY</span><h4>배분자(Agent)를 거치는 구조</h4><div class="desc">토큰화 자산을 일반 이용자 담보로 직접 받기보다 승인된 자본 배분자가 USDS를 차입해 매입</div>
+<ul><li>사용자: 주로 크립토 담보 → USDS 발행</li><li>Agent: 거버넌스가 승인하고 차입 한도 설정</li><li>Agent가 USDS 자금을 신용·국채 등 토큰화 자산에 배분</li><li>RWA가 프로토콜 담보/준비자산 측으로 편입</li><li>장점: RWA 운용을 전문 배분자에게 집중</li><li>Trade-off: Agent·거버넌스·오프체인 운용 리스크</li></ul>
+</div>
+<div class="versus">VS</div>
+<div class="brandcard">
+<span class="tag orange">FALCON FINANCE</span><h4>토큰화 자산을 직접 담보로 수용</h4><div class="desc">적격 담보를 사용자가 직접 예치하고 USDf를 발행하는 universal collateral 접근</div>
+<ul><li>사용자: 적격 담보 예치 → USDf 발행</li><li>담보별 변동성·유동성·매도 충격을 반영해 초과담보율 설정</li><li>RWA·금·토큰화 주식 등 담보 범위를 확대</li><li>USDf 자체는 시장에서 자유롭게 활용 가능</li><li>Mint/Redeem에는 KYC 등 접근 조건이 존재할 수 있음</li><li>Trade-off: 담보별 가격·환매·수탁·법적 리스크를 직접 관리</li></ul>
+</div>
+</div>
+<div class="grid2" style="margin-top:18px">
+<div class="flow">
+<div class="node">사용자 담보</div><div class="arrow">→</div><div class="node">USDS</div><div class="arrow">→</div><div class="node">Agent / Grove</div><div class="arrow">→</div><div class="node">RWA 매입</div>
+</div>
+<div class="flow">
+<div class="node">사용자 RWA/적격 담보</div><div class="arrow">→</div><div class="node">Falcon</div><div class="arrow">→</div><div class="node">USDf 발행</div>
+</div>
+</div>
+<div class="table-wrap" style="margin-top:20px">
+<table>
+<thead><tr><th>항목</th><th>Sky</th><th>Falcon Finance</th></tr></thead>
+<tbody>
+<tr><td><b>발행 자산</b></td><td>USDS</td><td>USDf</td></tr>
+<tr><td><b>RWA 유입 방식</b></td><td>승인된 Agent가 자금을 배분해 RWA 매입</td><td>사용자가 적격 RWA를 직접 담보로 예치 가능</td></tr>
+<tr><td><b>핵심 통제</b></td><td>거버넌스 + Agent 승인/한도</td><td>담보 승인 기준 + 담보별 haircut/초과담보</td></tr>
+<tr><td><b>강점</b></td><td>전문적인 자본 배분과 대규모 신용 전략</td><td>범용 담보화와 직접적인 자본 효율</td></tr>
+<tr><td><b>핵심 리스크</b></td><td>배분자·거버넌스·오프체인 신용</td><td>개별 담보 유동성·가격·수탁/환매 리스크</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="s9">
+<div class="section-head"><div class="section-index">3-9.</div><div><h3>RWA Lending 시장은 ‘통합 시장’과 ‘격리 시장’으로 갈린다</h3><p class="lead">같은 RWA를 담보로 받아도 유동성을 공유하는가, 각 담보 시장을 분리하는가에 따라 위험 전파 방식이 달라진다.</p></div></div>
+<div class="grid3">
+<div class="card"><span class="tag">통합 시장</span><h4>Aave / Jupiter Lend형</h4><p>여러 담보가 하나의 큰 유동성 풀을 공유한다. 새 담보가 승인되면 기존 유동성을 바로 활용할 수 있지만, 자산 부실이 풀 전체에 영향을 줄 수 있어 중앙화된 위험 파라미터 심사가 중요하다.</p></div>
+<div class="card"><span class="tag green">격리 시장</span><h4>Morpho형</h4><p>담보·차입자산 조합별로 시장을 분리한다. 부실 전파를 시장 내부로 제한하고 빠르게 신규 담보를 온보딩할 수 있지만 각 시장별 유동성을 새로 확보해야 한다.</p></div>
+<div class="card"><span class="tag purple">고정금리/만기</span><h4>Loopscale / Morpho Midnight형</h4><p>RWA 특성에 맞춰 금리와 만기를 미리 정하는 구조가 등장한다. 전통 금융의 repo·채권 시장과 DeFi의 간극을 줄이는 방향이다.</p></div>
+</div>
+<div class="callout"><strong>DeFi 4.0 관점:</strong> Permissionless 하나로 수렴하는 것이 아니라, <b>유동성은 공개적으로 조달하고 담보 쪽에는 KYC·적격투자자 제한을 두는 혼합 구조</b>가 늘어날 가능성이 높다.</div>
+</section>
+<section id="s10">
+<div class="section-head"><div class="section-index">3-10.</div><div><h3>DeFi의 성장 논리는 강하지만, 거래량 ≠ 안전성 ≠ 실수익</h3><p class="lead">높은 TVL과 거래량은 유동성과 사용성을 보여주지만 프로토콜의 건전성을 보장하지는 않는다.</p></div></div>
+<div class="grid4">
+<div class="card"><h4>Smart Contract</h4><p>코드 취약점, 업그레이드 권한, 관리자 키와 거버넌스 공격.</p></div>
+<div class="card"><h4>Oracle / Liquidation</h4><p>가격 왜곡, 급락 시 청산 지연, 유동성 부족으로 bad debt 발생 가능.</p></div>
+<div class="card"><h4>Stablecoin</h4><p>페그 이탈, 상환 유동성, 준비자산 또는 담보가치 훼손.</p></div>
+<div class="card"><h4>RWA / Legal</h4><p>발행사·수탁사·법적 청구권·영업일 환매·규제와 관할권 문제.</p></div>
+</div>
+<div class="warning" style="margin-top:18px"><b>리서치 문장으로 쓰기 좋은 결론:</b> “DeFi의 핵심 경쟁력은 탈중앙화 그 자체보다, 디지털 자산을 24시간 거래·담보·차입·정산 가능한 공통 금융 레이어로 만든다는 데 있다. RWA가 본격적으로 편입되는 DeFi 4.0에서는 ‘얼마나 탈중앙화됐는가’뿐 아니라 ‘오프체인 권리를 얼마나 안전하게 온체인 규칙과 연결하는가’가 핵심 경쟁력이 된다.”</div>
+</section>
+<section>
+<div class="section-head"><div class="section-index">APP.</div><div><h3>발표/리서치용 1페이지 요약</h3><p class="lead">슬라이드나 노션에 그대로 옮기기 좋은 구조</p></div></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>메시지</th><th>핵심 문장</th></tr></thead>
+<tbody>
+<tr><td><b>DeFi 정의</b></td><td>블록체인 위에서 거래·대출·화폐발행·파생상품을 스마트컨트랙트로 연결하는 금융 인프라.</td></tr>
+<tr><td><b>1.0</b></td><td>금융의 기본 기능을 온체인으로 구현: Maker·Compound·Uniswap.</td></tr>
+<tr><td><b>2.0</b></td><td>유동성과 자본 효율 경쟁: Yield·veTokenomics·Protocol-Owned Liquidity·Uniswap v3.</td></tr>
+<tr><td><b>3.0</b></td><td>확장성과 시장 구조 경쟁: L2·Perp DEX·CLOB·Isolated Lending·Aggregator.</td></tr>
+<tr><td><b>4.0</b></td><td>프로그래머블 유동성과 전통자산 연결: Hooks·Intent·RWA·Permissioning·고정금리/만기.</td></tr>
+<tr><td><b>왜 볼륨이 큰가</b></td><td>24/7 + 스테이블코인 + 레버리지 + composability + 봇/차익거래 + 저비용 체인.</td></tr>
+<tr><td><b>Pendle / Yield Trading</b></td><td>수익자산을 PT(원금)와 YT(미래 수익)로 분리해 고정금리와 미래 APY를 직접 거래한다.</td></tr><tr><td><b>Stablecoin 진화</b></td><td>USDC의 준비자산 모델 → Sky의 프로토콜 담보·CDP → Ethena의 Delta-neutral synthetic dollar처럼 $1을 만드는 엔진이 다양화됐다.</td></tr><tr><td><b>Lending vs CDP</b></td><td>Lending은 ‘예치자의 돈’을 빌리고, CDP는 ‘프로토콜이 새로 발행한 스테이블코인’을 빌린다.</td></tr>
+<tr><td><b>Sky vs Falcon</b></td><td>Sky는 Agent를 통해 RWA를 매입·배분하고, Falcon은 적격 토큰화 자산을 직접 담보로 받아 USDf를 발행.</td></tr>
+<tr><td><b>최종 관점</b></td><td>RWA 토큰화의 진짜 가치는 발행량이 아니라, 담보·유동성·정산 네트워크 안에서 얼마나 반복 사용되는가에 의해 결정될 가능성이 크다.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<div class="section-head"><div class="section-index">SRC.</div><div><h3>참고 자료</h3><p class="lead">본문의 수치와 구조 설명은 아래 자료를 중심으로 구성했다.</p></div></div>
+<ol class="sources">
+<li>Xangle, <b>[Xangle RWA Series] 디파이 : 렌딩</b> (2026-07-29): <a href="https://xangle.io/research/detail/2521" rel="noopener" target="_blank">https://xangle.io/research/detail/2521</a></li>
+<li>DefiLlama, DeFi Dashboard (TVL, DEX/Perp Volume, Stablecoin market cap): <a href="https://defillama.com/" rel="noopener" target="_blank">https://defillama.com/</a></li>
+<li>Uniswap Labs, <b>Uniswap v2, v3, and v4</b>: <a href="https://support.uniswap.org/hc/en-us/articles/7425482965517-Uniswap-v2-v3-and-v4" rel="noopener" target="_blank">Uniswap Support</a></li>
+<li>Falcon Finance Docs, <b>USDf (Synthetic Dollar)</b> / Collateral Acceptance &amp; Risk Framework: <a href="https://docs.falcon.finance/" rel="noopener" target="_blank">https://docs.falcon.finance/</a></li>
+<li>Xangle, <b>Yield Aggregator, 높은 수익률을 찾아</b> (DeFi 1.0/2.0의 유동성 경쟁 배경): <a href="https://xangle.io/research/detail/403" rel="noopener" target="_blank">https://xangle.io/research/detail/403</a></li>
+<li>Pendle Documentation, Yield Tokenization / PT &amp; YT: <a href="https://docs.pendle.finance/pendle-v2/Introduction" rel="noopener" target="_blank">https://docs.pendle.finance/pendle-v2/Introduction</a></li><li>Pendle Academy, Yield Tokenization Basics: <a href="https://docs.pendle.finance/pendle-academy/pendle-101/chapter-2-yield-tokenization-basics" rel="noopener" target="_blank">https://docs.pendle.finance/pendle-academy/pendle-101/chapter-2-yield-tokenization-basics</a></li><li>Ethena Documentation, How USDe Works / Delta-Neutral Stability: <a href="https://docs.ethena.fi/how-usde-works" rel="noopener" target="_blank">https://docs.ethena.fi/how-usde-works</a></li><li>Ethena Documentation, Protocol Risks: <a href="https://docs.ethena.fi/protocol-overview/risks" rel="noopener" target="_blank">https://docs.ethena.fi/protocol-overview/risks</a></li><li>Sky, What Is USDS?: <a href="https://sky.money/blog/what-is-usds" rel="noopener" target="_blank">https://sky.money/blog/what-is-usds</a></li><li>Circle, USDC reserves and 1:1 redemption: <a href="https://www.circle.com/usdc" rel="noopener" target="_blank">https://www.circle.com/usdc</a></li></ol>
+</section>
+<div class="footer"><strong>편집 메모.</strong> 이 문서에서 사용한 “DeFi 1.0~4.0”은 공식 표준 용어가 아니라 시대별 핵심 경쟁축을 설명하기 위한 리서치 프레임이다. 시장 데이터와 프로토콜 조건은 변경될 수 있으므로 배포용 자료로 사용할 때는 발행 직전에 각 프로토콜 공식 문서와 DefiLlama 수치를 재확인하는 것을 권장한다. Stablecoin 분류 역시 우열 또는 선형적 세대교체가 아니라, 페그 안정성을 만드는 서로 다른 설계 방식을 비교하기 위한 프레임이다.</div>
+</div>
+</body>
+</html>

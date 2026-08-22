@@ -3,24 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/* The research property's three surfaces as one tab set. Client component
+/* The research property's four surfaces as one tab set. Client component
    because active state needs the pathname; the header itself stays server-
    rendered. Home isn't a tab — the logo is the way back to it — so the row
-   only lights up once you've left it for one of these three. Article pages
+   only lights up once you've left it for one of these four. Article pages
    light up Research — they're the archive's leaves. */
 
 const TABS = [
   { href: "/research/articles", label: "Research" },
   { href: "/research/news", label: "News" },
+  { href: "/research/study", label: "Study" },
   { href: "/research/author", label: "Authors" },
 ] as const;
+
+/* Research is the catch-all: /research/<slug> is an article, and articles are
+   the archive's leaves. So every sibling surface has to be subtracted here by
+   name — a new one that isn't listed would silently light up Research on top of
+   its own tab. */
+const OWN_PREFIX = TABS.filter((t) => t.href !== "/research/articles").map(
+  (t) => t.href,
+);
 
 function isActive(href: string, pathname: string): boolean {
   if (href === "/research/articles") {
     return (
       pathname.startsWith("/research/") &&
-      !pathname.startsWith("/research/news") &&
-      !pathname.startsWith("/research/author")
+      !OWN_PREFIX.some((p) => pathname.startsWith(p))
     );
   }
   return pathname.startsWith(href);
@@ -30,7 +38,7 @@ export default function ResearchNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-5 md:gap-6">
+    <nav className="flex items-center gap-4 sm:gap-5 md:gap-6">
       {TABS.map(({ href, label }) => {
         const on = isActive(href, pathname);
         return (
