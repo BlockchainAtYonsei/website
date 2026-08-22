@@ -1,6 +1,14 @@
+import type { Readable } from "node:stream";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+
+export type StoredObject = {
+  body: Readable;
+  contentType: string;
+  contentLength?: number;
+  etag?: string;
+};
 
 /* S3-compatible object storage (R2/S3/MinIO) for re-hosted Notion images —
    Notion file URLs are expiring signed URLs and must never reach the DB
@@ -32,8 +40,38 @@ export class StorageService {
         accessKeyId: this.config.getOrThrow<string>("S3_ACCESS_KEY_ID"),
         secretAccessKey: this.config.getOrThrow<string>("S3_SECRET_ACCESS_KEY"),
       },
+      // Newer SDKs attach x-amz-checksum-* to every PUT by default; S3-compatible
+      // stores (R2, MinIO, Railway Buckets) don't all accept it — the known
+      // "image re-host failed (x-amz-checksum…)" case in docs/r2-setup.md.
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
     });
     return this._s3;
+  }
+
+  /* Read-through for the /media route. The bucket is private (Railway Buckets
+     have no public-URL mode), so this is how a stored key becomes the public
+     URL putImage handed out. Returns null for a missing key. */
+  async getImage(key: string): Promise<StoredObject | null> {
+    try {
+      const out = await this.s3.send(
+        new GetObjectCommand({
+          Bucket: this.config.getOrThrow<string>("S3_BUCKET"),
+          Key: key,
+        }),
+      );
+      if (!out.Body) return null;
+      return {
+        body: out.Body as Readable,
+        contentType: out.ContentType ?? "application/octet-stream",
+        contentLength: out.ContentLength,
+        etag: out.ETag,
+      };
+    } catch (e) {
+      const name = (e as { name?: string }).name;
+      if (name === "NoSuchKey" || name === "NotFound") return null;
+      throw e;
+    }
   }
 
   /* Content-hashed keys make uploads idempotent and immutable — hence the
