@@ -77,24 +77,108 @@ function Presenter({ name }: { name: string }) {
   );
 }
 
-function Parts({ parts }: { parts: { n: string; t: string }[] }) {
+/* A part number as a comparable key: "3-1. (1)" and "3-1 (1)" both become
+   "3-1(1)", so a record's title and a part's `n` match however each was typed. */
+const partKey = (s: string) => s.replace(/[.\s]/g, "");
+const PART_TOKEN = /\d+-\d+(?:\s*\(\d+\))?|\d+/g;
+
+/** The real part keys a title token stands for: itself when it names a part
+    exactly, or every "(N)" sub-part under it. So a deck titled "3-2." covers
+    "3-2(1)" and "3-2(2)" when the section was split between two presenters. */
+function childrenOf(token: string, valid: Set<string>): string[] {
+  const k = partKey(token);
+  return [...valid].filter((v) => v === k || v.startsWith(`${k}(`));
+}
+
+/** Which parts a record covers, read from the numbers its title opens with.
+    A record's title is "<parts>. <name>", e.g. "2-1 ~ 2-4. …", "3-2 · 3-3. …",
+    "4-4 · 4-6. …", "3-1. …". Groups split on · / , ; a group with ~ is an
+    inclusive range within one chapter. Returns [] when the title doesn't open
+    on a real part of this session (background docs like "00. …"), so those
+    stay in the 자료 list without wiring into the schedule. */
+function coveredParts(title: string, valid: Set<string>): string[] {
+  const cut = title.indexOf(". ");
+  const spec = cut >= 0 ? title.slice(0, cut) : "";
+  const first = spec.match(PART_TOKEN)?.[0];
+  if (!first || childrenOf(first, valid).length === 0) return [];
+
+  const keys = new Set<string>();
+  for (const group of spec.split(/[·,]/)) {
+    const toks = group.match(PART_TOKEN) ?? [];
+    const a = toks[0]?.match(/^(\d+)-(\d+)$/);
+    const b = toks[toks.length - 1]?.match(/^(\d+)-(\d+)$/);
+    if (group.includes("~") && a && b && a[1] === b[1]) {
+      for (let i = Number(a[2]); i <= Number(b[2]); i++)
+        for (const c of childrenOf(`${a[1]}-${i}`, valid)) keys.add(c);
+    } else {
+      for (const t of toks) for (const c of childrenOf(t, valid)) keys.add(c);
+    }
+  }
+  return [...keys];
+}
+
+/** part key → the deck that covers it. First writer wins, so a section's own
+    발표자료 (listed first) takes the part over a later 보충/PDF that repeats the
+    same number. */
+function partLinks(session: Session): Map<string, string> {
+  const valid = new Set(
+    session.assign.flatMap((a) => a.parts.map((p) => partKey(p.n))),
+  );
+  const map = new Map<string, string>();
+  for (const r of session.records) {
+    if (r.pending || !r.url) continue;
+    for (const k of coveredParts(r.title, valid)) {
+      if (!map.has(k)) map.set(k, r.url);
+    }
+  }
+  return map;
+}
+
+function Parts({
+  parts,
+  linkOf,
+}: {
+  parts: { n: string; t: string }[];
+  /* Resolves a part to its deck, or undefined when nothing is uploaded yet. */
+  linkOf: (n: string) => string | undefined;
+}) {
   return (
     <ul className="space-y-1.5">
-      {parts.map((p) => (
-        <li
-          key={p.n + p.t}
-          className="font-body text-[14px] leading-snug font-light break-keep text-slate-300"
-        >
-          <span className="font-mono mr-2 text-[11px] text-bay-300/80">{p.n}</span>
-          {p.t}
-        </li>
-      ))}
+      {parts.map((p) => {
+        const href = linkOf(p.n);
+        return (
+          <li
+            key={p.n + p.t}
+            className="font-body text-[14px] leading-snug font-light break-keep text-slate-300"
+          >
+            <span className="font-mono mr-2 text-[11px] text-bay-300/80">
+              {p.n}
+            </span>
+            {href ? (
+              // Underlined: this part has a deck. Opens in a new tab like the
+              // 자료 list below, which the same file also sits in.
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-white/25 underline-offset-4 transition-colors hover:text-white hover:decoration-bay-300"
+              >
+                {p.t}
+              </a>
+            ) : (
+              p.t
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
 /** Running order: one row per part, in the article's order. */
 export function Schedule({ session }: { session: Session }) {
+  const links = partLinks(session);
+  const linkOf = (n: string) => links.get(partKey(n));
   return (
     <ol>
       {session.assign.map((a, i) => (
@@ -108,7 +192,7 @@ export function Schedule({ session }: { session: Session }) {
             </div>
           )}
           <div className={a.who === EVERYONE ? SLOT_BODY_ALONE : SLOT_BODY}>
-            <Parts parts={a.parts} />
+            <Parts parts={a.parts} linkOf={linkOf} />
             {a.focus && (
               <p className="font-body mt-3 text-[13px] leading-relaxed font-light break-keep text-slate-500">
                 {a.focus}
