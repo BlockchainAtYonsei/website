@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>대체자산 토큰화 생태계 지도</title>
+<style>
+:root{--navy:#102b46;--blue:#176db2;--purple:#8b65b0;--sky:#edf7ff;--ink:#172536;--muted:#5d6d7e;--line:#dce6ef;--bg:#f5f8fb;--paper:#fff;--mint:#e9f7f1;--lilac:#f5f0fa}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;line-height:1.82;word-break:keep-all}
+.shell{max-width:1120px;margin:auto;padding:42px 24px 72px}
+.hero{background:linear-gradient(125deg,#102b46,#1a6aa8);color:#fff;padding:46px 50px;border-radius:24px;box-shadow:0 14px 34px #102b4626}
+.kicker{font-weight:800;font-size:12px;letter-spacing:.13em;color:#b9e2ff}
+.hero h1{font-size:clamp(30px,4.6vw,46px);line-height:1.25;letter-spacing:-.04em;margin:13px 0}
+.hero p{font-size:17px;max-width:820px;color:#e6f4ff;margin:0}
+.toc{margin-top:22px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;gap:10px;flex-wrap:wrap}
+.toc a{font-size:13px;color:#275c85;text-decoration:none;background:#edf5fb;padding:5px 10px;border-radius:20px;font-weight:700}
+section{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px;margin-top:22px}
+.label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.1em}
+.title{margin:4px 0 16px;font-size:26px;line-height:1.35;letter-spacing:-.03em}
+.intro{font-size:16.5px;color:#294056;margin:0 0 16px}
+p{margin:0 0 14px}
+p:last-child{margin-bottom:0}
+.box{background:var(--sky);border-left:4px solid var(--blue);border-radius:8px;padding:16px 20px;margin:18px 0}
+.box b{color:#0f3d63}
+
+/* 직접/간접 개념 카드 */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+.compare article{padding:20px 22px;border:1px solid var(--line);border-radius:14px}
+.compare h3{margin:0 0 8px;font-size:17px}
+.compare p{margin:0;color:#425568;font-size:14.5px}
+.direct{border-top:4px solid var(--blue)}
+.indirect{border-top:4px solid var(--purple)}
+
+/* 자산유형 5분류 카드 */
+.asset-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0 6px}
+.asset-card{border:1px solid var(--line);border-radius:14px;padding:16px 14px;text-align:center;background:#fbfdff}
+.asset-card .tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;margin-bottom:9px}
+.asset-card.d .tag{background:var(--sky);color:#17619c}
+.asset-card.i .tag{background:var(--lilac);color:#6c4a8f}
+.asset-card b{display:block;font-size:15px;color:#164b76;margin-bottom:6px;line-height:1.3}
+.asset-card span{display:block;font-size:12.5px;color:var(--muted);line-height:1.5}
+.asset-card i{display:block;font-style:normal;font-size:11.5px;color:#8fa1b1;margin-top:8px}
+
+/* 9레이어 플로우 (세로 · 얇은 표 형태) */
+.flow-legend{display:flex;gap:18px;margin:16px 0 14px;font-size:13px;font-weight:700;color:#3e5063;flex-wrap:wrap}
+.flow-legend span{display:inline-flex;align-items:center;gap:6px}
+.flow-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.flow-table-wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+table.flow-table{width:100%;border-collapse:collapse;font-size:13.8px}
+table.flow-table th{background:#edf4f9;text-align:left;padding:9px 14px;color:#23435e;font-size:12px;font-weight:800}
+table.flow-table td{padding:7px 14px;border-top:1px solid var(--line);vertical-align:middle;color:#2c3e50;line-height:1.4}
+table.flow-table td:first-child{width:36px}
+table.flow-table td:nth-child(2){font-weight:800;color:#164b76;white-space:nowrap;width:88px}
+table.flow-table td:nth-child(2) small{display:block;font-weight:600;color:var(--muted);font-size:10.5px;white-space:normal}
+table.flow-table td:nth-child(4){white-space:nowrap;width:150px}
+table.flow-table .fno{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:11.5px;font-weight:800}
+table.flow-table .fno.rn{background:var(--purple)}
+table.flow-table .fno.rg{background:var(--navy)}
+table.flow-table .co{display:inline-block;font-size:11.5px;font-weight:700;color:#227056;background:var(--mint);padding:2px 9px;border-radius:20px}
+table.flow-table tr.rg{background:#f3f8ff}
+table.flow-table tr.rg td{border-top:2px dashed #9fbfd6}
+.flow-caption{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.layer-gen{margin:0 0 14px 46px;color:#3e5063;font-size:15px}
+
+/* 큰 그룹 제목 (만드는층/돌리는층/감싸는층) */
+.group-head{display:flex;align-items:center;gap:12px;margin:0 0 6px}
+.group-head .ic{font-size:22px}
+.group-head h2{margin:0;font-size:22px;letter-spacing:-.03em}
+.group-sub{color:var(--muted);font-size:14.5px;margin:0 0 20px}
+
+/* 레이어 딥다이브 블록 */
+.layer-block{border-top:1px solid var(--line);padding:24px 0}
+.layer-block:first-of-type{border-top:0;padding-top:6px}
+.layer-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.layer-head .lno{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800;flex:0 0 auto}
+.layer-head h3{margin:0;font-size:18.5px;letter-spacing:-.02em;color:#17324d}
+.layer-q{font-size:13.5px;color:#7a5aa0;font-weight:700;margin:0 0 14px 46px}
+.company{margin:14px 0 0 46px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fbfdff}
+.company b.name{display:block;font-size:15px;color:#164b76;margin-bottom:6px}
+.company p{margin:0;font-size:14.5px;color:#3e5063}
+.krw{color:#17619c;font-weight:700}
+
+/* 각주 */
+.note-list{margin:10px 0 0 46px;padding:10px 14px;border-left:3px solid #dce6ef;font-size:12.5px;color:var(--muted);background:#fafcfd;border-radius:0 8px 8px 0}
+.note-list div{margin:3px 0}
+
+.end{background:var(--navy);color:#eaf5ff}
+.end .label{color:#a9d8fc}
+.end h2{color:#fff}
+.end p{font-size:17px;margin:0}
+.foot{font-size:12.5px;color:#6c7c8c;margin-top:20px}
+.src-cols{font-size:12px;color:#6c7c8c;line-height:1.85;columns:2;column-gap:34px;margin:0}
+.src-cols a{color:#216aa5;text-decoration:none}
+
+@media(max-width:860px){
+  .asset-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:720px){
+  .shell{padding:18px 13px 50px}
+  .hero,section{padding:26px 21px;border-radius:16px}
+  .compare{grid-template-columns:1fr}
+  .title{font-size:22px}
+  .layer-q,.company,.note-list,.layer-gen{margin-left:0}
+  .src-cols{columns:1}
+}
+</style>
+</head>
+<body>
+<a href="/research/study/1" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 1회차 진행안으로</a><main class="shell">
+
+<header class="hero">
+  <div class="kicker">STUDY SESSION · 대체자산 토큰화 개론</div>
+  <h1>대체자산 토큰화<br>생태계 지도</h1>
+  <p>집, 금, 오래된 카드처럼 사고팔기 번거로운 자산의 권리를 디지털 토큰으로 만들어, 주식처럼 쪼개서 사고팔 수 있게 만드는 것 — 그 전체 그림을 자산 유형과 9개 레이어로 짚어봄.</p>
+</header>
+
+<nav class="toc">
+  <a href="#intro">토큰화란</a>
+  <a href="#types">자산 유형 5분류</a>
+  <a href="#flow">9개 레이어 흐름</a>
+  <a href="#make">만드는 층</a>
+  <a href="#run">돌리는 층</a>
+  <a href="#wrap">감싸는 층</a>
+</nav>
+
+<section id="intro">
+  <div class="label">01 · INTRO</div>
+  <h2 class="title">대체자산 토큰화란?</h2>
+  <p class="intro">집, 금, 오래된 트레이딩카드 같은 자산은 사고팔기가 번거로움. 계약서를 쓰고, 관공서에 가고, 실물을 직접 옮겨야 함. 대체자산 토큰화는 이런 자산에 대한 "권리"를 디지털 증표(토큰)로 만들어서, 주식처럼 스마트폰 앱에서 쪼개서 사고팔 수 있게 만드는 것임.</p>
+  <div class="box"><b>오늘 짚을 것:</b> 자산 유형을 어떻게 나누는지, 그리고 자산이 토큰이 되어 시장에서 실제로 돌아가기까지 거치는 9개의 레이어가 무엇인지임.</div>
+</section>
+
+<section id="types">
+  <div class="label">02 · ASSET TYPES</div>
+  <h2 class="title">자산 유형 5분류</h2>
+  <p class="intro">이 5가지 유형을 가르는 축 중 하나는 "토큰이 자산 자체에 대한 권리를 담았는가, 아니면 그 자산을 갖고 있는 회사·펀드의 지분을 담았는가"임. 앞엣것을 <b>직접형</b>, 뒤엣것을 <b>간접형</b>이라 부르는데, 이 구분은 부동산만의 이야기가 아니라 원자재·수집품·사모신용 전체를 관통하는 공통된 설계 축임.</p>
+  <div class="compare">
+    <article class="direct"><h3>직접형</h3><p>토큰 = 자산 그 자체에 대한 권리. 부동산이면 등기부에 적힌 진짜 주인 자리, 금이면 금고 속 금괴에 대한 인출권, 카드 NFT면 그 카드 한 장 자체의 소유권.</p></article>
+    <article class="indirect"><h3>간접형</h3><p>토큰 = 자산을 갖고 있는 회사나 펀드의 지분. 부동산이면 건물을 소유한 회사의 주식, 사모신용이면 여러 대출채권을 모아놓은 펀드의 지분.</p></article>
+  </div>
+  <div class="asset-grid">
+    <div class="asset-card d"><span class="tag">직접형</span><b>부동산<br>직접 권리</b><span>등기부의 진짜 주인 자리</span><i>Ctrl Alt · PRYPCO</i></div>
+    <div class="asset-card i"><span class="tag">간접형</span><b>부동산<br>간접 지분</b><span>건물 소유 회사의 지분</span><i>Lofty · Blocksquare</i></div>
+    <div class="asset-card d"><span class="tag">직접형</span><b>원자재<br>실물 보관</b><span>금고 속 금괴 인출권</span><i>Paxos(PAXG)</i></div>
+    <div class="asset-card i"><span class="tag">간접형</span><b>사모신용<br>펀드 지분</b><span>대출 펀드 지분</span><i>Apollo</i></div>
+    <div class="asset-card d"><span class="tag">직접형</span><b>수집품<br>실물 보관 NFT</b><span>카드 1장의 소유권</span><i>Courtyard</i></div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="label">03 · 9-LAYER FLOW</div>
+  <h2 class="title">9개 레이어 흐름</h2>
+  <p class="intro">자산이 토큰이 되어 시장에서 실제로 돌아가기까지, 아래와 같은 순서로 흘러감.</p>
+
+  <div class="flow-legend">
+    <span><i style="background:var(--blue)"></i>🔧 만드는 층 (1~5)</span>
+    <span><i style="background:var(--purple)"></i>⚙️ 돌리는 층 (6~8)</span>
+    <span><i style="background:var(--navy)"></i>🛡️ 감싸는 층 (9)</span>
+  </div>
+
+  <div class="flow-table-wrap">
+    <table class="flow-table">
+      <tr><th>#</th><th>레이어</th><th>이 레이어가 답하는 질문</th><th>대표 회사</th></tr>
+      <tr class="mk"><td><span class="fno">1</span></td><td>원천</td><td>이게 진짜 있는 자산이고, 주인이 누구야?</td><td><span class="co">Apollo</span></td></tr>
+      <tr class="mk"><td><span class="fno">2</span></td><td>발행</td><td>이 권리를 어떤 모양의 토큰으로 만들까?</td><td><span class="co">Securitize</span></td></tr>
+      <tr class="mk"><td><span class="fno">3</span></td><td>실사·운영</td><td>지금도 여전히 안전해? 문제 생기면 누가 처리해?</td><td><span class="co">Moody's Ratings</span></td></tr>
+      <tr class="mk"><td><span class="fno">4</span></td><td>수탁</td><td>실물이나 서류는 지금 어디에 보관돼 있어?</td><td><span class="co">Brink's</span></td></tr>
+      <tr class="mk"><td><span class="fno">5</span></td><td>원장</td><td>누가 얼마 가졌는지는 어디에 적어?</td><td><span class="co">Canton Network</span></td></tr>
+      <tr class="rn"><td><span class="fno rn">6</span></td><td>데이터</td><td>이거 지금 얼마짜리야?</td><td><span class="co">Chainlink</span></td></tr>
+      <tr class="rn"><td><span class="fno rn">7</span></td><td>유동성</td><td>팔고 싶을 때 살 사람이 있어?</td><td><span class="co">Wintermute</span></td></tr>
+      <tr class="rn"><td><span class="fno rn">8</span></td><td>활용</td><td>이 토큰으로 뭘 할 수 있어?</td><td><span class="co">Fireblocks</span></td></tr>
+      <tr class="rg"><td><span class="fno rg">9</span></td><td>규제<small>전체를 감싸는 층</small></td><td>이거 법적으로 문제없어?</td><td><span class="co">Chainalysis</span></td></tr>
+    </table>
+  </div>
+  <p class="flow-caption">9번 규제는 따로 떨어진 마지막 단계가 아니라, 1~8번 전 과정에 걸쳐 있는 감싸는 층임(위 표에서 점선으로 구분).</p>
+</section>
+
+<section id="make">
+  <div class="group-head"><span class="ic">🔧</span><h2>만드는 층 (레이어 1~5)</h2></div>
+  <p class="group-sub">자산을 토큰으로 빚어내는 파이프라인임.</p>
+
+  <div class="box"><b>헷갈리기 쉬운 세 레이어: 원천 · 실사·운영 · 원장</b><br>1번 원천은 자산이 "처음에" 뭐고 누구 것인지 확인하는 것 — 탄생증명서처럼 최초 1회 파악하는 것임. 3번 실사·운영은 그게 "지금도 여전히" 맞는지 시간이 지나도 계속 확인하고 문제가 생기면 처리하는 것 — 정기 건강검진처럼 반복되는 것임. 5번 원장은 그 자산에 대한 권리(토큰)를 "지금 누가" 갖고 있는지 기록하는 것 — 등기소 서류처럼 거래할 때마다 갱신되는 것임. 즉 1·3번은 자산 자체를 보고, 5번은 그 자산에 대한 권리를 담은 토큰을 봄.</div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">1</span><h3>원천 레이어</h3></div>
+    <p class="layer-q">이게 진짜 있는 자산이고, 주인이 누구야?</p>
+    <p class="layer-gen">여기서는 토큰이 되기 전, 원래 자산이 어떤 상태인지와 진짜 주인이 누구인지를 관리함. 부동산이면 소유권·임대수익·담보대출·등기가, 원자재면 실물의 보관 상태·품질·소유권·인출권이 여기서 관리되는 것들임. 여기가 부실하면 그 위에 아무리 좋은 토큰을 만들어도 소용없음.</p>
+    <div class="company"><b class="name">Apollo</b><p>은행 대신 기업에 직접 돈을 빌려주는 회사. 예를 들어 Apollo가 한 기업에 1,000억 원을 새로 빌려준다고 하면(오리지네이션(1)), 바로 그 순간 "기업은 갚을 의무, Apollo는 이자·원금을 받을 권리"라는 새로운 자산이 생겨남 — 원천 레이어는 이 탄생의 순간, 무슨 자산이 생겼고 누가 그 권리자인지를 다룸. 이렇게 만들어진 대출채권 중 일부를 펀드에 담아 투자자에게도 팜. 돈은 맡아 굴리는 돈 규모에 비례한 관리 수수료 + 수익이 나면 그 일부를 받는 성과보수로 벎. 2024년 말 기준 운용자산 약 <span class="krw">937조 원</span>, 그중 대출 관련 자산만 약 <span class="krw">648조 원</span>.</p></div>
+    <div class="company"><b class="name">PSA</b><p>트레이딩카드가 진짜인지, 상태가 얼마나 좋은지 확인해서 점수를 매기는 회사. 카드 접수 → 진위 확인 → 상태 검사 → 1~10점 부여 → 투명 케이스에 밀봉(2). 돈은 카드 한 장 검사할 때마다 받는 수수료로 벎(약 3만~수십만 원, 연간 1,500만 장 이상 처리).</p></div>
+    <div class="note-list">
+      <div>(1) 오리지네이션: 대출을 처음부터 새로 만들어서 실행하는 것.</div>
+      <div>(2) 슬랩: 카드가 손상되지 않도록 투명 케이스에 밀봉해 넣는 것.</div>
+    </div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">2</span><h3>발행 레이어</h3></div>
+    <p class="layer-q">이 권리를 어떤 모양의 토큰으로 만들까?</p>
+    <p class="layer-gen">여기서는 그 권리와 현금흐름을 어떤 모양의 토큰으로 표현할지 정함. 금·카드처럼 실물이 있는 자산은 소유권·인출권 자체를 토큰으로 만들고, 부동산·펀드처럼 법적 구조가 필요한 자산은 회사·신탁의 지분이나 수익권을 토큰으로 만들고, 대출·매출채권처럼 현금흐름이 핵심인 자산은 원금·이자를 받을 권리를 묶어서 토큰으로 만듦.</p>
+    <div class="company"><b class="name">Securitize</b><p>펀드나 회사의 지분(1)을 토큰으로 만들어주는 인프라 회사. 발행사가 펀드를 설계하면 → 투자자 본인 확인(2)을 하고 → 토큰을 만들어 팔고 → 이후 거래·관리까지 도와줌. 블랙록의 토큰화 펀드(BUIDL)도 이 회사 플랫폼에서 만들어짐. 돈은 이 전 과정의 수수료로 벎 — 2026년 1분기 매출 약 <span class="krw">281억 원</span>(전년 대비 39% 증가), 이 회사가 만들어준 토큰들의 전체 가치는 평균 약 <span class="krw">4.6조 원</span>.</p></div>
+    <div class="note-list">
+      <div>(1) LLC(Limited Liability Company, 유한책임회사)·SPV(Special Purpose Vehicle, 특수목적법인): 특정 자산만 따로 담기 위해 만드는 회사. 본체가 망해도 이 안의 자산은 별도로 보호받도록 설계된 껍데기 회사에 가까움.</div>
+      <div>(2) KYC(Know Your Customer, 고객확인제도): 거래하는 사람이 진짜 본인이 맞는지 신분을 확인하는 절차.</div>
+    </div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">3</span><h3>실사·운영 레이어</h3></div>
+    <p class="layer-q">지금도 여전히 안전해? 문제 생기면 누가 처리해?</p>
+    <p class="layer-gen">여기서는 자산이 실제로 존재하는지, 가치가 맞는지, 발행 이후에도 문제가 없는지를 계속 확인함. 부동산이면 임대료가 잘 들어오는지·담보가 안전한지, 원자재면 보유량과 품질이 맞는지, 사모신용이면 대출이 잘 상환되고 있는지를 계속 점검·관리하는 것 — 이게 바로 "사후관리"임. 예를 들어 앞서 나온 Apollo도 대출을 실행한(원천 레이어) 이후 스스로 매달 이자가 잘 들어오는지 확인하고, 문제가 생기면 재협상하거나 담보를 처분하는 역할(실사·운영)을 같이 함. 즉 같은 회사가 두 레이어의 역할을 모두 하는 경우도 많고, 레이어를 가르는 기준은 "어느 회사냐"가 아니라 "대출이 생기는 순간이냐, 그 이후 계속되는 관리냐"임.</p>
+    <div class="company"><b class="name">Moody's Ratings</b><p>원래 기업·채권에 신용등급을 매기던 회사인데, 그 등급을 블록체인에서도 바로 읽을 수 있게 만든 최초의 신용평가사. 하던 일은 그대로 하고 결과를 온체인에도 발표하는 것뿐 — 돈도 원래처럼 등급 서비스 이용료로 벎.</p></div>
+    <div class="company"><b class="name">New Silver / Ankura Trust</b><p>New Silver는 부동산 담보대출을 해주는 회사, Ankura Trust는 그 대출이 잘 진행되는지 대신 관리해주는 독립 관리자. 예를 들어 국채 토큰화 상품 Ondo USDY에서는 Ankura Trust가 자산을 법적으로 보관하며 매일 가격을 다시 계산해 반영해줌. 만들고 끝이 아니라 매일 확인·관리하는 일을 대신 해주고 돈을 받음.</p></div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">4</span><h3>수탁 레이어</h3></div>
+    <p class="layer-q">실물이나 서류는 지금 어디에 보관돼 있어?</p>
+    <p class="layer-gen">여기서는 토큰을 뒷받침하는 진짜 실물(금괴·카드·예술품)이나 펀드·회사 관련 서류가 실제로 어디에 보관되어 있는지를 다룸. 그냥 보관만 하는 게 아니라 보험, 입출고 관리, 안전한 운송까지 포함됨.</p>
+    <div class="company"><b class="name">Brink's</b><p>전 세계 120개국, 약 1,000개 시설에서 금고를 운영하는 회사. 금이 들어오면 다른 사람 것과 안 섞이게 따로 보관하고, 보험을 들어두고, 정기적으로 실제로 있는지 확인함. 돈은 순전히 보관료로 벎. 원자재·수집품 토큰화 프로젝트 대부분이 이 회사의 금고를 그대로 빌려 씀.</p></div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">5</span><h3>원장 레이어</h3></div>
+    <p class="layer-q">누가 얼마 가졌는지는 어디에 적어?</p>
+    <p class="layer-gen">여기서는 이 토큰을 누가 얼마나 갖고 있는지, 사고팔 때마다 그 기록이 어떻게 바뀌는지를 컴퓨터 장부(블록체인)에 남김. 누구나 볼 수 있는 장부를 쓸지, 허가된 기관만 볼 수 있는 장부를 쓸지도 여기서 정해짐. 3번 실사·운영이 "자산 자체가 여전히 괜찮은지"를 보는 것이라면, 여기 5번 원장은 "그 자산에 대한 권리(토큰)를 지금 누가 들고 있는지"만 기록함 — 보는 대상이 서로 다름.</p>
+    <div class="company"><b class="name">Canton Network</b><p>JP모건, 골드만삭스 등 600개 이상 금융기관이 함께 쓰는 장부. 일반 블록체인과 달리 각 기관이 자기 거래 내역을 다른 기관에게 다 안 보여줘도 되게 설계됨(민감한 거래를 숨기고 싶어 하는 금융기관 특성 때문). <b>돈 버는 방식:</b> 이 네트워크를 쓸 때마다 수수료가 발생하는데, 그 수수료만큼 자체 코인(Canton Coin)이 사라지고(소각), 동시에 네트워크를 운영해주는 기관에게는 새로 발행된 코인이 보상으로 지급됨. 즉 특정 회사가 수수료를 걷어가는 구조가 아니라, 코인 시스템 자체가 "쓰는 만큼 없어지고, 운영하는 만큼 보상받는" 구조로 돌아감. 한때 이 네트워크가 관리하는 토큰화 자산 규모가 약 <span class="krw">8,640조 원</span>(6조 달러)에 달했다는 보도도 있음.</p></div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="group-head"><span class="ic">⚙️</span><h2>돌리는 층 (레이어 6~8)</h2></div>
+  <p class="group-sub">만들어진 토큰이 시장에서 실제로 굴러가게 하는 인프라임.</p>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">6</span><h3>데이터 레이어</h3></div>
+    <p class="layer-q">이거 지금 얼마짜리야?</p>
+    <p class="layer-gen">여기서는 이 토큰이 지금 얼마짜리인지 가격·가치 정보를 계산해서 스마트컨트랙트나 투자자에게 전달함.</p>
+    <div class="company"><b class="name">Chainlink</b><p>블록체인 밖의 정보(가격 등)를 블록체인 안으로 가져다주는 서비스(오라클(1)). 블록체인 스스로는 바깥 세상 가격을 알 방법이 없어서 이 회사가 대신 가져다줌. 네, 수수료로 버는 게 맞음 — 이 정보 전달 서비스를 이용하는 대가로 수수료를 받고, 최근에는 기업 고객들이 내는 이용료 일부도 자체 코인(LINK)으로 바꿔 받는 구조까지 추가됨. 2025년 기준 이 회사가 가격을 확인해주고 있는 자산 총액이 약 <span class="krw">144조 원</span> 규모.</p></div>
+    <div class="note-list"><div>(1) 오라클: 블록체인 바깥의 정보를 블록체인 안으로 전달해주는 서비스.</div></div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">7</span><h3>유동성 레이어</h3></div>
+    <p class="layer-q">팔고 싶을 때 살 사람이 있어?</p>
+    <p class="layer-gen">여기서는 이 토큰을 사고 싶거나 팔고 싶을 때 실제로 거래해줄 상대방을 구해주는 역할을 함. 대체자산은 원래도 사고팔 상대를 찾기 어려운 자산이라 이 역할이 특히 중요함.</p>
+    <div class="company"><b class="name">Wintermute</b><p>이 회사는 항상 "사는 가격"과 "파는 가격"을 동시에 걸어두는 회사임. 예를 들어 급하게 팔고 싶은 고객 A가 나타나면 Wintermute가 100원에 사줌(A는 100원을 받고 끝). 나중에 급하게 사고 싶은 고객 B가 나타나면 Wintermute가 101원에 팔아줌(B는 101원을 내고 끝). Wintermute는 100원에 사서 101원에 팔았으니 1원 이익이 남음. A와 B는 서로 다른 시점의 서로 다른 사람이고, 둘 다 손해 본 것 없이 각자 원하는 가격에 즉시 거래를 끝낸 것. Wintermute는 "언제든 즉시 거래를 성사시켜주는 대가"로 그 1원 차이(스프레드)를 가져가는 구조임. 하루 평균 약 <span class="krw">21.6조 원</span>어치 거래에 이런 식으로 상대가 되어줌.</p></div>
+  </div>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">8</span><h3>활용 레이어</h3></div>
+    <p class="layer-q">이 토큰으로 뭘 할 수 있어?</p>
+    <p class="layer-gen">여기서는 이 토큰을 실제로 가진 사람이 뭘 할 수 있는지를 다룸 — 팔거나, 담보로 맡기거나, 안전하게 보관해두는 것까지.</p>
+    <div class="company"><b class="name">Fireblocks</b><p>은행이나 큰 투자회사가 토큰을 안전하게 보관·이동하도록 도와주는 회사. Brink's와 헷갈릴 수 있는데 완전히 다른 대상을 지킴 — Brink's는 "진짜 금괴, 진짜 카드"를 넣어두는 물리적 금고고, Fireblocks는 그 토큰을 움직일 수 있는 비밀번호(키)를 지켜주는 디지털 금고임. 금고 안에 실물이 있는 게 아니라, 그 자산을 움직일 수 있는 열쇠 자체를 지키는 것. 이 열쇠 하나를 통째로 한 사람이 갖는 대신 여러 조각으로 나눠 여러 사람이 나눠 갖게 하는 보안기술(1)을 씀 — 한 사람이 해킹당해도 전체가 털리지 않게. 돈은 구독료 + 거래량에 따른 수수료로 벎.</p></div>
+    <div class="note-list"><div>(1) MPC(Multi-Party Computation, 다자간 연산): 비밀번호(키) 하나를 여러 조각으로 나눠 여러 사람이 나눠 갖게 하는 보안 기술.</div></div>
+  </div>
+</section>
+
+<section id="wrap">
+  <div class="group-head"><span class="ic">🛡️</span><h2>감싸는 층 (레이어 9)</h2></div>
+  <p class="group-sub">1~8번 레이어 전체를 관통하며 지켜보는 규제임.</p>
+
+  <div class="layer-block">
+    <div class="layer-head"><span class="lno">9</span><h3>규제 레이어</h3></div>
+    <p class="layer-q">이거 법적으로 문제없어?</p>
+    <p class="layer-gen">여기서는 이 토큰이 법적으로 증권인지, 상품인지, 그냥 물건인지를 나라가 판단하고, 그에 따라 누가 살 수 있는지·어떻게 팔아야 하는지를 정함.</p>
+    <div class="company"><b class="name">Chainalysis</b><p>블록체인 위 거래를 계속 들여다보면서 "이 지갑 주소가 범죄나 제재 대상과 관련 있는지"를 걸러내 주는 회사. 기업이 구독해서 쓰고, 사용 인원수에 따라 비용을 냄(1인당 약 1,440만 원부터). 토큰 발행 회사 입장에서는 "본인 확인이 안 된 사람, 문제 있는 자금은 아예 거래에 못 끼게" 막아야 하는데 그걸 대신 해줌 — 대체자산 토큰이 일반 코인처럼 아무나 자유롭게 사고팔 수는 없는 이유임.</p></div>
+  </div>
+</section>
+
+<section class="end">
+  <div class="label">KEY TAKEAWAY</div>
+  <h2 class="title">신뢰는 한 곳에서 나오지 않음 — 레이어마다 출처가 다름</h2>
+  <p>9개 레이어를 하나씩 보면 사실 블록체인이 새로 만든 신뢰는 거의 없음. 대출을 심사·실행하는 신뢰는 Apollo 같은 전통 자산운용사에서, 카드나 채권의 진위·품질을 확인하는 신뢰는 PSA·Moody's Ratings 같은 감정·평가기관에서, 실물을 안전하게 지키는 신뢰는 Brink's 같은 보안회사에서, 즉시 거래를 성사시켜주는 신뢰는 Wintermute 같은 시장조성자에서 나옴. 블록체인(원장 레이어)이 하는 일은 이 모든 신뢰의 결과물을 모아서 "누가 얼마나 갖고 있는지"를 빠르고 투명하게 기록·이전하는 것뿐임. 즉 토큰화는 신뢰를 새로 만드는 기술이 아니라, 이미 존재하는 여러 신뢰의 출처를 연결해서 더 빠르게 유통시키는 기술임.</p>
+</section>
+
+<section>
+  <div class="label">SOURCES</div>
+  <h2 class="title">주요 출처</h2>
+  <div class="src-cols">
+    <a href="https://www.apollo.com/strategies/asset-management/credit">Apollo, Credit 전략 공식 페이지</a><br>
+    <a href="https://pestel-analysis.com/blogs/how-it-works/apolloglobal">Pestel Analysis, Apollo 수익구조 (2025)</a><br>
+    <a href="https://www.psacard.com/services/tradingcardgrading">PSA, 등급 서비스 공식 페이지</a><br>
+    <a href="https://www.gradingmetric.com/psa-card-grading">GradingMetric, PSA 등급 비용·프로세스 (2026)</a><br>
+    <a href="https://www.theblock.co/post/402068/securitize-record-q1-revenue-3-4-billion-tokenized-assets-under-management">The Block, Securitize 분기 매출·AUM (2026)</a><br>
+    <a href="https://us.brinks.com/precious-metals">Brink's, 귀금속 보관 서비스</a><br>
+    <a href="https://blog.chain.link/chainlink-in-2025/">Chainlink Blog, 2025년 성과·수익구조</a><br>
+    <a href="https://genfinity.io/2026/04/30/canton-network-tops-blockchain-revenue-65-million-fees/">Genfinity, Canton Network 수수료·규모 (2026)</a><br>
+    <a href="https://blog.digitalasset.com/blog/myth-busters-canton-network">Digital Asset Blog, Canton Network 구조 설명</a><br>
+    <a href="https://phemex.com/academy/what-is-wintermute-making-markets-liquid">Phemex, Wintermute 시장조성 구조</a><br>
+    <a href="https://research.contrary.com/company/fireblocks">Contrary Research, Fireblocks 비즈니스 구조</a><br>
+    <a href="https://sacra.com/c/chainalysis/">Sacra, Chainalysis 수익모델</a><br>
+    <a href="https://ir.moodys.com/press-releases/news-details/2026/Moodys-Ratings-Becomes-First-Credit-Rating-Agency-to-Bring-Independent-Credit-Analysis-to-Blockchain-Financial-Infrastructure/default.aspx">Moody's Ratings, Token Integration Engine 발표 (2026)</a><br>
+    <a href="https://ankuratrust.com/expertise/loan-administrative-agent-services/">Ankura Trust, 대출 관리대리 서비스</a><br>
+    <a href="https://kr.investing.com/currencies/usd-krw">Investing.com, USD/KRW 환율 (2026.8.3 기준, 원화 환산에 사용)</a>
+  </div>
+</section>
+
+<p class="foot">대체자산 토큰화 개론 세션 자료. 2026.8.3 기준 검색된 최신 정보를 토대로 재구성했으며, 원화 환산은 1달러 = 1,440원 기준(2026.8.3)을 적용함. 수치는 출처 시점 기준이며 집계 기관별 편차가 있을 수 있음.</p>
+
+</main></body></html>

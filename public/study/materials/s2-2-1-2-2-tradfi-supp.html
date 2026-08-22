@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAY 자율스터디 보충 | 전당포에서 온체인까지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EDF1F5;
+  --bg-deep:#FFFFFF;
+  --svg-inset:#F5F8FB;
+  --surface:#FFFFFF;
+  --surface-2:#E3EAF1;
+  --line:#B8C8D6;
+  --line-soft:#DCE4EB;
+  --ink:#132030;
+  --ink-mid:#3B5165;
+  --ink-dim:#61768A;
+
+  --tradfi:#1F5F9E;
+  --onchain:#0C8A7E;
+  --accent:#AC6600;
+  --risk:#CB3230;
+  --gated:#6746CE;
+
+  --rgb-t:31,95,158;
+  --rgb-o:12,138,126;
+  --rgb-a:172,102,0;
+  --rgb-r:203,50,48;
+  --rgb-g:103,70,206;
+
+  --chip-bg:rgba(255,255,255,.8);
+  --row-hover:rgba(31,95,158,.06);
+  --shadow:0 1px 2px rgba(19,32,48,.05), 0 3px 12px rgba(19,32,48,.05);
+  --shadow-sm:0 1px 2px rgba(19,32,48,.05);
+
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Segoe UI','Malgun Gothic',sans-serif;
+  --maxw:960px;
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101822; --bg-deep:#0B1119; --svg-inset:#0B1119;
+  --surface:#18232F; --surface-2:#1F2D3C;
+  --line:#2A3D52; --line-soft:#22323F;
+  --ink:#E8EFF7; --ink-mid:#AEC0D2; --ink-dim:#7B92A8;
+  --tradfi:#7FA8D9; --onchain:#4DD0C7; --accent:#F2A23C; --risk:#FF5C5C; --gated:#A78BFA;
+  --rgb-t:127,168,217; --rgb-o:77,208,199; --rgb-a:242,162,60; --rgb-r:255,92,92; --rgb-g:167,139,250;
+  --chip-bg:rgba(24,35,47,.6); --row-hover:rgba(42,61,82,.18);
+  --shadow:none; --shadow-sm:none;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased;letter-spacing:-0.008em;
+}
+a{color:var(--tradfi);text-decoration:none;border-bottom:1px solid rgba(var(--rgb-t),.3)}
+:focus-visible{outline:2px solid var(--tradfi);outline-offset:3px}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+.shell{display:flex}
+.toc{
+  position:sticky;top:0;height:100vh;width:256px;flex-shrink:0;
+  border-right:1px solid var(--line-soft);padding:40px 20px 40px 28px;
+  overflow-y:auto;background:var(--bg-deep);box-shadow:1px 0 0 var(--line-soft);
+}
+.toc-brand{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--ink-dim);margin-bottom:6px;text-transform:uppercase}
+.toc-sub{font-size:11.5px;color:var(--tradfi);margin-bottom:22px;font-family:var(--mono)}
+.toc a{display:block;font-size:13.5px;color:var(--ink-dim);padding:7px 0 7px 12px;border:none;border-left:2px solid transparent;line-height:1.5;transition:color .15s,border-color .15s}
+.toc a:hover{color:var(--ink);border-left-color:var(--line)}
+.toc a.active{color:var(--tradfi);border-left-color:var(--tradfi)}
+.toc-div{height:1px;background:var(--line-soft);margin:16px 0 12px}
+.main{flex:1;min-width:0;padding-bottom:120px}
+@media(max-width:1080px){.toc{display:none}}
+
+/* HERO */
+.hero{
+  border-bottom:1px solid var(--line-soft);padding:92px 0 66px;
+  background:
+    radial-gradient(920px 400px at 10% -8%, rgba(var(--rgb-t),.14), transparent 62%),
+    radial-gradient(700px 340px at 90% 4%, rgba(var(--rgb-o),.09), transparent 60%);
+}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--tradfi);text-transform:uppercase;margin-bottom:22px}
+.hero h1{font-size:clamp(31px,5.4vw,56px);font-weight:800;line-height:1.16;letter-spacing:-0.035em;margin-bottom:26px}
+.hero h1 em{font-style:normal;color:var(--tradfi)}
+.hero-lead{font-size:18px;color:var(--ink-mid);max-width:700px;line-height:1.85}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:38px;font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+.hero-meta span{border:1px solid var(--line);padding:6px 12px;border-radius:2px;background:var(--chip-bg)}
+
+/* SECTION */
+section{padding:78px 0 8px;scroll-margin-top:24px}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:10px}
+.sec-num{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tradfi);letter-spacing:.1em;flex-shrink:0;padding-top:8px}
+h2{font-size:clamp(25px,3.7vw,35px);font-weight:800;letter-spacing:-0.03em;line-height:1.3}
+.sec-lead{font-size:15px;color:var(--ink-dim);margin:6px 0 30px;padding-left:44px;line-height:1.7}
+@media(max-width:640px){.sec-lead{padding-left:0}}
+h3{font-size:20px;font-weight:700;margin:50px 0 16px;letter-spacing:-0.02em;padding-left:13px;border-left:3px solid var(--tradfi)}
+h4{font-size:16px;font-weight:700;margin:30px 0 10px;color:var(--ink)}
+p{margin-bottom:16px;color:var(--ink-mid)}
+p strong,li strong,td strong,dd strong{color:var(--ink);font-weight:700}
+.tm{font-family:var(--mono);font-size:.86em;color:var(--ink-dim);letter-spacing:0}
+.rule{height:1px;background:var(--line-soft)}
+ul.bul{list-style:none;margin:10px 0 20px}
+ul.bul li{position:relative;padding-left:20px;margin-bottom:10px;color:var(--ink-mid);font-size:16px;line-height:1.78}
+ul.bul li::before{content:'';position:absolute;left:2px;top:12px;width:6px;height:6px;background:var(--line);border-radius:1px}
+ul.bul li.hl::before{background:var(--tradfi)}
+
+/* QUESTION LEAD */
+.qlead{
+  display:flex;gap:14px;align-items:flex-start;margin:38px 0 18px;
+  padding:16px 20px;border-radius:6px;background:var(--surface);
+  border:1px solid var(--line-soft);box-shadow:var(--shadow-sm);
+}
+.qlead .mk{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--tradfi);line-height:1.2;flex-shrink:0}
+.qlead p{margin:0;font-size:17px;font-weight:700;color:var(--ink);line-height:1.6}
+
+/* BOXES */
+.oneline{border-left:3px solid var(--tradfi);background:linear-gradient(90deg,rgba(var(--rgb-t),.11),transparent 78%);padding:18px 22px;margin:26px 0;border-radius:0 4px 4px 0;box-shadow:var(--shadow-sm)}
+.oneline .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--tradfi);text-transform:uppercase;display:block;margin-bottom:7px}
+.oneline p{margin:0;color:var(--ink);font-size:17px;font-weight:600;line-height:1.68}
+
+.plain{border:1px dashed var(--line);border-radius:6px;padding:16px 20px;margin:22px 0;background:var(--surface)}
+.plain .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--ink-dim);text-transform:uppercase;display:block;margin-bottom:7px}
+.plain p{margin:0;font-size:15.5px;line-height:1.8}
+.plain p+p{margin-top:10px}
+
+.bridge{border:1px solid rgba(var(--rgb-o),.42);border-radius:6px;padding:18px 22px;margin:28px 0;background:rgba(var(--rgb-o),.08);box-shadow:var(--shadow-sm)}
+.bridge .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--onchain);text-transform:uppercase;display:block;margin-bottom:9px}
+.bridge p{margin:0;font-size:15.5px;line-height:1.82}
+.bridge p+p{margin-top:11px}
+
+.warn{border:1px solid rgba(var(--rgb-r),.34);border-radius:6px;padding:16px 20px;margin:24px 0;background:rgba(var(--rgb-r),.07);font-size:15.5px;color:var(--ink-mid);line-height:1.8;box-shadow:var(--shadow-sm)}
+.warn .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--risk);display:block;margin-bottom:7px}
+
+.note{font-size:14px;color:var(--ink-dim);font-family:var(--mono);line-height:1.75;margin:14px 0 22px;padding-left:15px;border-left:2px solid var(--line-soft)}
+
+/* FIGURE */
+figure{margin:36px 0 40px}
+.fig-box{border:1px solid var(--line-soft);border-radius:7px;background:var(--svg-inset);padding:24px 20px;overflow-x:auto;box-shadow:var(--shadow-sm)}
+.fig-box svg{display:block;width:100%;height:auto;min-width:560px}
+figcaption{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);margin-top:12px;line-height:1.65}
+figcaption b{color:var(--tradfi);font-weight:700}
+.svg-t{font-family:'JetBrains Mono',monospace;font-size:11.5px;fill:var(--ink-mid)}
+.svg-t.sm{font-size:10.5px;fill:var(--ink-dim)}
+.svg-t.hd{font-size:13px;fill:var(--ink);font-weight:700}
+.svg-t.ko{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:13px;fill:var(--ink-mid)}
+.svg-t.ko-sm{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11.5px;fill:var(--ink-dim)}
+.svg-t.ko-hd{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:14px;fill:var(--ink);font-weight:700}
+.svg-t.ko-big{font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:16px;fill:var(--ink);font-weight:800}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;margin:30px 0;box-shadow:var(--shadow-sm)}
+.stat{background:var(--surface);padding:19px 17px}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--ink);line-height:1.15;letter-spacing:-0.025em}
+.stat .v.t{color:var(--tradfi)} .stat .v.o{color:var(--onchain)} .stat .v.r{color:var(--risk)}
+.stat .k{font-size:12.5px;color:var(--ink-dim);margin-top:8px;line-height:1.55}
+.stat .src{font-family:var(--mono);font-size:9px;color:var(--ink-dim);opacity:.7;margin-top:7px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;margin:28px 0;border:1px solid var(--line-soft);border-radius:6px;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:660px;background:var(--surface)}
+th{background:var(--surface-2);color:var(--ink);text-align:left;padding:12px 14px;font-weight:700;font-size:12.5px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--line-soft);color:var(--ink-mid);vertical-align:top;line-height:1.68}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--row-hover)}
+td.mono,th.mono{font-family:var(--mono);font-size:12.5px}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid currentColor;line-height:1.5;white-space:nowrap}
+.pill.t{color:var(--tradfi)} .pill.o{color:var(--onchain)} .pill.a{color:var(--accent)} .pill.g{color:var(--gated)}
+
+/* TRANSLATOR */
+.trans{border:1px solid var(--line);border-radius:8px;background:var(--bg-deep);padding:28px 26px;margin:36px 0;box-shadow:var(--shadow)}
+.trans-hd{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+.trans-hd .bar{width:3px;height:16px;background:var(--tradfi);border-radius:2px}
+.trans-hd h4{margin:0;font-size:16px}
+.trans-sub{font-size:14.5px;color:var(--ink-dim);margin-bottom:20px;line-height:1.7}
+.term-btns{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:24px}
+.tbtn{font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:3px;background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);cursor:pointer;transition:all .15s}
+.tbtn:hover{color:var(--ink);border-color:var(--ink-dim)}
+.tbtn.on{background:rgba(var(--rgb-t),.14);border-color:var(--tradfi);color:var(--tradfi)}
+.trans-body{display:grid;grid-template-columns:1fr auto 1fr;border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;background:var(--surface)}
+@media(max-width:720px){.trans-body{grid-template-columns:1fr}}
+.tside{padding:20px}
+.tside.l{background:rgba(var(--rgb-t),.08)}
+.tside.r{background:rgba(var(--rgb-o),.08)}
+.tside .cap{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:9px}
+.tside.l .cap{color:var(--tradfi)} .tside.r .cap{color:var(--onchain)}
+.tside .name{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-0.02em;line-height:1.35;margin-bottom:4px}
+.tside .en{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-bottom:12px}
+.tside .desc{font-size:14.5px;color:var(--ink-mid);line-height:1.75}
+.tmid{display:flex;align-items:center;justify-content:center;padding:0 15px;background:var(--surface);border-left:1px solid var(--line-soft);border-right:1px solid var(--line-soft)}
+.tmid span{font-family:var(--mono);font-size:16px;color:var(--ink-dim)}
+@media(max-width:720px){.tmid{padding:9px 0;border:none;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}.tmid span{transform:rotate(90deg);display:inline-block}}
+.tdiff{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-soft);border-top:1px solid var(--line-soft)}
+@media(max-width:720px){.tdiff{grid-template-columns:1fr}}
+.tdiff div{background:var(--surface);padding:16px 20px}
+.tdiff .h{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;color:var(--ink-dim)}
+.tdiff .same .h{color:var(--onchain)} .tdiff .diff .h{color:var(--risk)}
+.tdiff p{margin:0;font-size:14px;line-height:1.78}
+.tkey{margin-top:16px;padding:15px 18px;border-radius:5px;background:rgba(var(--rgb-a),.11);border:1px solid rgba(var(--rgb-a),.32);font-size:14.5px;color:var(--ink);line-height:1.72}
+.tkey b{color:var(--accent)}
+
+/* CONVERTER */
+.conv{border:1px solid var(--line);border-radius:8px;background:var(--bg-deep);padding:28px 26px;margin:36px 0;box-shadow:var(--shadow)}
+.conv-hd{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+.conv-hd .bar{width:3px;height:16px;background:var(--accent);border-radius:2px}
+.conv-hd h4{margin:0;font-size:16px}
+.conv-sub{font-size:14.5px;color:var(--ink-dim);margin-bottom:24px;line-height:1.7}
+.band{position:relative;height:44px;border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex;margin-bottom:7px}
+.band i{flex:1;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--ink-dim);font-style:normal;border-right:1px solid var(--line-soft);text-align:center;line-height:1.35;padding:0 4px}
+.band i:last-child{border-right:none}
+.band i.act{background:rgba(var(--rgb-a),.22);color:var(--accent);font-weight:700}
+.band-axis{display:flex;font-family:var(--mono);font-size:9.5px;color:var(--ink-dim);margin-bottom:22px}
+.band-axis span{flex:1;text-align:center}
+.conv-ctl label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--ink-mid);margin-bottom:10px}
+.conv-ctl label b{color:var(--accent)}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;background:var(--line);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--ink);cursor:pointer;border:3px solid var(--bg-deep);box-shadow:0 0 0 1px var(--line)}
+input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;background:var(--ink);cursor:pointer;border:3px solid var(--bg-deep)}
+.conv-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:4px;overflow:hidden;margin-top:24px}
+.conv-out div{background:var(--surface);padding:13px 14px}
+.conv-out .k{font-family:var(--mono);font-size:9.5px;color:var(--ink-dim);letter-spacing:.08em;text-transform:uppercase}
+.conv-out .v{font-family:var(--mono);font-size:18px;font-weight:700;margin-top:6px;color:var(--ink)}
+#convNote{margin-top:18px;padding:15px 18px;border-radius:5px;font-size:14.5px;line-height:1.78;border:1px solid var(--line);background:var(--surface);color:var(--ink-mid)}
+.conv-foot{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:15px;line-height:1.7}
+
+/* CARDS */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:26px 0}
+@media(max-width:640px){.cmp{grid-template-columns:1fr}}
+.cmp-card{border:1px solid var(--line);border-radius:6px;padding:20px;background:var(--surface);box-shadow:var(--shadow-sm)}
+.cmp-card.t{border-top:3px solid var(--tradfi)} .cmp-card.o{border-top:3px solid var(--onchain)}
+.cmp-card h5{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--ink)}
+.cmp-card .tagline{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-bottom:14px}
+.cmp-card ul{list-style:none}
+.cmp-card li{font-size:14.5px;color:var(--ink-mid);padding-left:16px;position:relative;margin-bottom:9px;line-height:1.72}
+.cmp-card li::before{content:'';position:absolute;left:0;top:10px;width:5px;height:5px;border-radius:1px;background:var(--line)}
+.cmp-card.t li::before{background:rgba(var(--rgb-t),.65)} .cmp-card.o li::before{background:rgba(var(--rgb-o),.65)}
+
+.acards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;margin:28px 0}
+.acard{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:20px;box-shadow:var(--shadow-sm)}
+.acard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:3px}
+.acard h5{font-size:16.5px;font-weight:800;color:var(--ink);letter-spacing:-0.02em;line-height:1.35}
+.acard .tok{font-family:var(--mono);font-size:9.5px;color:var(--onchain);border:1px solid rgba(var(--rgb-o),.45);padding:2px 6px;border-radius:2px;white-space:nowrap}
+.acard .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-bottom:14px}
+.acard dl{margin:0;font-size:14.5px;line-height:1.75}
+.acard dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-top:13px}
+.acard dt:first-child{margin-top:0}
+.acard dd{margin:4px 0 0;color:var(--ink-mid)}
+.acard dd b{color:var(--risk);font-weight:700}
+
+/* CHECKLIST */
+.chk{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:6px 0;margin:26px 0;box-shadow:var(--shadow-sm)}
+.chk label{display:flex;gap:13px;align-items:flex-start;padding:13px 22px;cursor:pointer;border-bottom:1px solid var(--line-soft);transition:background .15s}
+.chk label:last-of-type{border-bottom:none}
+.chk label:hover{background:var(--row-hover)}
+.chk input{margin-top:6px;width:16px;height:16px;accent-color:var(--tradfi);flex-shrink:0;cursor:pointer}
+.chk .q{font-size:15.5px;color:var(--ink);line-height:1.65}
+.chk .a{font-size:13.5px;color:var(--ink-dim);line-height:1.65;margin-top:4px;display:block}
+.chk input:checked ~ .txt .q{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--line)}
+#chkScore{font-family:var(--mono);font-size:12.5px;color:var(--tradfi);padding:15px 22px;border-top:1px solid var(--line);background:rgba(var(--rgb-t),.07)}
+
+.theme-btn{position:fixed;top:16px;right:16px;z-index:60;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:8px 13px;border-radius:20px;cursor:pointer;background:var(--surface);border:1px solid var(--line);color:var(--ink-mid);box-shadow:var(--shadow)}
+.theme-btn:hover{color:var(--ink);border-color:var(--ink-dim)}
+.theme-btn .sw{width:8px;height:8px;border-radius:50%;background:var(--tradfi)}
+@media print{.theme-btn,.toc{display:none}}
+
+footer{border-top:1px solid var(--line-soft);margin-top:84px;padding:46px 0 62px}
+footer h4{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-dim);text-transform:uppercase;margin-bottom:17px}
+.srcs{font-size:13.5px;color:var(--ink-dim);line-height:2}
+
+@media(max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 18px}
+  .hero{padding:58px 0 46px}
+  section{padding:56px 0 4px}
+  .fig-box{padding:15px 11px}
+  .trans,.conv{padding:20px 17px}
+  .theme-btn{top:10px;right:10px;padding:7px 11px;font-size:10px}
+  .band i{font-size:8.5px}
+}
+</style>
+</head>
+<body>
+<a href="/research/study/2" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 2회차 진행안으로</a>
+
+<button class="theme-btn" id="themeBtn" type="button" aria-pressed="false"><span class="sw" aria-hidden="true"></span><span id="themeLabel">다크 모드</span></button>
+
+<div class="shell">
+<nav class="toc" aria-label="목차">
+  <div class="toc-brand">BAY / 자율스터디</div>
+  <div class="toc-sub">보충자료 · 전통금융 편</div>
+  <a href="#s0">들어가며</a>
+  <a href="#s1">1. 담보 잡고 돈 빌려주기</a>
+  <a href="#s2">2. 얼마나 빌려줄까 (헤어컷)</a>
+  <a href="#s3">3. Repo, 기관들의 전당포</a>
+  <a href="#s4">4. 담보가 떨어지면</a>
+  <a href="#s5">5. 돈은 언제 도착하나</a>
+  <a href="#s6">6. 담보로 쓰이는 자산들</a>
+  <a href="#s7">7. 아무나 못 사는 증권</a>
+  <a href="#s8">8. 펀드를 담보로 잡기</a>
+  <div class="toc-div"></div>
+  <a href="#s9">용어 번역기</a>
+  <a href="#s10">전체 대조표</a>
+  <a href="#s11">자가진단</a>
+  <a href="#srcs">출처</a>
+</nav>
+
+<main class="main">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">BAY Research Track / 자율스터디 보충자료</div>
+    <h1>전당포에서<br><em>온체인</em>까지</h1>
+    <p class="hero-lead">
+      디파이 렌딩은 새로 발명된 것이 아닙니다.
+      담보를 잡고 돈을 빌려주는 방식은 전당포 시절부터 있었고, 그 구조가 계속 이어져 왔습니다.
+      이 자료는 가장 익숙한 전당포에서 출발해 온체인까지 한 계단씩 올라갑니다.
+      금융 전공이 아니어도 끝까지 따라올 수 있게 썼습니다.
+    </p>
+    <div class="hero-meta">
+      <span>1편 보충 · 디파이 렌딩과 RWA 담보</span>
+      <span>다이어그램 18</span>
+      <span>용어 번역기 12종</span>
+      <span>작성 2026.08.08</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== S0 ===== -->
+<section id="s0">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">00</span><h2>들어가며</h2></div>
+  <p class="sec-lead">이 자료가 어떤 순서로 진행되는지 먼저 확인합니다.</p>
+
+  <p>
+    1편에서 온체인 렌딩이 어떻게 돌아가는지 봤습니다.
+    담보인정비율, 청산 기준, 오라클, 큐레이터 같은 말이 나왔습니다.
+    처음 보면 블록체인이 만들어낸 새로운 개념처럼 느껴집니다.
+  </p>
+  <p>
+    그런데 <strong>전부 원래 있던 것들입니다.</strong>
+    이름만 다를 뿐, 담보를 잡고 돈을 빌려주는 시장이라면 어디서든 필요한 장치들입니다.
+    전당포도 이 장치들을 씁니다.
+  </p>
+
+  <div class="oneline">
+    <span class="lbl">이 자료가 하려는 것</span>
+    <p>디파이 용어를 원래 있던 것과 짝지어 주는 일. 그리고 어디까지 같고 어디서부터 다른지 짚어 주는 일.</p>
+  </div>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="전당포에서 온체인까지 이어지는 담보금융의 사다리">
+        <text x="20" y="26" class="svg-t ko-hd">담보 잡고 돈 빌려주기, 네 가지 버전</text>
+        <text x="20" y="48" class="svg-t ko-sm">규모와 상대만 바뀔 뿐 구조는 그대로 이어집니다</text>
+
+        <!-- steps -->
+        <g>
+          <rect x="20" y="68" width="200" height="86" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="38" y="92" class="svg-t sm" fill="var(--ink-dim)">STEP 1</text>
+          <text x="38" y="115" class="svg-t ko-big">전당포</text>
+          <text x="38" y="137" class="svg-t ko-sm">시계 맡기고 현금 받기</text>
+
+          <rect x="234" y="68" width="200" height="86" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <text x="252" y="92" class="svg-t sm" fill="var(--ink-dim)">STEP 2</text>
+          <text x="252" y="115" class="svg-t ko-big">증권담보대출</text>
+          <text x="252" y="137" class="svg-t ko-sm">주식 맡기고 현금 받기</text>
+
+          <rect x="448" y="68" width="200" height="86" rx="6" fill="rgba(var(--rgb-t),.13)" stroke="var(--tradfi)"/>
+          <text x="466" y="92" class="svg-t sm" fill="var(--tradfi)">STEP 3</text>
+          <text x="466" y="115" class="svg-t ko-big">Repo</text>
+          <text x="466" y="137" class="svg-t ko-sm">기관이 국채 맡기고 현금</text>
+
+          <rect x="662" y="68" width="218" height="86" rx="6" fill="rgba(var(--rgb-o),.13)" stroke="var(--onchain)"/>
+          <text x="680" y="92" class="svg-t sm" fill="var(--onchain)">STEP 4</text>
+          <text x="680" y="115" class="svg-t ko-big">온체인 렌딩</text>
+          <text x="680" y="137" class="svg-t ko-sm">지갑이 토큰 맡기고 현금</text>
+        </g>
+
+        <path d="M224 111 L230 111" stroke="var(--line)" stroke-width="2"/>
+        <path d="M438 111 L444 111" stroke="var(--line)" stroke-width="2"/>
+        <path d="M652 111 L658 111" stroke="var(--line)" stroke-width="2"/>
+
+        <!-- common elements -->
+        <text x="20" y="192" class="svg-t ko-hd" fill="var(--accent)">네 가지 모두 똑같이 필요한 세 가지</text>
+        <rect x="20" y="204" width="860" height="80" rx="6" fill="rgba(var(--rgb-a),.10)" stroke="var(--line)" stroke-dasharray="5 3"/>
+
+        <text x="46" y="232" class="svg-t ko-hd">1. 얼마나 빌려줄까</text>
+        <text x="46" y="254" class="svg-t ko-sm">맡긴 물건 값보다 적게 줍니다</text>
+        <text x="46" y="272" class="svg-t sm" fill="var(--accent)">헤어컷 · 담보인정비율(LTV)</text>
+
+        <line x1="316" y1="216" x2="316" y2="272" stroke="var(--line)"/>
+        <text x="342" y="232" class="svg-t ko-hd">2. 언제 팔아버릴까</text>
+        <text x="342" y="254" class="svg-t ko-sm">값이 너무 떨어지면 처분합니다</text>
+        <text x="342" y="272" class="svg-t sm" fill="var(--accent)">마진콜 · 청산 기준</text>
+
+        <line x1="606" y1="216" x2="606" y2="272" stroke="var(--line)"/>
+        <text x="632" y="232" class="svg-t ko-hd">3. 값은 누가 매길까</text>
+        <text x="632" y="254" class="svg-t ko-sm">기준이 될 가격이 필요합니다</text>
+        <text x="632" y="272" class="svg-t sm" fill="var(--accent)">감정 · 시가평가 · 오라클</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 1]</b> 이 자료 전체의 지도. 네 단계 모두 같은 세 가지 질문에 답해야 합니다.</figcaption>
+  </figure>
+
+  <div class="plain">
+    <span class="lbl">읽는 순서</span>
+    <p>
+      1장부터 순서대로 읽으면 됩니다. 앞 내용을 알아야 뒤가 이해되도록 배치했습니다.
+      급하면 각 장의 파란 상자(한 줄 요약)와 초록 상자(온체인에서는)만 읽어도 흐름은 잡힙니다.
+    </p>
+    <p>
+      맨 뒤에는 용어 번역기와 자가진단이 있습니다.
+      스터디 직전에 자가진단부터 풀어 보고, 막히는 항목만 해당 장으로 돌아가는 방법도 좋습니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S1 ===== -->
+<section id="s1">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">01</span><h2>담보 잡고 돈 빌려주기</h2></div>
+  <p class="sec-lead">가장 기초부터 시작합니다. 왜 담보를 잡는지, 그리고 담보를 잡으면 무엇이 달라지는지.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>돈을 빌려줄 때 왜 담보를 잡을까요?</p></div>
+
+  <p>
+    답은 단순합니다. <strong>상대를 못 믿기 때문입니다.</strong>
+    정확히는, 상대가 갚을지 안 갚을지 알아낼 방법이 마땅치 않기 때문입니다.
+  </p>
+  <p>
+    은행은 이 문제를 <strong>신용 심사</strong>로 풉니다.
+    소득이 얼마인지, 직장이 어디인지, 과거에 연체한 적은 없는지 확인합니다.
+    이걸 다 확인할 수 있으면 담보 없이도 돈을 빌려줍니다. 신용대출이 그것입니다.
+  </p>
+  <p>
+    그런데 확인할 방법이 없으면 어떻게 할까요.
+    이름도 모르고 다시 볼 일도 없는 사람에게 돈을 빌려줘야 한다면요.
+    이때 쓰는 방법이 <strong>담보</strong>입니다.
+    상대가 누구인지 몰라도 됩니다. 안 갚으면 물건을 팔면 되니까요.
+  </p>
+
+  <div class="plain">
+    <span class="lbl">쉽게 말하면</span>
+    <p>
+      담보는 <strong>사람을 안 봐도 되게 해 주는 장치</strong>입니다.
+      전당포가 손님의 직업이나 소득을 묻지 않는 이유가 이것입니다.
+      시계가 진짜인지만 확인하면 됩니다.
+    </p>
+  </div>
+
+  <h3>온체인은 왜 반드시 담보를 잡아야 하는가</h3>
+
+  <p>
+    온체인에서 돈을 빌리는 쪽은 지갑 주소입니다.
+    그냥 문자와 숫자의 나열입니다. 이름도 없고 국적도 없습니다.
+  </p>
+  <p>
+    더 중요한 건, 지갑은 누구나 몇 초 만에 새로 만들 수 있다는 점입니다.
+    안 갚고 도망가면 그 지갑을 버리고 새 지갑을 만들면 그만입니다.
+    소송을 걸 대상도, 찾아갈 주소도 없습니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 268" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="신용 심사가 가능한 경우와 불가능한 경우의 대출 방식 비교">
+        <text x="20" y="26" class="svg-t ko-hd">상대를 알 수 있는가에 따라 방식이 갈립니다</text>
+
+        <!-- can verify -->
+        <rect x="20" y="46" width="420" height="200" rx="6" fill="rgba(var(--rgb-t),.09)" stroke="var(--line)"/>
+        <text x="44" y="74" class="svg-t ko-hd" fill="var(--tradfi)">상대를 알 수 있을 때</text>
+
+        <rect x="44" y="90" width="372" height="42" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="62" y="108" class="svg-t ko">소득 · 직장 · 연체 이력 확인</text>
+        <text x="62" y="124" class="svg-t sm">신용 심사</text>
+
+        <path d="M230 136 L230 152" stroke="var(--line)" stroke-width="1.6" marker-end="url(#a1)"/>
+
+        <rect x="44" y="156" width="372" height="42" rx="4" fill="var(--surface)" stroke="var(--tradfi)"/>
+        <text x="62" y="174" class="svg-t ko" fill="var(--ink)">담보 없이도 빌려줌</text>
+        <text x="62" y="190" class="svg-t sm">신용대출 · 갚을 사람인지로 판단</text>
+
+        <text x="44" y="226" class="svg-t ko-sm">못 갚으면? 소송하고 재산을 찾아갑니다.</text>
+
+        <!-- cannot verify -->
+        <rect x="460" y="46" width="420" height="200" rx="6" fill="rgba(var(--rgb-o),.09)" stroke="var(--line)"/>
+        <text x="484" y="74" class="svg-t ko-hd" fill="var(--onchain)">상대를 알 수 없을 때</text>
+
+        <rect x="484" y="90" width="372" height="42" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="502" y="108" class="svg-t ko">지갑 주소만 있음 · 신원 없음</text>
+        <text x="502" y="124" class="svg-t sm">심사할 대상 자체가 없음</text>
+
+        <path d="M670 136 L670 152" stroke="var(--line)" stroke-width="1.6" marker-end="url(#a1)"/>
+
+        <rect x="484" y="156" width="372" height="42" rx="4" fill="var(--surface)" stroke="var(--onchain)"/>
+        <text x="502" y="174" class="svg-t ko" fill="var(--ink)">빌려주는 돈보다 비싼 담보를 요구</text>
+        <text x="502" y="190" class="svg-t sm">과담보 · 물건으로만 판단</text>
+
+        <text x="484" y="226" class="svg-t ko-sm" fill="var(--risk)">못 갚으면? 물건을 팝니다. 그 방법밖에 없습니다.</text>
+
+        <defs><marker id="a1" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="var(--line)"/></marker></defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 2]</b> 온체인 렌딩이 항상 과담보인 이유. 선택이 아니라 유일한 방법입니다.</figcaption>
+  </figure>
+
+  <div class="oneline">
+    <span class="lbl">1장 한 줄 요약</span>
+    <p>담보는 상대를 몰라도 돈을 빌려줄 수 있게 해 줍니다. 온체인은 상대를 알 방법이 없으니 담보 말고는 쓸 수 있는 수단이 없습니다.</p>
+  </div>
+
+  <div class="bridge">
+    <span class="lbl">온체인에서는</span>
+    <p>
+      1편에서 "온체인 대출은 담보 가치가 차입액을 넘는 과담보 방식으로 이뤄진다"고 했습니다.
+      이제 그게 프로토콜의 선택이 아니라 <strong>구조상 어쩔 수 없는 것</strong>이라는 게 보입니다.
+      신용을 볼 수 없으니 물건만 보는 것입니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S2 ===== -->
+<section id="s2">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">02</span><h2>얼마나 빌려줄까</h2></div>
+  <p class="sec-lead">담보를 잡기로 했다면 다음 질문은 금액입니다. 100만 원짜리 물건에 얼마를 빌려줄지 정해야 합니다.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>100만 원짜리 시계를 맡기면 100만 원을 빌려줄까요?</p></div>
+
+  <p>안 빌려줍니다. 보통 70만 원, 80만 원 정도만 빌려줍니다. 이유는 두 가지입니다.</p>
+
+  <ul class="bul">
+    <li class="hl"><strong>팔 때까지 값이 더 떨어질 수 있습니다.</strong> 손님이 안 갚아서 시계를 팔기로 결정한 그 시점부터 실제로 팔리기까지 시간이 걸립니다. 그사이 시세가 내려갈 수 있습니다.</li>
+    <li class="hl"><strong>급하게 팔면 제값을 못 받습니다.</strong> 천천히 팔면 100만 원을 받을 수 있어도, 오늘 당장 팔아야 하면 90만 원에 넘겨야 할 수도 있습니다.</li>
+  </ul>
+
+  <p>
+    그래서 미리 깎아 둡니다. 이 깎는 비율을 금융에서는 <strong class="tm">헤어컷(haircut)</strong>이라고 부릅니다.
+    머리카락 자르듯 값을 잘라낸다는 뜻입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="헤어컷이 생기는 이유를 보여주는 도해">
+        <text x="20" y="26" class="svg-t ko-hd">왜 시가보다 적게 빌려줄까</text>
+
+        <!-- bar -->
+        <text x="20" y="62" class="svg-t ko-sm">담보의 현재 시가</text>
+        <rect x="20" y="72" width="700" height="42" rx="4" fill="rgba(var(--rgb-t),.16)" stroke="var(--tradfi)"/>
+        <text x="370" y="99" class="svg-t ko-hd" text-anchor="middle">100만 원</text>
+
+        <path d="M730 93 L744 93" stroke="var(--line)" stroke-width="1.4"/>
+        <text x="752" y="97" class="svg-t sm">기준값</text>
+
+        <!-- deductions -->
+        <rect x="580" y="132" width="70" height="34" rx="3" fill="rgba(var(--rgb-r),.16)" stroke="var(--risk)"/>
+        <text x="615" y="153" class="svg-t sm" text-anchor="middle" fill="var(--risk)">-10만</text>
+        <text x="615" y="184" class="svg-t ko-sm" text-anchor="middle">팔기 전</text>
+        <text x="615" y="200" class="svg-t ko-sm" text-anchor="middle">추가 하락분</text>
+
+        <rect x="654" y="132" width="66" height="34" rx="3" fill="rgba(var(--rgb-r),.16)" stroke="var(--risk)"/>
+        <text x="687" y="153" class="svg-t sm" text-anchor="middle" fill="var(--risk)">-10만</text>
+        <text x="687" y="184" class="svg-t ko-sm" text-anchor="middle">급매 시</text>
+        <text x="687" y="200" class="svg-t ko-sm" text-anchor="middle">할인분</text>
+
+        <rect x="20" y="132" width="556" height="34" rx="3" fill="rgba(var(--rgb-o),.18)" stroke="var(--onchain)"/>
+        <text x="298" y="154" class="svg-t ko-hd" text-anchor="middle" fill="var(--ink)">실제로 빌려주는 금액 80만 원</text>
+
+        <path d="M580 220 L718 220" stroke="var(--accent)" stroke-width="1.6"/>
+        <path d="M580 214 L580 226 M718 214 L718 226" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="649" y="238" class="svg-t ko-sm" text-anchor="middle" fill="var(--accent)">헤어컷 20%</text>
+
+        <path d="M20 220 L576 220" stroke="var(--onchain)" stroke-width="1.6"/>
+        <path d="M20 214 L20 226 M576 214 L576 226" stroke="var(--onchain)" stroke-width="1.6"/>
+        <text x="298" y="238" class="svg-t ko-sm" text-anchor="middle" fill="var(--onchain)">담보인정비율(LTV) 80%</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 3]</b> 헤어컷과 LTV는 같은 막대의 양쪽 끝입니다. 헤어컷 20%면 LTV는 80%입니다.</figcaption>
+  </figure>
+
+  <div class="oneline">
+    <span class="lbl">여기가 핵심</span>
+    <p>헤어컷과 담보인정비율(LTV)은 같은 말을 반대로 표현한 것입니다. 둘을 더하면 항상 100이 됩니다.</p>
+  </div>
+
+  <p>
+    전통금융 사람들은 "깎는 쪽"을 말하는 게 익숙해서 헤어컷이라고 합니다.
+    디파이 사람들은 "빌려주는 쪽"을 말하는 게 익숙해서 LTV라고 합니다.
+    <strong>헤어컷 2%라는 말과 LTV 98%라는 말은 완전히 같은 뜻입니다.</strong>
+  </p>
+  <p>
+    그리고 한 가지 더. 헤어컷의 크기는 <strong>가격이 얼마나 떨어져도 버틸 수 있는지</strong>를 그대로 알려줍니다.
+    100만 원짜리에 80만 원을 빌려줬다면, 시세가 20% 떨어져 80만 원이 될 때까지는 팔아서 원금을 다 회수할 수 있습니다.
+  </p>
+
+  <!-- CONVERTER -->
+  <div class="conv">
+    <div class="conv-hd"><span class="bar"></span><h4>헤어컷 · LTV 변환기</h4></div>
+    <p class="conv-sub">슬라이더를 움직여 보세요. 헤어컷이 바뀌면 LTV가 반대로 움직이고, 실제 시장에서 그 정도 헤어컷을 받는 자산이 무엇인지 표시됩니다.</p>
+
+    <div class="band" id="band" aria-hidden="true">
+      <i data-lo="0" data-hi="3">미국 국채<br>2% 안팎</i>
+      <i data-lo="3" data-hi="5">주택저당증권<br>(MBS)</i>
+      <i data-lo="5" data-hi="8">우량 회사채</i>
+      <i data-lo="8" data-hi="15">주식<br>하이일드</i>
+      <i data-lo="15" data-hi="25">잘 안 팔리는<br>구조화 상품</i>
+      <i data-lo="25" data-hi="41">사모<br>비유동 자산</i>
+    </div>
+    <div class="band-axis"><span>0~3%</span><span>3~5%</span><span>5~8%</span><span>8~15%</span><span>15~25%</span><span>25% 이상</span></div>
+
+    <div class="conv-ctl">
+      <label for="hcSlider"><span>헤어컷을 움직여 보세요</span><b id="hcVal">2.0%</b></label>
+      <input type="range" id="hcSlider" min="0" max="40" value="2" step="0.5" aria-label="헤어컷 비율">
+    </div>
+
+    <div class="conv-out">
+      <div><div class="k">헤어컷</div><div class="v" id="oHc" style="color:var(--accent)">2.0%</div></div>
+      <div><div class="k">같은 뜻의 LTV</div><div class="v" id="oLtv" style="color:var(--onchain)">98.0%</div></div>
+      <div><div class="k">100 맡기면 받는 돈</div><div class="v" id="oCash">98.0</div></div>
+      <div><div class="k">버틸 수 있는 하락폭</div><div class="v" id="oTol">2.0%</div></div>
+    </div>
+
+    <div id="convNote">-</div>
+    <p class="conv-foot">
+      구간 값은 시장에서 흔히 쓰이는 범위를 정리한 참고치입니다. 실제 조건은 거래 상대와 시점에 따라 달라집니다.<br>
+      ⚠️ 미국 국채 헤어컷 2% 안팎은 뉴욕연준 통계로 확인된 값이고, 나머지 구간은 통상 범위입니다.
+    </p>
+  </div>
+
+  <h3>자산마다 헤어컷이 다른 이유</h3>
+
+  <p>국채는 2%만 깎고, 사모펀드 지분은 25% 넘게 깎습니다. 무엇이 이 차이를 만들까요. 네 가지를 봅니다.</p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 282" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="헤어컷을 결정하는 네 가지 요인">
+        <text x="20" y="26" class="svg-t ko-hd">헤어컷을 키우는 네 가지 요인</text>
+
+        <g>
+          <rect x="20" y="46" width="210" height="118" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <circle cx="48" cy="76" r="13" fill="rgba(var(--rgb-a),.20)"/>
+          <text x="48" y="81" class="svg-t hd" text-anchor="middle" fill="var(--accent)">1</text>
+          <text x="72" y="81" class="svg-t ko-hd">값이 많이 흔들리나</text>
+          <text x="40" y="110" class="svg-t ko-sm">하루에 몇 퍼센트씩 오르내리는</text>
+          <text x="40" y="128" class="svg-t ko-sm">자산이면 그만큼 더 깎습니다</text>
+          <text x="40" y="152" class="svg-t sm" fill="var(--ink-dim)">국채 거의 안 흔들림 / 주식 많이 흔들림</text>
+
+          <rect x="244" y="46" width="210" height="118" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <circle cx="272" cy="76" r="13" fill="rgba(var(--rgb-a),.20)"/>
+          <text x="272" y="81" class="svg-t hd" text-anchor="middle" fill="var(--accent)">2</text>
+          <text x="296" y="81" class="svg-t ko-hd">사려는 사람이 많나</text>
+          <text x="264" y="110" class="svg-t ko-sm">내가 팔면 값이 밀리는지를</text>
+          <text x="264" y="128" class="svg-t ko-sm">봅니다. 시장이 얕으면 위험</text>
+          <text x="264" y="152" class="svg-t sm" fill="var(--ink-dim)">국채 시장 깊음 / 사모 상품 거의 없음</text>
+
+          <rect x="468" y="46" width="210" height="118" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+          <circle cx="496" cy="76" r="13" fill="rgba(var(--rgb-a),.20)"/>
+          <text x="496" y="81" class="svg-t hd" text-anchor="middle" fill="var(--accent)">3</text>
+          <text x="520" y="81" class="svg-t ko-hd">파는 데 얼마나 걸리나</text>
+          <text x="488" y="110" class="svg-t ko-sm">오래 걸릴수록 그동안의</text>
+          <text x="488" y="128" class="svg-t ko-sm">가격 위험이 커집니다</text>
+          <text x="488" y="152" class="svg-t sm" fill="var(--ink-dim)">국채 즉시 / 부동산 담보 수개월</text>
+
+          <rect x="692" y="46" width="188" height="118" rx="6" fill="rgba(var(--rgb-r),.09)" stroke="var(--risk)"/>
+          <circle cx="720" cy="76" r="13" fill="rgba(var(--rgb-r),.20)"/>
+          <text x="720" y="81" class="svg-t hd" text-anchor="middle" fill="var(--risk)">4</text>
+          <text x="744" y="81" class="svg-t ko-hd">상대는 믿을 만한가</text>
+          <text x="712" y="110" class="svg-t ko-sm">부실해질 것 같은 상대에게는</text>
+          <text x="712" y="128" class="svg-t ko-sm">더 많이 깎습니다</text>
+          <text x="712" y="152" class="svg-t sm" fill="var(--risk)">온체인에서는 쓸 수 없음</text>
+        </g>
+
+        <rect x="20" y="184" width="860" height="82" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--onchain)" stroke-dasharray="5 3"/>
+        <text x="44" y="210" class="svg-t ko-hd" fill="var(--onchain)">온체인에서는 1, 2, 3만 쓰고 4는 못 씁니다</text>
+        <text x="44" y="234" class="svg-t ko-sm">빌리는 쪽이 익명 지갑이라 신용도를 반영할 방법이 없습니다.</text>
+        <text x="44" y="250" class="svg-t ko-sm">그래서 우량한 차입자에게 조건을 좋게 해 주는 일도 불가능합니다. 모두에게 똑같은 조건이 적용됩니다.</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 4]</b> 네 가지 요인 중 마지막 하나가 온체인에서 사라집니다. 이 빈자리를 담보 완충으로 메웁니다.</figcaption>
+  </figure>
+
+  <div class="warn">
+    <span class="lbl">경쟁이 붙으면 완충이 얇아집니다</span>
+    전당포가 여럿 모여 있으면 어떻게 될까요. 손님을 뺏기지 않으려고 서로 더 많이 빌려주려 합니다.
+    실제로 금융시장에서도 이런 일이 벌어집니다.
+    국제 금융 감독 논의를 담은 G30 보고서는 경쟁 압력 때문에 헤어컷이 때때로 0까지 내려간 사례를 지적했습니다.
+    담보는 잡았는데 완충이 하나도 없는 상태입니다.
+    <strong>온체인도 똑같습니다.</strong> 예치금을 더 모으려고 LTV를 공격적으로 잡으면 구조는 그만큼 약해집니다.
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S3 ===== -->
+<section id="s3">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">03</span><h2>Repo, 기관들의 전당포</h2></div>
+  <p class="sec-lead">개인이 시계를 맡기듯, 금융기관은 국채를 맡기고 돈을 빌립니다. 그 시장이 repo입니다.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>국채를 잔뜩 들고 있는 기관이 갑자기 현금이 필요하면 어떻게 할까요?</p></div>
+
+  <p>
+    국채를 팔면 됩니다. 그런데 팔기 싫을 수 있습니다.
+    이자를 계속 받고 싶고, 값이 오를 것 같기도 하고, 어차피 며칠 뒤면 현금이 다시 들어올 예정이기도 합니다.
+  </p>
+  <p>
+    이럴 때 쓰는 게 <strong class="tm">repo(환매조건부매매)</strong>입니다.
+    국채를 잠깐 넘기고 현금을 받은 뒤, 정해진 날에 조금 더 주고 되사옵니다.
+    더 주는 그 차액이 사실상 이자입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="repo 거래의 두 단계">
+        <text x="20" y="26" class="svg-t ko-hd">Repo는 두 번의 거래로 이뤄집니다</text>
+
+        <text x="20" y="60" class="svg-t sm" fill="var(--tradfi)">첫째 날</text>
+        <rect x="20" y="70" width="860" height="88" rx="6" fill="rgba(var(--rgb-t),.09)" stroke="var(--line)"/>
+
+        <rect x="46" y="92" width="170" height="46" rx="4" fill="var(--surface)" stroke="var(--tradfi)"/>
+        <text x="131" y="112" class="svg-t ko" text-anchor="middle" fill="var(--ink)">돈이 필요한 쪽</text>
+        <text x="131" y="129" class="svg-t sm" text-anchor="middle">국채를 들고 있음</text>
+
+        <rect x="684" y="92" width="170" height="46" rx="4" fill="var(--surface)" stroke="var(--tradfi)"/>
+        <text x="769" y="112" class="svg-t ko" text-anchor="middle" fill="var(--ink)">돈이 남는 쪽</text>
+        <text x="769" y="129" class="svg-t sm" text-anchor="middle">머니마켓펀드 등</text>
+
+        <path d="M224 106 L676 106" stroke="var(--tradfi)" stroke-width="1.8" marker-end="url(#r1)"/>
+        <text x="450" y="100" class="svg-t ko-sm" text-anchor="middle" fill="var(--tradfi)">국채를 넘김</text>
+        <path d="M676 126 L224 126" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#r2)"/>
+        <text x="450" y="148" class="svg-t ko-sm" text-anchor="middle" fill="var(--accent)">현금을 받음 (시가에서 헤어컷만큼 깎은 금액)</text>
+
+        <text x="20" y="196" class="svg-t sm" fill="var(--tradfi)">약속한 날 (대부분 바로 다음 날)</text>
+        <rect x="20" y="206" width="860" height="72" rx="6" fill="rgba(var(--rgb-o),.09)" stroke="var(--line)"/>
+
+        <path d="M224 232 L676 232" stroke="var(--accent)" stroke-width="1.8" marker-end="url(#r2)"/>
+        <text x="450" y="226" class="svg-t ko-sm" text-anchor="middle" fill="var(--accent)">받았던 현금에 이자를 더해 돌려줌</text>
+        <path d="M676 254 L224 254" stroke="var(--tradfi)" stroke-width="1.8" marker-end="url(#r1)"/>
+        <text x="450" y="272" class="svg-t ko-sm" text-anchor="middle" fill="var(--tradfi)">국채를 돌려받음. 원래 상태로 복귀</text>
+
+        <defs>
+          <marker id="r1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--tradfi)"/></marker>
+          <marker id="r2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent)"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 5]</b> 돈이 필요한 쪽은 국채를 계속 들고 있는 셈이 되고, 돈이 남는 쪽은 며칠짜리 이자를 법니다.</figcaption>
+  </figure>
+
+  <div class="qlead"><span class="mk">Q</span><p>그런데 왜 "담보로 맡긴다"고 안 하고 "판다"고 할까요?</p></div>
+
+  <p>
+    이게 repo에서 가장 중요한 부분이고, 온체인과 비교할 때 결정적인 지점입니다.
+  </p>
+  <p>
+    일반적인 담보대출에서 빌린 쪽이 파산하면 어떻게 될까요.
+    빌려준 쪽은 담보를 바로 팔 수 없습니다.
+    파산 절차가 시작되면 법원이 채권자들을 줄 세우고, 그 순서가 정리될 때까지 아무도 손을 못 댑니다.
+    이걸 <strong class="tm">자동중지(automatic stay)</strong>라고 합니다.
+    그사이 담보 값이 떨어져도 그냥 보고만 있어야 합니다.
+  </p>
+  <p>
+    그래서 repo는 아예 <strong>사고파는 계약</strong>으로 씁니다.
+    이렇게 하면 국채가 법적으로 이미 내 것입니다.
+    남의 물건을 잡고 있는 게 아니라 내 물건을 갖고 있는 것이니, 상대가 망해도 법원 허락 없이 바로 팔 수 있습니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="상대가 파산했을 때 담보를 처분하는 속도 비교">
+        <text x="20" y="26" class="svg-t ko-hd">빌린 쪽이 망했습니다. 담보를 언제 팔 수 있을까요</text>
+
+        <rect x="20" y="48" width="278" height="180" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="44" y="76" class="svg-t ko-hd">일반 담보대출</text>
+        <rect x="44" y="90" width="230" height="30" rx="3" fill="rgba(var(--rgb-r),.14)" stroke="var(--risk)"/>
+        <text x="159" y="110" class="svg-t ko-sm" text-anchor="middle" fill="var(--risk)">법원 절차 대기</text>
+        <text x="44" y="142" class="svg-t ko-sm">채권자 순서가 정리될 때까지</text>
+        <text x="44" y="160" class="svg-t ko-sm">담보에 손댈 수 없습니다</text>
+        <line x1="44" y1="176" x2="274" y2="176" stroke="var(--line-soft)"/>
+        <text x="44" y="200" class="svg-t ko-sm" fill="var(--ink-dim)">걸리는 시간</text>
+        <text x="44" y="220" class="svg-t ko-hd" fill="var(--risk)">수개월 이상</text>
+
+        <rect x="312" y="48" width="278" height="180" rx="6" fill="rgba(var(--rgb-t),.10)" stroke="var(--tradfi)"/>
+        <text x="336" y="76" class="svg-t ko-hd" fill="var(--tradfi)">Repo</text>
+        <rect x="336" y="90" width="230" height="30" rx="3" fill="rgba(var(--rgb-t),.18)" stroke="var(--tradfi)"/>
+        <text x="451" y="110" class="svg-t ko-sm" text-anchor="middle" fill="var(--tradfi)">법적으로 이미 내 소유</text>
+        <text x="336" y="142" class="svg-t ko-sm">매매 형식이라 파산법 예외를</text>
+        <text x="336" y="160" class="svg-t ko-sm">적용받습니다</text>
+        <line x1="336" y1="176" x2="566" y2="176" stroke="var(--line-soft)"/>
+        <text x="336" y="200" class="svg-t ko-sm" fill="var(--ink-dim)">걸리는 시간</text>
+        <text x="336" y="220" class="svg-t ko-hd" fill="var(--tradfi)">즉시</text>
+
+        <rect x="604" y="48" width="276" height="180" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--onchain)"/>
+        <text x="628" y="76" class="svg-t ko-hd" fill="var(--onchain)">온체인</text>
+        <rect x="628" y="90" width="228" height="30" rx="3" fill="rgba(var(--rgb-o),.18)" stroke="var(--onchain)"/>
+        <text x="742" y="110" class="svg-t ko-sm" text-anchor="middle" fill="var(--onchain)">컨트랙트가 담보를 직접 보유</text>
+        <text x="628" y="142" class="svg-t ko-sm">파산 절차라는 개념 자체가</text>
+        <text x="628" y="160" class="svg-t ko-sm">끼어들 자리가 없습니다</text>
+        <line x1="628" y1="176" x2="856" y2="176" stroke="var(--line-soft)"/>
+        <text x="628" y="200" class="svg-t ko-sm" fill="var(--ink-dim)">걸리는 시간</text>
+        <text x="628" y="220" class="svg-t ko-hd" fill="var(--onchain)">즉시</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 6]</b> 전통금융이 법률 설계로 수십 년에 걸쳐 얻어낸 권한을, 온체인은 기술 구조로 기본 제공합니다.</figcaption>
+  </figure>
+
+  <div class="bridge">
+    <span class="lbl">온체인에서는</span>
+    <p>
+      스마트 컨트랙트가 담보를 직접 들고 있습니다.
+      법원도, 파산 절차도, 자동중지도 끼어들 자리가 없습니다.
+      <strong>전통금융이 복잡한 계약 설계로 겨우 얻어낸 것을 온체인은 그냥 갖고 시작합니다.</strong>
+    </p>
+    <p>
+      다만 좋기만 한 건 아닙니다. 온체인에는 <strong>처분을 멈출 방법도 없습니다.</strong>
+      전통 시장에서는 급락장에 당국이 강제매도를 잠시 멈추게 하거나 거래를 중단시킬 수 있습니다.
+      온체인 청산은 가격이 기준에 닿는 순간 그냥 실행됩니다. 말릴 사람이 없습니다.
+    </p>
+  </div>
+
+  <h3>규모를 한번 비교해 봅니다</h3>
+
+  <div class="stats">
+    <div class="stat"><div class="v t">12.6조 달러</div><div class="k">미국 repo 시장이<br>하루에 처리하는 규모</div><div class="src">OFR / 2025년 3분기</div></div>
+    <div class="stat"><div class="v">88.9%</div><div class="k">그중 국채가<br>담보인 비중</div><div class="src">OFR / 청산 repo 기준</div></div>
+    <div class="stat"><div class="v o">74억 달러</div><div class="k">디파이에 담보로 들어간<br>실물자산 토큰 전체</div><div class="src">CoinShares / 2026년 2분기</div></div>
+    <div class="stat"><div class="v r">0.06%</div><div class="k">repo 하루 거래량 대비<br>온체인 RWA 담보 규모</div><div class="src">위 두 값의 비율</div></div>
+  </div>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 168" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="미국 repo 시장과 온체인 RWA 담보 시장의 규모 비교">
+        <text x="20" y="26" class="svg-t ko-hd">같은 축에 놓고 보면</text>
+
+        <text x="20" y="62" class="svg-t ko-sm">미국 repo 시장 · 하루 거래량</text>
+        <rect x="20" y="72" width="840" height="34" rx="3" fill="rgba(var(--rgb-t),.28)" stroke="var(--tradfi)"/>
+        <text x="440" y="94" class="svg-t ko-hd" text-anchor="middle">12조 6,000억 달러</text>
+
+        <text x="20" y="134" class="svg-t ko-sm">온체인 RWA 담보 시장 · 전체</text>
+        <rect x="20" y="144" width="3" height="20" rx="1" fill="var(--onchain)"/>
+        <text x="34" y="159" class="svg-t ko-sm" fill="var(--onchain)">74억 달러 (같은 축에서는 선 하나 굵기)</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 7]</b> 온체인 담보금융은 아직 원본 시장의 반올림 오차 수준입니다. 성장 여지가 크다는 뜻이기도 합니다.</figcaption>
+  </figure>
+
+  <h3>담보를 대신 관리해 주는 은행</h3>
+
+  <p>
+    repo를 하려면 할 일이 많습니다.
+    담보로 받을 자산이 적당한지 판단하고, 헤어컷을 얼마로 할지 정하고, 매일 값을 다시 매기고, 부족하면 더 받아야 합니다.
+    거래 상대가 수십 곳이면 이걸 다 하기가 어렵습니다.
+  </p>
+  <p>
+    그래서 중간에 은행을 하나 끼웁니다. 이 은행이 담보 관리를 전부 대신해 줍니다.
+    이런 방식을 <strong class="tm">삼자간 repo</strong>라고 하고, 미국에서는 사실상 BNY 한 곳이 이 역할을 맡고 있습니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 288" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="삼자간 repo 구조와 온체인 대응">
+        <rect x="350" y="24" width="200" height="60" rx="6" fill="rgba(var(--rgb-t),.16)" stroke="var(--tradfi)"/>
+        <text x="450" y="50" class="svg-t ko-hd" text-anchor="middle" fill="var(--tradfi)">중간 은행</text>
+        <text x="450" y="70" class="svg-t sm" text-anchor="middle">담보 관리를 전담</text>
+
+        <rect x="40" y="146" width="200" height="56" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="140" y="170" class="svg-t ko" text-anchor="middle" fill="var(--ink)">돈이 필요한 쪽</text>
+        <text x="140" y="188" class="svg-t sm" text-anchor="middle">증권사 · 헤지펀드</text>
+
+        <rect x="660" y="146" width="200" height="56" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="760" y="170" class="svg-t ko" text-anchor="middle" fill="var(--ink)">돈이 남는 쪽</text>
+        <text x="760" y="188" class="svg-t sm" text-anchor="middle">머니마켓펀드 · 기업</text>
+
+        <path d="M346 68 L246 152" stroke="var(--line)" stroke-width="1.6"/>
+        <path d="M554 68 L654 152" stroke="var(--line)" stroke-width="1.6"/>
+
+        <rect x="248" y="110" width="404" height="26" rx="3" fill="rgba(var(--rgb-a),.12)" stroke="var(--line)" stroke-dasharray="4 3"/>
+        <text x="450" y="128" class="svg-t ko-sm" text-anchor="middle">담보 받기 · 적당한지 판정 · 헤어컷 적용 · 매일 재평가 · 부족분 요구</text>
+
+        <!-- comparison -->
+        <rect x="40" y="222" width="400" height="60" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--onchain)" stroke-dasharray="5 3"/>
+        <text x="62" y="246" class="svg-t ko-hd" fill="var(--onchain)">온체인에서 같은 일을 하는 것</text>
+        <text x="62" y="270" class="svg-t ko-sm">프로토콜(규칙과 오라클) + 큐레이터(배분 판단)</text>
+
+        <rect x="460" y="222" width="400" height="60" rx="6" fill="rgba(var(--rgb-r),.09)" stroke="var(--risk)" stroke-dasharray="5 3"/>
+        <text x="482" y="246" class="svg-t ko-hd" fill="var(--risk)">결정적으로 다른 점</text>
+        <text x="482" y="270" class="svg-t ko-sm">은행은 잘못하면 배상합니다. 큐레이터는 배상하지 않습니다.</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 8]</b> 은행이 하던 일이 온체인에서 둘로 쪼개집니다. 그런데 책임은 함께 넘어오지 않았습니다.</figcaption>
+  </figure>
+
+  <div class="bridge">
+    <span class="lbl">온체인에서는</span>
+    <p>
+      중간 은행이 하던 일이 두 갈래로 나뉩니다.
+      담보로 받을지 말지, 얼마나 깎을지, 가격을 어디서 가져올지는 <strong>프로토콜과 오라클</strong>이 정합니다.
+      어느 시장에 돈을 얼마나 넣을지는 <strong>큐레이터</strong>가 정합니다.
+    </p>
+    <p>
+      차이는 책임에 있습니다.
+      BNY는 은행이라 감독을 받고, 자본을 쌓아 두고, 실수하면 배상합니다.
+      큐레이터는 수수료는 받지만 손실이 나도 물어주지 않습니다.
+      1편 6장에서 본 문제가 정확히 여기서 나옵니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S4 ===== -->
+<section id="s4">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">04</span><h2>담보가 떨어지면</h2></div>
+  <p class="sec-lead">담보 값이 내려가면 빌려준 쪽은 불안해집니다. 이때 대응하는 방식이 전통금융과 온체인에서 크게 다릅니다.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>100만 원짜리 담보에 80만 원을 빌려줬는데, 담보가 85만 원이 됐습니다. 어떻게 할까요?</p></div>
+
+  <p>
+    전통금융에서는 곧바로 팔지 않습니다. 순서가 있습니다.
+    먼저 연락합니다. "담보가 부족합니다. 더 넣어 주시거나 일부 갚아 주세요."
+    이 연락을 <strong class="tm">마진콜(margin call)</strong>이라고 합니다.
+    보통 그날 안이나 다음 날까지 시간을 줍니다.
+    그래도 해결이 안 되면 그때 팝니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="전통금융의 4단계 대응과 온체인의 즉시 청산 비교">
+        <text x="20" y="26" class="svg-t ko-hd" fill="var(--tradfi)">전통금융 · 네 단계를 거칩니다</text>
+        <rect x="20" y="42" width="860" height="122" rx="6" fill="rgba(var(--rgb-t),.09)" stroke="var(--line)"/>
+
+        <rect x="44" y="66" width="188" height="76" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <circle cx="68" cy="90" r="12" fill="rgba(var(--rgb-t),.20)"/>
+        <text x="68" y="95" class="svg-t hd" text-anchor="middle" fill="var(--tradfi)">1</text>
+        <text x="90" y="95" class="svg-t ko">값 다시 매기기</text>
+        <text x="62" y="120" class="svg-t ko-sm">보통 하루에 한 번</text>
+        <text x="62" y="136" class="svg-t ko-sm">부족분을 계산합니다</text>
+
+        <path d="M238 104 L256 104" stroke="var(--line)" stroke-width="1.6" marker-end="url(#m1)"/>
+
+        <rect x="262" y="66" width="188" height="76" rx="5" fill="var(--surface)" stroke="var(--accent)"/>
+        <circle cx="286" cy="90" r="12" fill="rgba(var(--rgb-a),.22)"/>
+        <text x="286" y="95" class="svg-t hd" text-anchor="middle" fill="var(--accent)">2</text>
+        <text x="308" y="95" class="svg-t ko">연락하기</text>
+        <text x="280" y="120" class="svg-t ko-sm">담보를 더 넣거나</text>
+        <text x="280" y="136" class="svg-t ko-sm" fill="var(--accent)">일부 갚을 시간을 줍니다</text>
+
+        <path d="M456 104 L474 104" stroke="var(--line)" stroke-width="1.6" marker-end="url(#m1)"/>
+
+        <rect x="480" y="66" width="188" height="76" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <circle cx="504" cy="90" r="12" fill="rgba(var(--rgb-t),.20)"/>
+        <text x="504" y="95" class="svg-t hd" text-anchor="middle" fill="var(--tradfi)">3</text>
+        <text x="526" y="95" class="svg-t ko">협의하기</text>
+        <text x="498" y="120" class="svg-t ko-sm">다른 담보로 바꾸거나</text>
+        <text x="498" y="136" class="svg-t ko-sm">조건을 다시 정합니다</text>
+
+        <path d="M674 104 L692 104" stroke="var(--risk)" stroke-width="1.6" marker-end="url(#m2)"/>
+
+        <rect x="698" y="66" width="158" height="76" rx="5" fill="rgba(var(--rgb-r),.12)" stroke="var(--risk)"/>
+        <circle cx="722" cy="90" r="12" fill="rgba(var(--rgb-r),.22)"/>
+        <text x="722" y="95" class="svg-t hd" text-anchor="middle" fill="var(--risk)">4</text>
+        <text x="744" y="95" class="svg-t ko">팔기</text>
+        <text x="716" y="120" class="svg-t ko-sm">끝내 안 되면</text>
+        <text x="716" y="136" class="svg-t ko-sm" fill="var(--risk)">그때 처분합니다</text>
+
+        <text x="20" y="200" class="svg-t ko-hd" fill="var(--onchain)">온체인 · 한 단계로 끝납니다</text>
+        <rect x="20" y="216" width="860" height="88" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--line)"/>
+
+        <rect x="44" y="240" width="380" height="48" rx="5" fill="var(--surface)" stroke="var(--onchain)"/>
+        <text x="234" y="260" class="svg-t ko" text-anchor="middle" fill="var(--ink)">가격이 기준선에 닿음</text>
+        <text x="234" y="278" class="svg-t sm" text-anchor="middle">블록마다 확인 · 24시간 · 주말 없음</text>
+
+        <path d="M430 264 L472 264" stroke="var(--risk)" stroke-width="2.2" marker-end="url(#m2)"/>
+
+        <rect x="478" y="240" width="378" height="48" rx="5" fill="rgba(var(--rgb-r),.12)" stroke="var(--risk)"/>
+        <text x="667" y="260" class="svg-t ko" text-anchor="middle" fill="var(--ink)">바로 팔림</text>
+        <text x="667" y="278" class="svg-t sm" text-anchor="middle" fill="var(--risk)">연락 없음 · 시간 없음 · 협의 없음</text>
+
+        <defs>
+          <marker id="m1" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="var(--line)"/></marker>
+          <marker id="m2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--risk)"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 9]</b> 온체인은 2번과 3번이 통째로 사라졌습니다. 빨라진 대신 되돌릴 기회도 없어졌습니다.</figcaption>
+  </figure>
+
+  <div class="cmp">
+    <div class="cmp-card t">
+      <h5>시간을 주면 좋은 점과 나쁜 점</h5>
+      <div class="tagline">전통금융</div>
+      <ul>
+        <li>좋은 점: 잠깐 가격이 튄 것뿐이면 굳이 팔지 않아도 됩니다</li>
+        <li>좋은 점: 담보를 바꾸거나 조건을 다시 정할 여지가 있습니다</li>
+        <li>나쁜 점: 기다리는 동안 값이 더 떨어지면 손실이 커집니다</li>
+        <li>나쁜 점: 시간을 줄 수 있다는 건 미룰 수 있다는 뜻이기도 합니다</li>
+      </ul>
+    </div>
+    <div class="cmp-card o">
+      <h5>바로 파는 것의 좋은 점과 나쁜 점</h5>
+      <div class="tagline">온체인</div>
+      <ul>
+        <li>좋은 점: 손실을 미룰 수 없으니 문제가 곪지 않습니다</li>
+        <li>좋은 점: 완충이 얇아도 바로 팔면 회수가 됩니다</li>
+        <li>나쁜 점: 잠깐 급락했을 뿐인데도 팔려 버립니다</li>
+        <li>나쁜 점: 여럿이 동시에 팔리면 그 물량이 값을 더 떨어뜨립니다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="qlead"><span class="mk">Q</span><p>그럼 온체인에서는 시간을 주는 장치가 아예 없나요?</p></div>
+
+  <p>
+    있습니다. 다만 시간이 아니라 <strong>여유 공간</strong>의 형태입니다.
+  </p>
+  <p>
+    1편에서 LTV 상한과 청산 기준이 따로 있었던 것을 떠올려 보세요.
+    LTV 80%까지만 빌려주는데 청산은 85%에서 합니다. 이 5%포인트 간격이 여유 공간입니다.
+    가격이 조금 흔들려도 바로 팔리지 않게 해 주는 완충재입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 216" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="자산별 완충 구간 비교">
+        <text x="20" y="26" class="svg-t ko-hd">자산마다 완충 구간이 다릅니다</text>
+        <text x="20" y="48" class="svg-t ko-sm">회색은 빌릴 수 있는 한도, 주황은 청산까지 남은 여유 공간입니다</text>
+
+        <!-- ETH -->
+        <text x="20" y="82" class="svg-t ko-sm">ETH</text>
+        <rect x="110" y="66" width="620" height="22" rx="3" fill="var(--surface)" stroke="var(--line)"/>
+        <rect x="110" y="66" width="496" height="22" rx="3" fill="rgba(var(--rgb-t),.22)"/>
+        <rect x="606" y="66" width="31" height="22" fill="rgba(var(--rgb-a),.35)"/>
+        <text x="750" y="82" class="svg-t sm" fill="var(--accent)">여유 5%p</text>
+
+        <!-- USTB -->
+        <text x="20" y="122" class="svg-t ko-sm">토큰화 국채</text>
+        <rect x="110" y="106" width="620" height="22" rx="3" fill="var(--surface)" stroke="var(--line)"/>
+        <rect x="110" y="106" width="570" height="22" rx="3" fill="rgba(var(--rgb-t),.22)"/>
+        <rect x="680" y="106" width="19" height="22" fill="rgba(var(--rgb-a),.35)"/>
+        <text x="750" y="122" class="svg-t sm" fill="var(--accent)">여유 3%p</text>
+
+        <!-- PRIME -->
+        <text x="20" y="162" class="svg-t ko-sm">주택담보 대출</text>
+        <rect x="110" y="146" width="620" height="22" rx="3" fill="var(--surface)" stroke="var(--line)"/>
+        <rect x="110" y="146" width="434" height="22" rx="3" fill="rgba(var(--rgb-t),.22)"/>
+        <rect x="544" y="146" width="62" height="22" fill="rgba(var(--rgb-a),.35)"/>
+        <text x="750" y="162" class="svg-t sm" fill="var(--accent)">여유 10%p</text>
+
+        <line x1="110" y1="180" x2="730" y2="180" stroke="var(--line-soft)"/>
+        <text x="110" y="196" class="svg-t sm">0%</text>
+        <text x="730" y="196" class="svg-t sm" text-anchor="end">100%</text>
+        <text x="420" y="196" class="svg-t ko-sm" text-anchor="middle">담보 대비 빌린 비율</text>
+
+        <text x="20" y="210" class="svg-t ko-sm" fill="var(--ink-dim)">국채는 값이 안 흔들려 여유가 좁아도 되고, 주택담보는 파는 데 오래 걸려 여유를 넓게 잡습니다</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 10]</b> 전통금융의 유예 시간을 온체인에서는 이 여유 공간이 대신합니다.</figcaption>
+  </figure>
+
+  <div class="oneline">
+    <span class="lbl">4장 한 줄 요약</span>
+    <p>전통금융은 시간으로 완충하고, 온체인은 여유 공간으로 완충합니다. 온체인에서 LTV를 보수적으로 잡는 게 중요한 이유입니다.</p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S5 ===== -->
+<section id="s5">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">05</span><h2>돈은 언제 도착하나</h2></div>
+  <p class="sec-lead">계약을 맺는 것과 실제로 물건과 돈이 오가는 것은 다른 일입니다. 이 시차가 생각보다 큰 비용을 만듭니다.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>주식을 오늘 팔면 돈이 오늘 들어올까요?</p></div>
+
+  <p>
+    아닙니다. 다음 날 들어옵니다.
+    체결은 오늘 됐지만 실제 정산은 하루 뒤에 이뤄집니다.
+    이걸 <strong class="tm">T+1</strong>이라고 씁니다. 거래일(T)에 하루를 더한다는 뜻입니다.
+  </p>
+  <p>
+    원래는 더 길었습니다. 미국 주식은 오랫동안 3일이 걸렸고, 2017년에 2일로, <strong>2024년 5월 28일에 하루로</strong> 줄었습니다.
+    한 단계 줄이는 데도 시장 전체가 시스템을 바꿔야 했습니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 268" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="T+1 결제와 온체인 즉시 결제 비교">
+        <text x="20" y="26" class="svg-t ko-hd" fill="var(--tradfi)">전통금융 · 체결과 정산 사이에 하루가 있습니다</text>
+        <rect x="20" y="42" width="860" height="118" rx="6" fill="rgba(var(--rgb-t),.09)" stroke="var(--line)"/>
+
+        <line x1="80" y1="98" x2="820" y2="98" stroke="var(--line)" stroke-width="1.6"/>
+        <circle cx="140" cy="98" r="8" fill="var(--tradfi)"/>
+        <text x="140" y="80" class="svg-t ko" text-anchor="middle" fill="var(--ink)">오늘 체결</text>
+        <text x="140" y="122" class="svg-t sm" text-anchor="middle">가격만 정해짐</text>
+
+        <circle cx="450" cy="98" r="8" fill="var(--accent)"/>
+        <text x="450" y="80" class="svg-t ko" text-anchor="middle" fill="var(--ink)">확인 · 청산 절차</text>
+        <text x="450" y="122" class="svg-t sm" text-anchor="middle">청산소가 중간에서 보증</text>
+
+        <circle cx="760" cy="98" r="8" fill="var(--tradfi)"/>
+        <text x="760" y="80" class="svg-t ko" text-anchor="middle" fill="var(--ink)">내일 정산</text>
+        <text x="760" y="122" class="svg-t sm" text-anchor="middle">주식과 돈이 실제로 이동</text>
+
+        <rect x="148" y="90" width="604" height="16" fill="rgba(var(--rgb-r),.16)" rx="2"/>
+        <text x="450" y="148" class="svg-t ko-sm" text-anchor="middle" fill="var(--risk)">이 구간 동안 상대가 망하면 거래가 깨집니다. 그래서 보증금을 걸어 둬야 합니다.</text>
+
+        <text x="20" y="196" class="svg-t ko-hd" fill="var(--onchain)">온체인 · 체결이 곧 정산입니다</text>
+        <rect x="20" y="212" width="860" height="46" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--line)"/>
+        <line x1="80" y1="235" x2="820" y2="235" stroke="var(--line)" stroke-width="1.6"/>
+        <circle cx="450" cy="235" r="10" fill="var(--onchain)"/>
+        <text x="470" y="240" class="svg-t ko-sm" fill="var(--onchain)">한 번에 처리됨 · 중간 구간이 아예 없음 · 보증금 불필요</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 11]</b> 온체인의 진짜 장점은 빠른 게 아니라, 위험한 중간 구간이 사라진다는 데 있습니다.</figcaption>
+  </figure>
+
+  <div class="qlead"><span class="mk">Q</span><p>하루 정도 기다리는 게 왜 그렇게 문제일까요?</p></div>
+
+  <p>
+    돈이 묶이기 때문입니다.
+    체결과 정산 사이에 상대가 망할 수 있으니, 그 위험을 막으려고 <strong>보증금</strong>을 걸어 둡니다.
+    보증금으로 걸어 둔 돈은 그동안 다른 데 못 씁니다.
+  </p>
+  <p>
+    시장 전체로 보면 이 금액이 어마어마합니다.
+    결제 기간이 하루 줄면 걸어 둬야 할 보증금도 줄어들고, 그만큼 자금이 풀립니다.
+    2024년에 시장 전체가 고생하며 T+2에서 T+1로 바꾼 이유가 이것입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="결제 시차가 짧아질수록 묶이는 자금이 줄어드는 구조">
+        <text x="20" y="26" class="svg-t ko-hd">시차가 짧을수록 묶이는 돈이 줄어듭니다</text>
+
+        <text x="20" y="66" class="svg-t ko-sm">T+3 (2017년 이전)</text>
+        <rect x="190" y="50" width="480" height="24" rx="3" fill="rgba(var(--rgb-r),.26)" stroke="var(--risk)"/>
+        <text x="686" y="67" class="svg-t sm" fill="var(--risk)">보증금 많이 필요</text>
+
+        <text x="20" y="110" class="svg-t ko-sm">T+2 (2017~2024)</text>
+        <rect x="190" y="94" width="320" height="24" rx="3" fill="rgba(var(--rgb-a),.28)" stroke="var(--accent)"/>
+        <text x="526" y="111" class="svg-t sm" fill="var(--accent)">줄어듦</text>
+
+        <text x="20" y="154" class="svg-t ko-sm">T+1 (2024년 5월~)</text>
+        <rect x="190" y="138" width="160" height="24" rx="3" fill="rgba(var(--rgb-t),.28)" stroke="var(--tradfi)"/>
+        <text x="366" y="155" class="svg-t sm" fill="var(--tradfi)">더 줄어듦</text>
+
+        <text x="20" y="192" class="svg-t ko-sm" fill="var(--onchain)">온체인 (즉시)</text>
+        <rect x="190" y="178" width="6" height="18" rx="2" fill="var(--onchain)"/>
+        <text x="210" y="192" class="svg-t sm" fill="var(--onchain)">보증금이라는 개념 자체가 필요 없음</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 12]</b> 기관이 토큰화에 관심을 갖는 가장 실무적인 이유. 신기술이라서가 아니라 묶여 있던 돈이 풀리기 때문입니다.</figcaption>
+  </figure>
+
+  <div class="bridge">
+    <span class="lbl">온체인에서는</span>
+    <p>
+      담보를 맡기는 것, 돈을 받는 것, 청산하는 것이 전부 한 번에 처리됩니다.
+      전부 되거나 전부 취소되거나 둘 중 하나라서, "한쪽만 이행된 어정쩡한 상태"가 아예 생기지 않습니다.
+    </p>
+    <p>
+      1편 7장에서 본 Ondo와 JPMorgan, Mastercard, Ripple의 국경 간 결제 사례가 증명하려던 게 정확히 이것입니다.
+      <strong>은행 영업시간과 상관없이, 기관 규모로, 실제로 되더라</strong>는 것을 보여 준 거래였습니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S6 ===== -->
+<section id="s6">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">06</span><h2>담보로 쓰이는 자산들</h2></div>
+  <p class="sec-lead">1편에 나온 낯선 티커들의 정체를 하나씩 확인합니다. 전부 원래 있던 금융상품입니다.</p>
+
+  <p>
+    BUIDL, JAAA, ACRED, PRIME, ONyc.
+    1편에서 담보로 등장한 이름들입니다. 처음 보면 암호화폐 같지만 아닙니다.
+    전부 기존 금융상품을 토큰으로 바꾼 것이고, 기초자산은 수십 년간 거래되어 온 것들입니다.
+  </p>
+
+  <div class="acards">
+    <div class="acard">
+      <div class="acard-top"><h5>단기 국채 펀드</h5><span class="tok">BUIDL · JTRSY · USTB</span></div>
+      <div class="sub">TREASURY / MONEY MARKET FUND</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>만기가 1년 안 남은 미국 국채를 잔뜩 모아 놓은 펀드입니다. 예금 대신 쓰는 초단기 자금 보관처라고 보면 됩니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>값이 거의 안 움직입니다. 그래서 헤어컷을 2% 수준까지 낮출 수 있습니다. repo 시장에서도 담보의 88.9%가 국채입니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>값이 아니라 돈 찾는 데 걸리는 시간.</b> 펀드는 발행사에 환매를 신청해야 현금이 나옵니다. 바로 되는 상품도 있고 하루 넘게 걸리는 상품도 있습니다.</dd>
+      </dl>
+    </div>
+
+    <div class="acard">
+      <div class="acard-top"><h5>CLO (기업대출 묶음)</h5><span class="tok">JAAA · STAC</span></div>
+      <div class="sub">COLLATERALIZED LOAN OBLIGATION</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>기업에 나간 대출 수백 건을 한데 모은 뒤, 안전한 몫과 위험한 몫으로 층층이 잘라 파는 상품입니다. 시장 규모는 약 1.4조 달러입니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>맨 위층(AAA)은 손실을 가장 나중에 받습니다. 아래층들이 먼저 다 깨져야 위층에 손실이 옵니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>등급이 아니라 팔 수 있느냐.</b> 2026년 1분기에 신용펀드에서 환매 요청이 몰리고 일부는 환매를 막으면서 CLO 시장 전체가 위축된 일이 있었습니다.</dd>
+      </dl>
+    </div>
+
+    <div class="acard">
+      <div class="acard-top"><h5>사모신용</h5><span class="tok">ACRED · mF-ONE · mGLOBAL</span></div>
+      <div class="sub">PRIVATE CREDIT</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>은행을 거치지 않고 운용사가 기업에 직접 빌려주는 대출입니다. 전 세계 규모가 약 3.2조 달러로 추정됩니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>이자가 높고 금리가 오르면 같이 오르는 구조가 많습니다. 기관 수요가 두텁습니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>값을 매기는 것 자체가 어렵습니다.</b> 거래소가 없어 운용사가 계산한 값을 믿어야 합니다. 금융안정위원회는 2026년 5월 이 시장의 겹겹이 쌓인 레버리지를 경고했습니다.</dd>
+      </dl>
+    </div>
+
+    <div class="acard">
+      <div class="acard-top"><h5>주택담보 한도대출</h5><span class="tok">PRIME</span></div>
+      <div class="sub">HELOC</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>집을 담보로 한도를 열어 두고 필요할 때 꺼내 쓰는 대출입니다. 미국판 마이너스통장에 가깝습니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>뒤에 부동산이라는 실물이 있고, 미국에서 표준화된 상품이라 규모를 키우기 쉽습니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>현금으로 바꾸는 데 아주 오래 걸립니다.</b> 1편에서 PRIME의 LTV가 70%로 낮았던 게 이 때문입니다. 여유 공간을 넓게 잡아 긴 시간을 버티는 설계입니다.</dd>
+      </dl>
+    </div>
+
+    <div class="acard">
+      <div class="acard-top"><h5>재보험 수익</h5><span class="tok">ONyc</span></div>
+      <div class="sub">REINSURANCE</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>보험사가 떠안은 위험을 다시 받아 주고 보험료를 버는 사업입니다. 그 수익을 받을 권리를 토큰으로 만든 것입니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>주식이나 금리와 따로 움직입니다. 증시가 폭락해도 보험 사업 손익은 별개입니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>평소엔 조용하다가 한 번에 튑니다.</b> 대형 재해가 터지면 손실이 계단처럼 점프합니다. 값이 서서히 내려갈 걸 전제한 청산 방식과 잘 안 맞습니다.</dd>
+      </dl>
+    </div>
+
+    <div class="acard">
+      <div class="acard-top"><h5>토큰화 주식 · 금</h5><span class="tok">xStocks · XAUT · PAXG</span></div>
+      <div class="sub">EQUITY / COMMODITY</div>
+      <dl>
+        <dt>쉽게 말하면</dt>
+        <dd>실제 주식을 어딘가에 보관해 두고 그만큼 토큰을 찍은 것, 또는 금고에 있는 금의 소유권을 담은 토큰입니다.</dd>
+        <dt>담보로 좋은 이유</dt>
+        <dd>누구나 사고팔 수 있고 참고할 가격이 공개 시장에 있습니다. 자격 제한이 없습니다.</dd>
+        <dt>진짜 위험한 지점</dt>
+        <dd><b>주식 시장이 문을 닫는 시간.</b> 정규장이 끝나면 참고할 가격이 없어지는데 온체인은 계속 돌아갑니다. 이 어긋남이 오라클 설계의 난제입니다.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <h3>CLO는 왜 안전하다고 하는가</h3>
+
+  <p>
+    JAAA는 1편에서 Aave Horizon, Morpho, Sky, Falcon Finance에 모두 등장했습니다.
+    이 상품 하나만 제대로 이해해도 절반은 온 셈이니 따로 봅니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 296" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CLO의 계층 구조와 손실 흡수 순서">
+        <text x="20" y="26" class="svg-t ko-hd">기업대출을 모아서 층층이 잘라 파는 구조</text>
+
+        <rect x="20" y="46" width="212" height="212" rx="6" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="126" y="74" class="svg-t ko-hd" text-anchor="middle">재료</text>
+        <text x="126" y="100" class="svg-t ko-sm" text-anchor="middle">기업에 나간 대출</text>
+        <text x="126" y="118" class="svg-t ko-sm" text-anchor="middle">수백 건을 모읍니다</text>
+        <line x1="44" y1="136" x2="208" y2="136" stroke="var(--line-soft)"/>
+        <text x="126" y="160" class="svg-t ko-sm" text-anchor="middle">여기서 들어온 이자를</text>
+        <text x="126" y="178" class="svg-t ko-sm" text-anchor="middle">위층부터 순서대로</text>
+        <text x="126" y="196" class="svg-t ko-sm" text-anchor="middle">나눠 줍니다</text>
+        <line x1="44" y1="212" x2="208" y2="212" stroke="var(--line-soft)"/>
+        <text x="126" y="234" class="svg-t sm" text-anchor="middle" fill="var(--ink-dim)">CLO 시장 전체 규모</text>
+        <text x="126" y="252" class="svg-t hd" text-anchor="middle">1.4조 달러</text>
+
+        <path d="M240 152 L272 152" stroke="var(--line)" stroke-width="1.8" marker-end="url(#w1)"/>
+
+        <rect x="282" y="46" width="420" height="42" rx="4" fill="rgba(var(--rgb-o),.22)" stroke="var(--onchain)"/>
+        <text x="304" y="72" class="svg-t hd" fill="var(--onchain)">AAA</text>
+        <text x="368" y="72" class="svg-t ko-sm">이자를 제일 먼저 받고 손실은 제일 나중에 받음</text>
+
+        <rect x="282" y="94" width="420" height="34" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="304" y="116" class="svg-t">AA · A</text>
+        <text x="368" y="116" class="svg-t ko-sm">중간층</text>
+
+        <rect x="282" y="134" width="420" height="34" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="304" y="156" class="svg-t">BBB · BB</text>
+        <text x="368" y="156" class="svg-t ko-sm">손실 순서가 앞쪽인 층</text>
+
+        <rect x="282" y="174" width="420" height="42" rx="4" fill="rgba(var(--rgb-r),.16)" stroke="var(--risk)"/>
+        <text x="304" y="200" class="svg-t hd" fill="var(--risk)">Equity</text>
+        <text x="368" y="200" class="svg-t ko-sm">손실을 제일 먼저, 전부 뒤집어씀</text>
+
+        <path d="M722 64 L722 198" stroke="var(--risk)" stroke-width="1.6" marker-end="url(#w2)"/>
+        <text x="738" y="122" class="svg-t ko-sm" fill="var(--risk)">손실은</text>
+        <text x="738" y="140" class="svg-t ko-sm" fill="var(--risk)">아래부터</text>
+
+        <path d="M816 198 L816 64" stroke="var(--onchain)" stroke-width="1.6" marker-end="url(#w3)"/>
+        <text x="832" y="122" class="svg-t ko-sm" fill="var(--onchain)">이자는</text>
+        <text x="832" y="140" class="svg-t ko-sm" fill="var(--onchain)">위부터</text>
+
+        <rect x="282" y="228" width="598" height="52" rx="5" fill="rgba(var(--rgb-a),.11)" stroke="var(--line)" stroke-dasharray="5 3"/>
+        <text x="304" y="250" class="svg-t ko-hd">핵심: AAA 아래에 있는 층 전부가 AAA의 완충재입니다</text>
+        <text x="304" y="270" class="svg-t ko-sm">헤어컷이 담보 바깥에 두는 완충이라면, 이건 담보 안에 이미 들어 있는 완충입니다</text>
+
+        <defs>
+          <marker id="w1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/></marker>
+          <marker id="w2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--risk)"/></marker>
+          <marker id="w3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--onchain)"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 13]</b> 온체인 프로토콜이 JAAA를 선호하는 이유. 담보 자체에 완충이 이미 쌓여 있기 때문입니다.</figcaption>
+  </figure>
+
+  <h3>어떤 위험을 조심해야 하는지 한눈에</h3>
+
+  <p>
+    지금까지 본 자산들을 두 축에 놓아 봅니다.
+    가로는 값이 얼마나 흔들리는지, 세로는 팔아서 현금 만들기가 얼마나 어려운지입니다.
+    <strong>많은 사람이 가로축만 보는데, 실제로 사고가 나는 건 세로축입니다.</strong>
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 438" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="담보 자산의 위험 지도">
+        <text x="20" y="26" class="svg-t ko-hd">담보 위험 지도</text>
+        <text x="20" y="46" class="svg-t ko-sm">가로는 값이 흔들리는 정도, 세로는 팔아서 현금 만들기가 어려운 정도입니다</text>
+
+        <rect x="140" y="62" width="700" height="300" rx="5" fill="var(--bg-deep)" stroke="var(--line)"/>
+        <line x1="490" y1="62" x2="490" y2="362" stroke="var(--line-soft)" stroke-dasharray="4 4"/>
+        <line x1="140" y1="212" x2="840" y2="212" stroke="var(--line-soft)" stroke-dasharray="4 4"/>
+
+        <text x="490" y="392" class="svg-t ko" text-anchor="middle">값이 흔들리는 정도 →</text>
+        <text x="74" y="204" class="svg-t ko" text-anchor="middle">현금화</text>
+        <text x="74" y="224" class="svg-t ko" text-anchor="middle">난이도 ↑</text>
+
+        <text x="156" y="82" class="svg-t sm" fill="var(--ink-dim)">안 흔들림 · 팔기 어려움</text>
+        <text x="824" y="82" class="svg-t sm" text-anchor="end" fill="var(--ink-dim)">많이 흔들림 · 팔기 어려움</text>
+        <text x="156" y="352" class="svg-t sm" fill="var(--ink-dim)">안 흔들림 · 팔기 쉬움</text>
+        <text x="824" y="352" class="svg-t sm" text-anchor="end" fill="var(--ink-dim)">많이 흔들림 · 팔기 쉬움</text>
+
+        <circle cx="200" cy="112" r="9" fill="var(--risk)"/>
+        <text x="218" y="110" class="svg-t ko-sm" fill="var(--ink)">주택담보 (PRIME)</text>
+        <text x="218" y="126" class="svg-t sm">파는 데 수개월</text>
+
+        <circle cx="248" cy="160" r="9" fill="var(--risk)"/>
+        <text x="266" y="158" class="svg-t ko-sm" fill="var(--ink)">사모신용 (ACRED)</text>
+        <text x="266" y="174" class="svg-t sm">시장가가 아예 없음</text>
+
+        <circle cx="352" cy="192" r="9" fill="var(--accent)"/>
+        <text x="370" y="190" class="svg-t ko-sm" fill="var(--ink)">JAAA (AAA CLO)</text>
+        <text x="370" y="206" class="svg-t sm">평시 안정 · 위기 때 유동성 급감</text>
+
+        <circle cx="618" cy="140" r="9" fill="var(--risk)"/>
+        <text x="636" y="138" class="svg-t ko-sm" fill="var(--ink)">재보험 (ONyc)</text>
+        <text x="636" y="154" class="svg-t sm">평소 조용하다 한 번에 점프</text>
+
+        <circle cx="272" cy="266" r="9" fill="var(--tradfi)"/>
+        <text x="290" y="264" class="svg-t ko-sm" fill="var(--ink)">토큰화 국채펀드</text>
+        <text x="290" y="280" class="svg-t sm">환매 시간이 변수</text>
+
+        <circle cx="206" cy="310" r="9" fill="var(--tradfi)"/>
+        <text x="224" y="308" class="svg-t ko-sm" fill="var(--ink)">미국 국채</text>
+        <text x="224" y="324" class="svg-t sm">헤어컷 2%</text>
+
+        <circle cx="700" cy="272" r="9" fill="var(--onchain)"/>
+        <text x="718" y="270" class="svg-t ko-sm" fill="var(--ink)">토큰화 주식</text>
+        <text x="718" y="286" class="svg-t sm">장 마감 시 가격 공백</text>
+
+        <circle cx="608" cy="322" r="9" fill="var(--onchain)"/>
+        <text x="626" y="326" class="svg-t ko-sm" fill="var(--ink)">금 토큰</text>
+
+        <circle cx="796" cy="238" r="9" fill="var(--gated)"/>
+        <text x="778" y="242" class="svg-t ko-sm" text-anchor="end" fill="var(--ink)">ETH</text>
+
+        <text x="20" y="418" class="svg-t ko-sm" fill="var(--ink-dim)">위쪽에 있는 자산일수록 LTV를 낮게 잡아야 합니다. 값이 안 흔들려도 못 팔면 소용없기 때문입니다.</text>
+        <text x="20" y="434" class="svg-t sm" fill="var(--ink-dim)">배치는 성격을 보여주기 위한 개념도이며 정량 좌표가 아닙니다</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 14]</b> 세로축이 진짜 위험입니다. 국채는 왼쪽 아래가 아니라 중간쯤에 있다는 점을 눈여겨볼 것.</figcaption>
+  </figure>
+
+  <div class="bridge">
+    <span class="lbl">1편과 연결하면</span>
+    <p>
+      1편 토론 질문 중에 "토큰화 국채는 변동성이 거의 없는데 진짜 위험은 무엇인가"가 있었습니다.
+      답은 이 지도의 세로축입니다.
+      값은 안 흔들리지만 <strong>현금으로 바꾸는 데 시간이 걸립니다.</strong>
+      청산이 실행되는 것과 청산한 사람이 실제로 현금을 손에 쥐는 것은 다른 사건입니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S7 ===== -->
+<section id="s7">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">07</span><h2>아무나 못 사는 증권</h2></div>
+  <p class="sec-lead">1편의 "허가형 자산"이 왜 존재하는지 봅니다. 블록체인이 만든 제한이 아니라 증권법을 옮겨 온 것입니다.</p>
+
+  <div class="qlead"><span class="mk">Q</span><p>왜 어떤 상품은 자격이 있어야만 살 수 있을까요?</p></div>
+
+  <p>
+    증권을 일반 대중에게 팔려면 감독당국에 등록해야 합니다.
+    등록하면 재무 상태를 다 공개해야 하고, 비용도 많이 들고, 시간도 오래 걸립니다.
+  </p>
+  <p>
+    그래서 많은 상품이 등록을 면제받는 길을 택합니다.
+    대신 조건이 붙습니다. <strong>아무에게나 팔 수 없습니다.</strong>
+    돈이 많거나 금융을 잘 아는 사람에게만 팔 수 있습니다.
+    스스로 위험을 판단할 수 있는 사람들이니 보호 장치를 줄여도 된다는 논리입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 296" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="투자자 자격 계층과 온체인 화이트리스트">
+        <text x="20" y="26" class="svg-t ko-hd">살 수 있는 사람의 자격이 세 단계로 나뉩니다</text>
+
+        <rect x="130" y="46" width="470" height="52" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="152" y="70" class="svg-t ko" fill="var(--ink)">일반 투자자</text>
+        <text x="152" y="88" class="svg-t ko-sm">등록된 공모 상품만 살 수 있습니다</text>
+        <text x="578" y="80" class="svg-t sm" text-anchor="end">누구나</text>
+
+        <rect x="130" y="106" width="470" height="62" rx="5" fill="rgba(var(--rgb-g),.12)" stroke="var(--gated)"/>
+        <text x="152" y="130" class="svg-t ko" fill="var(--ink)">적격 투자자</text>
+        <text x="152" y="148" class="svg-t ko-sm">소득이나 순자산이 일정 수준 이상, 또는 금융 전문 자격 보유</text>
+        <text x="152" y="163" class="svg-t sm">사모 상품을 살 수 있습니다</text>
+        <text x="578" y="140" class="svg-t sm" text-anchor="end" fill="var(--gated)">개인도 가능</text>
+
+        <rect x="130" y="176" width="470" height="62" rx="5" fill="rgba(var(--rgb-t),.14)" stroke="var(--tradfi)"/>
+        <text x="152" y="200" class="svg-t ko" fill="var(--ink)">적격기관투자자 (QIB)</text>
+        <text x="152" y="218" class="svg-t ko-sm">증권을 1억 달러 넘게 굴리는 기관만 해당됩니다</text>
+        <text x="152" y="233" class="svg-t sm">가장 제한적인 상품까지 살 수 있습니다</text>
+        <text x="578" y="210" class="svg-t sm" text-anchor="end" fill="var(--tradfi)">기관만</text>
+
+        <path d="M100 68 L100 208" stroke="var(--line)" stroke-width="1.6" marker-end="url(#p1)"/>
+        <text x="86" y="130" class="svg-t ko-sm" text-anchor="end">자격</text>
+        <text x="86" y="148" class="svg-t ko-sm" text-anchor="end">올라감</text>
+
+        <rect x="624" y="46" width="256" height="192" rx="6" fill="rgba(var(--rgb-o),.10)" stroke="var(--onchain)" stroke-dasharray="5 3"/>
+        <text x="646" y="72" class="svg-t ko-hd" fill="var(--onchain)">온체인에서는</text>
+        <text x="646" y="100" class="svg-t ko-sm">발행사가 지갑 주소를 심사해서</text>
+        <text x="646" y="118" class="svg-t ko-sm">허용 명단에 올립니다</text>
+        <text x="646" y="146" class="svg-t ko-sm">토큰 컨트랙트가 명단에 없는</text>
+        <text x="646" y="164" class="svg-t ko-sm">주소로는 전송을 막습니다</text>
+        <text x="646" y="196" class="svg-t ko-sm" fill="var(--risk)">담보를 맡기는 사람만이 아니라</text>
+        <text x="646" y="214" class="svg-t ko-sm" fill="var(--risk)">청산하는 사람도 자격이 필요합니다</text>
+
+        <rect x="20" y="252" width="860" height="34" rx="5" fill="rgba(var(--rgb-a),.11)" stroke="var(--line)" stroke-dasharray="5 3"/>
+        <text x="44" y="274" class="svg-t ko-sm">쉽게 말하면, 담보를 팔아 줄 사람이 소수로 줄어든다는 뜻입니다. 이게 다음 문제로 이어집니다.</text>
+
+        <defs><marker id="p1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/></marker></defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 15]</b> 온체인 지갑 화이트리스트는 이 자격 계층을 코드로 옮긴 것입니다.</figcaption>
+  </figure>
+
+  <div class="qlead"><span class="mk">Q</span><p>자격 제한이 왜 담보 조건까지 나쁘게 만들까요?</p></div>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 152" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="투자자 자격 제한이 LTV를 낮추는 인과 사슬">
+        <text x="20" y="26" class="svg-t ko-hd">규제가 LTV를 끌어내리는 경로</text>
+
+        <rect x="20" y="48" width="152" height="66" rx="5" fill="rgba(var(--rgb-g),.13)" stroke="var(--gated)"/>
+        <text x="96" y="76" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">자격 있는 사람만</text>
+        <text x="96" y="94" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">보유 가능</text>
+
+        <path d="M178 81 L200 81" stroke="var(--line)" stroke-width="1.8" marker-end="url(#ch)"/>
+
+        <rect x="206" y="48" width="152" height="66" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="282" y="76" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">청산에 참여할</text>
+        <text x="282" y="94" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">사람이 줄어듦</text>
+
+        <path d="M364 81 L386 81" stroke="var(--line)" stroke-width="1.8" marker-end="url(#ch)"/>
+
+        <rect x="392" y="48" width="152" height="66" rx="5" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="468" y="76" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">담보를 파는 데</text>
+        <text x="468" y="94" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">시간이 더 걸림</text>
+
+        <path d="M550 81 L572 81" stroke="var(--line)" stroke-width="1.8" marker-end="url(#ch)"/>
+
+        <rect x="578" y="48" width="152" height="66" rx="5" fill="rgba(var(--rgb-a),.14)" stroke="var(--accent)"/>
+        <text x="654" y="76" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">여유 공간을</text>
+        <text x="654" y="94" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">더 넓게 잡아야 함</text>
+
+        <path d="M736 81 L758 81" stroke="var(--risk)" stroke-width="1.8" marker-end="url(#ch2)"/>
+
+        <rect x="764" y="48" width="116" height="66" rx="5" fill="rgba(var(--rgb-r),.13)" stroke="var(--risk)"/>
+        <text x="822" y="86" class="svg-t ko" text-anchor="middle" fill="var(--risk)">LTV 하락</text>
+
+        <text x="20" y="142" class="svg-t ko-sm" fill="var(--ink-dim)">규제는 시장 바깥의 문제처럼 보이지만, 이렇게 담보 조건이라는 아주 실무적인 숫자로 되돌아옵니다.</text>
+
+        <defs>
+          <marker id="ch" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/></marker>
+          <marker id="ch2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--risk)"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 16]</b> 다섯 칸짜리 인과 사슬. 1편에서 허가형 담보의 LTV가 낮았던 이유가 이것입니다.</figcaption>
+  </figure>
+
+  <div class="bridge">
+    <span class="lbl">1편과 연결하면</span>
+    <p>
+      Aave Horizon이 <strong>담보 쪽만 자격을 요구하고, 돈 넣는 쪽은 아무나 되게</strong> 만든 이유가 이제 보입니다.
+      담보 토큰의 보유 제한은 증권법상 반드시 지켜야 합니다.
+      하지만 스테이블코인을 예치하는 건 증권을 사는 게 아니니 제한할 이유가 없습니다.
+      꼭 필요한 곳에만 제한을 걸고 나머지는 최대한 열어 둔 설계입니다.
+    </p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S8 ===== -->
+<section id="s8">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">08</span><h2>펀드를 담보로 잡기</h2></div>
+  <p class="sec-lead">1편의 담보 대부분은 개별 증권이 아니라 펀드 지분입니다. 여기에 고유한 함정이 있습니다.</p>
+
+  <p>
+    BUIDL, JTRSY, USTB, JAAA, ACRED. 전부 펀드입니다.
+    주식 한 종목을 담보로 잡는 것과 펀드 지분을 담보로 잡는 것은 성격이 다릅니다.
+  </p>
+
+  <div class="qlead"><span class="mk">Q</span><p>펀드의 가격은 누가 정할까요?</p></div>
+
+  <p>
+    주식은 거래소에서 수많은 사람이 사고팔며 가격이 만들어집니다.
+    펀드는 다릅니다. <strong>운용사가 계산해서 발표합니다.</strong>
+    보유 자산을 다 더하고 부채를 뺀 뒤 지분 수로 나눈 값인데, 이걸 <strong class="tm">기준가격(NAV)</strong>이라고 합니다.
+  </p>
+  <p>
+    국채 펀드처럼 안에 든 게 명확하면 계산이 기계적입니다.
+    그런데 사모신용처럼 시장가가 없는 자산이 들어 있으면, 운용사가 모형을 돌려 "이 정도 가치일 것"이라고 추정합니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 214" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="거래소 가격과 펀드 기준가격의 차이">
+        <text x="20" y="26" class="svg-t ko-hd">가격을 누가 만드는가</text>
+
+        <rect x="20" y="46" width="420" height="146" rx="6" fill="rgba(var(--rgb-o),.09)" stroke="var(--line)"/>
+        <text x="44" y="74" class="svg-t ko-hd" fill="var(--onchain)">거래소 가격</text>
+        <g>
+          <circle cx="70" cy="112" r="10" fill="rgba(var(--rgb-o),.4)"/>
+          <circle cx="104" cy="112" r="10" fill="rgba(var(--rgb-o),.4)"/>
+          <circle cx="138" cy="112" r="10" fill="rgba(var(--rgb-o),.4)"/>
+          <circle cx="172" cy="112" r="10" fill="rgba(var(--rgb-o),.4)"/>
+          <circle cx="206" cy="112" r="10" fill="rgba(var(--rgb-o),.4)"/>
+          <text x="230" y="117" class="svg-t ko-sm">수많은 참가자가 함께 만듦</text>
+        </g>
+        <text x="44" y="158" class="svg-t ko-sm">한 명이 틀려도 나머지가 바로잡습니다</text>
+        <text x="44" y="178" class="svg-t sm" fill="var(--onchain)">조작하려면 시장 전체를 움직여야 함</text>
+
+        <rect x="460" y="46" width="420" height="146" rx="6" fill="rgba(var(--rgb-r),.08)" stroke="var(--line)"/>
+        <text x="484" y="74" class="svg-t ko-hd" fill="var(--risk)">펀드 기준가격(NAV)</text>
+        <g>
+          <circle cx="510" cy="112" r="14" fill="rgba(var(--rgb-r),.35)"/>
+          <text x="536" y="117" class="svg-t ko-sm">운용사 한 곳이 계산해서 발표</text>
+        </g>
+        <text x="484" y="158" class="svg-t ko-sm">틀려도 바로잡아 줄 상대가 없습니다</text>
+        <text x="484" y="178" class="svg-t sm" fill="var(--risk)">믿을 곳이 한 군데로 모입니다</text>
+      </svg>
+    </div>
+    <figcaption><b>[그림 17]</b> 온체인 오라클이 NAV를 읽어 온다면, 신뢰가 한 지점에 집중된다는 뜻입니다.</figcaption>
+  </figure>
+
+  <div class="warn">
+    <span class="lbl">1편 6장과 이어지는 지점</span>
+    1편에서 온체인 사고의 최다 원인이 오라클 문제였습니다.
+    본질은 "가격이 틀렸는데 시스템은 맞다고 믿었다"는 것이었습니다.
+    NAV를 읽어 오는 담보는 이 위험을 구조적으로 안고 있습니다.
+    <strong>거래소 가격은 여러 사람이 만들지만 NAV는 한 곳이 만듭니다.</strong>
+  </div>
+
+  <div class="qlead"><span class="mk">Q</span><p>청산이 실행되면 바로 현금이 들어올까요?</p></div>
+
+  <p>
+    아닙니다. 청산으로 펀드 토큰을 넘겨받은 사람은 그걸 현금으로 바꿔야 합니다. 방법은 둘입니다.
+    시장에 내다 팔거나, 운용사에 환매를 신청하거나.
+  </p>
+  <p>
+    문제는 위기 상황에 <strong>이 두 길이 동시에 막힐 수 있다</strong>는 점입니다.
+    시장에는 사려는 사람이 사라지고, 운용사는 인출이 몰리면 환매를 제한합니다.
+    이걸 게이팅이라고 하는데, 남은 투자자를 보호하려는 정상적인 장치입니다.
+    다만 담보를 잡은 입장에서는 최악의 상황입니다.
+  </p>
+
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 900 244" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="펀드 담보를 현금화하는 두 경로와 막히는 지점">
+        <text x="20" y="26" class="svg-t ko-hd">청산했는데 현금이 안 들어오는 경우</text>
+
+        <rect x="20" y="52" width="176" height="56" rx="5" fill="rgba(var(--rgb-o),.13)" stroke="var(--onchain)"/>
+        <text x="108" y="76" class="svg-t ko" text-anchor="middle" fill="var(--ink)">청산 실행</text>
+        <text x="108" y="94" class="svg-t sm" text-anchor="middle">펀드 토큰을 넘겨받음</text>
+
+        <path d="M202 80 L232 80" stroke="var(--line)" stroke-width="1.8" marker-end="url(#g1)"/>
+
+        <rect x="240" y="42" width="220" height="36" rx="4" fill="rgba(var(--rgb-o),.13)" stroke="var(--onchain)"/>
+        <text x="350" y="65" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">길 A · 시장에 내다 팔기</text>
+
+        <rect x="240" y="86" width="220" height="36" rx="4" fill="rgba(var(--rgb-a),.14)" stroke="var(--accent)"/>
+        <text x="350" y="109" class="svg-t ko-sm" text-anchor="middle" fill="var(--ink)">길 B · 운용사에 환매 신청</text>
+
+        <path d="M466 60 L494 60" stroke="var(--onchain)" stroke-width="1.6" marker-end="url(#g2)"/>
+        <path d="M466 104 L494 104" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#g3)"/>
+
+        <rect x="500" y="42" width="380" height="36" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="520" y="65" class="svg-t ko-sm">사려는 사람이 없으면 헐값에 넘겨야 합니다</text>
+
+        <rect x="500" y="86" width="380" height="36" rx="4" fill="var(--surface)" stroke="var(--line)"/>
+        <text x="520" y="109" class="svg-t ko-sm">환매 주기와 한도가 걸립니다. 하루 넘게 걸리기도 합니다</text>
+
+        <rect x="240" y="142" width="640" height="82" rx="6" fill="rgba(var(--rgb-r),.09)" stroke="var(--risk)" stroke-dasharray="5 3"/>
+        <text x="264" y="168" class="svg-t ko-hd" fill="var(--risk)">최악: 위기 때 두 길이 동시에 막힙니다</text>
+        <text x="264" y="192" class="svg-t ko-sm">시장에서는 호가가 사라지고, 운용사는 환매를 제한합니다.</text>
+        <text x="264" y="212" class="svg-t ko-sm">청산은 끝났는데 현금은 못 만드는 상태가 되고, 그 손실은 부실채권으로 남습니다.</text>
+
+        <text x="20" y="172" class="svg-t ko-sm" fill="var(--ink-dim)">이 위험을</text>
+        <text x="20" y="190" class="svg-t ko-sm" fill="var(--ink-dim)">막아 주는 건</text>
+        <text x="20" y="212" class="svg-t ko" fill="var(--ink)">낮은 LTV뿐</text>
+
+        <defs>
+          <marker id="g1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--line)"/></marker>
+          <marker id="g2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--onchain)"/></marker>
+          <marker id="g3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent)"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <figcaption><b>[그림 18]</b> 청산 실행과 현금 회수는 별개 사건입니다. 그 사이가 온체인 담보 설계의 진짜 병목입니다.</figcaption>
+  </figure>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S9 ===== -->
+<section id="s9">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">09</span><h2>용어 번역기</h2></div>
+  <p class="sec-lead">디파이 용어를 누르면 원래 있던 것과 나란히 보여 줍니다. 같은 점보다 다른 점을 눈여겨보세요.</p>
+
+  <div class="trans">
+    <div class="trans-hd"><span class="bar"></span><h4>눌러서 확인하기</h4></div>
+    <p class="trans-sub">스터디 직전에 이것만 한 번 훑어도 1편 용어가 대부분 정리됩니다.</p>
+    <div class="term-btns" id="termBtns" role="group" aria-label="용어 선택"></div>
+
+    <div class="trans-body">
+      <div class="tside l">
+        <div class="cap">원래 있던 것</div>
+        <div class="name" id="tfName">-</div>
+        <div class="en" id="tfEn">-</div>
+        <div class="desc" id="tfDesc">-</div>
+      </div>
+      <div class="tmid"><span>&#8644;</span></div>
+      <div class="tside r">
+        <div class="cap">온체인 이름</div>
+        <div class="name" id="ocName">-</div>
+        <div class="en" id="ocEn">-</div>
+        <div class="desc" id="ocDesc">-</div>
+      </div>
+    </div>
+    <div class="tdiff">
+      <div class="same"><div class="h">같은 점</div><p id="dSame">-</p></div>
+      <div class="diff"><div class="h">다른 점</div><p id="dDiff">-</p></div>
+    </div>
+    <div class="tkey" id="dKey">-</div>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S10 ===== -->
+<section id="s10">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">10</span><h2>전체 대조표</h2></div>
+  <p class="sec-lead">발표할 때 한 장으로 띄우기 좋은 요약입니다. 오른쪽 두 열이 실제로 중요합니다.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>원래 있던 것</th><th>온체인 이름</th><th>같은 점</th><th>다른 점</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Repo</strong></td><td><strong>담보부 렌딩</strong></td><td>자산을 계속 들고 있으면서 현금만 확보</td><td>repo는 만기가 있고, 온체인은 대부분 만기가 없음</td></tr>
+        <tr><td><strong>헤어컷</strong></td><td><strong>담보인정비율(LTV)</strong></td><td>완충 구간을 정하는 같은 개념. 합치면 100</td><td>온체인은 빌리는 사람의 신용도를 반영 못 함</td></tr>
+        <tr><td><strong>마진콜 · 강제처분</strong></td><td><strong>청산</strong></td><td>담보가 부족하면 팔아서 회수한다는 원칙</td><td>온체인에는 연락도 유예도 협의도 없음</td></tr>
+        <tr><td><strong>시가평가 · 감정</strong></td><td><strong>오라클</strong></td><td>담보 값을 밖에서 가져와 기준으로 삼음</td><td>온체인은 실시간이지만 틀린 값도 즉시 집행됨</td></tr>
+        <tr><td><strong>중간 은행</strong></td><td><strong>프로토콜 + 큐레이터</strong></td><td>담보 판정과 자금 배분을 대신해 줌</td><td>은행은 잘못하면 배상, 큐레이터는 배상 안 함</td></tr>
+        <tr><td><strong>펀드 · MMF</strong></td><td><strong>볼트(Vault)</strong></td><td>돈을 모아 전문가가 나눠 넣음</td><td>볼트는 돈을 직접 못 만지고 규칙이 코드로 고정됨</td></tr>
+        <tr><td><strong>일반담보 repo</strong></td><td><strong>통합 시장</strong></td><td>자산군 단위로 담보를 다루고 자금을 공유</td><td>온체인은 새 담보를 넣을 때 투표를 거침</td></tr>
+        <tr><td><strong>개별 계약 repo</strong></td><td><strong>격리 시장</strong></td><td>거래마다 조건을 따로 정하고 위험을 분리</td><td>온체인은 누구나 시장을 열 수 있음</td></tr>
+        <tr><td><strong>기간물 repo</strong></td><td><strong>고정금리·고정만기</strong><br><span class="pill a">Midnight · Loopscale</span></td><td>빌릴 때 금리와 기간을 미리 확정</td><td>온체인은 만기 전에도 포지션을 사고팔 수 있음</td></tr>
+        <tr><td><strong>재담보</strong></td><td><strong>루핑(Looping)</strong></td><td>같은 담보를 반복 활용해 규모를 키움</td><td>온체인은 본인이 직접 하고 배수 상한이 코드에 박힘</td></tr>
+        <tr><td><strong>사모증권 규제</strong></td><td><strong>허가형 토큰</strong></td><td>살 수 있는 사람을 자격으로 제한</td><td>온체인은 청산하는 사람에게도 자격을 요구함</td></tr>
+        <tr><td><strong>T+1 결제</strong></td><td><strong>즉시 결제</strong></td><td>물건과 돈을 동시에 주고받음</td><td>온체인은 중간 구간이 없어 보증금이 필요 없음</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="oneline">
+    <span class="lbl">전체를 관통하는 한 문장</span>
+    <p>온체인은 담보금융의 문법을 거의 그대로 가져왔고, 사람이 하던 자리를 코드로 바꿨습니다. 얻은 것은 속도와 확실함, 잃은 것은 융통성과 책임질 사람입니다.</p>
+  </div>
+</div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ===== S11 ===== -->
+<section id="s11">
+<div class="wrap">
+  <div class="sec-head"><span class="sec-num">11</span><h2>자가진단</h2></div>
+  <p class="sec-lead">스터디 전에 풀어 보세요. 설명할 수 있으면 체크, 막히면 해당 장으로 돌아가면 됩니다.</p>
+
+  <div class="chk" id="chkList">
+    <label><input type="checkbox"><span class="txt"><span class="q">담보를 잡는 이유를 한 문장으로 말할 수 있다</span><span class="a">1장 · 상대를 몰라도 돈을 빌려줄 수 있게 해 주기 때문</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">온체인 렌딩이 항상 과담보인 이유를 설명할 수 있다</span><span class="a">1장 · 지갑은 몇 초 만에 새로 만들 수 있어 신용을 볼 방법이 없음</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">헤어컷 5%와 LTV 95%가 같은 말임을 바로 알 수 있다</span><span class="a">2장 · 둘을 더하면 항상 100. 헤어컷 크기 = 버틸 수 있는 하락폭</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">자산마다 헤어컷이 다른 이유를 두 가지 이상 말할 수 있다</span><span class="a">2장 · 값의 흔들림, 사려는 사람 수, 파는 데 걸리는 시간, 상대 신용도</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">repo가 "담보"가 아니라 "매매" 형식인 이유를 설명할 수 있다</span><span class="a">3장 · 상대가 망해도 법원 절차 없이 바로 팔기 위해서</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">중간 은행과 큐레이터의 결정적 차이를 말할 수 있다</span><span class="a">3장 · 은행은 잘못하면 배상하고, 큐레이터는 배상하지 않음</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">마진콜과 온체인 청산의 차이를 설명할 수 있다</span><span class="a">4장 · 전통금융은 연락하고 기다려 주지만 온체인은 바로 실행</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">온체인에서 "여유 공간"이 무엇을 대신하는지 말할 수 있다</span><span class="a">4장 · 전통금융의 유예 시간. LTV와 청산 기준의 간격</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">결제에 하루가 걸리는 게 왜 비용인지 설명할 수 있다</span><span class="a">5장 · 상대가 망할 위험 때문에 보증금이 묶임</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">JAAA가 무엇이고 왜 AAA인지 설명할 수 있다</span><span class="a">6장 · 기업대출 묶음의 맨 위층. 아래층들이 손실을 먼저 흡수</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">토큰화 국채의 진짜 위험이 값이 아니라는 걸 안다</span><span class="a">6장·8장 · 현금으로 바꾸는 데 걸리는 시간</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">자격 제한이 LTV를 낮추는 경로를 그릴 수 있다</span><span class="a">7장 · 청산 참여자 감소 → 파는 시간 증가 → 여유 공간 확대 필요</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">펀드 기준가격이 거래소 가격과 무엇이 다른지 말할 수 있다</span><span class="a">8장 · 여럿이 만드는 값이 아니라 운용사 한 곳이 계산한 값</span></span></label>
+    <label><input type="checkbox"><span class="txt"><span class="q">청산 실행과 현금 회수가 별개 사건인 이유를 안다</span><span class="a">8장 · 시장이 막히고 환매도 제한되면 현금을 못 만듦</span></span></label>
+    <div id="chkScore">0 / 14 확인 완료</div>
+  </div>
+</div>
+</section>
+
+<footer id="srcs">
+<div class="wrap">
+  <h4>출처 및 데이터 기준</h4>
+  <div class="srcs">
+    repo 시장 규모 · Office of Financial Research, Sizing the U.S. Repo Market (2025년 3분기 기준)<br>
+    삼자간 repo 헤어컷 · Federal Reserve Bank of New York, Tri-Party/GCF Repo Statistics<br>
+    CLO 시장 규모 · Guggenheim Investments (2026.03) · 구조화 신용 13.3조 달러 중 1.4조 달러<br>
+    사모신용 규모 · PIMCO 추정 (2026.06) · 금융안정위원회(FSB) 사모신용 취약성 보고서 (2026.05.06)<br>
+    CLO 시장 2026년 1분기 환매 관련 동향 · McDermott, CLO transactions Spring 2026<br>
+    결제주기 · SEC Press Release 2024-62, T+1 시행일 2024.05.28<br>
+    투자자 자격 · SEC Regulation D, Rule 144A<br>
+    온체인 수치 · CoinShares × Token Terminal (2026 Q2) · 1편 자료 및 Xangle RWA Series (2026.07.29)
+    <br><br>
+    <span style="font-family:var(--mono);font-size:11.5px;line-height:1.85;display:block">
+      본 자료는 BAY 자율스터디 학습 목적으로 작성되었습니다. 투자 자문이나 투자 권유가 아닙니다.<br>
+      헤어컷 구간 값은 시장에서 흔히 쓰이는 참고 범위이며 실제 거래 조건과 다를 수 있습니다.<br>
+      1편 「토큰화된 자산은 어떻게 담보가 되는가」와 함께 읽는 것을 전제로 작성되었습니다.<br>
+      작성 기준일 2026.08.08
+    </span>
+  </div>
+</div>
+</footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var tBtn=document.getElementById('themeBtn'), tLbl=document.getElementById('themeLabel');
+  if(tBtn){
+    tBtn.addEventListener('click',function(){
+      var dark=document.documentElement.getAttribute('data-theme')==='dark';
+      if(dark){document.documentElement.removeAttribute('data-theme');tLbl.textContent='다크 모드';tBtn.setAttribute('aria-pressed','false');}
+      else{document.documentElement.setAttribute('data-theme','dark');tLbl.textContent='라이트 모드';tBtn.setAttribute('aria-pressed','true');}
+    });
+  }
+
+  var links=document.querySelectorAll('.toc a'), secs=[];
+  links.forEach(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el) secs.push({el:el,link:a});
+  });
+  function spy(){
+    var y=window.scrollY+130, cur=null;
+    secs.forEach(function(s){ if(s.el.offsetTop<=y) cur=s; });
+    links.forEach(function(a){a.classList.remove('active');});
+    if(cur) cur.link.classList.add('active');
+  }
+  var tick=false;
+  window.addEventListener('scroll',function(){
+    if(!tick){window.requestAnimationFrame(function(){spy();tick=false;});tick=true;}
+  },{passive:true});
+  spy();
+
+  /* TRANSLATOR */
+  var TERMS=[
+    {btn:'LTV',
+     tf:{n:'헤어컷',en:'HAIRCUT',d:'담보 값에서 얼마를 깎고 빌려줄지 정하는 비율입니다. 100만 원짜리에 98만 원을 빌려주면 헤어컷 2%입니다.'},
+     oc:{n:'담보인정비율',en:'LOAN TO VALUE',d:'담보 대비 얼마까지 빌릴 수 있는지의 상한입니다. 담보 100에 LTV 80%면 80까지 빌립니다.'},
+     same:'둘 다 담보 값과 빌린 돈 사이에 여유를 얼마나 둘지 정하는 값입니다. 합치면 100이 됩니다.',
+     diff:'전통금융은 믿을 만한 상대에게 헤어컷을 깎아 주지만, 온체인은 빌리는 쪽이 익명이라 모두에게 똑같이 적용됩니다.',
+     key:'헤어컷 2% = LTV 98%. 그리고 <b>헤어컷 크기가 곧 버틸 수 있는 하락폭</b>입니다.'},
+
+    {btn:'청산',
+     tf:{n:'마진콜 · 강제처분',en:'MARGIN CALL',d:'담보가 부족하다고 연락한 뒤 시간을 주고, 그래도 안 되면 담보를 파는 여러 단계짜리 절차입니다.'},
+     oc:{n:'청산',en:'LIQUIDATION',d:'오라클 가격이 기준선에 닿는 순간 누군가 담보를 가져가고 빚을 대신 갚아 줍니다.'},
+     same:'담보가 부족해지면 팔아서 회수한다는 원칙 자체는 똑같습니다.',
+     diff:'전통금융에는 연락과 유예, 협의가 있지만 온체인은 판정과 실행이 같은 순간입니다. 되돌릴 방법이 없습니다.',
+     key:'전통금융이 시간으로 주던 여유를 온체인에서는 <b>LTV와 청산 기준의 간격</b>이 대신합니다.'},
+
+    {btn:'오라클',
+     tf:{n:'시가평가',en:'MARK TO MARKET',d:'보유 자산을 매일 시장 가격으로 다시 계산하는 일입니다. 시장가가 없으면 모형이나 운용사 발표값을 씁니다.'},
+     oc:{n:'오라클',en:'ORACLE',d:'바깥 가격을 온체인으로 가져오는 장치입니다. 이 값으로 청산 여부가 결정됩니다.'},
+     same:'담보 값을 바깥에서 가져와 판단 기준으로 삼는다는 역할이 같습니다.',
+     diff:'전통금융은 하루 한 번이 보통이고 틀리면 고칠 시간이 있습니다. 온체인은 실시간이라 틀린 값도 바로 집행됩니다.',
+     key:'온체인 사고의 최다 원인이 오라클 문제입니다. <b>가격이 틀리면 LTV도 청산 기준도 무의미</b>합니다.'},
+
+    {btn:'큐레이터',
+     tf:{n:'중간 은행',en:'TRI-PARTY AGENT',d:'담보를 받아 주고, 적당한지 판정하고, 헤어컷을 매기고, 매일 값을 다시 계산해 주는 은행입니다.'},
+     oc:{n:'큐레이터',en:'CURATOR',d:'돈을 모으는 창구(볼트)를 열고, 어느 시장에 얼마를 넣을지 정하는 전문 운용 주체입니다.'},
+     same:'맡긴 사람을 대신해 담보를 판단하고 자금을 나눠 넣는 역할입니다.',
+     diff:'은행은 감독을 받고 자본을 쌓아 두고 잘못하면 배상합니다. 큐레이터는 수수료만 받고 손실은 물어주지 않습니다.',
+     key:'1편 6장 사태의 구조적 원인입니다. <b>손해는 맡긴 사람이 보고 수수료는 큐레이터가 가져갑니다</b>.'},
+
+    {btn:'볼트',
+     tf:{n:'펀드 · MMF',en:'FUND',d:'여러 사람 돈을 모아 전문가가 굴려 주는 상품입니다. 지분을 받아 갖고 있습니다.'},
+     oc:{n:'볼트',en:'VAULT',d:'큐레이터가 여는 예치 창구입니다. 모인 돈을 여러 시장에 나눠 넣고 수익을 돌려줍니다.'},
+     same:'하나하나 직접 고르는 대신 전문가에게 맡긴다는 구조가 같습니다.',
+     diff:'볼트는 돈을 직접 만질 수 없어 승인 안 된 곳으로 옮길 수 없고, 규칙을 바꾸려면 시간이 걸립니다.',
+     key:'이 장치는 <b>나쁜 마음을 먹은 운용자는 막지만 판단이 틀린 운용자는 못 막습니다</b>.'},
+
+    {btn:'통합 시장',
+     tf:{n:'일반담보 repo',en:'GENERAL COLLATERAL',d:'"국채 아무거나"처럼 자산 종류만 정하고 돈을 빌리는 방식입니다. 목적이 자금 조달입니다.'},
+     oc:{n:'통합 시장',en:'POOLED MARKET',d:'여러 담보가 하나의 자금 풀을 같이 쓰는 구조입니다. 담보별 조건만 따로 정합니다.'},
+     same:'담보를 종류 단위로 다루고 자금은 한곳에 모아 씁니다.',
+     diff:'온체인은 새 담보를 넣으려면 투표를 거쳐야 해서 느립니다. repo는 은행 기준으로 훨씬 빨리 처리됩니다.',
+     key:'자금을 같이 쓰는 대가로 <b>담보 하나가 부실해지면 모두의 손실</b>이 됩니다.'},
+
+    {btn:'격리 시장',
+     tf:{n:'개별 계약 repo',en:'BILATERAL REPO',d:'당사자 둘이 담보와 조건을 직접 정하는 거래입니다. 계약마다 조건이 다릅니다.'},
+     oc:{n:'격리 시장',en:'ISOLATED MARKET',d:'담보와 빌릴 자산의 조합마다 시장을 따로 엽니다. 자금이 분리돼 부실이 번지지 않습니다.'},
+     same:'거래마다 조건을 따로 정하고 위험을 칸막이로 나눈다는 발상이 같습니다.',
+     diff:'온체인은 누구나 시장을 열 수 있고 조건이 열 때 고정됩니다. 대신 돈을 스스로 모아 와야 합니다.',
+     key:'칸막이는 <b>손실은 막지만 인출 쇄도는 못 막습니다</b>. 1편 6장 참조.'},
+
+    {btn:'고정금리',
+     tf:{n:'기간물 repo',en:'TERM REPO',d:'하루짜리가 아니라 기간을 정해 놓고 하는 repo입니다. 시작할 때 금리와 기간이 확정됩니다.'},
+     oc:{n:'고정금리·고정만기',en:'FIXED RATE / TERM',d:'Morpho Midnight과 Loopscale이 도입한 방식입니다. 호가로 금리와 기간을 정해 체결합니다.'},
+     same:'금리와 기간을 미리 못 박아 불확실성을 없앤다는 목적이 같습니다.',
+     diff:'온체인은 만기 전에도 포지션을 사고팔 수 있습니다. 전통 기간물 repo에는 없는 유연함입니다.',
+     key:'디파이가 전통금융을 닮아간 대표 사례이지만 <b>완전히 돌아간 것은 아닙니다</b>.'},
+
+    {btn:'루핑',
+     tf:{n:'재담보',en:'REHYPOTHECATION',d:'받은 담보를 또 담보로 써서 자금을 조달하는 관행입니다. 담보 하나가 여러 거래에 쓰입니다.'},
+     oc:{n:'루핑',en:'LOOPING',d:'빌린 돈으로 같은 자산을 또 사서 담보로 넣기를 반복합니다. 노출을 몇 배로 키웁니다.'},
+     same:'같은 담보를 반복 활용해 규모를 키우는 원리가 같습니다.',
+     diff:'전통금융은 중개기관이 본인 모르게 하기도 하지만, 온체인은 본인이 직접 하고 최대 배수가 코드에 박혀 있습니다.',
+     key:'1편의 Jupiter Lend 최대 3.8배가 이것입니다. <b>값이 떨어지면 손실도 같은 배수로 커집니다</b>.'},
+
+    {btn:'허가형',
+     tf:{n:'사모증권',en:'PRIVATE PLACEMENT',d:'등록을 면제받는 대신 자격 있는 사람에게만 팔 수 있는 증권입니다.'},
+     oc:{n:'허가형 토큰',en:'PERMISSIONED TOKEN',d:'발행사가 심사한 지갑만 갖고 옮길 수 있게 컨트랙트에 제한을 걸어 둔 토큰입니다.'},
+     same:'살 수 있는 사람을 자격으로 제한한다는 규제 요건이 같습니다.',
+     diff:'온체인은 청산하는 사람에게도 자격이 필요합니다. 팔아 줄 사람이 줄어 LTV를 낮출 수밖에 없습니다.',
+     key:'규제가 곧 <b>담보 조건을 보수적으로 만드는 요인</b>으로 되돌아옵니다.'},
+
+    {btn:'CDP',
+     tf:{n:'담보 잡고 돈 찍기',en:'COLLATERALIZED ISSUANCE',d:'중앙은행이 적당한 담보를 받고 자금을 내주면 그만큼 돈이 새로 생기는 구조입니다.'},
+     oc:{n:'CDP',en:'COLLATERALIZED DEBT POSITION',d:'담보를 맡기면 프로토콜이 스테이블코인을 새로 찍어 주고, 갚으면 태워 없앱니다.'},
+     same:'빌려주는 상대가 따로 없고, 담보를 근거로 돈이 생겼다가 사라집니다.',
+     diff:'중앙은행 돈은 법이 통용을 보장하지만, CDP가 찍은 코인은 시장이 받아 줘야 쓸 수 있습니다.',
+     key:'CDP의 진짜 한계는 담보가 아니라 <b>찍은 코인을 사람들이 받아 주느냐</b>입니다.'},
+
+    {btn:'즉시 결제',
+     tf:{n:'T+1 결제',en:'DELIVERY VERSUS PAYMENT',d:'물건과 돈을 동시에 주고받되, 체결과 실제 이전 사이에 하루가 있습니다. 미국은 2024년 5월부터 T+1입니다.'},
+     oc:{n:'즉시 결제',en:'ATOMIC SETTLEMENT',d:'담보 맡기기와 돈 받기가 한 번에 처리됩니다. 전부 되거나 전부 취소됩니다.'},
+     same:'한쪽만 이행되는 어정쩡한 상태를 막는다는 목적이 같습니다.',
+     diff:'T+1은 하루 시차가 남아 보증금이 필요하지만, 즉시 결제는 그 구간 자체가 없습니다.',
+     key:'기관이 토큰화에 관심 갖는 실무적 이유입니다. <b>보증금으로 묶였던 돈이 풀립니다</b>.'}
+  ];
+
+  var wrap=document.getElementById('termBtns');
+  var E={tfN:'tfName',tfE:'tfEn',tfD:'tfDesc',ocN:'ocName',ocE:'ocEn',ocD:'ocDesc',sm:'dSame',df:'dDiff',ky:'dKey'};
+  function g(k){return document.getElementById(E[k]);}
+  function paint(t){
+    g('tfN').textContent=t.tf.n; g('tfE').textContent=t.tf.en; g('tfD').textContent=t.tf.d;
+    g('ocN').textContent=t.oc.n; g('ocE').textContent=t.oc.en; g('ocD').textContent=t.oc.d;
+    g('sm').textContent=t.same; g('df').textContent=t.diff; g('ky').innerHTML=t.key;
+  }
+  if(wrap){
+    TERMS.forEach(function(t,i){
+      var b=document.createElement('button');
+      b.className='tbtn'+(i===0?' on':''); b.type='button'; b.textContent=t.btn;
+      b.setAttribute('aria-pressed', i===0?'true':'false');
+      b.addEventListener('click',function(){
+        wrap.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false');});
+        b.classList.add('on'); b.setAttribute('aria-pressed','true'); paint(t);
+      });
+      wrap.appendChild(b);
+    });
+    paint(TERMS[0]);
+  }
+
+  /* CONVERTER */
+  var hc=document.getElementById('hcSlider');
+  var bandEls=document.querySelectorAll('#band i');
+  var NOTES=[
+    {lo:0,hi:3,t:'미국 국채 구간입니다. 값이 거의 안 움직여서 조금만 깎아도 안전합니다. 온체인에서 토큰화 국채가 LTV 90% 넘게 받는 것과 같은 이유입니다.'},
+    {lo:3,hi:5,t:'주택저당증권 구간입니다. 국채 다음으로 사려는 사람이 많은 자산이라 repo 담보에서도 국채와 함께 대부분을 차지합니다.'},
+    {lo:5,hi:8,t:'우량 회사채 구간입니다. 부도 위험이 조금 붙기 시작하고 팔 때 값도 좀 밀립니다. JAAA 같은 AAA 등급 구조화 상품이 대체로 이 부근입니다.'},
+    {lo:8,hi:15,t:'주식과 하이일드 구간입니다. 값이 많이 흔들려서 여유를 두껍게 잡아야 합니다. 1편에서 ETH의 LTV가 80%였던 것과 대응합니다.'},
+    {lo:15,hi:25,t:'잘 안 팔리는 구조화 상품 구간입니다. 값 매기기도 어렵고 파는 데도 시간이 걸립니다. 주택담보 대출(PRIME)의 LTV 70%가 이 영역의 사고방식입니다.'},
+    {lo:25,hi:41,t:'사모 비유동 자산 구간입니다. 공개 시세가 아예 없어서 값을 매기는 것부터가 어렵습니다. 담보로 받더라도 아주 보수적으로 잡아야 합니다.'}
+  ];
+  function conv(){
+    var h=parseFloat(hc.value), ltv=100-h;
+    document.getElementById('hcVal').textContent=h.toFixed(1)+'%';
+    document.getElementById('oHc').textContent=h.toFixed(1)+'%';
+    document.getElementById('oLtv').textContent=ltv.toFixed(1)+'%';
+    document.getElementById('oCash').textContent=ltv.toFixed(1);
+    document.getElementById('oTol').textContent=h.toFixed(1)+'%';
+    bandEls.forEach(function(b){
+      b.classList.toggle('act', h>=+b.dataset.lo && h<+b.dataset.hi);
+    });
+    var n=NOTES.find(function(x){return h>=x.lo&&h<x.hi;})||NOTES[NOTES.length-1];
+    document.getElementById('convNote').innerHTML='100을 맡기면 <b>'+ltv.toFixed(1)+'</b>을 빌릴 수 있고, 담보 값이 <b>'+h.toFixed(1)+'%</b> 떨어질 때까지는 팔아서 빌려준 돈을 다 회수할 수 있습니다. '+n.t;
+  }
+  if(hc){ hc.addEventListener('input',conv); conv(); }
+
+  /* CHECKLIST */
+  var list=document.getElementById('chkList');
+  if(list){
+    var boxes=list.querySelectorAll('input[type=checkbox]');
+    var score=document.getElementById('chkScore');
+    boxes.forEach(function(b){
+      b.addEventListener('change',function(){
+        var n=0; boxes.forEach(function(x){ if(x.checked) n++; });
+        score.textContent=n+' / '+boxes.length+' 확인 완료'
+          +(n===boxes.length?' · 1편으로 넘어가도 좋습니다':'');
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

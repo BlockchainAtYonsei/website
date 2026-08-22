@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주식이 블록체인 위로 올라간다면? — 전통자산 토큰화 강의</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ StudioBlank Design System ============ */
+  :root {
+    --c-primary: #0A0A0A;
+    --c-secondary: #FAFAFA;
+    --c-tertiary: #D4D4D8;
+    --c-border-soft: #E5E5E5;
+    --c-divider: #F4F4F5;
+    --c-info: #71717A;
+    --c-muted: #A1A1AA;
+    --c-success: #16A34A;
+    --c-error: #DC2626;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 32px;
+    --sp-5: 48px; --sp-6: 64px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: var(--c-secondary);
+    color: var(--c-primary);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.5; }
+  h1 { font-size: 40px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+  h2 { font-size: 28px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+  h3 { font-size: 20px; font-weight: 600; line-height: 1.3; }
+  strong, b { font-weight: 700; }
+  p + p { margin-top: var(--sp-3); }
+  .caption { font-size: 12px; font-weight: 400; line-height: 1.5; color: var(--c-info); }
+  .body-sm { font-size: 15px; font-weight: 400; line-height: 1.65; }
+
+  /* ============ 한 페이지 세로 스크롤 레이아웃 ============ */
+  .deck { }
+  .track { }
+  .slide { padding: 96px 0; }
+  .slide + .slide { border-top: 1px solid var(--c-border-soft); }
+  .slide--inverse + .slide, .slide + .slide--inverse { border-top: none; }
+  .slide-inner { max-width: 1060px; margin: 0 auto; padding: 0 56px; }
+  .slide--inverse { background: var(--c-primary); color: var(--c-secondary); }
+  .slide--inverse .caption { color: var(--c-muted); }
+
+  /* 스크롤 진행 바 */
+  #progress { position: fixed; top: 0; left: 0; height: 2px; background: var(--c-primary); width: 0; z-index: 40; }
+  .hint-keys { display: none; }
+
+  /* ============ Components ============ */
+  .chip {
+    display: inline-flex; align-items: center; height: 28px; padding: 0 12px;
+    font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em;
+    border: 1px solid var(--c-tertiary); color: var(--c-info); background: transparent;
+  }
+  .chip--solid { background: var(--c-primary); color: var(--c-secondary); border: none; }
+  .chip--outline-dark { border: 1px solid var(--c-primary); color: var(--c-primary); }
+  .chip-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+  .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--c-info); display: block; margin-bottom: var(--sp-3); }
+  .slide-head { margin-bottom: var(--sp-4); }
+  .slide-head h2 { font-size: 34px; }
+  .slide-head::after { content: ""; display: block; width: 72px; height: 5px; background: var(--c-primary); margin-top: var(--sp-3); }
+  .slide--inverse .slide-head::after { background: var(--c-secondary); }
+
+  /* 출처 링크 버튼 */
+  .src-links { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+  .src-btn {
+    display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 16px;
+    border: 1px solid var(--c-primary); color: var(--c-primary); background: transparent;
+    font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em;
+    text-decoration: none; transition: background 150ms, color 150ms; font-family: 'IBM Plex Mono', monospace;
+  }
+  .src-btn:hover { background: var(--c-primary); color: var(--c-secondary); }
+  .src-btn--solid { background: var(--c-primary); color: var(--c-secondary); }
+  .src-btn--solid:hover { background: transparent; color: var(--c-primary); }
+  .slide--inverse .src-btn { border-color: var(--c-secondary); color: var(--c-secondary); }
+  .slide--inverse .src-btn:hover { background: var(--c-secondary); color: var(--c-primary); }
+
+  /* 통계 밴드 */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); border: 1px solid var(--c-primary); background: #fff; margin-top: var(--sp-4); }
+  .stat-row > div { padding: 20px 22px; border-right: 1px solid var(--c-border-soft); }
+  .stat-row > div:last-child { border-right: none; }
+  .stat-row .sv { font-family: 'IBM Plex Mono', monospace; font-size: 30px; font-weight: 500; letter-spacing: -0.02em; display: block; line-height: 1.1; }
+  .stat-row .sl { font-size: 12px; color: var(--c-info); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-top: 6px; }
+
+  .card { background: #FFFFFF; border: 1px solid var(--c-border-soft); transition: border-color 180ms; }
+  .card:hover { border-color: var(--c-primary); }
+  .card-pad { padding: var(--sp-4); }
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-3); }
+  @media (max-width: 860px) { .card-grid, .card-grid-3 { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; font-weight: 400; }
+  th { text-align: left; font-size: 12px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em;
+       background: var(--c-primary); color: var(--c-secondary); padding: 12px 14px; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--c-divider); vertical-align: top; }
+  tr:hover td { background: var(--c-divider); }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--c-border-soft); background: #fff; }
+
+  figure { margin: var(--sp-4) 0 0; }
+  figure svg { display: block; width: 100%; height: auto; background: #FFFFFF; border: 1px solid var(--c-border-soft); }
+  figcaption { margin-top: var(--sp-2); font-size: 15px; font-weight: 400; color: #3F3F46; }
+  .slide--inverse figcaption { color: #D4D4D8; }
+  .sk-label { font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+  .sk-role { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+
+  .analogy { border: 2px solid var(--c-primary); background: #FFFFFF; padding: var(--sp-4); margin-top: var(--sp-4); }
+  .analogy .tag { display: inline-block; background: var(--c-primary); color: var(--c-secondary);
+    font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; margin-bottom: var(--sp-3); font-weight: 400; }
+
+  /* 원문 밖 사례 확장 블록 */
+  .case-stack { display: grid; gap: var(--sp-5); }
+  .linkback { border: 2px solid var(--c-primary); background: var(--c-divider); padding: var(--sp-3) var(--sp-4); margin-top: var(--sp-4); }
+  .linkback .tag { display: inline-block; background: var(--c-primary); color: var(--c-secondary);
+    font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; margin-bottom: var(--sp-2); font-weight: 400; }
+
+  details.layer-table { border: 1px solid var(--c-border-soft); background: #fff; margin-top: var(--sp-4); }
+  details.layer-table summary { cursor: pointer; padding: 16px 20px; font-size: 15px; font-weight: 600; list-style: none; }
+  details.layer-table summary::before { content: "+ "; font-family: 'IBM Plex Mono', monospace; }
+  details.layer-table[open] summary::before { content: "− "; }
+  details.layer-table summary:hover { background: var(--c-divider); }
+  details.layer-table .table-scroll { border: none; border-top: 1px solid var(--c-border-soft); }
+
+  .tnote { border-left: 2px solid var(--c-primary); padding: var(--sp-2) 0 var(--sp-2) var(--sp-3); margin-top: var(--sp-4); }
+  .slide--inverse .tnote { border-left-color: var(--c-secondary); }
+  .tnote .caption { display: block; margin-bottom: var(--sp-1); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  ul.clean { list-style: none; }
+  ul.clean li { padding-left: var(--sp-3); position: relative; margin-bottom: var(--sp-2); }
+  ul.clean li::before { content: "—"; position: absolute; left: 0; color: var(--c-muted); }
+
+  /* 개념어 그리드 */
+  .vocab-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--c-primary); border-left: 1px solid var(--c-border-soft); }
+  .vocab-grid > div { border-right: 1px solid var(--c-border-soft); border-bottom: 1px solid var(--c-border-soft);
+    padding: 20px 22px; background: #fff; transition: background 150ms; }
+  .vocab-grid > div:hover { background: var(--c-divider); }
+  .vocab-grid .vn { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--c-primary); color: var(--c-secondary); display: inline-block; padding: 2px 8px; margin-bottom: 8px; }
+  .vocab-grid .vt { font-size: 17px; font-weight: 700; display: block; margin-bottom: 6px; letter-spacing: -0.01em; }
+  .vocab-grid .vd { font-size: 13px; font-weight: 400; color: #3F3F46; line-height: 1.55; }
+  @media (max-width: 860px) { .vocab-grid { grid-template-columns: 1fr 1fr; } }
+
+  /* 케이스 카드 */
+  .case-card { background: #fff; border: 1px solid var(--c-border-soft); cursor: pointer; transition: border-color 180ms; }
+  .case-card:hover { border-color: var(--c-primary); }
+  .case-card .q { padding: var(--sp-3) var(--sp-4); }
+  .case-card .answer { display: none; border-top: 1px solid var(--c-border-soft); padding: var(--sp-3) var(--sp-4); background: var(--c-divider); }
+  .case-card.open .answer { display: block; }
+  .case-card .verdict { font-weight: 700; margin-bottom: var(--sp-1); }
+  .case-card .hint-btn { margin-top: var(--sp-2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--c-info); font-weight: 400; }
+  .case-card.open .hint-btn { display: none; }
+
+  /* 퀴즈 */
+  .quiz-item { background: #fff; border: 1px solid var(--c-border-soft); padding: var(--sp-3) var(--sp-4); }
+  .quiz-q { font-weight: 600; margin-bottom: var(--sp-2); font-size: 15px; }
+  .quiz-opts { display: grid; gap: var(--sp-2); }
+  .quiz-opt { text-align: left; font-family: inherit; font-size: 13px; font-weight: 400; padding: 9px 14px;
+    background: transparent; border: 1px solid var(--c-tertiary); cursor: pointer;
+    transition: background 150ms, border-color 150ms; color: var(--c-primary); line-height: 1.5; }
+  .quiz-opt:hover { background: var(--c-divider); border-color: var(--c-muted); }
+  .quiz-opt.correct { background: var(--c-primary); color: var(--c-secondary); border-color: var(--c-primary); }
+  .quiz-opt.wrong { border-color: var(--c-error); color: var(--c-error); background: #fff; }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-expl { display: none; margin-top: var(--sp-2); font-size: 13px; border-top: 1px solid var(--c-border-soft); padding-top: var(--sp-2); }
+  .quiz-expl.show { display: block; }
+  .quiz-expl .ok { color: var(--c-success); font-weight: 600; }
+  .quiz-expl .no { color: var(--c-error); font-weight: 600; }
+
+  /* 용어 사전 */
+  .glossary { border: 1px solid var(--c-border-soft); background: #fff; }
+  .glossary .row { display: grid; grid-template-columns: 200px 1fr; border-bottom: 1px solid var(--c-divider); }
+  .glossary .row:last-child { border-bottom: none; }
+  .glossary .row:hover { background: var(--c-divider); }
+  .glossary dt { padding: 10px 16px; font-weight: 600; font-size: 14px; }
+  .glossary dd { padding: 10px 16px; font-size: 14px; font-weight: 400; color: #3F3F46; }
+
+  a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .hero-title { font-size: clamp(44px, 6.5vw, 64px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+  .hero-sub { margin-top: var(--sp-4); font-size: 19px; font-weight: 300; line-height: 1.55; color: var(--c-info); max-width: 660px; }
+  .cover-center { display: flex; flex-direction: column; justify-content: center; min-height: calc(100vh - 220px); }
+</style>
+</head>
+<body>
+<a href="/research/study/1" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 1회차 진행안으로</a>
+
+<div id="progress"></div>
+
+<div class="deck"><div class="track" id="track">
+
+<!-- ══════════ SLIDE 1 · 표지 ══════════ -->
+<section class="slide" data-label="표지">
+  <div class="slide-inner cover-center">
+    <div class="chip-row" style="margin-bottom:var(--sp-4)">
+      <span class="chip chip--solid">한 차시 강의 · 25분</span>
+      <span class="chip">중 · 고등학생 눈높이</span>
+      <span class="chip">RWA 토큰화 3-1 ~ 3-3</span>
+    </div>
+    <h1 class="hero-title">주식이 블록체인 위로<br>올라간다면?</h1>
+    <p class="hero-sub">전통자산 토큰화 — 오늘 수업의 준비물은 단 하나, <strong style="color:var(--c-primary)">성냥갑</strong>입니다.
+    성냥갑 하나로 직접 발행형과 간접 발행형 주식 토큰의 차이를 끝까지 설명합니다.</p>
+    <div class="chip-row" style="margin-top:var(--sp-5)">
+      <span class="chip chip--outline-dark">오브제: 성냥갑 1개</span>
+      <span class="chip chip--outline-dark">실제 기업: Securitize · Exodus · Backed 외</span>
+    </div>
+    <div class="src-links" style="margin-top:var(--sp-4)">
+      <a class="src-btn src-btn--solid" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 · Xangle 리서치 「RWA 토큰화 생태계」 ↗</a>
+    </div>
+  </div>
+  <p class="hint-keys">↑ ↓ 방향키 또는 우측 하단 버튼으로 넘기세요</p>
+</section>
+
+<!-- ══════════ SLIDE 2 · 핵심 개념어 ══════════ -->
+<section class="slide" data-label="핵심 개념어">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">이 파트의 언어 — 오늘 계속 등장할 12개의 말</span>
+      <h2>핵심 개념어 한눈에 보기</h2>
+      <p class="body-sm" style="color:var(--c-info);margin-top:var(--sp-2)">지금은 훑어만 보세요. 각 개념어는 수업 중 처음 등장하는 순간마다 성냥갑으로 다시 설명합니다.</p>
+    </div>
+    <div class="vocab-grid">
+      <div><span class="vn">01</span><span class="vt">토큰화</span><span class="vd">주식·채권 같은 기존 자산을 블록체인 장부에서 발행·이전·거래되게 만드는 것</span></div>
+      <div><span class="vn">02</span><span class="vt">원장 (장부)</span><span class="vd">누가 무엇을 얼마나 갖고 있는지 적은 공식 기록. 블록체인은 모두가 사본을 나눠 드는 공용 장부</span></div>
+      <div><span class="vn">03</span><span class="vt">주주명부</span><span class="vd">회사가 관리하는 공식 주주 목록. 여기 이름이 있어야 "진짜 주주"</span></div>
+      <div><span class="vn">04</span><span class="vt">명의개서대리인</span><span class="vd">주주명부를 공식적으로 고쳐 쓸 자격이 있는 기관 (예: Computershare, Securitize)</span></div>
+      <div><span class="vn">05</span><span class="vt">수탁 (커스터디)</span><span class="vd">자산을 안전하게 대신 보관하는 것. 오늘 수업의 "금고에 넣은 성냥갑"</span></div>
+      <div><span class="vn">06</span><span class="vt">직접 발행형</span><span class="vd">발행 회사가 주식을 처음부터 디지털 증권으로 발행 — 토큰 기록이 주주명부와 연결</span></div>
+      <div><span class="vn">07</span><span class="vt">간접 발행형</span><span class="vd">제3자가 진짜 주식을 사서 보관하고, 그 가격을 따라가는 토큰을 발행</span></div>
+      <div><span class="vn">08</span><span class="vt">추적 증서</span><span class="vd">기초자산의 가격·성과를 따라가도록 설계된 증서. 간접형 토큰의 법적 정체</span></div>
+      <div><span class="vn">09</span><span class="vt">1:1 담보</span><span class="vd">토큰 1개마다 진짜 자산 1개가 금고에 들어 있는 상태</span></div>
+      <div><span class="vn">10</span><span class="vt">Proof of Reserve</span><span class="vd">"금고에 진짜로 들어 있나?"를 외부 장치로 상시 검증·공개하는 방식 (예: Chainlink)</span></div>
+      <div><span class="vn">11</span><span class="vt">유동성</span><span class="vd">사고 싶을 때 사고 팔고 싶을 때 팔 수 있는 정도 — "언제든 거래 상대가 있는가"</span></div>
+      <div><span class="vn">12</span><span class="vt">ATS</span><span class="vd">대체거래시스템. 정식 인가를 받아 증권을 사고파는 규제형 시장 (예: Securitize Markets)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 3 · 수업 흐름 ══════════ -->
+<section class="slide" data-label="수업 흐름">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">00 / 수업 흐름</span>
+      <h2>25분, 이렇게 갑니다</h2>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <tr><th style="width:110px">시간</th><th style="width:200px">단계</th><th>내용</th></tr>
+        <tr><td class="mono">00–03</td><td><strong>오브제 소개</strong></td><td>성냥갑 해부 — 겉갑, 속갑, 성냥, 그리고 공장 대장</td></tr>
+        <tr><td class="mono">03–06</td><td><strong>도입</strong></td><td>토큰화란 무엇인가</td></tr>
+        <tr><td class="mono">06–12</td><td><strong>3-1 생태계</strong></td><td>성냥이 내 주머니에 오기까지 9개의 층 + 실제 기업 지도</td></tr>
+        <tr><td class="mono">12–15</td><td><strong>책상 실험</strong></td><td>각인 성냥갑 실험 vs 겉갑 교환권 실험</td></tr>
+        <tr><td class="mono">15–21</td><td><strong>3-2 · 3-3</strong></td><td>직접 발행형(Exodus × Securitize) vs 간접 발행형(Backed × AAPLx)</td></tr>
+        <tr><td class="mono">21–25</td><td><strong>정리</strong></td><td>비교표 → 케이스 판별 훈련 → 퀴즈</td></tr>
+      </table>
+    </div>
+    <div class="tnote">
+      <span class="caption">학습 목표</span>
+      <ul class="clean body-sm">
+        <li>"토큰화"를 한 문장으로 설명할 수 있다.</li>
+        <li>토큰화 생태계 9개 층의 역할을 실제 기업 이름과 함께 말할 수 있다.</li>
+        <li>직접 발행형(EXOD)과 간접 발행형(AAPLx)을 성냥갑 모형으로 구별할 수 있다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 4 · 오늘의 오브제: 성냥갑 ══════════ -->
+<section class="slide" data-label="오늘의 오브제">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">01 / 오늘의 오브제 · 3분</span>
+      <h2>성냥갑 하나면 됩니다</h2>
+    </div>
+    <p>성냥갑 몇 개로 인공지능의 학습을 통째로 보여준 실험처럼, 오늘은 <strong>성냥갑 하나로 토큰화 전체</strong>를 설명합니다.
+    성냥갑은 세 부분으로 분해됩니다 — 그리고 그 세 부분이 오늘 배울 개념과 정확히 1:1로 대응합니다.</p>
+
+    <figure>
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" aria-label="그림 1 성냥갑의 구성"><text x="270" y="40" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">성냥갑의 구성</text><rect x="215" y="64" width="96" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="215" y="64" width="96" height="14" fill="#0A0A0A"/><rect x="281" y="84" width="44" height="30" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="291" cy="92" r="3.5" fill="#0A0A0A"/><line x1="291" y1="95" x2="291" y2="109" stroke="#0A0A0A" stroke-width="2"/><circle cx="302" cy="92" r="3.5" fill="#0A0A0A"/><line x1="302" y1="95" x2="302" y2="109" stroke="#0A0A0A" stroke-width="2"/><circle cx="313" cy="92" r="3.5" fill="#0A0A0A"/><line x1="313" y1="95" x2="313" y2="109" stroke="#0A0A0A" stroke-width="2"/><text x="270" y="142" text-anchor="middle" class="sk-label" font-size="14" fill="#71717A">완성된 성냥갑</text><line x1="270" y1="150" x2="270" y2="172" stroke="#0A0A0A" stroke-width="1.5"/><line x1="110" y1="172" x2="430" y2="172" stroke="#0A0A0A" stroke-width="1.5"/><line x1="110" y1="172" x2="110" y2="190" stroke="#0A0A0A" stroke-width="1.5"/><line x1="270" y1="172" x2="270" y2="190" stroke="#0A0A0A" stroke-width="1.5"/><line x1="430" y1="172" x2="430" y2="190" stroke="#0A0A0A" stroke-width="1.5"/><rect x="62" y="192" width="96" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="62" y="192" width="96" height="14" fill="#0A0A0A"/><rect x="76" y="216" width="68" height="24" fill="none" stroke="#0A0A0A" stroke-width="1.5" stroke-dasharray="4 3"/><text x="110" y="276" text-anchor="middle" class="sk-role" font-size="16" fill="#0A0A0A">겉갑</text><text x="110" y="296" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">토큰 · 증표</text><rect x="222" y="200" width="96" height="48" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="230" y="192" width="80" height="8" fill="none" stroke="#0A0A0A" stroke-width="1.5"/><text x="270" y="276" text-anchor="middle" class="sk-role" font-size="16" fill="#0A0A0A">속갑</text><text x="270" y="296" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">보관 구조(계정)</text><line x1="392" y1="242" x2="440" y2="200" stroke="#0A0A0A" stroke-width="3.5"/><circle cx="444" cy="197" r="6.5" fill="#0A0A0A"/><line x1="416" y1="250" x2="464" y2="208" stroke="#0A0A0A" stroke-width="3.5"/><circle cx="468" cy="205" r="6.5" fill="#0A0A0A"/><text x="430" y="276" text-anchor="middle" class="sk-role" font-size="16" fill="#0A0A0A">성냥개비</text><text x="430" y="296" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">실제 주식</text><line x1="555" y1="30" x2="555" y2="300" stroke="#D4D4D8" stroke-width="1.5"/><text x="675" y="40" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">시스템을 운영하는 장치</text><rect x="631" y="64" width="88" height="60" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="675.0" y1="64" x2="675.0" y2="124" stroke="#0A0A0A" stroke-width="2"/><line x1="640" y1="80" x2="667.0" y2="80" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="683.0" y1="80" x2="710" y2="80" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="640" y1="93" x2="667.0" y2="93" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="683.0" y1="93" x2="710" y2="93" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="675" y="150" text-anchor="middle" class="sk-role" font-size="16" fill="#0A0A0A">공책</text><text x="675" y="170" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">공식 주주명부</text><rect x="639" y="204" width="72" height="72" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="675.0" cy="240.0" r="15.12" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="675.0" y1="240.0" x2="675.0" y2="224.88" stroke="#0A0A0A" stroke-width="2"/><rect x="664.0" y="192" width="22" height="12" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="675" y="304" text-anchor="middle" class="sk-role" font-size="14" fill="#0A0A0A">금고 — 수탁기관</text>
+</svg>
+<figcaption>그림 1. 왼쪽 세 부분이 성냥갑 하나를 이루고, 오른쪽 두 장치(공책·금고)가 시스템을 굴립니다.</figcaption>
+</figure>
+
+    <figure>
+<svg viewBox="0 0 800 76" xmlns="http://www.w3.org/2000/svg" aria-label="선 문법 두 가지"><line x1="60" y1="34" x2="180" y2="34" stroke="#0A0A0A" stroke-width="4"/><text x="280" y="40" text-anchor="start" class="sk-label" font-size="16" fill="#0A0A0A">굵은 실선 = 공식 소유권</text><line x1="60" y1="60" x2="180" y2="60" stroke="#0A0A0A" stroke-width="2.5" stroke-dasharray="7 6"/><text x="280" y="66" text-anchor="start" class="sk-label" font-size="16" fill="#0A0A0A">점선 = 가격·담보 연동</text></svg>
+<figcaption>오늘 필요한 선 문법은 이 두 개뿐입니다. 금고·눈·게이트 기호는 등장하는 순간 그 자리에서 설명합니다.</figcaption>
+</figure>
+
+    <div class="analogy">
+      <span class="tag">미리 보는 결론</span>
+      <p class="body-sm"><strong>직접 발행형</strong> = 겉갑과 속갑이 <strong>한 몸</strong>으로 움직이고, 주인이 바뀔 때마다 공장 대장이 고쳐지는 성냥갑.<br>
+      <strong>간접 발행형</strong> = 진짜 성냥갑은 <strong>금고 안</strong>에 있고, "금고 속 1개와 교환"이라 적힌 <strong>겉갑만</strong> 세상을 돌아다니는 구조.<br>
+      이 두 문장을 25분 동안 실제 기업 사례로 확인하는 것이 오늘 수업입니다.</p>
+    </div>
+      </div>
+</section>
+
+<!-- ══════════ SLIDE 5 · 도입: 토큰화란 ══════════ -->
+<section class="slide" data-label="도입 · 토큰화란">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">02 / 도입 · 3분</span>
+      <h2>토큰화: 진짜 자산을 공용 장부 위로</h2>
+    </div>
+    <p><strong>토큰화(tokenization)</strong>란, 주식·채권·펀드처럼 원래 종이 서류와 금융회사 전산망 안에 살던 자산을
+    <strong>블록체인이라는 공용 장부 위에서 발행하고, 주고받고, 사고팔 수 있게 만드는 것</strong>입니다.</p>
+    <p>성냥갑으로 말하면 — 지금까지는 성냥 공장이 <strong>자기 사무실 대장에만</strong> "이 성냥갑 주인은 ○○"라고 적어 왔습니다.
+    토큰화는 이 대장을 <strong>전 세계 수많은 컴퓨터가 똑같은 사본을 나눠 들고 서로 검증하는 공용 대장</strong>으로 옮기는 일입니다.
+    리서치 원문의 핵심 질문이 바로 이것입니다: <strong>"기존 금융 인프라와 온체인 장부를 어떻게 연결할 것인가?"</strong></p>
+
+    <figure>
+<svg viewBox="0 0 800 270" xmlns="http://www.w3.org/2000/svg" aria-label="그림 2 두 장부 비교"><text x="170" y="42" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">기존 금융 장부</text><rect x="115" y="62" width="110" height="74" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="170.0" y1="62" x2="170.0" y2="136" stroke="#0A0A0A" stroke-width="2"/><line x1="124" y1="78" x2="162.0" y2="78" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="178.0" y1="78" x2="216" y2="78" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="124" y1="91" x2="162.0" y2="91" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="178.0" y1="91" x2="216" y2="91" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="170" y="166" text-anchor="middle" class="sk-label" font-size="14" fill="#71717A">한 기관이 수정</text><text x="170" y="192" text-anchor="middle" class="sk-label" font-size="15" fill="#0A0A0A">주인: A</text><rect x="336" y="98" width="128" height="40" fill="#0A0A0A"/><text x="400" y="123" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">기록 방식 전환</text><text x="630" y="42" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">블록체인 공용 장부</text><rect x="545" y="80" width="46" height="36" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="591" y1="98" x2="607" y2="98" stroke="#0A0A0A" stroke-width="2"/><rect x="607" y="80" width="46" height="36" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="653" y1="98" x2="669" y2="98" stroke="#0A0A0A" stroke-width="2"/><rect x="669" y="80" width="46" height="36" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="630" y="166" text-anchor="middle" class="sk-label" font-size="14" fill="#71717A">여러 참여자가 검증</text><text x="630" y="192" text-anchor="middle" class="sk-label" font-size="15" fill="#0A0A0A">주인: A</text>
+</svg>
+<figcaption>그림 2. 이동하는 것은 자산이 아니라 "주인 기록" — 토큰화는 기록 인프라의 교체입니다.</figcaption>
+</figure>
+
+    <p style="margin-top:var(--sp-4)" class="body-sm">전통자산 토큰화는 기초자산에 따라 세 갈래입니다:
+    <strong>주식</strong>(직접 발행형 vs 간접 발행형 — 오늘의 주인공), <strong>채권</strong>(발행자가 처음부터 디지털 증권으로 발행),
+    <strong>펀드 지분</strong>(국채 등에 투자하는 펀드 지분의 토큰화). 이번 차시는 주식의 두 갈래를 끝까지 파고듭니다.</p>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 6 · 3-1: 9개의 층 ══════════ -->
+<section class="slide" data-label="3-1 · 9개의 층">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">03 / 3-1 생태계 개요 · 3분</span>
+      <h2>성냥 한 개비가 내 주머니에 오기까지 — 9개의 층</h2>
+      <div class="src-links"><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-1 원문에서 확인 ↗</a></div>
+    </div>
+    <p>수업에서는 <strong>다섯 정거장</strong>만 짚습니다 — 나머지 네 층은 정거장 사이의 보조 단계이고, 전체 표는 아래 접힌 영역에 있습니다.</p>
+    <figure>
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" aria-label="그림 3 다섯 정거장 지도"><rect x="12" y="12" width="776" height="240" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="32" y1="6" x2="32" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="76" y1="6" x2="76" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="120" y1="6" x2="120" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="164" y1="6" x2="164" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="208" y1="6" x2="208" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="252" y1="6" x2="252" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="296" y1="6" x2="296" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="340" y1="6" x2="340" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="384" y1="6" x2="384" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="428" y1="6" x2="428" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="472" y1="6" x2="472" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="516" y1="6" x2="516" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="560" y1="6" x2="560" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="604" y1="6" x2="604" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="648" y1="6" x2="648" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="692" y1="6" x2="692" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="736" y1="6" x2="736" y2="18" stroke="#0A0A0A" stroke-width="2"/><line x1="780" y1="6" x2="780" y2="18" stroke="#0A0A0A" stroke-width="2"/><rect x="36" y="58" width="128" height="112" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/><rect x="36" y="58" width="128" height="28" fill="#0A0A0A"/><text x="100" y="78" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">① 공장</text><rect x="60" y="112" width="80" height="40" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><path d="M 60 112 L 73 98 L 86 112 L 99 98 L 112 112" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="156" y="162" text-anchor="end" class="sk-label" font-size="13" fill="#3F3F46">기초자산</text><rect x="190" y="58" width="128" height="112" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/><rect x="190" y="58" width="128" height="28" fill="#0A0A0A"/><text x="254" y="78" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">④ 금고</text><rect x="230" y="100" width="48" height="48" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="254.0" cy="124.0" r="10.08" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="254.0" y1="124.0" x2="254.0" y2="113.92" stroke="#0A0A0A" stroke-width="2"/><rect x="243.0" y="88" width="22" height="12" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="310" y="162" text-anchor="end" class="sk-label" font-size="13" fill="#3F3F46">수탁</text><rect x="344" y="58" width="128" height="112" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/><rect x="344" y="58" width="128" height="28" fill="#0A0A0A"/><text x="408" y="78" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">⑤ 공용 대장</text><rect x="374" y="100" width="68" height="46" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="408.0" y1="100" x2="408.0" y2="146" stroke="#0A0A0A" stroke-width="2"/><line x1="383" y1="116" x2="400.0" y2="116" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="416.0" y1="116" x2="433" y2="116" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="383" y1="129" x2="400.0" y2="129" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="416.0" y1="129" x2="433" y2="129" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="464" y="162" text-anchor="end" class="sk-label" font-size="13" fill="#3F3F46">원장</text><rect x="498" y="58" width="128" height="112" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/><rect x="498" y="58" width="128" height="28" fill="#0A0A0A"/><text x="562" y="78" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">⑦ 거래 가게</text><rect x="522" y="108" width="80" height="42" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="518" y="100" width="88" height="9" fill="#0A0A0A"/><line x1="524" y1="109" x2="524" y2="114" stroke="#0A0A0A" stroke-width="2"/><line x1="546" y1="109" x2="546" y2="114" stroke="#0A0A0A" stroke-width="2"/><line x1="568" y1="109" x2="568" y2="114" stroke="#0A0A0A" stroke-width="2"/><line x1="590" y1="109" x2="590" y2="114" stroke="#0A0A0A" stroke-width="2"/><text x="618" y="162" text-anchor="end" class="sk-label" font-size="13" fill="#3F3F46">유동성</text><rect x="652" y="58" width="128" height="112" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="3"/><rect x="652" y="58" width="128" height="28" fill="#0A0A0A"/><text x="716" y="78" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">⑧ 투자자</text><circle cx="716" cy="102" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="716" y1="111" x2="716" y2="136" stroke="#0A0A0A" stroke-width="2"/><line x1="704" y1="121" x2="728" y2="121" stroke="#0A0A0A" stroke-width="2"/><line x1="716" y1="136" x2="706" y2="152" stroke="#0A0A0A" stroke-width="2"/><line x1="716" y1="136" x2="726" y2="152" stroke="#0A0A0A" stroke-width="2"/><text x="772" y="162" text-anchor="end" class="sk-label" font-size="13" fill="#3F3F46">활용</text><line x1="164" y1="114" x2="190" y2="114" stroke="#0A0A0A" stroke-width="2.5"/><polygon points="190,114 180,118 180,110" fill="#0A0A0A"/><line x1="318" y1="114" x2="344" y2="114" stroke="#0A0A0A" stroke-width="2.5"/><polygon points="344,114 334,118 334,110" fill="#0A0A0A"/><line x1="472" y1="114" x2="498" y2="114" stroke="#0A0A0A" stroke-width="2.5"/><polygon points="498,114 488,118 488,110" fill="#0A0A0A"/><line x1="626" y1="114" x2="652" y2="114" stroke="#0A0A0A" stroke-width="2.5"/><polygon points="652,114 642,118 642,110" fill="#0A0A0A"/><circle cx="177" cy="148" r="3" fill="#71717A"/><text x="177" y="196" text-anchor="middle" class="sk-label" font-size="12" fill="#71717A">② 발행 · ③ 거래</text><circle cx="485" cy="148" r="3" fill="#71717A"/><text x="485" y="196" text-anchor="middle" class="sk-label" font-size="12" fill="#71717A">⑥ 데이터</text><rect x="230" y="272" width="340" height="34" fill="#0A0A0A"/><text x="400.0" y="295" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">⑨ 규제 — 전체를 두르는 울타리</text>
+</svg>
+<figcaption>그림 3. 다섯 정거장만 기억하세요 — 공장, 금고, 공용 대장, 거래 가게, 투자자. 발행·거래·데이터는 그 사이의 보조 단계입니다.</figcaption>
+</figure>
+    <details class="layer-table"><summary>9개 층 전체 표 — 펼쳐 보기 (강사용 참고 자료)</summary><div class="table-scroll">
+      <table>
+        <tr><th style="width:32px">#</th><th style="width:140px">레이어</th><th>하는 일</th><th>성냥갑 세계에서는</th></tr>
+        <tr><td class="mono">1</td><td><strong>기초자산 관리</strong></td><td>기업·정부가 원천 자산(주식·채권)을 발행·관리</td><td>성냥을 만드는 공장과 공장 대장</td></tr>
+        <tr><td class="mono">2</td><td><strong>발행</strong></td><td>토큰화 방식을 설계 — 직접? 간접?</td><td>겉갑을 어떻게 만들지 정하는 포장 설계실</td></tr>
+        <tr><td class="mono">3</td><td><strong>거래·운용</strong></td><td>브로커·자산운용사가 실제 자산을 사고팖</td><td>공장과 가게 사이의 도매상</td></tr>
+        <tr><td class="mono">4</td><td><strong>수탁</strong></td><td>기초자산을 안전하게 보관</td><td>잠금장치 달린 금고</td></tr>
+        <tr><td class="mono">5</td><td><strong>원장</strong></td><td>블록체인 위에 보유 기록을 기재</td><td>모두가 사본을 나눠 든 공용 대장</td></tr>
+        <tr><td class="mono">6</td><td><strong>데이터</strong></td><td>가격·배당 등 기준 정보 공급</td><td>매일 갱신되는 성냥 시세표</td></tr>
+        <tr><td class="mono">7</td><td><strong>유동성</strong></td><td>시장조성자가 "언제든 사고팔 상대"가 되어 줌</td><td>24시간 열려 있는 교환 가게</td></tr>
+        <tr><td class="mono">8</td><td><strong>활용</strong></td><td>투자자가 청약·환매·거래에 사용</td><td>성냥갑을 주머니에 넣고 다니는 사람들</td></tr>
+        <tr><td class="mono">9</td><td><strong>규제</strong></td><td>증권 규제·투자자 보호 장치</td><td>불을 다루는 물건이니 따라붙는 소방 규정</td></tr>
+      </table>
+    </div></details>
+      </div>
+</section>
+
+<!-- ══════════ SLIDE 7 · 3-1: 실제 기업 지도 ══════════ -->
+<section class="slide" data-label="3-1 · 실제 기업 지도">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">04 / 3-1 생태계 개요 · 3분</span>
+      <h2>이 층에는 실제로 어떤 회사가 있을까</h2>
+      <p class="body-sm" style="color:var(--c-info);margin-top:var(--sp-2)">전부 원문(Xangle 리서치)에 등장하는 실존 기업·기관입니다. "블록체인 회사"만이 아니라 전통 금융의 거인들이 층마다 이미 자리 잡고 있다는 점에 주목하세요.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <tr><th style="width:150px">레이어</th><th style="width:280px">실제 기업 · 기관</th><th>무엇을 하는가</th></tr>
+        <tr><td><strong>1 기초자산 관리</strong></td><td>Computershare</td><td>명의개서대리인의 대표주자 — S&amp;P 500 기업의 58%가 주주명부 관리를 맡기는 회사</td></tr>
+        <tr><td><strong>4 수탁·결제</strong></td><td>DTC, Euroclear</td><td>미국·유럽 증권의 중앙예탁·청산·결제를 담당하는 "금융권의 거대 금고"</td></tr>
+        <tr><td><strong>5 원장</strong></td><td>Ethereum, Solana, Algorand</td><td>토큰이 실제로 발행·기록되는 블록체인들</td></tr>
+        <tr><td><strong>6 데이터</strong></td><td>Bloomberg, Nasdaq Data / Chainlink, Chronicle, RedStone</td><td>전통시장 기준 데이터 공급 / 그 데이터를 블록체인 안으로 전달하는 오라클</td></tr>
+        <tr><td><strong>7 유동성</strong></td><td>시장조성자, 거래소 (Kraken, Bybit 등)</td><td>호가를 대며 "언제든 거래 상대"가 되어 줌</td></tr>
+        <tr><td><strong>9 규제·감시</strong></td><td>Chainalysis, TRM Labs, Elliptic</td><td>온체인 거래 분석 — 지갑 위험도 평가, 제재 대상 주소 모니터링</td></tr>
+      </table>
+    </div>
+    <div class="analogy">
+      <span class="tag">성냥갑으로 잇기</span>
+      <p class="body-sm">Computershare는 <strong>공장 대장을 대신 관리해 주는 회사</strong>, DTC·Euroclear는 <strong>나라 전체의 성냥갑을 맡아 두는 초대형 금고</strong>,
+      Chainlink는 <strong>시세표를 공용 대장 옆에 실시간으로 붙여 주는 게시판 직원</strong>, Chainalysis는 <strong>수상한 성냥갑 거래를 추적하는 감시원</strong>입니다.
+      토큰화는 이 기존 직업들을 없애는 게 아니라, 공용 대장 위에서 다시 연결하는 작업입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 8 · 책상 실험 (dark) ══════════ -->
+<section class="slide slide--inverse" data-label="책상 실험">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num" style="color:#A1A1AA">05 / 책상 실험 · 3분</span>
+      <h2>실험 A: 각인 성냥갑 — 실험 B: 겉갑 교환권</h2>
+    </div>
+    <p style="color:#D4D4D8">학생 3명(공장장, 투자자 A, 투자자 B)을 앞으로 부르세요. 성냥갑 1개(지우개 곽도 좋습니다), 공책 1권이면 충분합니다.</p>
+
+    <div class="card-grid" style="margin-top:var(--sp-4)">
+      <div class="card card-pad" style="background:var(--c-primary);border-color:#3F3F46">
+        <span class="chip" style="border-color:#FAFAFA;color:#FAFAFA">실험 A — 각인 성냥갑 (직접 발행형)</span>
+        <p class="body-sm" style="color:#D4D4D8;margin-top:var(--sp-3)">
+        ① 공장장이 성냥갑 겉갑에 <strong style="color:#FAFAFA">일련번호 001</strong>을 쓰고, 공책(공장 대장)에 <strong style="color:#FAFAFA">"001의 주인 = A"</strong>라고 적은 뒤 성냥갑을 A에게 줍니다.<br><br>
+        ② A가 B에게 넘기려면? 성냥갑만 건네면 <strong style="color:#FAFAFA">무효</strong>. 반드시 공장장에게 가서 대장을 "주인 = B"로 고쳐야 거래가 성립합니다.<br><br>
+        ③ 관찰 — 겉갑·속갑·성냥·대장이 <strong style="color:#FAFAFA">한 몸</strong>으로 움직인다. 느리지만, B는 명실상부한 "진짜 주인"이 됩니다.</p>
+      </div>
+      <div class="card card-pad" style="background:var(--c-primary);border-color:#3F3F46">
+        <span class="chip" style="border-color:#FAFAFA;color:#FAFAFA">실험 B — 겉갑 교환권 (간접 발행형)</span>
+        <p class="body-sm" style="color:#D4D4D8;margin-top:var(--sp-3)">
+        ① 이번엔 가게 주인 역할. 진짜 성냥갑(성냥 든 속갑째)을 <strong style="color:#FAFAFA">금고(책상 서랍)에 넣고 잠급니다.</strong> 대장에는 "주인 = 가게"라고만 적혀 있습니다.<br><br>
+        ② 가게는 <strong style="color:#FAFAFA">빈 겉갑</strong>에 "금고 속 성냥갑 1개와 교환"이라 써서 A에게 팝니다.<br><br>
+        ③ A → B → 또 다른 친구… 겉갑은 <strong style="color:#FAFAFA">공장장 허락 없이</strong> 자유롭게 돌아다닙니다. 하지만 대장의 주인은 끝까지 "가게". 겉갑의 가치는 금고 속 진짜가 지켜줍니다.</p>
+      </div>
+    </div>
+
+    
+  </div>
+</section>
+
+<!-- ══════════ 사슬 vs 점선 — 한 장으로 ══════════ -->
+<section class="slide" data-label="사슬 vs 점선">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">06 / 한 장 정리</span>
+      <h2>토큰이 움직일 때, 공책도 움직이는가</h2>
+    </div>
+    <figure>
+<svg viewBox="0 0 800 590" xmlns="http://www.w3.org/2000/svg" aria-label="그림 4 직접형 간접형 3컷 비교"><text x="200" y="30" text-anchor="middle" class="sk-role" font-size="14" fill="#0A0A0A">직접 발행형 — 각인 성냥갑</text><text x="600" y="30" text-anchor="middle" class="sk-role" font-size="14" fill="#0A0A0A">간접 발행형 — 겉갑 교환권</text><rect x="20" y="48" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="34" y="70" class="sk-label" font-size="11" fill="#A1A1AA">1</text><rect x="42" y="104" width="80" height="40" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><path d="M 42 104 L 55 90 L 68 104 L 81 90 L 94 104" fill="none" stroke="#0A0A0A" stroke-width="2"/><rect x="146" y="96" width="96" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="146" y="96" width="96" height="14" fill="#0A0A0A"/><rect x="212" y="116" width="44" height="30" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="222" cy="124" r="3.5" fill="#0A0A0A"/><line x1="222" y1="127" x2="222" y2="141" stroke="#0A0A0A" stroke-width="2"/><circle cx="233" cy="124" r="3.5" fill="#0A0A0A"/><line x1="233" y1="127" x2="233" y2="141" stroke="#0A0A0A" stroke-width="2"/><circle cx="244" cy="124" r="3.5" fill="#0A0A0A"/><line x1="244" y1="127" x2="244" y2="141" stroke="#0A0A0A" stroke-width="2"/><text x="194" y="107" text-anchor="middle" class="sk-label" font-size="9" fill="#FAFAFA">001</text><rect x="276" y="94" width="84" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="318.0" y1="94" x2="318.0" y2="150" stroke="#0A0A0A" stroke-width="2"/><line x1="285" y1="110" x2="310.0" y2="110" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="326.0" y1="110" x2="351" y2="110" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="285" y1="123" x2="310.0" y2="123" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="326.0" y1="123" x2="351" y2="123" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="318" y="172" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">001 = A</text><rect x="20" y="200" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="34" y="222" class="sk-label" font-size="11" fill="#A1A1AA">2</text><circle cx="64" cy="250" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="64" y1="259" x2="64" y2="284" stroke="#0A0A0A" stroke-width="2"/><line x1="52" y1="269" x2="76" y2="269" stroke="#0A0A0A" stroke-width="2"/><line x1="64" y1="284" x2="54" y2="300" stroke="#0A0A0A" stroke-width="2"/><line x1="64" y1="284" x2="74" y2="300" stroke="#0A0A0A" stroke-width="2"/><text x="64" y="316" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">A</text><line x1="100" y1="270" x2="170" y2="270" stroke="#0A0A0A" stroke-width="2"/><polygon points="170,270 160,274 160,266" fill="#0A0A0A"/><text x="135.0" y="262.0" text-anchor="middle" class="sk-label" font-size="11" fill="#3F3F46">성냥갑 전달</text><circle cx="204" cy="250" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="204" y1="259" x2="204" y2="284" stroke="#0A0A0A" stroke-width="2"/><line x1="192" y1="269" x2="216" y2="269" stroke="#0A0A0A" stroke-width="2"/><line x1="204" y1="284" x2="194" y2="300" stroke="#0A0A0A" stroke-width="2"/><line x1="204" y1="284" x2="214" y2="300" stroke="#0A0A0A" stroke-width="2"/><text x="204" y="316" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">B</text><line x1="260" y1="270" x2="292" y2="270" stroke="#0A0A0A" stroke-width="1.5"/><polygon points="292,270 282,274 282,266" fill="#0A0A0A"/><rect x="296" y="242" width="70" height="48" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="331.0" y1="242" x2="331.0" y2="290" stroke="#0A0A0A" stroke-width="2"/><line x1="305" y1="258" x2="323.0" y2="258" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="339.0" y1="258" x2="357" y2="258" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="305" y1="271" x2="323.0" y2="271" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="339.0" y1="271" x2="357" y2="271" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="331" y="312" text-anchor="middle" class="sk-label" font-size="11" fill="#3F3F46">명부 수정 요청</text><rect x="20" y="352" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="34" y="374" class="sk-label" font-size="11" fill="#A1A1AA">3</text><rect x="60" y="396" width="90" height="58" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="105.0" y1="396" x2="105.0" y2="454" stroke="#0A0A0A" stroke-width="2"/><line x1="69" y1="412" x2="97.0" y2="412" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="113.0" y1="412" x2="141" y2="412" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="69" y1="425" x2="97.0" y2="425" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="113.0" y1="425" x2="141" y2="425" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="105" y="478" text-anchor="middle" class="sk-label" font-size="13" font-weight="700" fill="#0A0A0A">001 = B</text><circle cx="224" cy="400" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="224" y1="409" x2="224" y2="434" stroke="#0A0A0A" stroke-width="2"/><line x1="212" y1="419" x2="236" y2="419" stroke="#0A0A0A" stroke-width="2"/><line x1="224" y1="434" x2="214" y2="450" stroke="#0A0A0A" stroke-width="2"/><line x1="224" y1="434" x2="234" y2="450" stroke="#0A0A0A" stroke-width="2"/><text x="224" y="466" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">B</text><rect x="258" y="400" width="96" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="258" y="400" width="96" height="14" fill="#0A0A0A"/><rect x="324" y="420" width="44" height="30" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="334" cy="428" r="3.5" fill="#0A0A0A"/><line x1="334" y1="431" x2="334" y2="445" stroke="#0A0A0A" stroke-width="2"/><circle cx="345" cy="428" r="3.5" fill="#0A0A0A"/><line x1="345" y1="431" x2="345" y2="445" stroke="#0A0A0A" stroke-width="2"/><circle cx="356" cy="428" r="3.5" fill="#0A0A0A"/><line x1="356" y1="431" x2="356" y2="445" stroke="#0A0A0A" stroke-width="2"/><text x="306" y="411" text-anchor="middle" class="sk-label" font-size="9" fill="#FAFAFA">001</text><rect x="420" y="48" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="434" y="70" class="sk-label" font-size="11" fill="#A1A1AA">1</text><rect x="438" y="106" width="80" height="42" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="434" y="98" width="88" height="9" fill="#0A0A0A"/><line x1="440" y1="107" x2="440" y2="112" stroke="#0A0A0A" stroke-width="2"/><line x1="462" y1="107" x2="462" y2="112" stroke="#0A0A0A" stroke-width="2"/><line x1="484" y1="107" x2="484" y2="112" stroke="#0A0A0A" stroke-width="2"/><line x1="506" y1="107" x2="506" y2="112" stroke="#0A0A0A" stroke-width="2"/><rect x="548" y="90" width="62" height="62" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><circle cx="579.0" cy="121.0" r="13.02" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="579.0" y1="121.0" x2="579.0" y2="107.98" stroke="#0A0A0A" stroke-width="2"/><rect x="568.0" y="78" width="22" height="12" fill="none" stroke="#0A0A0A" stroke-width="2"/><rect x="562" y="106" width="34" height="22" fill="#0A0A0A"/><rect x="660" y="94" width="84" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="702.0" y1="94" x2="702.0" y2="150" stroke="#0A0A0A" stroke-width="2"/><line x1="669" y1="110" x2="694.0" y2="110" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="710.0" y1="110" x2="735" y2="110" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="669" y1="123" x2="694.0" y2="123" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="710.0" y1="123" x2="735" y2="123" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="702" y="172" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">주인 = 가게</text><rect x="420" y="200" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="434" y="222" class="sk-label" font-size="11" fill="#A1A1AA">2</text><rect x="442" y="260" width="80" height="42" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="438" y="252" width="88" height="9" fill="#0A0A0A"/><line x1="444" y1="261" x2="444" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="466" y1="261" x2="466" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="488" y1="261" x2="488" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="510" y1="261" x2="510" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="538" y1="272" x2="588" y2="272" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5 4"/><polygon points="588,272 578,276 578,268" fill="#0A0A0A"/><text x="563.0" y="264.0" text-anchor="middle" class="sk-label" font-size="11" fill="#3F3F46">교환권 발행</text><rect x="596" y="244" width="96" height="56" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><rect x="596" y="244" width="96" height="14" fill="#0A0A0A"/><rect x="610" y="268" width="68" height="24" fill="none" stroke="#0A0A0A" stroke-width="1.5" stroke-dasharray="4 3"/><text x="644" y="255" text-anchor="middle" class="sk-label" font-size="9" fill="#FAFAFA">교환권</text><circle cx="732" cy="250" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="732" y1="259" x2="732" y2="284" stroke="#0A0A0A" stroke-width="2"/><line x1="720" y1="269" x2="744" y2="269" stroke="#0A0A0A" stroke-width="2"/><line x1="732" y1="284" x2="722" y2="300" stroke="#0A0A0A" stroke-width="2"/><line x1="732" y1="284" x2="742" y2="300" stroke="#0A0A0A" stroke-width="2"/><text x="732" y="316" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">A</text><rect x="420" y="352" width="360" height="140" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="434" y="374" class="sk-label" font-size="11" fill="#A1A1AA">3</text><circle cx="458" cy="402" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="458" y1="411" x2="458" y2="436" stroke="#0A0A0A" stroke-width="2"/><line x1="446" y1="421" x2="470" y2="421" stroke="#0A0A0A" stroke-width="2"/><line x1="458" y1="436" x2="448" y2="452" stroke="#0A0A0A" stroke-width="2"/><line x1="458" y1="436" x2="468" y2="452" stroke="#0A0A0A" stroke-width="2"/><text x="458" y="468" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">A</text><line x1="490" y1="422" x2="538" y2="422" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5 4"/><polygon points="538,422 528,426 528,418" fill="#0A0A0A"/><text x="514.0" y="414.0" text-anchor="middle" class="sk-label" font-size="11" fill="#3F3F46">겉갑 전달</text><circle cx="564" cy="402" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="564" y1="411" x2="564" y2="436" stroke="#0A0A0A" stroke-width="2"/><line x1="552" y1="421" x2="576" y2="421" stroke="#0A0A0A" stroke-width="2"/><line x1="564" y1="436" x2="554" y2="452" stroke="#0A0A0A" stroke-width="2"/><line x1="564" y1="436" x2="574" y2="452" stroke="#0A0A0A" stroke-width="2"/><text x="564" y="468" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">B</text><rect x="640" y="394" width="90" height="58" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><line x1="685.0" y1="394" x2="685.0" y2="452" stroke="#0A0A0A" stroke-width="2"/><line x1="649" y1="410" x2="677.0" y2="410" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="693.0" y1="410" x2="721" y2="410" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="649" y1="423" x2="677.0" y2="423" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><line x1="693.0" y1="423" x2="721" y2="423" stroke="#0A0A0A" stroke-width="1.2" opacity="0.45"/><text x="685" y="476" text-anchor="middle" class="sk-label" font-size="13" font-weight="700" fill="#0A0A0A">주인 = 가게</text><rect x="20" y="510" width="360" height="30" fill="#0A0A0A"/><text x="200.0" y="530" text-anchor="middle" class="sk-label" font-size="12" fill="#FAFAFA">토큰 이동 = 명부 변경 · B는 실제 주주</text><rect x="420" y="510" width="360" height="30" fill="#0A0A0A"/><text x="600.0" y="530" text-anchor="middle" class="sk-label" font-size="12" fill="#FAFAFA">토큰 이동 ≠ 명부 변경 · B는 가격 노출 보유자</text>
+</svg>
+<figcaption>그림 4. 3컷 비교 — 마지막 칸의 두 공책만 비교하세요. "001 = B"로 바뀌었는가, "주인 = 가게" 그대로인가.</figcaption>
+</figure>
+  </div>
+</section>
+
+
+<!-- ══════════ SLIDE 9 · 3-2 개념 ══════════ -->
+<section class="slide" data-label="3-2 · 직접 발행형">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">07 / 3-2 직접 발행형 주식</span>
+      <h2>직접 발행형 — 공장이 직접 새긴 성냥갑</h2>
+    </div>
+    <p><strong>정의:</strong> 발행 회사가 자기 주식을 <strong>처음부터 디지털 증권 형태로 직접 발행</strong>하고,
+    회사의 <strong>공식 주주명부와 온체인 토큰 기록을 연결</strong>하는 방식. 토큰은 "가격을 흉내 내는 무언가"가 아니라
+    <strong>진짜 주식 그 자체의 디지털 표현</strong>입니다. 기초 주식을 따로 사서 쌓아 두는 단계 자체가 없습니다.</p>
+
+    <div class="analogy">
+      <span class="tag">성냥갑으로 보면 — 실험 A</span>
+      <p class="body-sm">공장이 겉갑에 일련번호를 직접 새기고, 공장 대장에 주인 이름을 적는 <strong>각인 성냥갑</strong>.
+      성냥갑을 넘길 때마다 대장이 같이 고쳐지므로, 들고 있는 사람이 곧 <strong>진짜 주인</strong>입니다.
+      대신 아무 가게에서나 사고팔 수 없고, 공장이 인정한 절차(신원 확인, 허가된 시장)를 거쳐야 합니다.</p>
+    </div>
+
+    <div class="card-grid" style="margin-top:var(--sp-4)">
+      <div class="card card-pad">
+        <span class="caption" style="text-transform:uppercase;letter-spacing:0.05em">이 방식이 주는 것</span>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li><strong>진짜 주주의 권리</strong> — 배당·의결권·주식분할 같은 기업 이벤트가 토큰 보유자에게 그대로 처리</li>
+          <li>공식 주주명부와 온체인 기록의 <strong>정합성</strong> — 둘이 어긋나지 않음</li>
+          <li>발행-유통-권리 처리가 <strong>하나의 규제 틀 안</strong>에서 돌아감</li>
+        </ul>
+      </div>
+      <div class="card card-pad">
+        <span class="caption" style="text-transform:uppercase;letter-spacing:0.05em">대신 감수하는 것</span>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li><strong>아무나 못 삼</strong> — 투자자 신원·관할권 확인, 이전 제한을 충족해야 함</li>
+          <li><strong>규제형 인프라 안에서만 거래</strong> — 인가받은 ATS 등</li>
+          <li>그래서 <strong>유동성이 제한적</strong> — 사고팔 수 있는 사람과 장소가 좁음</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tnote">
+      <span class="caption">한 줄 요약</span>
+      <p class="body-sm"><strong>"대장과 한 몸인 진짜 주식."</strong> 권리는 온전하지만, 문은 좁다. → 다음 슬라이드: 이걸 실제로 해낸 회사들.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 10 · 3-2 실제 기업 ══════════ -->
+<section class="slide" data-label="3-2 · Exodus × Securitize">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">08 / 3-2 실제 기업 이야기</span>
+      <h2>실전: Exodus × Securitize</h2>
+      <div class="src-links">
+        <a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-2 원문에서 확인 ↗</a>
+        <a class="src-btn" href="https://securitize.io" target="_blank" rel="noopener">Securitize 공식 사이트 ↗</a>
+      </div>
+    </div>
+
+    
+
+    <figure>
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" aria-label="직접형 이중 레일"><text x="40" y="40" text-anchor="start" class="sk-label" font-size="14" fill="#71717A">법적 소유권 레일</text><rect x="40" y="52" width="175" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="127.5" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">발행 회사</text><text x="127.5" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">Exodus</text><line x1="215" y1="87" x2="300" y2="87" stroke="#0A0A0A" stroke-width="4"/><polygon points="300,87 290,91 290,83" fill="#0A0A0A"/><rect x="300" y="52" width="200" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="400.0" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">공식 주주명부</text><text x="400.0" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">관리: Securitize</text><line x1="500" y1="87" x2="596" y2="87" stroke="#0A0A0A" stroke-width="4"/><polygon points="596,87 586,91 586,83" fill="#0A0A0A"/><text x="40" y="228" text-anchor="start" class="sk-label" font-size="14" fill="#71717A">온체인 토큰 레일</text><rect x="40" y="240" width="175" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="127.5" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">토큰 발행</text><text x="127.5" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">EXOD</text><line x1="215" y1="275" x2="300" y2="275" stroke="#0A0A0A" stroke-width="2"/><polygon points="300,275 290,279 290,271" fill="#0A0A0A"/><rect x="300" y="240" width="200" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="400.0" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">블록체인</text><text x="400.0" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">Algorand</text><line x1="500" y1="275" x2="596" y2="275" stroke="#0A0A0A" stroke-width="2"/><polygon points="596,275 586,279 586,271" fill="#0A0A0A"/><line x1="390" y1="122" x2="390" y2="240" stroke="#0A0A0A" stroke-width="2"/><line x1="410" y1="122" x2="410" y2="240" stroke="#0A0A0A" stroke-width="2"/><circle cx="394" cy="180" r="7" fill="none" stroke="#0A0A0A" stroke-width="2"/><circle cx="406" cy="180" r="7" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="366" y="178" text-anchor="end" class="sk-label" font-size="14" fill="#3F3F46">명부 ↔ 토큰</text><text x="366" y="196" text-anchor="end" class="sk-label" font-size="14" fill="#3F3F46">동기화</text><rect x="614" y="132" width="7" height="58" fill="#0A0A0A"/><rect x="660" y="132" width="7" height="58" fill="#0A0A0A"/><rect x="611" y="124" width="59" height="8" fill="#0A0A0A"/><line x1="621" y1="140" x2="654" y2="152" stroke="#0A0A0A" stroke-width="2"/><line x1="654" y1="152" x2="654" y2="184" stroke="#0A0A0A" stroke-width="2"/><text x="641" y="216" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">KYC · 이전 제한</text><line x1="596" y1="87" x2="641" y2="132" stroke="#0A0A0A" stroke-width="4"/><line x1="596" y1="275" x2="641" y2="198" stroke="#0A0A0A" stroke-width="2"/><circle cx="714" cy="142" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="714" y1="151" x2="714" y2="176" stroke="#0A0A0A" stroke-width="2"/><line x1="702" y1="161" x2="726" y2="161" stroke="#0A0A0A" stroke-width="2"/><line x1="714" y1="176" x2="704" y2="192" stroke="#0A0A0A" stroke-width="2"/><line x1="714" y1="176" x2="724" y2="192" stroke="#0A0A0A" stroke-width="2"/><rect x="640" y="232" width="150" height="30" fill="#0A0A0A"/><text x="715" y="252" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">투자자 = 주주</text><rect x="200" y="312" width="400" height="34" fill="#0A0A0A"/><text x="400.0" y="335" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">토큰 레일과 명부 레일이 하나로 동기화된다</text>
+</svg>
+<figcaption>그림 5. 직접형 — 질문: EXOD 보유자는 공식 주주인가? 답: 예. 두 레일이 이중선으로 묶여 함께 투자자에게 닿습니다.</figcaption>
+</figure>
+
+    <div class="card-grid">
+      <div class="card card-pad">
+        <h3>Securitize — "공장 대장 관리 + 인가된 가게"를 한 회사가</h3>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li>미국 SEC에 등록된 <strong>증권중개업자</strong>이자 FINRA 회원사 — 규제 안에서 영업하는 정식 금융회사</li>
+          <li>SEC 등록 <strong>명의개서대리인</strong> — 주주명부를 공식적으로 고쳐 쓸 자격 (성냥갑 세계의 "공장 대장 관리인")</li>
+          <li>인가받은 규제형 시장 <strong>Securitize Markets ATS</strong> 운영 (공장이 인정한 "공식 가게")</li>
+          <li>관리하는 토큰화 자산 <strong>약 40억 달러 이상</strong> (2026년 4월, 원문 기준)</li>
+          <li>BlackRock·Apollo·Hamilton Lane 같은 세계적 자산운용사가 토큰화 파트너로 선택한 회사</li>
+        </ul>
+      </div>
+      <div class="card card-pad">
+        <h3>Exodus — 자기 주식을 직접 올린 상장기업</h3>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li>암호화폐 지갑을 만드는 미국 상장기업 — 자사 <strong>Class A 보통주(EXOD)</strong>를 디지털 증권으로 발행</li>
+          <li>토큰은 <strong>Algorand 등 블록체인</strong>에서 발행되어 승인된 지갑에 배정</li>
+          <li>토큰 기록이 <strong>공식 주주명부와 직접 연결</strong> — 배당·의결권·주식분할이 토큰 보유자에게 처리</li>
+          <li>거래는 투자자 신원·관할권·이전 제한을 충족한 사람끼리, <strong>규제형 인프라 안에서만</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    
+
+    <div class="stat-row">
+      <div><span class="sv">$40억+</span><span class="sl">Securitize 관리 토큰화 자산 (2026.4)</span></div>
+      <div><span class="sv">SEC ×2</span><span class="sl">증권중개업자 + 명의개서대리인 등록</span></div>
+      <div><span class="sv">ATS 1곳</span><span class="sl">규제형 시장 Securitize Markets 운영</span></div>
+    </div>
+
+    <div class="tnote">
+      <span class="caption">최신 동향 (원문 기준)</span>
+      <p class="body-sm">2026년 4월, 명의개서대리인의 거인 <strong>Computershare</strong>(S&amp;P 500 기업 58%의 명부 관리)가 Securitize와 협약 —
+      미국 상장사가 기존 주식·직접등록제도(DRS) 보유분을 기반으로 <strong>발행사 주도형 토큰</strong>을 만들 수 있게 지원하기로 했습니다.
+      "각인 성냥갑" 방식이 Exodus 한 곳의 실험을 넘어 표준 인프라가 되어 가는 신호입니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 11 · 3-3 개념 ══════════ -->
+<section class="slide" data-label="3-3 · 간접 발행형">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">09 / 3-3 간접 발행형 주식</span>
+      <h2>간접 발행형 — 금고 속 성냥갑의 겉갑 교환권</h2>
+    </div>
+    <p><strong>정의:</strong> 제3자 발행자가 <strong>이미 상장되어 있는 주식·ETF를 사서 수탁기관(금고)에 보관</strong>하고,
+    그 자산의 <strong>가격·경제적 성과를 따라가는 토큰</strong>(추적 증서, tracker certificate)을 발행하는 방식.
+    토큰 보유자는 그 회사의 주주가 <strong>아니며</strong>, 주주명부에 이름이 올라가지 않습니다.</p>
+
+    <div class="analogy">
+      <span class="tag">성냥갑으로 보면 — 실험 B</span>
+      <p class="body-sm">진짜 성냥갑은 가게 금고에 잠겨 있고, "금고 속 1개와 교환"이라 적힌 <strong>겉갑만</strong> 세상을 돌아다닙니다.
+      겉갑은 공장 허락 없이 누구에게나, 새벽에도 넘길 수 있을 만큼 가볍습니다. 그 대신 두 가지를 기억해야 합니다:
+      ① 겉갑을 아무리 모아도 <strong>공장 대장에 내 이름은 없다</strong>. ② 겉갑의 가치는 전적으로
+      <strong>"금고에 진짜가 들어 있는가"</strong>에 달려 있다 — 그래서 금고 검증 장치가 생명입니다.</p>
+    </div>
+
+    <div class="card-grid" style="margin-top:var(--sp-4)">
+      <div class="card card-pad">
+        <span class="caption" style="text-transform:uppercase;letter-spacing:0.05em">이 방식이 주는 것</span>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li><strong>넓은 접근성</strong> — 거래소·DeFi에서 24시간 거래, 지역·시차의 벽이 낮음</li>
+          <li><strong>자기수탁</strong> — 내 지갑에 내가 직접 보관 가능</li>
+          <li>가격이 진짜 주가와 벌어지면 <strong>발행·환매로 되돌리는 재정렬 장치</strong>가 작동</li>
+        </ul>
+      </div>
+      <div class="card card-pad">
+        <span class="caption" style="text-transform:uppercase;letter-spacing:0.05em">대신 감수하는 것</span>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li><strong>주주가 아님</strong> — 의결권 없음, 발행 기업에 대한 직접 청구권 없음</li>
+          <li>발행자·수탁 구조를 <strong>믿어야 함</strong> — 담보 검증(Proof of Reserve)이 필수인 이유</li>
+          <li><strong>판매 제한</strong> — 관할권 제한 존재, 미국 거주자에게는 판매되지 않음</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tnote">
+      <span class="caption">한 줄 요약</span>
+      <p class="body-sm"><strong>"금고 속 진짜의 겉갑 교환권."</strong> 문은 넓지만, 주주는 아니다. → 다음 슬라이드: 이 구조를 굴리는 실제 회사들.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 12 · 3-3 실제 기업 ══════════ -->
+<section class="slide" data-label="3-3 · Backed × AAPLx">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">10 / 3-3 실제 기업 이야기</span>
+      <h2>실전: Backed Finance의 xStocks — AAPLx의 생애주기</h2>
+      <div class="src-links">
+        <a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-3 원문에서 확인 ↗</a>
+        <a class="src-btn" href="https://xstocks.com" target="_blank" rel="noopener">xStocks 공식 사이트 ↗</a>
+      </div>
+    </div>
+
+    
+
+    <figure>
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" aria-label="간접형 이중 레일"><text x="40" y="40" text-anchor="start" class="sk-label" font-size="14" fill="#71717A">실제 자산 레일</text><rect x="40" y="52" width="175" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="127.5" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">실제 주식시장</text><text x="127.5" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">AAPL</text><line x1="215" y1="87" x2="300" y2="87" stroke="#0A0A0A" stroke-width="4"/><polygon points="300,87 290,91 290,83" fill="#0A0A0A"/><text x="257.5" y="77.0" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">매입</text><rect x="300" y="52" width="200" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="400.0" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">진짜 주식 금고</text><text x="400.0" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">Alpaca · 1:1</text><circle cx="613" cy="75" r="13" fill="none" stroke="#0A0A0A" stroke-width="2.5"/><line x1="604" y1="84" x2="622" y2="66" stroke="#0A0A0A" stroke-width="2.5"/><text x="613" y="112" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">명부 연결 없음</text><text x="40" y="228" text-anchor="start" class="sk-label" font-size="14" fill="#71717A">토큰 레일</text><rect x="40" y="240" width="175" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="127.5" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">토큰 발행자</text><text x="127.5" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">Backed</text><line x1="215" y1="275" x2="300" y2="275" stroke="#0A0A0A" stroke-width="2"/><polygon points="300,275 290,279 290,271" fill="#0A0A0A"/><rect x="300" y="240" width="200" height="70" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"/><text x="400.0" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#0A0A0A">블록체인</text><text x="400.0" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">Solana · ERC-20</text><line x1="500" y1="275" x2="596" y2="275" stroke="#0A0A0A" stroke-width="2"/><polygon points="596,275 586,279 586,271" fill="#0A0A0A"/><line x1="400" y1="122" x2="400" y2="240" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7 6"/><text x="376" y="178" text-anchor="end" class="sk-label" font-size="14" fill="#3F3F46">가격·담보</text><text x="376" y="196" text-anchor="end" class="sk-label" font-size="14" fill="#3F3F46">연동</text><path d="M 424 176 Q 440 160 456 176 Q 440 192 424 176 Z" fill="none" stroke="#0A0A0A" stroke-width="2"/><circle cx="440" cy="176" r="5" fill="#0A0A0A"/><polyline points="462,178 467,184 476,168" fill="none" stroke="#0A0A0A" stroke-width="2.5"/><text x="452" y="214" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">공급량 검증 · PoR</text><rect x="614" y="246" width="7" height="58" fill="#0A0A0A"/><rect x="660" y="246" width="7" height="58" fill="#0A0A0A"/><rect x="611" y="238" width="59" height="8" fill="#0A0A0A"/><line x1="621" y1="254" x2="654" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="654" y1="266" x2="654" y2="298" stroke="#0A0A0A" stroke-width="2"/><text x="641" y="330" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">관할권 제한</text><line x1="596" y1="275" x2="700" y2="275" stroke="#0A0A0A" stroke-width="2"/><circle cx="720" cy="224" r="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><line x1="720" y1="233" x2="720" y2="258" stroke="#0A0A0A" stroke-width="2"/><line x1="708" y1="243" x2="732" y2="243" stroke="#0A0A0A" stroke-width="2"/><line x1="720" y1="258" x2="710" y2="274" stroke="#0A0A0A" stroke-width="2"/><line x1="720" y1="258" x2="730" y2="274" stroke="#0A0A0A" stroke-width="2"/><rect x="606" y="164" width="188" height="30" fill="#0A0A0A"/><text x="700" y="184" text-anchor="middle" class="sk-label" font-size="12.5" fill="#FAFAFA">토큰 보유자 ≠ Apple 주주</text><rect x="200" y="312" width="400" height="34" fill="#0A0A0A"/><text x="400.0" y="335" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">점선은 가격만 잇는다 — 명부로 가는 실선이 없다</text>
+</svg>
+<figcaption>그림 6. 간접형 — 그림 5와 같은 좌표입니다. 질문: AAPLx 보유자는 Apple 주주인가? 답: 아니오. 이중선이 점선으로, 게이트 위 합류가 금지 표시로 바뀌었을 뿐입니다.</figcaption>
+</figure>
+
+    <div class="card-grid">
+      <div class="card card-pad">
+        <h3>Backed Finance — 겉갑 교환권 공장</h3>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li>xStocks 제품군: <strong>131개 자산</strong> 토큰화 (주식 100 · ETF 27 · 기타 4)</li>
+          <li>온체인 누적 거래량 <strong>35억 달러 이상</strong>, 온체인 자산 <strong>2.25억 달러 이상</strong>, 보유자 <strong>8만 명 이상</strong> (원문 기준)</li>
+          <li>실제 발행 주체는 <strong>Backed Assets (JE) Limited</strong> — 추적 증서 구조를 설계하는 법인</li>
+        </ul>
+      </div>
+      <div class="card card-pad">
+        <h3>함께 굴러가는 회사들</h3>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3)">
+          <li><strong>Alpaca Securities LLC</strong> — 진짜 AAPL 주식을 매입·조달하고, 다른 상품과 분리된 계정에 <strong>1:1 담보</strong>로 보관 (금고 담당)</li>
+          <li><strong>Kraken · Bybit · DeFi 프로토콜</strong> — AAPLx가 실제로 거래·활용되는 곳 (24시간 가게)</li>
+          <li><strong>Chainlink Proof of Reserve</strong> — "금고에 진짜로 있나"를 상시 검증·공개 (금고 감시원)</li>
+        </ul>
+      </div>
+    </div>
+
+    
+
+    <div class="stat-row">
+      <div><span class="sv">131개</span><span class="sl">토큰화 자산 (주식 100 · ETF 27)</span></div>
+            <div><span class="sv">$2.25억+</span><span class="sl">온체인 자산 규모</span></div>
+      <div><span class="sv">80,000+</span><span class="sl">고유 온체인 보유자</span></div>
+    </div>
+
+    <div class="tnote">
+      <span class="caption">투자자 관점 정리</span>
+      <p class="body-sm">AAPLx를 산 사람은 Apple 주가 상승의 <strong>경제적 이익</strong>은 얻지만, Apple의 <strong>주주는 아닙니다</strong> —
+      의결권도, Apple에 대한 직접 청구권도 없습니다. 관할권 제한이 있어 <strong>미국 거주자에게는 판매되지 않습니다.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 13 · 비교표 ══════════ -->
+<section class="slide" data-label="비교 · EXOD vs AAPLx">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">11 / 나란히 놓고 보기</span>
+      <h2>직접형 vs 간접형 — 네 가지 질문이면 끝</h2>
+      <div class="src-links"><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">두 사례 모두 원문 3-2 · 3-3 기준 ↗</a></div>
+    </div>
+
+    <div class="card-grid">
+      <div style="background:#FFFFFF;border:3px solid var(--c-primary);padding:var(--sp-4)">
+        <svg viewBox="0 0 300 56" xmlns="http://www.w3.org/2000/svg" style="width:220px;display:block;margin-bottom:12px">
+          <rect x="4" y="10" width="70" height="36" fill="none" stroke="#0A0A0A" stroke-width="2"/>
+          <text x="39" y="33" text-anchor="middle" class="sk-label" font-size="11" fill="#0A0A0A">명부</text>
+          <line x1="74" y1="22" x2="130" y2="22" stroke="#0A0A0A" stroke-width="3.5"/>
+          <line x1="74" y1="34" x2="130" y2="34" stroke="#0A0A0A" stroke-width="3.5"/>
+          <rect x="130" y="10" width="70" height="36" fill="none" stroke="#0A0A0A" stroke-width="2"/>
+          <text x="165" y="33" text-anchor="middle" class="sk-label" font-size="11" fill="#0A0A0A">토큰</text>
+          <text x="245" y="33" text-anchor="middle" class="sk-label" font-size="12" fill="#0A0A0A">한 몸</text>
+        </svg>
+        <p style="font-size:18px;font-weight:700;line-height:1.4">직접형:<br>권리를 블록체인에 올림</p>
+        <p class="body-sm" style="color:var(--c-info);margin-top:8px">EXOD · GLXY — 토큰 보유자가 곧 주주</p>
+      </div>
+      <div style="background:#FFFFFF;border:2px dashed var(--c-primary);padding:var(--sp-4)">
+        <svg viewBox="0 0 300 56" xmlns="http://www.w3.org/2000/svg" style="width:220px;display:block;margin-bottom:12px">
+          <rect x="4" y="10" width="70" height="36" fill="none" stroke="#0A0A0A" stroke-width="2"/>
+          <text x="39" y="33" text-anchor="middle" class="sk-label" font-size="11" fill="#0A0A0A">금고</text>
+          <line x1="74" y1="28" x2="130" y2="28" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="6 5"/>
+          <rect x="130" y="10" width="70" height="36" fill="none" stroke="#0A0A0A" stroke-width="2"/>
+          <text x="165" y="33" text-anchor="middle" class="sk-label" font-size="11" fill="#0A0A0A">겉갑</text>
+          <text x="245" y="33" text-anchor="middle" class="sk-label" font-size="12" fill="#3F3F46">가격만</text>
+        </svg>
+        <p style="font-size:18px;font-weight:700;line-height:1.4">간접형:<br>가격 노출을 블록체인에 올림</p>
+        <p class="body-sm" style="color:var(--c-info);margin-top:8px">AAPLx · dShares — 보유자는 주주가 아님</p>
+      </div>
+    </div>
+
+    <div class="table-scroll" style="margin-top:var(--sp-4)">
+      <table>
+        <tr><th style="width:230px">판별 질문</th><th>직접 발행형 (EXOD)</th><th>간접 발행형 (AAPLx)</th></tr>
+        <tr><td><strong>진짜 자산은 어디에 있는가?</strong></td><td>토큰 자체가 디지털 주식</td><td>별도 금고 (Alpaca, 1:1 보관)</td></tr>
+        <tr><td><strong>공식 주주는 누구인가?</strong></td><td>토큰 보유자</td><td>발행자·수탁 구조 (내 이름 없음)</td></tr>
+        <tr><td><strong>토큰 이동 시 명부가 바뀌는가?</strong></td><td>예 — 이동 = 명부 변경</td><td>아니오 — 명부는 그대로</td></tr>
+        <tr><td><strong>핵심 신뢰 장치는 무엇인가?</strong></td><td>명부 동기화 · 규제 (명의개서대리인, ATS)</td><td>1:1 담보 · Proof of Reserve</td></tr>
+      </table>
+    </div>
+      </div>
+</section>
+
+<!-- ══════════ SLIDE 13.5 · 원문 밖 실전 사례 (심화) ══════════ -->
+<section class="slide" data-label="사례 1 · Galaxy">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">12 / 심화 · 원문 밖 검증 사례</span>
+      <h2>사례 1 — Galaxy × Superstate</h2>
+      <div class="chip-row" style="margin-top:var(--sp-3)"><span class="chip chip--solid">직접형 · 미국</span><span class="chip">2025년 9월</span></div>
+    </div>
+    <p>나스닥 상장사 Galaxy Digital이 자사 주식 GLXY를 Solana에서 토큰화했습니다. <strong>그림 5(EXOD)와 같은 구조 — 바뀐 것은 회사 이름 세 개뿐입니다.</strong></p>
+    <figure>
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" aria-label="그림 7 Galaxy 이름 교체"><text x="40" y="40" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">법적 소유권 레일</text><rect x="40" y="52" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">발행 회사</text><text x="127.5" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA"></text><line x1="215" y1="87" x2="300" y2="87" stroke="#A1A1AA" stroke-width="4"/><polygon points="300,87 290,91 290,83" fill="#A1A1AA"/><rect x="300" y="52" width="200" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="400.0" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">공식 주주명부</text><text x="400.0" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA"></text><line x1="500" y1="87" x2="596" y2="87" stroke="#A1A1AA" stroke-width="4"/><polygon points="596,87 586,91 586,83" fill="#A1A1AA"/><text x="40" y="228" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">온체인 토큰 레일</text><rect x="40" y="240" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">토큰 발행</text><text x="127.5" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">GLXY</text><line x1="215" y1="275" x2="300" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="300,275 290,279 290,271" fill="#A1A1AA"/><rect x="300" y="240" width="200" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="400.0" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">블록체인</text><text x="400.0" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA"></text><line x1="500" y1="275" x2="596" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="596,275 586,279 586,271" fill="#A1A1AA"/><line x1="390" y1="122" x2="390" y2="240" stroke="#A1A1AA" stroke-width="2"/><line x1="410" y1="122" x2="410" y2="240" stroke="#A1A1AA" stroke-width="2"/><circle cx="394" cy="180" r="7" fill="none" stroke="#A1A1AA" stroke-width="2"/><circle cx="406" cy="180" r="7" fill="none" stroke="#A1A1AA" stroke-width="2"/><rect x="614" y="132" width="7" height="58" fill="#A1A1AA"/><rect x="660" y="132" width="7" height="58" fill="#A1A1AA"/><rect x="611" y="124" width="59" height="8" fill="#A1A1AA"/><line x1="621" y1="140" x2="654" y2="152" stroke="#A1A1AA" stroke-width="2"/><line x1="654" y1="152" x2="654" y2="184" stroke="#A1A1AA" stroke-width="2"/><line x1="596" y1="87" x2="641" y2="132" stroke="#A1A1AA" stroke-width="4"/><line x1="596" y1="275" x2="641" y2="198" stroke="#A1A1AA" stroke-width="2"/><circle cx="714" cy="142" r="9" fill="none" stroke="#A1A1AA" stroke-width="2"/><line x1="714" y1="151" x2="714" y2="176" stroke="#A1A1AA" stroke-width="2"/><line x1="702" y1="161" x2="726" y2="161" stroke="#A1A1AA" stroke-width="2"/><line x1="714" y1="176" x2="704" y2="192" stroke="#A1A1AA" stroke-width="2"/><line x1="714" y1="176" x2="724" y2="192" stroke="#A1A1AA" stroke-width="2"/><text x="715" y="250" text-anchor="middle" class="sk-role" font-size="14" fill="#A1A1AA">투자자 = 주주</text><rect x="65" y="96" width="124" height="28" fill="#0A0A0A"/><text x="127" y="115" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">Galaxy</text><text x="127" y="142" text-anchor="middle" class="sk-label" font-size="12" fill="#A1A1AA">(← Exodus)</text><rect x="338" y="96" width="124" height="28" fill="#0A0A0A"/><text x="400" y="115" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">Superstate</text><text x="400" y="142" text-anchor="middle" class="sk-label" font-size="12" fill="#A1A1AA">(← Securitize)</text><rect x="338" y="284" width="124" height="28" fill="#0A0A0A"/><text x="400" y="303" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">Solana</text><text x="400" y="330" text-anchor="middle" class="sk-label" font-size="12" fill="#A1A1AA">(← Algorand)</text><rect x="200" y="312" width="400" height="34" fill="#0A0A0A"/><text x="400.0" y="335" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">구조는 동일 · 참여 회사만 변경</text>
+</svg>
+<figcaption>그림 7. 그림 5와 같은 판 — 회색 구조는 그대로, 검은 이름표 세 개만 바뀌었습니다.</figcaption>
+</figure>
+    <div class="tnote">
+      <span class="caption">원문 3-2와 연결</span>
+      <p class="body-sm">원문 3-2의 직접형 3요소(발행사 직접 발행 · 명의개서대리인 · 명부=토큰 정합성)가 그대로 재현됐습니다. 원문이 소개한 Computershare-Securitize 협약(2026.4)이 예고한 "발행사 주도형 토큰" 흐름이 실제로 늘고 있다는 증거입니다.</p>
+    </div>
+    <div class="src-links"><a class="src-btn" href="https://www.coindesk.com/business/2025/09/03/galaxy-digital-tokenizes-its-shares-on-solana-with-superstate" target="_blank" rel="noopener">출처 · CoinDesk ↗</a><a class="src-btn" href="https://superstate.com/newsroom/galaxy-stock-tokenization-via-opening-bell" target="_blank" rel="noopener">출처 · Superstate ↗</a><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-2 ↗</a></div>
+  </div>
+</section>
+
+<section class="slide" data-label="사례 2 · Robinhood">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">13 / 심화 · 원문 밖 검증 사례</span>
+      <h2>사례 2 — Robinhood 토큰과 OpenAI의 반박</h2>
+      <div class="chip-row" style="margin-top:var(--sp-3)"><span class="chip chip--solid">간접형보다 더 간접 · EU</span><span class="chip">2025년 7월</span></div>
+    </div>
+    <p>Robinhood가 EU에서 판 비상장사 "OpenAI 토큰"에 대해, OpenAI가 <strong>"우리 지분이 아니다"</strong>라고 공개 반박했습니다. <strong>그림 6과 같은 판인데, 금고 자리에 물음표가 남았습니다.</strong></p>
+    <figure>
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" aria-label="그림 8 Robinhood 금고 물음표"><text x="40" y="40" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">실제 자산 레일</text><rect x="40" y="52" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">실제 주식시장</text><text x="127.5" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">OpenAI 가격</text><line x1="215" y1="87" x2="300" y2="87" stroke="#A1A1AA" stroke-width="4"/><polygon points="300,87 290,91 290,83" fill="#A1A1AA"/><text x="257.5" y="77.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">매입</text><rect x="300" y="52" width="200" height="70" fill="#0A0A0A"/><text x="400" y="82" text-anchor="middle" class="sk-role" font-size="26" fill="#FAFAFA">?</text><text x="400" y="108" text-anchor="middle" class="sk-label" font-size="12" fill="#A1A1AA">금고 내용물 = 같은 주식인가?</text><circle cx="613" cy="75" r="13" fill="none" stroke="#A1A1AA" stroke-width="2.5"/><line x1="604" y1="84" x2="622" y2="66" stroke="#A1A1AA" stroke-width="2.5"/><text x="613" y="112" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">명부 연결 없음</text><text x="40" y="228" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">토큰 레일</text><rect x="40" y="240" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">토큰 발행자</text><text x="127.5" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">토큰 발행</text><line x1="215" y1="275" x2="300" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="300,275 290,279 290,271" fill="#A1A1AA"/><rect x="300" y="240" width="200" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="400.0" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">블록체인</text><text x="400.0" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">Arbitrum</text><line x1="500" y1="275" x2="596" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="596,275 586,279 586,271" fill="#A1A1AA"/><line x1="400" y1="122" x2="400" y2="240" stroke="#A1A1AA" stroke-width="2" stroke-dasharray="7 6"/><text x="376" y="178" text-anchor="end" class="sk-label" font-size="14" fill="#A1A1AA">가격·담보</text><text x="376" y="196" text-anchor="end" class="sk-label" font-size="14" fill="#A1A1AA">연동</text><rect x="614" y="246" width="7" height="58" fill="#A1A1AA"/><rect x="660" y="246" width="7" height="58" fill="#A1A1AA"/><rect x="611" y="238" width="59" height="8" fill="#A1A1AA"/><line x1="621" y1="254" x2="654" y2="266" stroke="#A1A1AA" stroke-width="2"/><line x1="654" y1="266" x2="654" y2="298" stroke="#A1A1AA" stroke-width="2"/><text x="641" y="330" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">관할권 제한</text><line x1="596" y1="275" x2="700" y2="275" stroke="#A1A1AA" stroke-width="2"/><circle cx="720" cy="224" r="9" fill="none" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="233" x2="720" y2="258" stroke="#A1A1AA" stroke-width="2"/><line x1="708" y1="243" x2="732" y2="243" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="258" x2="710" y2="274" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="258" x2="730" y2="274" stroke="#A1A1AA" stroke-width="2"/><rect x="622" y="164" width="168" height="30" fill="#0A0A0A"/><text x="706" y="184" text-anchor="middle" class="sk-label" font-size="13" fill="#FAFAFA">보유자 ≠ OpenAI 주주</text><rect x="200" y="312" width="400" height="34" fill="#0A0A0A"/><text x="400.0" y="335" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">라벨이 아니라 금고를 확인하라</text>
+</svg>
+<figcaption>그림 8. 그림 6과 같은 판 — 금고 자리에 물음표만 남았습니다. OpenAI는 "우리 지분이 아니다"라고 답했습니다.</figcaption>
+</figure>
+    <div class="tnote">
+      <span class="caption">원문 3-3와 연결 (반례)</span>
+      <p class="body-sm">원문 3-3의 간접형이 성립하는 조건은 기초자산 매입·수탁, 1:1 담보, Proof of Reserve 검증이었습니다. 이 조건이 빠지면 무슨 일이 생기는지 보여주는 살아 있는 반례 — Backed가 굳이 금고를 공개하는 이유가 여기서 증명됩니다.</p>
+    </div>
+    <div class="src-links"><a class="src-btn" href="https://www.cnbc.com/2025/07/07/robinhood-stock-tokens-face-scrutiny-in-the-eu-after-openai-warning.html" target="_blank" rel="noopener">출처 · CNBC ↗</a><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-3 ↗</a></div>
+  </div>
+</section>
+
+<section class="slide" data-label="사례 3 · Dinari">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">14 / 심화 · 원문 밖 검증 사례</span>
+      <h2>사례 3 — Dinari, 규제 게이트가 열리다</h2>
+      <div class="chip-row" style="margin-top:var(--sp-3)"><span class="chip chip--solid">간접형 · 미국</span><span class="chip">2025년</span></div>
+    </div>
+    <p>Dinari는 토큰화 주식을 다루는 <strong>미국 최초의 브로커-딜러 등록(FINRA 승인)</strong>을 받았다고 보도됐습니다. <strong>그림 6과 같은 판 — 오른쪽 게이트 한 칸(미국 투자자 × → ○)만 바뀌었습니다.</strong></p>
+    <figure>
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" aria-label="그림 9 Dinari 게이트 변경"><text x="40" y="40" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">실제 자산 레일</text><rect x="40" y="52" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">실제 주식시장</text><text x="127.5" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">미국 상장주식</text><line x1="215" y1="87" x2="300" y2="87" stroke="#A1A1AA" stroke-width="4"/><polygon points="300,87 290,91 290,83" fill="#A1A1AA"/><text x="257.5" y="77.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">매입</text><rect x="300" y="52" width="200" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="400.0" y="84.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">진짜 주식 금고</text><text x="400.0" y="106.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">수탁기관 · 1:1</text><text x="40" y="228" text-anchor="start" class="sk-label" font-size="14" fill="#A1A1AA">토큰 레일</text><rect x="40" y="240" width="175" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="127.5" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">토큰 발행자</text><text x="127.5" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">Dinari</text><line x1="215" y1="275" x2="300" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="300,275 290,279 290,271" fill="#A1A1AA"/><rect x="300" y="240" width="200" height="70" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="2"/><text x="400.0" y="272.0" text-anchor="middle" class="sk-role" font-size="17" fill="#A1A1AA">블록체인</text><text x="400.0" y="294.0" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">온체인</text><line x1="500" y1="275" x2="596" y2="275" stroke="#A1A1AA" stroke-width="2"/><polygon points="596,275 586,279 586,271" fill="#A1A1AA"/><line x1="400" y1="122" x2="400" y2="240" stroke="#A1A1AA" stroke-width="2" stroke-dasharray="7 6"/><text x="376" y="178" text-anchor="end" class="sk-label" font-size="14" fill="#A1A1AA">가격·담보</text><text x="376" y="196" text-anchor="end" class="sk-label" font-size="14" fill="#A1A1AA">연동</text><path d="M 424 176 Q 440 160 456 176 Q 440 192 424 176 Z" fill="none" stroke="#A1A1AA" stroke-width="2"/><circle cx="440" cy="176" r="5" fill="#A1A1AA"/><polyline points="462,178 467,184 476,168" fill="none" stroke="#A1A1AA" stroke-width="2.5"/><text x="452" y="214" text-anchor="middle" class="sk-label" font-size="13" fill="#A1A1AA">공급량 검증 · PoR</text><rect x="614" y="246" width="7" height="58" fill="#0A0A0A"/><rect x="660" y="246" width="7" height="58" fill="#0A0A0A"/><rect x="611" y="238" width="59" height="8" fill="#0A0A0A"/><line x1="621" y1="254" x2="654" y2="266" stroke="#0A0A0A" stroke-width="2"/><line x1="654" y1="266" x2="654" y2="298" stroke="#0A0A0A" stroke-width="2"/><rect x="556" y="316" width="150" height="26" fill="#0A0A0A"/><text x="631" y="333" text-anchor="middle" class="sk-label" font-size="13" fill="#FAFAFA">미국 투자자 × → ○</text><line x1="596" y1="275" x2="700" y2="275" stroke="#A1A1AA" stroke-width="2"/><circle cx="720" cy="224" r="9" fill="none" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="233" x2="720" y2="258" stroke="#A1A1AA" stroke-width="2"/><line x1="708" y1="243" x2="732" y2="243" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="258" x2="710" y2="274" stroke="#A1A1AA" stroke-width="2"/><line x1="720" y1="258" x2="730" y2="274" stroke="#A1A1AA" stroke-width="2"/><rect x="622" y="164" width="168" height="30" fill="#0A0A0A"/><text x="706" y="184" text-anchor="middle" class="sk-label" font-size="13" fill="#FAFAFA">미국 투자자도 보유 가능</text><rect x="612" y="40" width="150" height="26" fill="#0A0A0A"/><text x="687" y="58" text-anchor="middle" class="sk-label" font-size="13" fill="#FAFAFA">규제 변화</text><line x1="687" y1="66" x2="687" y2="84" stroke="#0A0A0A" stroke-width="1.5"/><polygon points="687,84 683,74 691,74" fill="#0A0A0A"/><rect x="612" y="86" width="150" height="26" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="687" y="104" text-anchor="middle" class="sk-label" font-size="13" fill="#0A0A0A">접근성 확대</text><line x1="687" y1="112" x2="687" y2="130" stroke="#0A0A0A" stroke-width="1.5"/><polygon points="687,130 683,120 691,120" fill="#0A0A0A"/><rect x="612" y="132" width="150" height="26" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="1.5"/><text x="687" y="150" text-anchor="middle" class="sk-label" font-size="13" fill="#0A0A0A">유동성 확대</text><rect x="200" y="312" width="340" height="34" fill="#0A0A0A"/><text x="370.0" y="335" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">규제 한 칸이 바뀌면 문이 넓어진다</text>
+</svg>
+<figcaption>그림 9. 그림 6과 같은 판 — 바뀐 것은 오른쪽 게이트 하나(미국 투자자 × → ○)와 그 연쇄 효과뿐입니다.</figcaption>
+</figure>
+    <div class="tnote">
+      <span class="caption">원문 3-3 · 3-1과 연결</span>
+      <p class="body-sm">원문 3-3의 규제 항목은 "미국인 판매 제한"으로 끝났지만, Dinari는 그 제한을 제도 안에서 정면으로 푸는 시도입니다. 원문 3-1의 9층으로 말하면, 규제(9층) 한 칸이 바뀌면 유동성(7층)·활용(8층)이 연쇄적으로 넓어집니다.</p>
+    </div>
+    <div class="src-links"><a class="src-btn" href="https://finance.yahoo.com/news/dinari-granted-first-broker-dealer-153706691.html" target="_blank" rel="noopener">출처 · Reuters/Yahoo ↗</a><a class="src-btn" href="https://dinari.com/dshares" target="_blank" rel="noopener">Dinari 공식 ↗</a><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-3 ↗</a></div>
+  </div>
+</section>
+
+<section class="slide" data-label="사례 4 · 한국 STO">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">15 / 심화 · 원문 밖 검증 사례</span>
+      <h2>사례 4 — 한국 토큰증권(STO) 법제화</h2>
+      <div class="chip-row" style="margin-top:var(--sp-3)"><span class="chip chip--solid">제도 · 한국</span><span class="chip">2026년 1월</span></div>
+    </div>
+    <p>전자증권법·자본시장법 개정안이 국회 본회의를 통과했습니다(발의 약 3년 만). <strong>상품이 아니라 규제 울타리가 바뀐 사례 — 그림 3의 울타리에 문이 열렸습니다.</strong></p>
+    <figure>
+<svg viewBox="0 0 800 310" xmlns="http://www.w3.org/2000/svg" aria-label="그림 10 한국 STO 울타리 개방"><rect x="30" y="56" width="540" height="164" fill="none" stroke="#A1A1AA" stroke-width="2"/><line x1="48" y1="50" x2="48" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="84" y1="50" x2="84" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="120" y1="50" x2="120" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="156" y1="50" x2="156" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="192" y1="50" x2="192" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="228" y1="50" x2="228" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="264" y1="50" x2="264" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="300" y1="50" x2="300" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="336" y1="50" x2="336" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="372" y1="50" x2="372" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="408" y1="50" x2="408" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="444" y1="50" x2="444" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="480" y1="50" x2="480" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="516" y1="50" x2="516" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><line x1="552" y1="50" x2="552" y2="62" stroke="#A1A1AA" stroke-width="1.5"/><rect x="52" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="80" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">①공장</text><line x1="108" y1="132" x2="116" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="116" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="144" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">②발행</text><line x1="172" y1="132" x2="180" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="180" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="208" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">③거래</text><line x1="236" y1="132" x2="244" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="244" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="272" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">④금고</text><line x1="300" y1="132" x2="308" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="308" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="336" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">⑤대장</text><line x1="364" y1="132" x2="372" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="372" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="400" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">⑥데이터</text><line x1="428" y1="132" x2="436" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="436" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="464" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">⑦가게</text><line x1="492" y1="132" x2="500" y2="132" stroke="#A1A1AA" stroke-width="1.5"/><rect x="500" y="106" width="56" height="52" fill="#FFFFFF" stroke="#A1A1AA" stroke-width="1.5"/><text x="528" y="137" text-anchor="middle" class="sk-label" font-size="11" fill="#71717A">⑧지갑</text><text x="300" y="206" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">규제 울타리 (⑨)</text><rect x="562" y="96" width="8" height="68" fill="#0A0A0A"/><line x1="570" y1="102" x2="630" y2="72" stroke="#0A0A0A" stroke-width="3.5"/><line x1="630" y1="72" x2="630" y2="140" stroke="#0A0A0A" stroke-width="3.5"/><line x1="576" y1="132" x2="652" y2="132" stroke="#0A0A0A" stroke-width="3"/><polygon points="652,132 642,136 642,128" fill="#0A0A0A"/><rect x="614" y="152" width="172" height="32" fill="#0A0A0A"/><text x="700" y="173" text-anchor="middle" class="sk-label" font-size="13" fill="#FAFAFA">법 개정 · 2026.1 통과</text><text x="700" y="106" text-anchor="middle" class="sk-label" font-size="13" fill="#71717A">이전: 법적 연결 제한</text><text x="700" y="214" text-anchor="middle" class="sk-label" font-size="14" fill="#0A0A0A">이후: 법적 인정 경로</text><rect x="200" y="262" width="400" height="34" fill="#0A0A0A"/><text x="400.0" y="285" text-anchor="middle" class="sk-label" font-size="14" fill="#FAFAFA">울타리의 문이 열렸다 — 지도는 그림 3 그대로</text>
+</svg>
+<figcaption>그림 10. 상품이 아니라 규제 울타리가 바뀐 사례 — 그림 3의 울타리에 문이 생겼습니다.</figcaption>
+</figure>
+    <div class="tnote">
+      <span class="caption">원문 3-1 · 3-2와 연결</span>
+      <p class="body-sm">원문 3-1은 "9개 층이 모두 맞물려야 작동한다"고 했습니다. 한국 STO 법제화는 그중 규제층이 국가 단위에서 바뀐 사건이며, 원문 3-2의 EXOD가 미국 규제 위에서 가능했던 것처럼 한국에도 직접 발행형의 법적 토대가 생겼습니다.</p>
+    </div>
+    <div class="src-links"><a class="src-btn" href="https://www.seoul.co.kr/news/economy/finance/2026/01/15/20260115500181" target="_blank" rel="noopener">출처 · 서울신문 ↗</a><a class="src-btn" href="https://www.lawtimes.co.kr/LawFirm-NewsLetter/215101" target="_blank" rel="noopener">출처 · 법률신문 ↗</a><a class="src-btn" href="https://xangle.io/research/detail/2479" target="_blank" rel="noopener">원문 3-1 ↗</a></div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 14 · 케이스 판별 ══════════ -->
+<section class="slide" data-label="케이스 판별 훈련">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">16 / 케이스 판별 훈련</span>
+      <h2>각인 성냥갑일까, 겉갑 교환권일까?</h2>
+      <p class="body-sm" style="color:var(--c-info);margin-top:var(--sp-2)">먼저 손을 들어 답하게 한 뒤, 카드를 눌러 정답을 확인하세요. 함정 카드도 있습니다.</p>
+    </div>
+    <div class="card-grid">
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 01</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">K사는 자기 회사 주식을 처음부터 디지털 증권으로 발행했고, 토큰 기록이 곧 공식 주주명부와 연결된다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 직접 발행형 (각인 성냥갑)</p>
+          <p>단서: "회사가 직접" + "주주명부와 연결". 기초 주식을 사서 금고에 넣는 단계 자체가 없습니다.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 02</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">F사는 테슬라 주식을 시장에서 사들여 수탁기관에 1:1로 보관하고, 그 가격을 따라가는 토큰을 발행해 거래소에 상장했다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 간접 발행형 (겉갑 교환권)</p>
+          <p>단서: "사들여 보관" + "가격을 따라가는". 테슬라는 이 일과 무관 — 진짜는 금고에, 겉갑만 유통.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 03</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">이 토큰을 들고 있으면 주주총회에서 투표할 수 있고 배당도 받는다. 다만 신원 확인을 거친 사람끼리, 인가받은 시장에서만 거래된다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 직접 발행형</p>
+          <p>단서: 의결권·배당 = 대장에 이름이 있는 진짜 주인의 권리. "좁은 문"도 직접형의 특징.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 04</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">이 토큰은 새벽 3시에도 해외 거래소에서 사고팔 수 있고, 내 지갑에 직접 보관하며, DeFi에서 담보로도 쓴다. 대신 주주총회 초대장은 안 온다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 간접 발행형</p>
+          <p>단서: 24시간 거래·자기수탁·DeFi = 겉갑의 가벼움. "주주 아님" = 대장에 이름 없음. AAPLx가 정확히 이 모습.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 05</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">토큰 가격이 진짜 주가보다 비싸지자 발행사가 토큰을 새로 발행하고 기초 주식을 더 사들여 가격 차이를 좁혔다. 금고 잔고는 외부 검증 장치가 실시간 공개한다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 간접 발행형</p>
+          <p>단서: "발행·환매 재정렬"과 "Proof of Reserve"는 겉갑 구조에서만 필요한 장치. 직접형은 토큰이 곧 주식이라 가격이 '벌어질' 대상이 따로 없습니다.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 06 · 함정</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">민준이는 용돈으로 비트코인을 샀다. 직접 발행형일까, 간접 발행형일까?</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 둘 다 아님</p>
+          <p>비트코인은 <strong>토큰화가 아닙니다.</strong> 금고에 넣어 둔 "진짜 성냥갑"이 뒤에 없고, 처음부터 블록체인에서 태어난 자산입니다. 토큰화 = "기존 전통자산을 올리는 것"이라는 정의를 되짚는 함정.</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 07 · 실화</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">나스닥 상장사 G사가 등록 명의개서대리인과 손잡고 자사 주식을 Solana에서 토큰으로 발행했다. 토큰 보유 기록이 곧 공식 주주 기록이다.</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 직접 발행형 (각인 성냥갑)</p>
+          <p>실제 사건입니다 — 2025년 9월 Galaxy Digital(GLXY) × Superstate. 단서: "자사 주식" + "명의개서대리인" + "토큰 기록 = 주주 기록".</p></div>
+      </div>
+      <div class="case-card" onclick="this.classList.toggle('open')">
+        <div class="q"><span class="mono" style="color:var(--c-info)">CASE 08 · 실화 · 최상급</span>
+          <p class="body-sm" style="margin-top:var(--sp-1)">R사는 비상장 기업의 가치를 따라간다는 토큰을 팔았다. 그런데 정작 그 기업이 "그 토큰은 우리 지분이 아니다"라고 발표했다. 이 토큰은 무엇일까?</p>
+          <p class="hint-btn">눌러서 정답 보기 ↓</p></div>
+        <div class="answer body-sm"><p class="verdict">→ 간접형도 아닌 파생 구조 — 토론 카드</p>
+          <p>실제 사건입니다 — 2025년 7월 Robinhood의 OpenAI 토큰에 OpenAI가 공개 반박. 간접형의 생명은 "금고 속 진짜"인데, 여기서는 금고에 <strong>그 회사 주식이 아니라 다른 것(간접 노출 구조)</strong>이 들어 있다는 게 논쟁의 핵심. "토큰이라고 다 주식이 아니다 — 겉갑 라벨보다 금고 내용물을 확인하라"는 오늘 수업의 결론 그 자체입니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 15 · 퀴즈 ══════════ -->
+<section class="slide" data-label="마무리 퀴즈">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">17 / 마무리 퀴즈</span>
+      <h2>네 문제로 확인</h2>
+    </div>
+    <div class="card-grid">
+      <div class="quiz-item" data-answer="1">
+        <p class="quiz-q">Q1. "토큰화"를 가장 정확하게 설명한 것은?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt">새로운 암호화폐를 만들어 상장하는 것</button>
+          <button class="quiz-opt">주식·채권 같은 기존 자산을 블록체인 장부에서 발행·이전·거래되게 만드는 것</button>
+          <button class="quiz-opt">주식을 여러 조각으로 잘라 싸게 파는 것</button>
+        </div>
+        <div class="quiz-expl">핵심은 "기존 전통자산 ↔ 온체인 장부의 연결"입니다. 새 코인 발행(1)과 다르고, 조각 판매(3)는 토큰화가 가능하게 만드는 활용 중 하나일 뿐입니다.</div>
+      </div>
+      <div class="quiz-item" data-answer="0">
+        <p class="quiz-q">Q2. EXOD 토큰과 "각인 성냥갑 실험"의 공통점은?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt">토큰(성냥갑)이 움직이면 공식 명부(공장 대장)도 함께 바뀐다</button>
+          <button class="quiz-opt">진짜 자산을 금고에 넣고 교환권을 발행한다</button>
+          <button class="quiz-opt">누구나 제한 없이 24시간 거래할 수 있다</button>
+        </div>
+        <div class="quiz-expl">직접형의 본질은 "명부와 토큰이 한 몸". 금고+교환권(2)은 간접형이고, EXOD는 오히려 신원·관할권 확인을 거친 규제형 시장에서만 거래됩니다(3 오답).</div>
+      </div>
+      <div class="quiz-item" data-answer="2">
+        <p class="quiz-q">Q3. AAPLx를 산 사람이 가질 수 <u>없는</u> 것은?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt">Apple 주가가 오를 때의 경제적 이익</button>
+          <button class="quiz-opt">내 지갑에 직접 보관할 권리</button>
+          <button class="quiz-opt">Apple 주주총회 의결권</button>
+        </div>
+        <div class="quiz-expl">AAPLx는 겉갑 교환권(추적 증서) — 가격 노출(1)과 자기수탁(2)은 되지만, 대장(주주명부)에 이름이 없으므로 의결권은 없습니다.</div>
+      </div>
+      <div class="quiz-item" data-answer="1">
+        <p class="quiz-q">Q4. 간접 발행형에서 "금고에 진짜로 들어 있나?"를 확인해 주는 장치는?</p>
+        <div class="quiz-opts">
+          <button class="quiz-opt">주주총회</button>
+          <button class="quiz-opt">Chainlink Proof of Reserve 같은 담보 검증</button>
+          <button class="quiz-opt">주식분할</button>
+        </div>
+        <div class="quiz-expl">겉갑의 가치는 금고 속 진짜가 지킵니다. 그래서 외부 검증 장치로 1:1 담보를 상시 확인·공개합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 16 · 용어 사전 ══════════ -->
+<section class="slide" data-label="용어 사전">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num">18 / 용어 사전</span>
+      <h2>오늘 나온 말들 — 성냥갑 번역기</h2>
+    </div>
+    <figure>
+<svg viewBox="0 0 800 100" xmlns="http://www.w3.org/2000/svg" aria-label="그림 문법 전체 정리">
+  <line x1="30" y1="38" x2="100" y2="38" stroke="#0A0A0A" stroke-width="4"/><text x="65" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">공식 소유권</text>
+  <line x1="150" y1="38" x2="220" y2="38" stroke="#0A0A0A" stroke-width="2.5" stroke-dasharray="7 6"/><text x="185" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">가격 연동</text>
+  <line x1="278" y1="28" x2="278" y2="48" stroke="#0A0A0A" stroke-width="2"/><line x1="288" y1="28" x2="288" y2="48" stroke="#0A0A0A" stroke-width="2"/><circle cx="306" cy="38" r="7" fill="none" stroke="#0A0A0A" stroke-width="2"/><circle cx="318" cy="38" r="7" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="298" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">동기화</text>
+  <rect x="392" y="24" width="28" height="28" fill="none" stroke="#0A0A0A" stroke-width="2"/><rect x="400" y="15" width="12" height="9" fill="none" stroke="#0A0A0A" stroke-width="2"/><circle cx="406" cy="38" r="6" fill="none" stroke="#0A0A0A" stroke-width="2"/><text x="406" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">수탁(금고)</text>
+  <path d="M 486 38 Q 502 22 518 38 Q 502 54 486 38 Z" fill="none" stroke="#0A0A0A" stroke-width="2"/><circle cx="502" cy="38" r="4.5" fill="#0A0A0A"/><text x="502" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">검증 · PoR</text>
+  <rect x="582" y="18" width="6" height="40" fill="#0A0A0A"/><rect x="620" y="18" width="6" height="40" fill="#0A0A0A"/><rect x="579" y="12" width="50" height="6" fill="#0A0A0A"/><line x1="588" y1="24" x2="614" y2="34" stroke="#0A0A0A" stroke-width="2"/><text x="604" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">규제 게이트</text>
+  <rect x="680" y="22" width="64" height="36" fill="none" stroke="#0A0A0A" stroke-width="2"/><rect x="680" y="22" width="64" height="10" fill="#0A0A0A"/><text x="712" y="70" text-anchor="middle" class="sk-label" font-size="13" fill="#3F3F46">성냥갑</text>
+</svg>
+<figcaption>그림 문법 전체 — 오늘 등장한 일곱 가지 기호 정리.</figcaption>
+</figure>
+
+    <dl class="glossary">
+      <div class="row"><dt>토큰화</dt><dd>기존 금융자산을 블록체인 장부에서 발행·이전·거래 가능하게 만드는 것 — 주인 기록을 공용 대장으로 옮기기</dd></div>
+      <div class="row"><dt>원장 (장부)</dt><dd>보유 기록 공책. 블록체인 = 모두가 사본을 나눠 드는 공용 대장</dd></div>
+      <div class="row"><dt>주주명부</dt><dd>회사의 공식 주주 목록 = 공장 대장. 여기 이름이 있어야 진짜 주인</dd></div>
+      <div class="row"><dt>명의개서대리인</dt><dd>주주명부를 공식적으로 고쳐 쓰는 기관 = 공장 대장 관리인 (Computershare, Securitize)</dd></div>
+      <div class="row"><dt>수탁 (커스터디)</dt><dd>자산을 대신 안전하게 보관 = 금고 (Alpaca, DTC, Euroclear)</dd></div>
+      <div class="row"><dt>ATS</dt><dd>인가받은 대체거래시스템 = 공장이 인정한 공식 가게 (Securitize Markets)</dd></div>
+      <div class="row"><dt>추적 증서</dt><dd>기초자산 가격을 따라가는 증서 = "금고 속 1개와 교환" 겉갑 (AAPLx)</dd></div>
+      <div class="row"><dt>1:1 담보</dt><dd>겉갑 1개마다 금고에 진짜 성냥갑 1개가 들어 있는 상태</dd></div>
+      <div class="row"><dt>Proof of Reserve</dt><dd>금고 잔고를 외부 장치로 상시 검증·공개 = 금고 감시원 (Chainlink)</dd></div>
+      <div class="row"><dt>유동성</dt><dd>사고 싶을 때 사고 팔고 싶을 때 팔 수 있는 정도 = 언제든 열려 있는 교환 가게가 있는가</dd></div>
+      <div class="row"><dt>시장조성자</dt><dd>항상 사고팔 준비가 된 전문 거래자 = 24시간 가게 주인</dd></div>
+      <div class="row"><dt>청약 · 환매</dt><dd>새로 발행받기(청약) / 발행자에게 되팔기(환매) = 겉갑을 새로 사기 / 금고 앞에서 진짜와 바꾸기</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 17 · 강사 노트 (dark) ══════════ -->
+<section class="slide slide--inverse" data-label="출처">
+  <div class="slide-inner">
+    <div class="slide-head">
+      <span class="section-num" style="color:#A1A1AA">19 / 출처</span>
+      <h2>출처 및 수치 기준</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card card-pad" style="background:var(--c-primary);border-color:#3F3F46">
+        <span class="caption" style="text-transform:uppercase;letter-spacing:0.05em">출처 및 수치 기준</span>
+        <ul class="clean body-sm" style="margin-top:var(--sp-3);color:#D4D4D8">
+          <li>본 자료는 Xangle 리서치 <a href="https://xangle.io/research/detail/2479" style="color:#FAFAFA">「RWA 토큰화 생태계」</a> 3-1 ~ 3-3을 중·고교 수준으로 재구성한 것입니다.</li>
+          <li>수치·기업 사례는 모두 원문 기준: Securitize 관리 자산 약 40억 달러 이상(2026년 4월) · Backed xStocks 131개 자산, 온체인 거래량 35억 달러 이상, 온체인 자산 2.25억 달러 이상, 보유자 8만 명 이상 · Computershare는 S&amp;P 500 기업 58%의 명의개서 업무 수행 · Computershare-Securitize 협약(2026년 4월).</li>
+          <li>성냥갑 비유·책상 실험·케이스 카드·퀴즈는 교육 목적으로 새로 만든 것으로 원문에는 없습니다.</li>
+          <li><strong style="color:#FAFAFA">"원문 밖 검증 사례" 섹션(12~15)과 CASE 07·08은 원문에 없는 추가 사례</strong>로, 2026년 8월 3일 별도 검증했습니다:
+          Galaxy × Superstate GLXY 토큰화(<a href="https://www.coindesk.com/business/2025/09/03/galaxy-digital-tokenizes-its-shares-on-solana-with-superstate" style="color:#FAFAFA">CoinDesk</a>, <a href="https://superstate.com/newsroom/galaxy-stock-tokenization-via-opening-bell" style="color:#FAFAFA">Superstate</a>) ·
+          Robinhood EU 주식 토큰과 OpenAI 반박(<a href="https://www.cnbc.com/2025/07/07/robinhood-stock-tokens-face-scrutiny-in-the-eu-after-openai-warning.html" style="color:#FAFAFA">CNBC</a>) ·
+          Dinari 브로커-딜러 등록(<a href="https://finance.yahoo.com/news/dinari-granted-first-broker-dealer-153706691.html" style="color:#FAFAFA">Reuters/Yahoo</a>) ·
+          한국 STO 법제화(<a href="https://www.seoul.co.kr/news/economy/finance/2026/01/15/20260115500181" style="color:#FAFAFA">서울신문</a>, <a href="https://www.lawtimes.co.kr/LawFirm-NewsLetter/215101" style="color:#FAFAFA">법률신문</a>)</li>
+          <li>본 자료는 교육용이며 투자 권유가 아닙니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<script>
+  // ===== 스크롤 진행 바 =====
+  var progress = document.getElementById('progress');
+  function updateProgress() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var ratio = max > 0 ? (window.scrollY / max) : 0;
+    progress.style.width = (ratio * 100) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+
+  // ===== 퀴즈 (in-memory) =====
+  document.querySelectorAll('.quiz-item').forEach(function (item) {
+    var answer = parseInt(item.dataset.answer, 10);
+    var opts = item.querySelectorAll('.quiz-opt');
+    var expl = item.querySelector('.quiz-expl');
+    opts.forEach(function (btn, i) {
+      btn.addEventListener('click', function () {
+        opts.forEach(function (b) { b.disabled = true; });
+        if (i === answer) {
+          btn.classList.add('correct');
+          expl.insertAdjacentHTML('afterbegin', '<span class="ok">정답! </span>');
+        } else {
+          btn.classList.add('wrong');
+          opts[answer].classList.add('correct');
+          expl.insertAdjacentHTML('afterbegin', '<span class="no">아쉽다! </span>');
+        }
+        expl.classList.add('show');
+      });
+    });
+  });
+</script>
+</body>
+</html>

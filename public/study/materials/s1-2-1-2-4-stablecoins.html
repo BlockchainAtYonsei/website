@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>스테이블코인 생태계 지도</title>
+<style>
+:root{
+  --navy:#112b43;--blue:#1769aa;--cyan:#1697a6;--green:#22845f;
+  --orange:#d5792d;--purple:#7b61a8;--red:#b94e5a;
+  --sky:#eef7ff;--mint:#edf9f4;--sand:#fff6eb;--lilac:#f5f1fa;
+  --rose:#fff1f3;--ink:#172536;--muted:#5e6e7e;--line:#dce6ef;
+  --bg:#f5f8fb;--paper:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;
+  line-height:1.8;word-break:keep-all
+}
+.shell{max-width:1120px;margin:auto;padding:42px 24px 72px}
+.hero{
+  background:linear-gradient(128deg,#102b46 0%,#1769aa 58%,#15929f 100%);
+  color:#fff;padding:48px 50px;border-radius:24px;
+  box-shadow:0 14px 34px #102b4626
+}
+.kicker{font-weight:800;font-size:12px;letter-spacing:.13em;color:#bfe9ff}
+.hero h1{
+  font-size:clamp(31px,4.7vw,48px);line-height:1.22;
+  letter-spacing:-.045em;margin:13px 0
+}
+.hero p{font-size:17px;max-width:850px;color:#e8f7ff;margin:0}
+.hero .scope{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:20px
+}
+.hero .scope span{
+  border:1px solid #ffffff45;background:#ffffff14;border-radius:999px;
+  padding:5px 11px;font-size:12px;font-weight:700
+}
+.toc{
+  margin-top:22px;padding:16px 20px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;display:flex;gap:10px;flex-wrap:wrap
+}
+.toc a{
+  font-size:13px;color:#275c85;text-decoration:none;background:#edf5fb;
+  padding:5px 10px;border-radius:20px;font-weight:700
+}
+section{
+  background:var(--paper);border:1px solid var(--line);border-radius:18px;
+  padding:34px;margin-top:22px
+}
+.label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.1em}
+.title{
+  margin:4px 0 16px;font-size:26px;line-height:1.35;
+  letter-spacing:-.03em
+}
+.intro{font-size:16.5px;color:#294056;margin:0 0 16px}
+p{margin:0 0 14px}
+p:last-child{margin-bottom:0}
+.box{
+  background:var(--sky);border-left:4px solid var(--blue);border-radius:8px;
+  padding:16px 20px;margin:18px 0
+}
+.box b{color:#0f3d63}
+.box.warn{background:var(--sand);border-left-color:var(--orange)}
+.box.warn b{color:#7d471a}
+.box.risk{background:var(--rose);border-left-color:var(--red)}
+.box.risk b{color:#7f2e38}
+.box.mint{background:var(--mint);border-left-color:var(--green)}
+.box.mint b{color:#145c42}
+
+/* 세 가지 유형 */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}
+.type-card{
+  border:1px solid var(--line);border-radius:15px;padding:20px 19px;
+  background:#fbfdff;position:relative;overflow:hidden
+}
+.type-card:before{
+  content:"";position:absolute;left:0;top:0;width:100%;height:4px
+}
+.type-card.fiat:before{background:var(--blue)}
+.type-card.crypto:before{background:var(--purple)}
+.type-card.synthetic:before{background:var(--orange)}
+.type-card .tag{
+  display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;
+  border-radius:20px;margin-bottom:10px
+}
+.type-card.fiat .tag{background:var(--sky);color:#17619c}
+.type-card.crypto .tag{background:var(--lilac);color:#67478e}
+.type-card.synthetic .tag{background:var(--sand);color:#9b581e}
+.type-card h3{margin:0 0 9px;font-size:18px;color:#173b5b}
+.type-card p{margin:0;font-size:14px;color:#43576a}
+.type-card .trust{
+  margin-top:12px;padding-top:11px;border-top:1px solid var(--line);
+  color:#283f54;font-size:13px
+}
+
+/* 핵심 구조식 */
+.core-line{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;
+  gap:10px;margin:22px 0
+}
+.core-node{
+  border:1px solid var(--line);border-radius:13px;padding:15px;text-align:center;
+  background:#fbfdff
+}
+.core-node b{display:block;font-size:15px;color:#164b76;margin-bottom:4px}
+.core-node span{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
+.arrow{display:grid;place-items:center;color:#7d91a4;font-weight:900}
+
+/* 7레이어 */
+.legend{display:flex;gap:18px;margin:16px 0 14px;font-size:13px;font-weight:700;color:#3e5063;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.table-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+.flow-table{font-size:13.8px;min-width:760px}
+.flow-table th{
+  background:#edf4f9;text-align:left;padding:9px 14px;color:#23435e;
+  font-size:12px;font-weight:800
+}
+.flow-table td{
+  padding:8px 14px;border-top:1px solid var(--line);
+  vertical-align:middle;color:#2c3e50;line-height:1.42
+}
+.flow-table td:first-child{width:40px}
+.flow-table td:nth-child(2){font-weight:800;color:#164b76;white-space:nowrap;width:100px}
+.fno{
+  display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;
+  color:#fff;background:var(--blue);font-size:11.5px;font-weight:800
+}
+.fno.run{background:var(--purple)}
+.fno.wrap{background:var(--navy)}
+.co{
+  display:inline-block;font-size:11.5px;font-weight:700;color:#227056;
+  background:var(--mint);padding:2px 9px;border-radius:20px;white-space:nowrap
+}
+.flow-table tr.wrap{background:#f3f8ff}
+.flow-table tr.wrap td{border-top:2px dashed #9fbfd6}
+.caption{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+
+/* 섹션 헤드 */
+.group-head{display:flex;align-items:center;gap:12px;margin:0 0 6px}
+.group-head .ic{font-size:22px}
+.group-head h2{margin:0;font-size:23px;letter-spacing:-.03em}
+.group-sub{color:var(--muted);font-size:14.5px;margin:0 0 20px}
+
+/* 작동 과정 */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.step{
+  border:1px solid var(--line);border-radius:12px;padding:15px 13px;
+  background:#fbfdff;position:relative
+}
+.step .n{
+  display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;
+  background:var(--navy);color:#fff;font-size:12px;font-weight:800;margin-bottom:9px
+}
+.step b{display:block;font-size:14px;color:#173b5b;margin-bottom:5px}
+.step p{font-size:12.8px;color:var(--muted);line-height:1.55;margin:0}
+
+/* 사례 카드 */
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:18px 0}
+.case{
+  border:1px solid var(--line);border-radius:14px;padding:18px;background:#fbfdff
+}
+.case h3{margin:0 0 7px;font-size:17px;color:#164b76}
+.case p{font-size:14px;color:#3e5063;margin:0}
+.case .badge{
+  display:inline-block;margin-top:10px;font-size:11.5px;font-weight:700;
+  color:#516579;background:#eef3f7;border-radius:999px;padding:3px 9px
+}
+
+/* 위험 카드 */
+.risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.risk-card{
+  border:1px solid #ead6d9;border-radius:13px;padding:16px;background:#fffafb
+}
+.risk-card b{display:block;font-size:14px;color:#843944;margin-bottom:5px}
+.risk-card span{display:block;font-size:12.8px;color:#6e5960;line-height:1.55}
+
+/* 델타 예시 */
+.delta{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr;
+  gap:10px;align-items:center;margin:20px 0
+}
+.delta .asset{
+  border:1px solid var(--line);border-radius:13px;padding:17px;text-align:center;
+  background:#fbfdff
+}
+.delta .asset b{display:block;font-size:15px;color:#173b5b}
+.delta .asset span{font-size:12.5px;color:var(--muted)}
+.delta .plus{font-size:22px;color:#7d91a4;font-weight:800}
+
+/* 비교표 */
+.compare-table{font-size:13.5px;min-width:820px}
+.compare-table th{
+  background:#edf4f9;padding:10px 13px;text-align:left;
+  font-size:12px;color:#23435e
+}
+.compare-table td{
+  padding:10px 13px;border-top:1px solid var(--line);
+  vertical-align:top;line-height:1.55
+}
+.compare-table td:first-child{font-weight:800;color:#173b5b;white-space:nowrap}
+.good{color:#176f51;font-weight:700}
+.bad{color:#a3444f;font-weight:700}
+
+/* UST vs USDe */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch;margin:18px 0}
+.vs-card{border:1px solid var(--line);border-radius:15px;padding:20px;background:#fbfdff}
+.vs-card h3{margin:0 0 9px;font-size:18px}
+.vs-card.terra h3{color:#8b5b26}
+.vs-card.ethena h3{color:#285d91}
+.vs-card p{font-size:14px;color:#3e5063}
+.vs-mid{display:grid;place-items:center;font-size:13px;font-weight:800;color:#7c8e9f}
+
+/* 발표 대본 */
+.script{
+  border-left:4px solid var(--cyan);background:#f0fafb;border-radius:8px;
+  padding:18px 20px;margin:15px 0;font-size:14.5px;color:#29495a
+}
+.script b{color:#11646d}
+.time{
+  display:inline-block;font-size:11px;font-weight:800;background:#dff4f5;
+  color:#11646d;border-radius:999px;padding:2px 8px;margin-right:6px
+}
+
+/* takeaway */
+.end{background:var(--navy);color:#eaf5ff}
+.end .label{color:#a9d8fc}
+.end h2{color:#fff}
+.end p{font-size:17px}
+.take-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.take{
+  background:#ffffff10;border:1px solid #ffffff28;border-radius:13px;padding:15px
+}
+.take b{display:block;color:#fff;margin-bottom:5px}
+.take span{font-size:13px;color:#d7eaf6;line-height:1.5}
+
+.sources{font-size:12.5px;color:#6c7c8c;line-height:1.85}
+.sources a{color:#216aa5;text-decoration:none}
+.foot{font-size:12.5px;color:#6c7c8c;margin-top:20px}
+
+@media(max-width:900px){
+  .type-grid,.risk-grid,.take-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .core-line,.delta{grid-template-columns:1fr}
+  .arrow,.delta .plus{transform:rotate(90deg)}
+}
+@media(max-width:720px){
+  .shell{padding:18px 13px 50px}
+  .hero,section{padding:26px 21px;border-radius:16px}
+  .case-grid,.vs{grid-template-columns:1fr}
+  .vs-mid{padding:0}
+  .steps{grid-template-columns:1fr}
+  .title{font-size:22px}
+}
+</style>
+</head>
+<body>
+<a href="/research/study/1" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 1회차 진행안으로</a><main class="shell">
+<header class="hero">
+<div class="kicker">PART 1 · STABLECOIN ECOSYSTEM</div>
+<h1>스테이블코인<br/>생태계 지도</h1>
+<p>모두 1달러를 목표로 하지만, 실제로는 ‘무엇을 믿고 1달러를 유지하는가’가 서로 다름. 법정화폐 준비금, 온체인 초과담보, 현물·선물 헤지라는 세 가지 구조를 7개 레이어와 리스크 관점에서 정리함.</p>
+<div class="scope">
+<span>2-1 생태계 개요</span><span>2-2 법정화폐 담보형</span>
+<span>2-3 가상자산 담보형</span><span>2-4 합성·델타중립형</span>
+</div>
+</header>
+<nav class="toc">
+<a href="#intro">스테이블코인이란</a>
+<a href="#types">3가지 유형</a>
+<a href="#layers">7개 레이어</a>
+<a href="#fiat">법정화폐 담보형</a>
+<a href="#crypto">가상자산 담보형</a>
+<a href="#synthetic">합성·델타중립형</a>
+<a href="#compare">구조·리스크 비교</a>
+<a href="#luna">UST와 USDe</a>
+
+</nav>
+<section id="intro">
+<div class="label">01 · INTRO</div>
+<h2 class="title">스테이블코인이란?</h2>
+<p class="intro">달러 같은 법정화폐 또는 특정 기준자산의 가치에 연동되도록 설계된 디지털 자산임. 일반 가상자산보다 가격 변동을 줄여 거래, 송금, 결제, 담보, 유동성 공급에 쓰이도록 만든 온체인 현금성 자산에 가까움.</p>
+<div class="box">
+<b>발표의 출발점:</b> 스테이블코인은 단순히 “가격이 잘 안 움직이는 코인”이 아님. 가격을 1달러 근처로 되돌리는 <b>발행·상환, 청산 또는 헤지 메커니즘</b>을 가진 구조임.
+  </div>
+<div class="core-line">
+<div class="core-node"><b>거래소</b><span>가상자산 거래의 기준통화</span></div>
+<div class="arrow">→</div>
+<div class="core-node"><b>DeFi</b><span>대출·예치·LP·파생상품 증거금</span></div>
+<div class="arrow">→</div>
+<div class="core-node"><b>결제·송금</b><span>국경 간 이전과 디지털 결제</span></div>
+</div>
+<p class="caption">원문 기준 2026년 5월 말 스테이블코인 시장 가치는 약 3,034.6억 달러로 제시됨. 수치는 원문 작성 시점 기준임.</p>
+</section>
+<section id="types">
+<div class="label">02 · THREE TYPES</div>
+<h2 class="title">같은 1달러, 다른 신뢰의 원천</h2>
+<p class="intro">세 유형의 차이는 “무슨 이름의 코인이냐”보다 <b>토큰 뒤에 어떤 자산과 안정화 장치가 놓여 있느냐</b>에 있음.</p>
+<div class="type-grid">
+<article class="type-card fiat">
+<span class="tag">법정화폐 담보형</span>
+<h3>현금성 준비금</h3>
+<p>발행사가 현금·은행예금·단기 국채·RP·MMF 등을 보유하고, 이에 대응하는 토큰을 발행함.</p>
+<div class="trust"><b>믿는 것:</b> 준비금, 발행사, 수탁기관, 상환 가능성</div>
+</article>
+<article class="type-card crypto">
+<span class="tag">가상자산 담보형</span>
+<h3>온체인 초과담보</h3>
+<p>ETH·BTC 계열 자산 등을 스마트컨트랙트에 더 많이 맡기고, 그보다 적은 스테이블코인을 발행·차입함.</p>
+<div class="trust"><b>믿는 것:</b> 담보비율, 오라클, 청산 엔진, 스마트컨트랙트</div>
+</article>
+<article class="type-card synthetic">
+<span class="tag">합성·델타중립형</span>
+<h3>현물 + 파생상품 숏</h3>
+<p>현물 담보를 보유하면서 같은 자산의 선물·무기한선물 숏을 잡아 가격 변동을 상쇄함.</p>
+<div class="trust"><b>믿는 것:</b> 헤지 유지, 거래소·수탁, 펀딩비, 상환 유동성</div>
+</article>
+</div>
+<div class="box mint">
+<b>한 줄 분류:</b> 법정화폐 담보형은 <b>상환</b>, 가상자산 담보형은 <b>초과담보와 청산</b>, 합성형은 <b>델타 헤지</b>를 중심으로 안정성을 만듦.
+  </div>
+</section>
+<section id="layers">
+<div class="label">03 · 7-LAYER FLOW</div>
+<h2 class="title">스테이블코인이 실제로 돌아가는 7개 레이어</h2>
+<p class="intro">코인을 발행하는 것만으로 끝나지 않음. 담보를 보관하고 운용하며, 가격 데이터를 받고, 체인에서 유통하고, 규제와 보안을 관리하는 전체 파이프라인이 필요함.</p>
+<div class="legend">
+<span><i style="background:var(--blue)"></i>만드는 기반</span>
+<span><i style="background:var(--purple)"></i>시장 활용</span>
+<span><i style="background:var(--navy)"></i>전 과정을 감싸는 관리</span>
+</div>
+<div class="table-wrap">
+<table class="flow-table">
+<tr><th>#</th><th>레이어</th><th>이 레이어가 답하는 질문</th><th>유형별 핵심</th></tr>
+<tr><td><span class="fno">1</span></td><td>발행</td><td>무엇을 받고 어떤 규칙으로 토큰을 만들까?</td><td><span class="co">준비금 · 초과담보 · 현물+숏</span></td></tr>
+<tr><td><span class="fno">2</span></td><td>수탁</td><td>준비금이나 담보는 실제로 어디에 있나?</td><td><span class="co">은행·수탁사 · 온체인 금고 · OES</span></td></tr>
+<tr><td><span class="fno">3</span></td><td>담보 운용</td><td>상환과 가격 충격에 버티도록 어떻게 관리하나?</td><td><span class="co">유동성 · 담보비율 · 헤지 포지션</span></td></tr>
+<tr><td><span class="fno">4</span></td><td>원장</td><td>발행·소각·이전·잔고는 어디에 기록되나?</td><td><span class="co">Ethereum · Solana · L2 등</span></td></tr>
+<tr><td><span class="fno run">5</span></td><td>데이터</td><td>담보 가격, 준비금, 페그 상태를 어떻게 아나?</td><td><span class="co">오라클 · 확인보고 · 파생시장 데이터</span></td></tr>
+<tr><td><span class="fno run">6</span></td><td>활용</td><td>이 토큰은 시장에서 어디에 쓰이나?</td><td><span class="co">거래 · 결제 · 담보 · LP · RWA 결제</span></td></tr>
+<tr class="wrap"><td><span class="fno wrap">7</span></td><td>규제·보안</td><td>누가 발행·상환할 수 있고 무엇을 검증해야 하나?</td><td><span class="co">라이선스 · KYC/AML · 감사 · 보안</span></td></tr>
+</table>
+</div>
+<p class="caption">7번은 마지막에 한 번 거치는 단계라기보다 발행·수탁·상환·유통 전 과정에 걸쳐 작동하는 층으로 보는 편이 정확함.</p>
+</section>
+<section id="fiat">
+<div class="group-head"><span class="ic">🏦</span><h2>2-2. 법정화폐 담보형</h2></div>
+<p class="group-sub">발행사에 달러를 맡기면 토큰이 생기고, 토큰을 돌려주면 달러를 받는 구조.</p>
+<div class="steps">
+<article class="step"><span class="n">1</span><b>달러 납입</b><p>적격 고객이 발행사에 법정화폐를 보냄.</p></article>
+<article class="step"><span class="n">2</span><b>토큰 발행</b><p>발행사는 대응하는 USDC·USDT 등을 발행함.</p></article>
+<article class="step"><span class="n">3</span><b>준비금 운용</b><p>현금·예금·단기 국채·RP·MMF 등으로 보관·운용함.</p></article>
+<article class="step"><span class="n">4</span><b>상환·소각</b><p>토큰을 반환하면 소각하고 법정화폐를 지급함.</p></article>
+</div>
+<div class="box">
+<b>페그가 복원되는 이유:</b> 시장가격이 1달러보다 싸면 적격 상환자가 할인된 토큰을 사서 1달러로 상환할 유인이 생김. 결국 핵심은 “정말 1달러로 상환할 수 있는가”임.
+  </div>
+<div class="case-grid">
+<article class="case">
+<h3>USDC · Circle</h3>
+<p>원문은 USDC를 현금성 준비금과 상환 가능성을 강조하는 규제 친화적 스테이블코인으로 설명함.</p>
+<span class="badge">준비금·상환·규제 친화성</span>
+</article>
+<article class="case">
+<h3>USDT · Tether</h3>
+<p>원문은 USDT를 가장 큰 규모의 스테이블코인으로 소개하며, 글로벌 거래소·OTC·신흥시장 결제에서의 높은 유동성을 강조함.</p>
+<span class="badge">글로벌 유동성·거래 인프라</span>
+</article>
+</div>
+<div class="risk-grid">
+<article class="risk-card"><b>준비금 리스크</b><span>보유 자산의 질과 만기가 상환 수요에 맞지 않을 수 있음.</span></article>
+<article class="risk-card"><b>수탁·은행 리스크</b><span>준비금이 온체인이 아니라 은행과 수탁기관에 놓여 있음.</span></article>
+<article class="risk-card"><b>상환·규제 리스크</b><span>상환 자격, 관할권, 계정 동결, 제재 주소 관리의 영향을 받음.</span></article>
+</div>
+<div class="script"><span class="time">핵심 멘트</span><b>“법정화폐 담보형은 블록체인 코인이지만, 신뢰의 중심은 오프체인 준비금과 발행사에 있다.”</b></div>
+</section>
+<section id="crypto">
+<div class="group-head"><span class="ic">⛓️</span><h2>2-3. 가상자산 담보형</h2></div>
+<p class="group-sub">변동성이 큰 담보를 더 많이 맡기고, 그보다 적은 달러 토큰을 빌리는 구조.</p>
+<div class="steps">
+<article class="step"><span class="n">1</span><b>담보 예치</b><p>승인된 가상자산을 스마트컨트랙트 금고에 맡김.</p></article>
+<article class="step"><span class="n">2</span><b>초과담보 발행</b><p>담보 가치보다 낮은 금액의 스테이블코인을 발행·차입함.</p></article>
+<article class="step"><span class="n">3</span><b>가격 감시</b><p>오라클 가격으로 담보비율과 청산 가능 여부를 계속 계산함.</p></article>
+<article class="step"><span class="n">4</span><b>청산</b><p>기준 아래로 내려가면 담보를 매각해 스테이블코인 부채를 갚음.</p></article>
+</div>
+<div class="box mint">
+<b>왜 100달러 담보로 100달러를 빌려주지 않나?</b> 담보 가격이 빠르게 떨어질 수 있기 때문임. 부채보다 더 많은 담보를 잡아두고, 위험 구간에 도달하기 전에 청산해 부족분이 생기는 것을 막음.
+  </div>
+<div class="case-grid">
+<article class="case">
+<h3>대표 사례</h3>
+<p>원문은 Sky USDS, Liquity LUSD/BOLD, Curve crvUSD, Aave GHO를 대표적인 온체인 담보형 스테이블코인으로 제시함.</p>
+<span class="badge">각 프로젝트마다 담보·청산·금리 구조가 다름</span>
+</article>
+<article class="case">
+<h3>신뢰의 중심</h3>
+<p>발행사의 직접 상환 의무보다는 스마트컨트랙트, 담보비율, 오라클, 청산 엔진과 거버넌스가 시스템의 신뢰 기반이 됨.</p>
+<span class="badge">온체인 규칙 기반</span>
+</article>
+</div>
+<div class="risk-grid">
+<article class="risk-card"><b>급락·청산 리스크</b><span>담보가 너무 빨리 하락하면 청산이 불리한 가격에 진행될 수 있음.</span></article>
+<article class="risk-card"><b>오라클 리스크</b><span>가격 데이터가 지연·왜곡되면 잘못된 청산이나 부실이 발생할 수 있음.</span></article>
+<article class="risk-card"><b>컨트랙트·거버넌스 리스크</b><span>코드 취약점이나 파라미터 변경 권한이 안정성에 영향을 줌.</span></article>
+</div>
+<div class="script"><span class="time">핵심 멘트</span><b>“가상자산 담보형은 발행사를 덜 믿는 대신, 담보가 충분하고 청산 시스템이 제대로 작동한다는 것을 믿는다.”</b></div>
+</section>
+<section id="synthetic">
+<div class="group-head"><span class="ic">⚖️</span><h2>2-4. 합성·델타중립형</h2></div>
+<p class="group-sub">현물 가격이 움직여도 반대 방향의 숏 손익으로 전체 달러 가치를 안정시키는 구조.</p>
+<div class="delta">
+<div class="asset"><b>현물 담보</b><span>BTC·ETH·SOL·LST 등<br/>가격 상승 시 이익 / 하락 시 손실</span></div>
+<div class="plus">+</div>
+<div class="asset"><b>선물·무기한선물 숏</b><span>가격 상승 시 손실 / 하락 시 이익</span></div>
+<div class="plus">=</div>
+<div class="asset"><b>델타중립 포트폴리오</b><span>두 손익을 상쇄해 USD 가치 변동 축소</span></div>
+</div>
+<div class="box">
+<b>간단한 예시:</b> 100달러어치 ETH 현물과 같은 명목 규모의 ETH 숏을 함께 보유한다고 가정함. ETH가 하락하면 현물에서 손실이 나지만 숏에서 이익이 발생하고, 상승하면 반대로 움직여 전체 가치 변동을 줄이는 방식임.
+  </div>
+<div class="case-grid">
+<article class="case">
+<h3>Ethena USDe</h3>
+<p>은행에 달러를 1:1로 보관하는 토큰이 아니라, 승인된 현물 자산과 이에 대응하는 파생상품 숏 포지션으로 뒷받침되는 합성 달러임.</p>
+<span class="badge">현물 담보 + 델타 헤지</span>
+</article>
+<article class="case">
+<h3>보관·운용 구조</h3>
+<p>원문은 Copper, Ceffu, Fireblocks 같은 거래소 외 정산·수탁 인프라를 제시함. Ethena는 거래소 가격, 오더북, 펀딩비와 포지션 데이터를 이용해 헤지를 관리함.</p>
+<span class="badge">OES·수탁·파생시장 데이터</span>
+</article>
+</div>
+<div class="risk-grid">
+<article class="risk-card"><b>펀딩비·베이시스 리스크</b><span>숏 포지션의 보유 비용이 장기간 불리하게 움직일 수 있음.</span></article>
+<article class="risk-card"><b>거래소·수탁 상대방 리스크</b><span>헤지 포지션과 담보가 외부 인프라의 정상 작동에 의존함.</span></article>
+<article class="risk-card"><b>헤지·상환 유동성 리스크</b><span>대규모 상환 시 포지션을 제때 줄이고 자산을 확보해야 함.</span></article>
+</div>
+<div class="script"><span class="time">핵심 멘트</span><b>“합성형은 담보가 없어서 위험한 것이 아니라, 담보의 달러 가치를 파생상품 운용으로 유지하기 때문에 위험의 위치가 펀딩·거래소·운영으로 이동한 구조다.”</b></div>
+</section>
+<section id="compare">
+<div class="label">07 · COMPARISON</div>
+<h2 class="title">담보형·합성형의 작동 방식과 리스크 차이</h2>
+<p class="intro">발표에서는 프로젝트 이름을 많이 나열하기보다, 각 유형이 위기 때 <b>어떤 행동으로 1달러를 복원하는지</b>를 비교하면 이해하기 쉬움.</p>
+<div class="table-wrap">
+<table class="compare-table">
+<tr>
+<th>구분</th><th>법정화폐 담보형</th><th>가상자산 담보형</th><th>합성·델타중립형</th>
+</tr>
+<tr>
+<td>기초 구조</td>
+<td>현금·예금·단기 국채 등 준비금</td>
+<td>온체인 가상자산 초과담보</td>
+<td>현물 담보 + 파생상품 숏</td>
+</tr>
+<tr>
+<td>1달러 유지 장치</td>
+<td class="good">발행·상환 차익거래</td>
+<td class="good">초과담보·청산·금리 조정</td>
+<td class="good">델타 헤지·민팅·상환</td>
+</tr>
+<tr>
+<td>수탁 위치</td>
+<td>은행·수탁기관·펀드 관리자</td>
+<td>스마트컨트랙트 금고</td>
+<td>수탁기관·MPC·거래소 외 정산 인프라</td>
+</tr>
+<tr>
+<td>필수 데이터</td>
+<td>준비금·발행량·확인보고</td>
+<td>담보 가격·담보비율·오라클</td>
+<td>현물·선물 가격·펀딩비·베이시스·유동성</td>
+</tr>
+<tr>
+<td>가장 큰 의존</td>
+<td>발행사와 준비금의 상환 능력</td>
+<td>청산 시스템과 스마트컨트랙트</td>
+<td>헤지 운용과 외부 거래 인프라</td>
+</tr>
+<tr>
+<td>대표 리스크</td>
+<td class="bad">준비금·은행·규제·동결</td>
+<td class="bad">급락·오라클·청산·코드</td>
+<td class="bad">펀딩·베이시스·상대방·유동성</td>
+</tr>
+</table>
+</div>
+<div class="box warn">
+<b>디페그가 발생했을 때 확인할 세 질문:</b><br/>
+    ① 누가 직접 상환할 수 있는가? ② 상환 시 무엇을 돌려받는가? ③ 대규모 상환이 몰리면 준비금 매각·담보 청산·헤지 축소 중 어떤 일이 일어나는가?
+  </div>
+</section>
+<section id="luna">
+<div class="label">08 · SUPPLEMENT</div>
+<h2 class="title">왜 LUNA–UST와 ENA–USDe가 비슷해 보이지만 같은 구조는 아닌가</h2>
+<p class="intro">이 부분은 쟁글 원문의 세 유형 설명을 바탕으로, 발표 중 나올 수 있는 질문에 대비해 공식 문서로 보충한 내용임.</p>
+<div class="vs">
+<article class="vs-card terra">
+<h3>Terra · UST/LUNA</h3>
+<p>Terra Classic의 시장 모듈은 UST를 태우면 1달러어치 LUNA를 새로 발행하고, LUNA를 태우면 UST를 발행하는 알고리즘을 사용했음. 따라서 UST 환매 압력이 LUNA 공급 증가와 직접 연결될 수 있었음.</p>
+</article>
+<div class="vs-mid">구조 비교</div>
+<article class="vs-card ethena">
+<h3>Ethena · USDe/ENA</h3>
+<p>USDe는 지원되는 담보자산과 헤지 포지션을 기반으로 발행되며, 상환 때 USDe를 소각하고 기초 담보자산을 돌려주는 구조임. ENA는 공식 문서상 우선적으로 거버넌스 토큰이며 USDe를 상환하기 위해 새로 발행되는 자산이 아님.</p>
+</article>
+</div>
+<div class="box">
+<b>비슷하게 보이는 이유:</b> 높은 수익·보상 → 스테이블 자산 수요 확대 → 생태계 성장 → 거버넌스 토큰 가치 상승 기대라는 <b>성장 플라이휠</b>은 닮아 보일 수 있음.
+  </div>
+<div class="box risk">
+<b>결정적 차이:</b> UST는 수축 과정에서 LUNA 발행과 기계적으로 연결됐지만, USDe의 상환은 ENA 발행으로 처리되지 않음. 다만 USDe도 펀딩비, 베이시스, 거래소·수탁기관, 헤지 및 상환 유동성 위험에서는 자유롭지 않음.
+  </div>
+</section>
+
+<section class="end">
+<div class="label">KEY TAKEAWAY</div>
+<h2 class="title">스테이블코인의 안정성은 ‘이름’이 아니라 ‘대차대조표와 위기 대응 방식’에서 나옴</h2>
+<p>같은 1달러 토큰이라도 준비금에 대한 상환청구권인지, 초과담보 대출인지, 헤지된 합성 포지션인지에 따라 투자자가 부담하는 위험은 완전히 달라짐.</p>
+<div class="take-grid">
+<div class="take"><b>법정화폐 담보형</b><span>준비금과 상환 능력을 확인</span></div>
+<div class="take"><b>가상자산 담보형</b><span>담보비율과 청산 구조를 확인</span></div>
+<div class="take"><b>합성·델타중립형</b><span>헤지·펀딩·상대방·유동성을 확인</span></div>
+</div>
+</section>
+<section>
+<div class="label">SOURCES</div>
+<h2 class="title">주요 출처</h2>
+<div class="sources">
+<a href="https://xangle.io/research/detail/2479">쟁글, 「RWA 토큰화 생태계 분류와 주요 사례」, 2026.06.04</a><br/>
+<a href="https://classic-docs.terra.money/docs/learn/protocol.html">Terra Classic Docs, About the Terra Protocol</a><br/>
+<a href="https://docs.ethena.fi/solution-design/minting-usde/mint-and-redeem-key-functions">Ethena Docs, Mint &amp; Redeem Key Functions</a><br/>
+<a href="https://docs.ethena.fi/resources/faq">Ethena Docs, FAQ — Peg Stability</a><br/>
+<a href="https://docs.ethena.fi/ena">Ethena Docs, ENA</a>
+</div>
+</section>
+<p class="foot">발표 범위: 쟁글 원문 2-1~2-4. 원문의 분류와 7개 레이어를 중심으로 재구성했으며, UST–USDe 비교만 공식 프로젝트 문서를 활용한 보충 설명임. 개별 토큰의 투자 매력도를 평가하는 자료가 아니라 구조 이해를 위한 학습 자료임.</p>
+</main></body>
+</html>

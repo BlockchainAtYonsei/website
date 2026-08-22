@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RWA 스터디 · Morpho — 격리 시장 렌딩 프로토콜</title>
+<!--
+  ============================================================
+  RAWBLOCK · HI LAB 공유 장표 템플릿 v3 — OFFLINE SAFE
+  - 모든 폰트(Archivo Black · Work Sans · Space Mono · Pretendard)를 base64로 내장함
+  - 외부 네트워크 요청 0회: 인터넷이 없는 환경에서도 동일하게 렌더링됨
+  - HI LAB 내부 공유·발표용(교수님/선생님 열람 가정) 슬라이드 템플릿임
+    (1920×1080 스테이지 + 클릭/키보드 내비, RawBlock Design System)
+  - 사용법: 각 <section class="slide">의 플레이스홀더 문구를 실제 내용으로 교체
+  - 이미지: 오프라인에서도 깨지지 않게 base64 data URI로 넣거나, 같은 폴더의
+    파일명(상대경로)으로 넣고 HTML과 이미지를 함께 이동함
+  - 섹션 추가: data-sec 번호를 늘리고, 스크립트 하단 NAMES 배열에 이름 추가
+  ============================================================
+-->
+<style>
+/* ===== 내장 폰트 (오프라인용, 외부 요청 없음) ===== */
+@font-face{font-family:"Archivo Black";font-style:normal;font-weight:400;font-display:block;src:url(fonts/pretendard-01.woff2) format("woff2")}
+@font-face{font-family:"Work Sans";font-style:normal;font-weight:400;font-display:block;src:url(fonts/pretendard-02.woff2) format("woff2")}
+@font-face{font-family:"Work Sans";font-style:normal;font-weight:600;font-display:block;src:url(fonts/pretendard-03.woff2) format("woff2")}
+@font-face{font-family:"Work Sans";font-style:normal;font-weight:700;font-display:block;src:url(fonts/pretendard-04.woff2) format("woff2")}
+@font-face{font-family:"Space Mono";font-style:normal;font-weight:400;font-display:block;src:url(fonts/pretendard-05.woff2) format("woff2")}
+@font-face{font-family:"Space Mono";font-style:normal;font-weight:700;font-display:block;src:url(fonts/pretendard-06.woff2) format("woff2")}
+@font-face{font-family:"Pretendard";font-style:normal;font-weight:45 920;font-display:block;font-stretch:normal;src:url(fonts/pretendard-07.woff2) format("woff2")}
+/* ===== /내장 폰트 ===== */
+:root{
+  --bg:#FFFFFF; --ink:#000000;
+  --link:#0000FF;            /* 하이퍼링크 전용. 다른 용도 사용 금지 */
+  --ok:#008000; --warn:#FFA500; --err:#FF0000;
+  --sunken:#F0F0F0; --dis:#CCCCCC;
+}
+*{box-sizing:border-box;border-radius:0 !important;box-shadow:none !important}
+html,body{margin:0;padding:0;height:100%;background:var(--sunken);overflow:hidden}
+body{font-family:"Work Sans","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased}
+.hd,h1,h2,h3{font-family:"Archivo Black","Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-weight:900}
+.mono{font-family:"Space Mono","Pretendard","Apple SD Gothic Neo","Malgun Gothic",monospace}
+a{color:var(--link)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:50% 50%}
+
+/* ---------- slide frame ---------- */
+.slide{position:absolute;inset:0;background:var(--bg);padding:56px 92px 108px;
+  opacity:0;visibility:hidden;overflow:hidden;display:flex;flex-direction:column;
+  border-top:10px solid var(--ink)}
+.slide.on{opacity:1;visibility:visible;z-index:2}
+.slide.inv{background:var(--ink);color:var(--bg)}
+
+.s-kicker{display:flex;align-items:center;gap:16px;font-size:20px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase}
+.s-kicker b{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:38px;
+  padding:0 12px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono","Pretendard","Apple SD Gothic Neo","Malgun Gothic",monospace;font-size:20px;font-weight:700;letter-spacing:1px}
+h2.s-title{margin:18px 0 0;font-size:62px;line-height:1.05;letter-spacing:-1px}
+p.s-lead{margin:20px 0 0;padding-left:20px;border-left:8px solid var(--ink);
+  font-size:29px;line-height:1.35;font-weight:600}
+.s-body{flex:1;margin-top:30px;min-height:0}
+.s-basis{margin-top:auto;padding-top:12px;font-family:"Space Mono","Pretendard","Apple SD Gothic Neo","Malgun Gothic",monospace;
+  font-size:17px;line-height:1.4}
+.s-next{margin-top:18px;padding:16px 24px;background:var(--ink);color:var(--bg);
+  display:flex;align-items:center;gap:20px;font-size:23px;line-height:1.35}
+.s-next::before{content:"NEXT →";flex:0 0 auto;font-family:"Space Mono",monospace;
+  font-size:17px;font-weight:700;letter-spacing:2px;border:2px solid var(--bg);padding:4px 10px}
+.s-next b{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- generic blocks ---------- */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.g23{display:grid;grid-template-columns:1.15fr .85fr;gap:32px}
+.g32{display:grid;grid-template-columns:.85fr 1.15fr;gap:32px}
+.card{background:var(--bg);border:3px solid var(--ink);padding:24px 26px}
+.card.hv{border-width:5px}                     /* elevated: 두꺼운 보더 = 더 중요 */
+.card h4{margin:0 0 14px;font-size:28px;line-height:1.2;font-weight:700}
+.card h4 .n{display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;margin-right:12px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:20px;font-weight:700}
+.card p{margin:0 0 10px;font-size:24px;line-height:1.5}
+.card p:last-child{margin-bottom:0}
+ul.bl{list-style:none;margin:0;padding:0}
+ul.bl>li{position:relative;padding-left:30px;margin-bottom:16px;font-size:25px;line-height:1.5}
+ul.bl>li:last-child{margin-bottom:0}
+ul.bl>li::before{content:"";position:absolute;left:2px;top:13px;width:12px;height:12px;background:var(--ink)}
+ul.bl>li b{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+ul.bl.sm>li{font-size:23px;margin-bottom:12px}
+.hl{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.callout{position:relative;border:3px solid var(--ink);padding:28px 26px 20px;font-size:24px;line-height:1.5}
+.callout::before{content:"NOTE";position:absolute;left:-3px;top:-18px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:15px;font-weight:700;letter-spacing:2px;padding:4px 12px}
+.callout b{font-weight:700}
+.tag{display:inline-block;padding:4px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);
+  font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.tag.fill{background:var(--ink);color:var(--bg)}
+.tag.ok{border-color:var(--ok);color:var(--ok)}
+.tag.warn{border-color:var(--warn);color:var(--warn)}
+.tag.err{border-color:var(--err);color:var(--err)}
+table.tbl{width:100%;border-collapse:collapse}
+table.tbl th,table.tbl td{border:3px solid var(--ink);padding:16px 20px;font-size:24px;line-height:1.4;
+  text-align:left;vertical-align:top}
+table.tbl thead th{background:var(--ink);color:var(--bg);font-family:"Archivo Black","Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-weight:900;font-size:21px;text-transform:uppercase;letter-spacing:1px}
+table.tbl tbody th{background:var(--sunken);font-weight:700;width:230px}
+
+/* ---------- flow ---------- */
+.flow{display:flex;align-items:stretch;gap:0}
+.flow .st{flex:1;border:3px solid var(--ink);padding:16px 14px;text-align:center;
+  font-size:23px;line-height:1.35;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.flow .st i{display:block;font-style:normal;font-family:"Space Mono",monospace;
+  font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.flow .st b{font-weight:700}
+.flow .st.fin{background:var(--ink);color:var(--bg)}
+.flow .ar{flex:0 0 44px;display:flex;align-items:center;justify-content:center;
+  font-family:"Space Mono",monospace;font-size:30px;font-weight:700}
+
+/* ---------- chain diagram ---------- */
+.chain{display:flex;align-items:center;gap:0}
+.blk{flex:1;border:3px solid var(--ink);background:var(--bg);color:var(--ink);overflow:hidden}
+.blk .bh{background:var(--ink);color:var(--bg);padding:10px 14px;font-size:20px;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.blk .bb{padding:14px}
+.blk .row{font-size:19px;margin-bottom:8px;line-height:1.3}
+.blk .row:last-child{margin-bottom:0}
+.blk .row s{display:block;font-size:15px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;
+  font-family:"Space Mono",monospace}
+.blk .row .v{font-family:"Space Mono",monospace;font-size:19px;font-weight:700}
+.blk.bad{border-color:var(--err)}
+.blk.bad .bh{background:var(--err);color:var(--bg)}
+.blk.warn{border-color:var(--warn)}
+.blk.warn .bh{background:var(--warn);color:var(--ink)}
+.link{flex:0 0 52px;text-align:center;font-family:"Space Mono",monospace;font-size:24px;font-weight:700}
+.link.bad{color:var(--err)}
+
+/* ---------- bars ---------- */
+.bars{display:flex;flex-direction:column;gap:24px}
+.bar{display:grid;grid-template-columns:260px 1fr;align-items:center;gap:22px}
+.bar .nm{font-size:26px;font-weight:700}
+.bar .nm s{display:block;text-decoration:none;font-size:18px;font-weight:400;margin-top:4px;
+  font-family:"Space Mono",monospace}
+.bar .tr{height:54px;background:var(--bg);border:3px solid var(--ink);position:relative}
+.bar .fl{position:absolute;left:0;top:0;bottom:0;background:var(--ink);
+  display:flex;align-items:center;justify-content:flex-end;padding-right:14px}
+.bar .fl span{font-family:"Space Mono",monospace;font-size:21px;font-weight:700;color:var(--bg);white-space:nowrap}
+.bar .fl.min span{position:absolute;left:calc(100% + 14px);color:var(--ink)}
+
+/* ---------- figure (image) ---------- */
+.fig{border:3px solid var(--ink);background:var(--bg);display:flex;flex-direction:column;min-height:0}
+.fig .im{flex:1;min-height:0;position:relative;background:var(--sunken);overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.fig .im img{width:100%;height:100%;object-fit:contain;display:block}
+.fig .im.crop img{object-fit:cover}
+.fig .im .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  text-align:center;background:repeating-linear-gradient(45deg,var(--sunken) 0 26px,#E2E2E2 26px 52px)}
+.fig .im .ph b{font-family:"Space Mono","Pretendard","Apple SD Gothic Neo","Malgun Gothic",monospace;
+  font-size:22px;font-weight:700;letter-spacing:3px;background:var(--ink);color:var(--bg);padding:6px 16px}
+.fig .im .ph span{font-size:18px;line-height:1.4;max-width:80%}
+.fig .cap{border-top:3px solid var(--ink);padding:12px 16px;display:flex;gap:14px;align-items:baseline;
+  font-size:20px;line-height:1.35;background:var(--bg)}
+.fig .cap b{flex:0 0 auto;font-family:"Space Mono","Pretendard","Apple SD Gothic Neo","Malgun Gothic",monospace;
+  font-size:15px;font-weight:700;letter-spacing:2px;background:var(--ink);color:var(--bg);padding:3px 10px}
+
+/* ---------- section cover ---------- */
+.cover{justify-content:center;padding:70px 110px 120px}
+.cover-wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:70px;align-items:center}
+.cover .cn{font-size:230px;line-height:.85;letter-spacing:-6px;
+  color:var(--bg);-webkit-text-stroke:6px var(--ink);text-stroke:6px var(--ink)}
+.slide.inv .cn{color:var(--ink);-webkit-text-stroke:6px var(--bg)}
+.cover .cl{display:inline-block;margin-top:20px;padding:6px 16px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.slide.inv .cl{background:var(--bg);color:var(--ink)}
+.cover h2{margin:22px 0 0;font-size:74px;line-height:1.1;letter-spacing:-1px;max-width:1000px}
+.cover .cq{margin:26px 0 0;padding-top:20px;border-top:3px solid var(--ink);
+  font-size:30px;line-height:1.4;font-weight:600;max-width:960px}
+.slide.inv .cq{border-top-color:var(--bg)}
+.cover .toc{border:5px solid var(--ink);padding:28px 30px}
+.slide.inv .toc{border-color:var(--bg)}
+.cover .toc .th{font-family:"Space Mono",monospace;font-size:17px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.cover .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+.cover .toc li{counter-increment:t;display:flex;gap:16px;align-items:baseline;
+  padding:12px 0;border-top:3px solid var(--ink);font-size:24px;line-height:1.35}
+.slide.inv .toc li{border-top-color:var(--bg)}
+.cover .toc li::before{content:counter(t,decimal-leading-zero);
+  font-family:"Space Mono",monospace;font-size:19px;font-weight:700;flex:0 0 44px}
+
+/* ---------- title slide ---------- */
+.title{justify-content:center;padding:90px 110px}
+.title .tk{display:inline-block;align-self:flex-start;padding:6px 16px;border:3px solid var(--ink);
+  font-family:"Space Mono",monospace;font-size:21px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.slide.inv .title-border{border-color:var(--bg)}
+.title h1{margin:34px 0 0;font-size:104px;line-height:1.0;letter-spacing:-3px}
+.title .ts{margin:28px 0 0;font-size:31px;line-height:1.45;max-width:1500px}
+.title .tq{margin:44px 0 0;max-width:1400px;border:5px solid var(--ink)}
+.title .tq span{display:block;background:var(--ink);color:var(--bg);padding:8px 22px;
+  font-family:"Space Mono",monospace;font-size:17px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.title .tq p{margin:0;padding:20px 24px;font-size:33px;line-height:1.35;font-weight:700}
+.title .tf{margin-top:52px;font-family:"Space Mono",monospace;font-size:21px;line-height:1.5}
+
+/* ---------- bottom chrome ---------- */
+#bar{position:absolute;left:0;right:0;bottom:0;height:68px;padding:0 92px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-top:3px solid var(--ink);z-index:5}
+#secs{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;overflow:hidden}
+#secs .sc{font-size:16px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  padding:5px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);
+  white-space:nowrap;cursor:pointer}
+#secs .sc:hover{background:var(--ink);color:var(--bg)}
+#secs .sc.on{background:var(--ink);color:var(--bg)}
+#pg{font-family:"Space Mono",monospace;font-size:19px;white-space:nowrap;flex:0 0 auto;margin-left:20px}
+#pg b{font-size:23px}
+#prog{position:absolute;left:0;bottom:0;height:6px;background:var(--ink);width:0;z-index:6}
+</style>
+</head>
+<body>
+<a href="/research/study/2" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 2회차 진행안으로</a>
+<div id="stage">
+
+<!-- 1 · 타이틀 ================================================== -->
+<section class="slide title" data-sec="0">
+  <div class="tk">HI LAB · RWA 스터디</div>
+  <h1>Morpho<br>격리 시장 렌딩 프로토콜</h1>
+  <p class="ts">거버넌스의 심의를 기다리는 대신, 누구든 다섯 개 부품만 끼우면 대출 시장 하나를 열 수 있게 한 프로토콜임. 온체인 렌딩의 기본 원리(2장)를 먼저 압축하고, Morpho의 구조를 부품 단위로 해부한 뒤, 반대 접근을 택한 사례들과 비교함.</p>
+  <div class="tq">
+    <span>이 자료의 핵심 질문</span>
+    <p>승인 절차 없이 아무나 시장을 여는 렌딩이, 어떻게 토큰화 자산 12억 달러를 굴리는 최대 시장이 됐는가?</p>
+  </div>
+  <div class="tf">HI LAB 스터디 자료 · 2026. 08. 10. · 원문: Xangle 리서치 「토큰화 자산을 담보로 활용하는 프로토콜」</div>
+</section>
+
+<!-- 2 · OPEN ================================================== -->
+<section class="slide" data-sec="0">
+  <div class="s-kicker"><b>OPEN</b> 이 자료가 답하는 질문</div>
+  <h2 class="s-title">이 6가지 질문에 답할 수 있게 됨</h2>
+  <p class="s-lead">아래 순서 그대로 진행함 — 원리 → 해부 → 비교</p>
+  <div class="s-body">
+    <div class="g3">
+      <div class="card"><h4><span class="n">1</span>담보 렌딩</h4><p>은행도 신용점수도 없이, 담보만 보고 돈을 빌려주는 일이 어떻게 성립하는지 설명할 수 있음.</p></div>
+      <div class="card"><h4><span class="n">2</span>세 갈림길</h4><p>렌딩 vs CDP, 통합 vs 격리, 비허가 vs 허가 — 온체인 대출 시장을 나누는 세 가지 기준을 구분할 수 있음.</p></div>
+      <div class="card"><h4><span class="n">3</span>왜 격리인가</h4><p>시장을 방 단위로 쪼개면 무엇이 좋아지고(속도·위험 차단) 무엇이 어려워지는지(유동성 분산) 말할 수 있음.</p></div>
+    </div>
+    <div class="g3" style="margin-top:24px">
+      <div class="card"><h4><span class="n">4</span>Morpho 구조</h4><p>다섯 부품으로 여는 시장, 큐레이터가 굴리는 볼트, 고정만기 Midnight까지 세 층을 그림으로 그릴 수 있음.</p></div>
+      <div class="card"><h4><span class="n">5</span>담보의 정체</h4><p>mF-ONE · PRIME · wJAAA · sACRED 같은 낯선 티커가 실제로 무엇을 담은 토큰인지 풀어 말할 수 있음.</p></div>
+      <div class="card"><h4><span class="n">6</span>유사 사례</h4><p>같은 문제를 반대로 푼 Aave Horizon, 앞서 실험한 Arc · Flux와 비교해 Morpho의 좌표를 평가할 수 있음.</p></div>
+    </div>
+  </div>
+  <div class="s-next"><span>먼저 원문 2장을 압축함. <b>온체인 렌딩은 어떻게 작동하는가</b>부터 시작함</span></div>
+</section>
+
+<!-- 3 · 섹션 01 표지 ================================================== -->
+<section class="slide cover" data-sec="1">
+  <div class="cover-wrap">
+    <div>
+      <div class="cn">01</div>
+      <div class="cl">2장 요약</div>
+      <h2>온체인 렌딩의 작동 원리</h2>
+      <p class="cq">은행 없이, 신원도 묻지 않고 어떻게 대출이 성립하는가 — 원문 2장을 두 장으로 압축함</p>
+    </div>
+    <div class="toc">
+      <div class="th">In This Section</div>
+      <ol>
+        <li>비유 하나 — 24시간 무인 전당포</li>
+        <li>다섯 개의 부품 — 과담보 · LTV · 청산 · 오라클 · 금리</li>
+        <li>세 가지 갈림길 — 렌딩/CDP · 통합/격리 · 비허가/허가</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · 2장 요약 ① 무인 전당포 ================================================== -->
+<section class="slide" data-sec="1">
+  <div class="s-kicker"><b>01</b> 2장 요약 · 1/2</div>
+  <h2 class="s-title">온체인 렌딩 = 24시간 무인 전당포</h2>
+  <p class="s-lead">사람 심사가 없으므로 <b>담보와 규칙</b>이 심사를 대신함 — 개념어 다섯 개가 곧 부품임</p>
+  <div class="s-body">
+    <table class="tbl">
+      <thead><tr><th style="width:400px">무인 전당포에서는</th><th style="width:270px">개념어</th><th>실제 뜻</th></tr></thead>
+      <tbody>
+        <tr><th>맡긴 물건값보다 항상 적게 빌려줌</th><td><span class="hl">과담보</span></td><td>빌리는 돈보다 담보 가치가 크도록 강제함. 갚을 사람이 누군지 모르니 담보가 유일한 안전판임</td></tr>
+        <tr><th>"이 물건이면 60%까지"라는 비율표</th><td><span class="hl">LTV</span> (담보인정비율)</td><td>담보 가치 대비 빌릴 수 있는 최대 비율. 자산이 위험할수록 낮게 잡음</td></tr>
+        <tr><th>물건값이 떨어지면 자동으로 처분</th><td><span class="hl">청산</span></td><td>담보 가치가 기준 아래로 내려가면 시스템이 담보를 팔아 대출을 회수함</td></tr>
+        <tr><th>물건 시세를 알려 주는 감정사</th><td><span class="hl">오라클</span></td><td>여러 시장의 가격을 블록체인 안으로 전달하는 장치. 청산 판단의 근거가 됨</td></tr>
+        <tr><th>금고에 현금이 마르면 이자가 오름</th><td><span class="hl">이용률 금리</span></td><td>예치금 중 얼마나 차입됐는지에 따라 금리가 실시간 변동함. 고정 만기도 없음</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:26px">전당포 비유는 이해를 돕기 위해 이 자료에서 새로 만든 것임. <b>"신용을 심사할 대상이 없으므로 과담보 방식"</b>이라는 원문 2장의 한 문장이 다섯 부품 전체를 관통함.</div>
+  </div>
+  <div class="s-next"><span>부품은 같아도 시장을 짓는 방식은 다름. <b>세 가지 갈림길</b>로 이어짐</span></div>
+</section>
+
+<!-- 5 · 2장 요약 ② 세 갈림길 ================================================== -->
+<section class="slide" data-sec="1">
+  <div class="s-kicker"><b>01</b> 2장 요약 · 2/2</div>
+  <h2 class="s-title">시장을 나누는 세 가지 갈림길</h2>
+  <p class="s-lead">어떤 조합을 고르느냐가 곧 프로토콜의 정체성임 — Morpho의 좌표를 미리 찍어 둠</p>
+  <div class="s-body">
+    <div class="g3">
+      <div class="card">
+        <h4>돈이 어디서 오나 — 렌딩 vs CDP</h4>
+        <p><b>렌딩</b>: 예치자들이 넣어 둔 돈을 빌려줌. 빌려줄 상대(공급자)가 반드시 필요함.</p>
+        <p><b>CDP</b>: 담보를 맡기면 프로토콜이 스테이블코인을 새로 찍어 줌. 상대가 필요 없고 담보 가치만으로 한도가 정해짐.</p>
+      </div>
+      <div class="card hv">
+        <h4>풀을 어떻게 짓나 — 통합 vs 격리</h4>
+        <p><b>통합 시장</b>: 여러 담보가 하나의 유동성을 공유함. 위험 관리 기관이 조건을 제안하고 거버넌스가 승인함.</p>
+        <p><b>격리 시장</b>: <span class="hl">담보–차입 조합마다 방을 따로 둠</span>. 큐레이터가 관리하고 위험이 방 안에 갇힘. 이 갈림길이 이 자료의 주인공임.</p>
+      </div>
+      <div class="card">
+        <h4>누가 들어오나 — 비허가 vs 허가</h4>
+        <p><b>비허가형</b>: 누구나 보유·전송 가능함 (토큰화 주식, 금 토큰 등).</p>
+        <p><b>허가형</b>: 검증된 적격 투자자만 보유 가능함 (일부 펀드·사모신용). 담보를 맡길 때도, 청산으로 받아갈 때도 자격 확인이 필요함.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:30px">Morpho의 좌표: <b>렌딩형 · 격리 시장 · 허가는 시장이 아니라 자산 단위</b>. 통합 시장이 '운영위원회가 심의하는 하나의 큰 금고'라면, Morpho는 <b>방을 무한히 늘릴 수 있는 건물</b>을 지었음 — 두 번째 갈림길(격리)이 나머지 모든 설계를 결정함.</div>
+  </div>
+  <div class="s-basis">기준: Xangle 원문 2장 (2-1 담보 렌딩의 구성, 2-2 실물자산 담보 시 차이) 재구성</div>
+  <div class="s-next"><span>이제 주인공을 해부함. <b>Morpho는 그 건물을 어떻게 지었는가</b></span></div>
+</section>
+
+<!-- 6 · 섹션 02 표지 ================================================== -->
+<section class="slide cover inv" data-sec="2">
+  <div class="cover-wrap">
+    <div>
+      <div class="cn">02</div>
+      <div class="cl">Deep Dive</div>
+      <h2>Morpho 해부</h2>
+      <p class="cq">방을 여는 자유, 방을 골라 주는 큐레이터, 만기를 파는 Midnight — 세 층을 차례로 뜯음</p>
+    </div>
+    <div class="toc">
+      <div class="th">In This Section</div>
+      <ol>
+        <li>개요 — 무엇을, 어디서, 얼마나</li>
+        <li>1층 · 시장 — 다섯 부품으로 여는 방</li>
+        <li>2층 · 볼트 — 큐레이터가 굴리는 돈</li>
+        <li>담보 자산 — 낯선 티커 전부 풀기</li>
+        <li>3층 · Midnight — 만기를 사고파는 시장</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · Morpho 개요 ================================================== -->
+<section class="slide" data-sec="2">
+  <div class="s-kicker"><b>02</b> Morpho · 개요</div>
+  <h2 class="s-title">무엇을, 어디서, 얼마나</h2>
+  <p class="s-lead">스스로는 시장을 열지 않는 <b>'대출 시장의 건물주'</b>임 — 방은 남들이 열게 함</p>
+  <div class="s-body">
+    <div class="g4">
+      <div class="card"><h4>누가 · 어디서</h4><p>Morpho Labs가 만들어 이더리움과 Base 등에서 운영함.</p><p>고정 상품이 아니라 <span class="hl">누구나 가져다 쓰는 렌딩 인프라</span>를 표방함.</p></div>
+      <div class="card"><h4>무엇이 다른가</h4><p>새 시장을 여는 데 <span class="hl">거버넌스 투표가 필요 없음</span>.</p><p>담보–차입 조합마다 방을 따로 두는 격리 시장형임 — 편입 심의가 없으니 새 자산이 가장 빨리 올라옴.</p></div>
+      <div class="card hv"><h4>규모</h4><p>예치 약 <span class="mono">75억 달러</span>.</p><p>그중 토큰화 실물자산 약 <span class="mono">12억 5천만 달러</span> — <b>이 분야 최대</b>임 (원문 집계).</p></div>
+      <div class="card"><h4>세 개의 층</h4><p>1층 <b>시장</b>(방) · 2층 <b>볼트</b>(큐레이터) · 3층 <b>Midnight</b>(고정만기).</p><p>이 순서대로 해부함.</p></div>
+    </div>
+    <div class="callout" style="margin-top:32px">한 줄 정의: <b>"거버넌스 승인 없이 시장을 만들고, 위험 관리는 큐레이터에게 맡기는 격리 시장 렌딩"</b> (원문 3장 재구성). 승인이 없는데 어떻게 안전한가 — 가 다음 두 장의 질문임.</div>
+  </div>
+  <div class="s-basis">기준: 규모 = Xangle 원문 집계 / 구조 = Morpho 공식 문서 · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>1층부터 봄. <b>방 하나는 부품 다섯 개</b>로 정의됨</span></div>
+</section>
+
+<!-- 8 · 1층 시장 ================================================== -->
+<section class="slide" data-sec="2">
+  <div class="s-kicker"><b>02</b> Morpho · 1층 시장</div>
+  <h2 class="s-title">다섯 부품으로 여는 방</h2>
+  <p class="s-lead">2장에서 본 부품이 그대로 옴 — 다만 <b>방마다 따로</b> 끼우고, 한 번 끼우면 못 바꿈</p>
+  <div class="s-body">
+    <div class="flow">
+      <div class="st"><i>부품 1</i><b>담보 자산</b>이 방에서 맡길 수<br>있는 물건</div>
+      <div class="ar">+</div>
+      <div class="st"><i>부품 2</i><b>대출 자산</b>이 방에서 빌려 가는<br>돈 (보통 스테이블코인)</div>
+      <div class="ar">+</div>
+      <div class="st"><i>부품 3</i><b>LLTV</b>청산이 시작되는<br>담보 비율 (예: 80%)</div>
+      <div class="ar">+</div>
+      <div class="st"><i>부품 4</i><b>오라클</b>이 방이 신뢰할<br>가격 출처</div>
+      <div class="ar">+</div>
+      <div class="st fin"><i>부품 5</i><b>금리 모델</b>이용률에 따라 금리를<br>정하는 공식 (IRM)</div>
+    </div>
+    <div class="g3" style="margin-top:30px">
+      <div class="card"><h4>누구나 연다</h4><p>다섯 부품을 골라 넣으면 <span class="hl">투표 없이</span> 새 시장이 생김. 거버넌스는 LLTV 선택지와 금리 모델 목록만 미리 승인해 둠.</p></div>
+      <div class="card"><h4>한 번 열면 영원하다</h4><p>배포된 방은 <span class="hl">변경 불가(불변)</span>이고 체인이 존재하는 한 지속됨. 규칙이 바뀔 위험이 없어 기관이 조건을 신뢰할 수 있음.</p></div>
+      <div class="card"><h4>불이 나도 그 방만 탄다</h4><p>부실이 나도 손실은 <span class="hl">그 방의 예치자</span>에게만 감. 통합 시장처럼 담보 하나의 사고가 풀 전체로 번지지 않음.</p></div>
+    </div>
+    <div class="callout" style="margin-top:28px">대가도 명확함: 방이 많아질수록 <b>유동성이 조각남</b>. 이 문제를 푸는 것이 2층의 볼트임.</div>
+  </div>
+  <div class="s-basis">기준: Morpho 공식 문서 (시장 5요소 · permissionless 생성 · 불변성 · 거버넌스 범위) · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>2층으로 올라감. <b>예치자는 방을 직접 고르지 않음</b></span></div>
+</section>
+
+<!-- 9 · 2층 볼트 ================================================== -->
+<section class="slide" data-sec="2">
+  <div class="s-kicker"><b>02</b> Morpho · 2층 볼트</div>
+  <h2 class="s-title">큐레이터 — 방을 골라 주는 관리인</h2>
+  <p class="s-lead">수백 개의 방 중 어디에 돈을 둘지는 <b>사람(큐레이터)의 일</b>로 남겨 둠</p>
+  <div class="s-body">
+    <div class="flow">
+      <div class="st"><i>Step 1</i><b>예치</b>이용자는 방이 아니라<br>볼트(금고)에 돈을 넣음</div>
+      <div class="ar">→</div>
+      <div class="st"><i>Step 2</i><b>위험 설계</b>큐레이터가 담보별 한도 등<br>배분 규칙을 정함</div>
+      <div class="ar">→</div>
+      <div class="st"><i>Step 3</i><b>배분</b>규칙 안에서 여러 방에<br>자금을 나눠 공급함</div>
+      <div class="ar">→</div>
+      <div class="st fin"><i>Step 4</i><b>수익 · 수수료</b>이자를 모아 돌려주고<br>큐레이터가 보수를 가져감</div>
+    </div>
+    <div class="g3" style="margin-top:30px">
+      <div class="card"><h4>큐레이터는 누구인가</h4><p>Steakhouse Financial · Gauntlet 같은 <span class="hl">전문 위험 관리사</span>임. 통합 시장에서 거버넌스가 하던 일이 여기서는 경쟁하는 민간 서비스가 됨.</p></div>
+      <div class="card"><h4>보수 구조</h4><p>성과 수수료 최대 <span class="mono">50%</span>, 관리 수수료 최대 <span class="mono">5%</span> 한도 안에서 볼트마다 설정함. 잘 굴리는 큐레이터에게 돈이 몰리는 시장 원리로 작동함.</p></div>
+      <div class="card"><h4>안전장치</h4><p>주요 변경에는 <span class="hl">타임록</span>(예고 기간)이 걸리고, Sentinel이라는 비상 역할이 위험 자산 회수·한도 축소를 즉시 실행할 수 있음.</p></div>
+    </div>
+  </div>
+  <div class="s-basis">기준: Morpho 공식 문서 Vault 항목 (큐레이터 · 한도 · 수수료 · Sentinel) · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>그 방들에 실제로 들어와 있는 <b>낯선 티커들의 정체</b>를 풀어 봄</span></div>
+</section>
+
+<!-- 10 · 담보 자산 ================================================== -->
+<section class="slide" data-sec="2">
+  <div class="s-kicker"><b>02</b> Morpho · 담보 자산</div>
+  <h2 class="s-title">방마다 들어 있는 것들 — 티커 전부 풀기</h2>
+  <p class="s-lead">전부 <b>'무언가에 빌려준 돈의 묶음'을 토큰으로 만든 것</b>임 — 허가(KYC)는 자산이 스스로 들고 다님</p>
+  <div class="s-body">
+    <div class="g3">
+      <div class="card hv">
+        <h4><span class="tag fill">사모신용</span> &nbsp;mF-ONE</h4>
+        <p>토큰화 업체 Midas가 운용사 Fasanara의 <span class="hl">사모신용 포트폴리오</span>(핀테크 매출채권 · 중소기업 대출)를 증서로 만든 것임.</p>
+        <p>출시 3개월 만에 약 <span class="mono">1.9억 달러</span>가 Morpho에 담보로 예치됨 (Morpho 공식 블로그).</p>
+      </div>
+      <div class="card">
+        <h4><span class="tag">구조화 신용</span> &nbsp;wJAAA</h4>
+        <p>Janus Henderson의 <span class="hl">AAA 등급 CLO 펀드</span>를 Centrifuge가 토큰화(JAAA)하고, Morpho에서 쓸 수 있게 한 번 감싼(wrapped) 것임.</p>
+        <p>CLO = 기업 대출 수백 건을 묶어 등급별로 자른 상품. 그중 최상단 조각임.</p>
+      </div>
+      <div class="card">
+        <h4><span class="tag">주택담보</span> &nbsp;PRIME</h4>
+        <p>주택담보대출 기반 자산임 (원문 분류 기준).</p>
+        <p>국채·기업 신용에 이어 <span class="hl">부동산 계열 신용</span>까지 격리 방 단위로 들어와 있다는 점이 Morpho 담보 스펙트럼의 특징임.</p>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:24px">
+      <div class="card"><h4><span class="tag">분산 신용</span> &nbsp;sACRED</h4><p>사모펀드 대기업 <b>Apollo</b>의 분산 신용 펀드를 Securitize가 토큰화함. 담보로 맡기고 USDC를 빌려 다시 sACRED를 사는 <span class="hl">루핑</span>(수익 증폭) 전략이 Gauntlet 관리 하에 굴러감.</p></div>
+      <div class="card"><h4><span class="tag">허가형 처리</span> &nbsp;KYC는 자산 단위</h4><p>Pareto의 AA_FalconXUSDC처럼 <span class="hl">KYC를 마친 지갑만</span> 다룰 수 있는 자산도 격리 방에 올라옴(LTV 최대 77%). 시장 입구가 아니라 <b>자산 자체에 자물쇠</b>가 달려 있고, 방은 그 규칙을 그대로 상속함.</p></div>
+    </div>
+  </div>
+  <div class="s-basis">기준: 자산 분류 = Xangle 원문 3장 / mF-ONE · sACRED · Pareto 상세 = Morpho 공식 블로그 "RWA Playbook" · CoinDesk 2025. 6. 27. · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>마지막 3층 — 변동금리·무만기라는 디파이 문법을 깨는 <b>Midnight</b></span></div>
+</section>
+
+<!-- 11 · Midnight ================================================== -->
+<section class="slide" data-sec="2">
+  <div class="s-kicker"><b>02</b> Morpho · 3층 Midnight</div>
+  <h2 class="s-title">Midnight — 만기를 사고파는 시장</h2>
+  <p class="s-lead">기관이 요구하는 <b>고정금리 · 고정만기</b>를 온체인 문법으로 다시 만든 신제품임</p>
+  <div class="s-body">
+    <div class="g2">
+      <div class="card hv">
+        <h4>어떻게 작동하나</h4>
+        <ul class="bl sm" style="margin-top:14px">
+          <li><b>만기일에 1달러로 정산되는 단위</b>를 지금 할인된 가격에 사고팖.</li>
+          <li>예: 1년 뒤 1달러짜리를 지금 0.95달러에 사면, 그 <span class="hl">할인율 5%가 곧 금리</span>임 — 전통 금융의 할인채와 같은 원리임.</li>
+          <li>금리와 만기가 <b>체결 순간 확정</b>되고, 만기 전에도 그 단위를 되팔 수 있음.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>왜 만들었나</h4>
+        <ul class="bl sm" style="margin-top:14px">
+          <li>2장에서 본 이용률 금리는 <b>실시간으로 변하고 만기가 없음</b> — 회계·부채 관리를 해야 하는 기관에는 치명적 불편임.</li>
+          <li>전통 금융의 채권 문법(고정금리·고정만기)을 그대로 가져와 그 벽을 허묾.</li>
+          <li>Base 체인에서 출시됐고 백서가 공개돼 있음.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:30px">위치 정리: 1층(시장)이 <b>공간</b>을, 2층(볼트)이 <b>운용</b>을, 3층(Midnight)이 <b>시간(만기)</b>을 팖. 원문의 결론 — 전통 금융과 디파이의 문법이 수렴한다 — 이 가장 선명하게 보이는 지점임.</div>
+  </div>
+  <div class="s-basis">기준: Xangle 원문 3장(할인 매매 = 금리) · Morpho 공식 문서 · Midnight 백서 공개 페이지 · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>같은 문제를 <b>반대로 푼 프로토콜들</b>과 나란히 놓아 봄</span></div>
+</section>
+
+<!-- 12 · 섹션 03 표지 ================================================== -->
+<section class="slide cover" data-sec="3">
+  <div class="cover-wrap">
+    <div>
+      <div class="cn">03</div>
+      <div class="cl">유사 사례</div>
+      <h2>반대편의 실험들</h2>
+      <p class="cq">같은 토큰화 담보를 놓고 통합·허가·오더북으로 각각 다르게 푼 사례들과 비교함</p>
+    </div>
+    <div class="toc">
+      <div class="th">In This Section</div>
+      <ol>
+        <li>Aave Horizon — 정반대 접근: 통합 + 허가</li>
+        <li>Arc와 Flux — 허가형 실험의 계보</li>
+        <li>동시대 지형 — 규모 한눈 비교</li>
+        <li>네 프로토콜 비교표</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · Aave Horizon ================================================== -->
+<section class="slide" data-sec="3">
+  <div class="s-kicker"><b>03</b> 유사 사례 · 1/3</div>
+  <h2 class="s-title">Aave Horizon — 정반대의 해법</h2>
+  <p class="s-lead">같은 RWA 담보를 Morpho는 <b>방을 열어</b> 받고, Horizon은 <b>심의해서 한 금고에</b> 받음</p>
+  <div class="s-body">
+    <div class="g23">
+      <div>
+        <ul class="bl">
+          <li>디파이 1위 렌딩 Aave의 개발사가 <b>2025년 8월</b> 이더리움에 별도 인스턴스로 출시한 <span class="hl">통합 시장</span>임. 규모는 원문 기준 약 3.6억 달러, 이후 4.2억 달러대로 성장함.</li>
+          <li>담보 예치는 <b>발행사가 승인한 적격 투자자만</b>(허가형), 스테이블코인 공급은 <b>누구나</b>(비허가형) — 허가를 시장 입구에 거는 반개방 구조임.</li>
+          <li>담보는 토큰화 국채(USTB · JTRSY), 사모신용(mGLOBAL), CLO(JAAA) 등 — <span class="hl">Morpho와 상당 부분 겹침</span>.</li>
+          <li>담보인정비율과 한도는 위험 기관이 제안하고 <b>거버넌스가 심의해 확정</b>함 — Morpho가 없앤 바로 그 절차임.</li>
+        </ul>
+      </div>
+      <div class="card hv">
+        <h4>같은 재료, 다른 요리</h4>
+        <ul class="bl sm">
+          <li><b>허가의 위치</b>: Horizon은 시장 입구, Morpho는 자산 단위.</li>
+          <li><b>편입 속도</b>: Horizon은 심의를 거침, Morpho는 방을 열면 끝임.</li>
+          <li><b>위험 부담</b>: Horizon은 거버넌스가, Morpho는 큐레이터와 예치자가 짐.</li>
+        </ul>
+        <div class="s-basis" style="margin-top:18px">기준: Aave 공식 블로그 · Xangle 원문 3-1</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:28px">요약: 규모 대비 안정 우선이면 Horizon 방식, 속도와 다양성 우선이면 Morpho 방식임. 원문 집계 기준 토큰화 자산 규모는 <b>Morpho(12.5억)가 Horizon(3.6억)의 세 배 이상</b>임 <b>(발표자 해석 포함)</b>.</div>
+  </div>
+  <div class="s-basis">기준: Aave 공식 블로그 "Horizon Launch" · Xangle 원문 3-1 · LlamaRisk 주간 리포트(4.2억 달러, 스냅샷) · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>이 두 갈래가 나오기 전, <b>먼저 실험한 두 사례</b>가 있었음</span></div>
+</section>
+
+<!-- 14 · Arc와 Flux ================================================== -->
+<section class="slide" data-sec="3">
+  <div class="s-kicker"><b>03</b> 유사 사례 · 2/3</div>
+  <h2 class="s-title">Arc와 Flux — 허가형 실험의 계보</h2>
+  <p class="s-lead">'어디에 자물쇠를 다는가'의 역사임 — Morpho의 자산 단위 방식은 Flux 계열의 확장판임</p>
+  <div class="s-body">
+    <div class="g2">
+      <div class="card" style="border-color:var(--err)">
+        <h4><span class="tag err">실패</span> &nbsp;Aave Arc (2022) — 시장 전체를 잠금</h4>
+        <ul class="bl sm" style="margin-top:14px">
+          <li>Fireblocks가 FATF 기준 KYC로 30개 금융기관을 심사해 들여보낸 <b>완전 회원제 풀</b>임 (Wintermute · GSR · Galaxy · Celsius 등).</li>
+          <li>공급 · 차입 · 청산 <b>전부</b>가 허가제 — 유동성이 형성되지 못함.</li>
+          <li>예치 <span class="mono">600만~800만 달러</span>에 그친 채 2022년 말 사실상 비워짐. 금리 인상기 + Celsius 파산 등 신뢰 붕괴가 겹침.</li>
+        </ul>
+      </div>
+      <div class="card hv">
+        <h4><span class="tag ok">증명</span> &nbsp;Flux Finance (2023) — 자산에만 자물쇠</h4>
+        <ul class="bl sm" style="margin-top:14px">
+          <li>Ondo 팀이 Compound V2를 포크해 만든 렌딩임. 토큰화 미 국채 <b>OUSG</b>를 담보로 받음.</li>
+          <li>USDC 공급자는 무제한, OUSG 담보 차입자만 자격 확인 — <span class="hl">권한이 자산에 붙는 설계</span>를 처음 증명함.</li>
+          <li>Morpho의 허가형 처리(KYC 자산을 격리 방에 상장)와 같은 계열이고, Horizon의 반개방 구조에도 이 교훈이 이어짐.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:30px">계보 정리: Arc(전부 잠금 → 실패) → Flux(자산만 잠금 → 소규모 증명) → <b>Morpho(자산 잠금 × 격리 방 × 큐레이터로 일반화)</b> / Horizon(시장 입구 잠금 × 통합 금고로 일반화) <b>(발표자 해석)</b>.</div>
+  </div>
+  <div class="s-basis">기준: Fireblocks 보도자료(2022. 1. 5.) · Aave 거버넌스 포럼 "Aave Arc - What happened?" · Flux 공식 문서 · CoinDesk 2023. 2. 9. · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>동시대 프로토콜들의 <b>규모를 한눈에</b> 놓고 비교함</span></div>
+</section>
+
+<!-- 15 · 동시대 지형 (막대) ================================================== -->
+<section class="slide" data-sec="3">
+  <div class="s-kicker"><b>03</b> 유사 사례 · 3/3</div>
+  <h2 class="s-title">동시대 지형 — 토큰화 담보 규모</h2>
+  <p class="s-lead">렌딩 계열만 나란히 세움 — Morpho가 압도적 1위, 접근법은 전부 다름</p>
+  <div class="s-body">
+    <div class="bars">
+      <div class="bar">
+        <div class="nm">Morpho<s>격리 시장 · 무허가 개설</s></div>
+        <div class="tr"><div class="fl" style="width:96%"><span>12.5억 달러</span></div></div>
+      </div>
+      <div class="bar">
+        <div class="nm">Kamino<s>솔라나 · 통합+격리 병행</s></div>
+        <div class="tr"><div class="fl" style="width:41.5%"><span>5.4억 달러</span></div></div>
+      </div>
+      <div class="bar">
+        <div class="nm">Aave Horizon<s>통합 시장 · 허가형 담보</s></div>
+        <div class="tr"><div class="fl" style="width:27.6%"><span>3.6억 달러</span></div></div>
+      </div>
+      <div class="bar">
+        <div class="nm">Loopscale<s>오더북 · 고정금리 실험</s></div>
+        <div class="tr"><div class="fl min" style="width:3.7%"><span>4,800만 달러</span></div></div>
+      </div>
+      <div class="bar">
+        <div class="nm">Jupiter Lend<s>단일 풀 · 토큰화 주식 루핑</s></div>
+        <div class="tr"><div class="fl min" style="width:1.5%"><span>2,000만 달러</span></div></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:28px">렌딩 밖에는 담보로 스테이블코인을 찍는 <b>CDP 갈래</b>가 따로 있음 — Sky(USDS 96억 달러) · Falcon(USDf 12억 달러). Loopscale의 오더북 고정금리는 Morpho Midnight과 같은 문제의식을 다른 구조로 푼 경우임.</div>
+  </div>
+  <div class="s-basis">기준: 전 수치 Xangle 원문 3장 집계(각 프로토콜 내 토큰화 자산 규모) · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>구조 차이를 <b>한 표로 접어서</b> 좌표를 확정함</span></div>
+</section>
+
+<!-- 16 · 비교표 ================================================== -->
+<section class="slide" data-sec="3">
+  <div class="s-kicker"><b>03</b> 유사 사례 · 비교</div>
+  <h2 class="s-title">네 프로토콜 한눈 비교</h2>
+  <p class="s-lead">'누가 심사하는가'와 '위험을 누가 지는가'가 갈림</p>
+  <div class="s-body">
+    <table class="tbl">
+      <thead><tr><th style="width:190px">기준</th><th>Morpho (2021~)</th><th>Aave Horizon (2025~)</th><th>Kamino</th><th>Loopscale</th></tr></thead>
+      <tbody>
+        <tr><th>시장 구조</th><td>격리 — 담보·차입 쌍마다 방</td><td>통합 — 하나의 공동 금고</td><td>통합 + 격리 병행</td><td>오더북 — 주문 매칭</td></tr>
+        <tr><th>자산 편입</th><td>누구나 방 개설, 투표 없음</td><td>위험 기관 제안 → 거버넌스 심의</td><td>운영 주체가 관리</td><td>시장별 개설</td></tr>
+        <tr><th>허가 처리</th><td>자산 단위 (KYC 자산도 방에 상장)</td><td>시장 입구 (적격 투자자만 담보 예치)</td><td>자산군별 상이</td><td>자산 단위</td></tr>
+        <tr><th>금리 · 만기</th><td>변동 + 고정만기(Midnight)</td><td>이용률 변동 · 무만기</td><td>이용률 변동</td><td>고정금리 · 고정만기</td></tr>
+        <tr><th>위험 관리</th><td>큐레이터 경쟁 (볼트)</td><td>거버넌스 + 위험 기관</td><td>운영 주체</td><td>큐레이터 볼트</td></tr>
+        <tr><th>토큰화 자산</th><td><span class="mono">12.5억 달러</span> (최대)</td><td><span class="mono">3.6억 달러</span></td><td><span class="mono">5.4억 달러</span></td><td><span class="mono">4,800만 달러</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:24px">한 줄 결론: Morpho는 심사를 없앤 게 아니라 <b>거버넌스에서 큐레이터 시장으로 옮겼음</b>. 심사의 민영화가 편입 속도를 만들고, 그 속도가 토큰화 담보 1위 규모를 만든 것으로 읽힘 <b>(발표자 해석)</b>.</div>
+  </div>
+  <div class="s-basis">기준: 각 셀 근거는 8~15장 출처와 동일함 · 검증일 2026. 08. 10.</div>
+  <div class="s-next"><span>전체를 <b>한 장으로 접어서</b> 마무리함</span></div>
+</section>
+
+<!-- 17 · END 총정리 ================================================== -->
+<section class="slide" data-sec="4">
+  <div class="s-kicker"><b>END</b> 총정리</div>
+  <h2 class="s-title">오늘 흐름 한 장 정리</h2>
+  <p class="s-lead">부품 → 갈림길 → 격리의 선택 → 세 개의 층 → 반대편 비교 순서로 왔음</p>
+  <div class="s-body">
+    <div class="flow" style="margin-bottom:14px">
+      <div class="st"><i>01</i><b>다섯 부품</b>과담보 · LTV · 청산 ·<br>오라클 · 이용률 금리</div>
+      <div class="ar">→</div>
+      <div class="st"><i>02</i><b>세 갈림길</b>렌딩/CDP · 통합/격리 ·<br>비허가/허가</div>
+      <div class="ar">→</div>
+      <div class="st"><i>03</i><b>격리의 선택</b>심의 대신 방 — 위험은<br>방 안에, 편입은 즉시</div>
+      <div class="ar">→</div>
+      <div class="st"><i>04</i><b>1층 · 시장</b>다섯 부품으로 열고<br>한 번 열면 불변임</div>
+    </div>
+    <div class="flow">
+      <div class="st"><i>05</i><b>2층 · 볼트</b>큐레이터가 방을 골라<br>유동성 조각을 묶음</div>
+      <div class="ar">→</div>
+      <div class="st"><i>06</i><b>3층 · Midnight</b>할인 매매로 고정금리 ·<br>고정만기를 복원함</div>
+      <div class="ar">→</div>
+      <div class="st fin"><i>07</i><b>남는 질문</b>큐레이터 경쟁은 거버넌스<br>심의만큼 안전한가</div>
+    </div>
+    <div class="callout" style="margin-top:32px">
+      종합: Morpho는 <b>'심사를 누가 하는가'를 바꾼 프로토콜</b>임 — 거버넌스의 일을 시장(큐레이터)에 넘겨 편입 속도를 얻었고, 그 속도로 토큰화 담보 최대 시장이 됨. 반대편의 Horizon과 함께, 전통 금융의 자격·만기 문법과 디파이의 자동화가 수렴하는 두 경로를 보여 줌 (발표자 해석).
+    </div>
+  </div>
+  <div class="s-next"><span>마지막 장에 <b>모든 출처와 검증 상태</b>를 남김</span></div>
+</section>
+
+<!-- 18 · 출처 ================================================== -->
+<section class="slide" data-sec="4">
+  <div class="s-kicker"><b>REF</b> 출처 · 검증</div>
+  <h2 class="s-title">출처와 검증 상태</h2>
+  <p class="s-lead">본문 전문을 직접 확인한 자료만 논지의 근거로 사용함 — 스냅샷 수치는 별도 표기함</p>
+  <div class="s-body">
+    <div class="g2">
+      <div class="card hv">
+        <h4>원문 (전문 확인)</h4>
+        <ul class="bl sm">
+          <li>Xangle 리서치 「토큰화 자산을 담보로 활용하는 프로토콜」 (research/detail/2521) — 2장 요약 · Morpho/지형 수치의 기준 문서임.</li>
+          <li>Morpho 공식 문서 — 시장 5요소 · 무허가 개설 · 불변성 · 볼트/큐레이터 · Midnight.</li>
+          <li>Morpho 공식 블로그 "The Morpho RWA Playbook" — mF-ONE 1.9억 달러 · sACRED 루핑 · Pareto LTV 77%.</li>
+          <li>Aave 공식 블로그 "Horizon Launch" · Aave 거버넌스 포럼(Arc 부검) · Fireblocks 보도자료(2022. 1. 5.) · Flux 공식 문서.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card">
+          <h4>스냅샷 · 보조 수치 (표기 후 사용)</h4>
+          <ul class="bl sm">
+            <li>Horizon 예치 4.2억 달러대 — LlamaRisk 주간 리포트(X 게시물) 기준임.</li>
+            <li>Midas × Fasanara 협업 구조 — CoinDesk 2025. 6. 27. 보도 기준임.</li>
+            <li>Flux fOUSG 출시 시점 — CoinDesk 2023. 2. 9. 보도 기준임.</li>
+          </ul>
+        </div>
+        <div class="callout" style="margin-top:24px">
+          전 항목 검증일: <b>2026. 08. 10.</b> · '무인 전당포 / 건물주와 방' 비유와 (발표자 해석) 표기 부분은 이 자료에서 교육용으로 새로 작성한 것임. 본 자료는 학습용 재구성이며 투자 권유가 아님.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-basis">문의 · 오류 제보 환영함 — HI LAB 스터디</div>
+</section>
+
+</div>
+
+<div id="bar">
+  <div id="secs"></div>
+  <div id="pg"></div>
+</div>
+<div id="prog"></div>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var secs=document.getElementById('secs');
+  var pg=document.getElementById('pg');
+  var prog=document.getElementById('prog');
+  var NAMES=['시작','2장 요약','MORPHO','유사 사례','정리'];
+  secs.innerHTML='';
+  NAMES.forEach(function(n,i){
+    var d=document.createElement('div');
+    d.className='sc';
+    d.textContent=n;
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      for(var k=0;k<slides.length;k++){if(+slides[k].getAttribute('data-sec')===i){go(k);break;}}
+    });
+    secs.appendChild(d);
+  });
+  var cur=0;
+  function render(){
+    for(var i=0;i<slides.length;i++){
+      if(i===cur){slides[i].classList.add('on');}else{slides[i].classList.remove('on');}
+    }
+    var sec=+slides[cur].getAttribute('data-sec');
+    var chips=secs.children;
+    for(var j=0;j<chips.length;j++){
+      if(j===sec){chips[j].classList.add('on');}else{chips[j].classList.remove('on');}
+    }
+    pg.innerHTML='<b>'+(cur+1)+'</b> / '+slides.length+' · '+NAMES[sec];
+    prog.style.width=((cur+1)/slides.length*100)+'%';
+    if(history.replaceState){history.replaceState(null,'','#'+(cur+1));}
+  }
+  function go(n){
+    if(n<0){n=0;}
+    if(n>slides.length-1){n=slides.length-1;}
+    if(n===cur){return;}
+    cur=n;render();
+  }
+  function next(){go(cur+1);}
+  function prev(){go(cur-1);}
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'||k==='Enter'){next();e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){prev();e.preventDefault();}
+    else if(k==='Home'){go(0);e.preventDefault();}
+    else if(k==='End'){go(slides.length-1);e.preventDefault();}
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('#bar')){return;}
+    next();
+  });
+  document.addEventListener('contextmenu',function(e){e.preventDefault();prev();});
+  function fit(){
+    var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  /* 폰트 환경이 달라 본문이 넘칠 경우 슬라이드 안으로 축소 보정함 */
+  function fitBodies(){
+    slides.forEach(function(el){
+      var b=el.querySelector('.s-body');
+      if(!b){return;}
+      b.style.transform='';b.style.width='';
+      var over=b.scrollHeight-b.clientHeight;
+      if(over>1&&b.scrollHeight>0){
+        var k=b.clientHeight/b.scrollHeight;
+        if(k<0.84){k=0.84;}
+        b.style.transformOrigin='top left';
+        b.style.transform='scale('+k+')';
+        b.style.width=(100/k)+'%';
+      }
+    });
+  }
+  window.addEventListener('resize',fit);
+  window.addEventListener('load',fitBodies);
+  /* 내장 폰트가 적용된 최종 메트릭 기준으로 한 번 더 보정함 */
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){fitBodies();});}
+  setTimeout(fitBodies,300);
+  fit();
+  fitBodies();
+  var h=parseInt((location.hash||'').replace('#',''),10);
+  if(h>0&&h<=slides.length){cur=h-1;}
+  render();
+})();
+</script>
+
+</body></html>
