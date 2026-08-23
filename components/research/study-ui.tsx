@@ -222,7 +222,7 @@ export function SessionCard({
         )}
         {materials > 0 && (
           <Badge className="border-white/15 bg-white/8 text-white/75">
-            자료 {materials}
+            자료
           </Badge>
         )}
         <Badge className={badge.className}>{badge.text}</Badge>

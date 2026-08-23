@@ -70,8 +70,11 @@ function StudyCover() {
 /* One card in the hub row. The whole card is a single link to its surface —
    not to the taster item — because these three stand for the surfaces, and a
    card whose picture opens one thing and whose title opens another is two
-   links wearing one box. The eyebrow says which surface; the media and the
-   line under it are the freshest thing on it, proof the surface is alive. */
+   links wearing one box. The label rides on the picture, not under it: buried
+   as a sub-title eyebrow it lost the scan, so a person saw three photos and
+   had to read to tell News from Study. On the image it's the first thing read;
+   the line under the title is the freshest thing on it, proof the surface is
+   alive. */
 function HubCard({
   href,
   label,
@@ -90,13 +93,19 @@ function HubCard({
       href={href}
       className="group flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors hover:border-white/25"
     >
-      <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
-      <div className="flex flex-1 flex-col p-6">
-        <p className="font-mono flex items-center justify-between text-[10px] tracking-[0.18em] text-bay-300 uppercase">
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        {media}
+        {/* Label pill — dark glass so it holds over any photo, sitting above
+            the media's hover scale. */}
+        <span className="font-mono absolute top-4 left-4 z-10 inline-flex items-center rounded-full bg-ink/55 px-3 py-1.5 text-[10px] tracking-[0.18em] text-white uppercase ring-1 ring-white/15 backdrop-blur-md">
           {label}
-          <ArrowUpRight className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-bay-300" />
-        </p>
-        <h2 className="font-heading mt-3 line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
+        </span>
+        <span className="absolute top-4 right-4 z-10 grid h-7 w-7 place-items-center rounded-full bg-ink/55 text-white/70 ring-1 ring-white/15 backdrop-blur-md transition-colors group-hover:text-white">
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col p-6">
+        <h2 className="font-heading line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
           {title}
         </h2>
         <p className="font-mono mt-auto pt-4 text-[10px] tracking-[0.18em] text-white/40 uppercase">

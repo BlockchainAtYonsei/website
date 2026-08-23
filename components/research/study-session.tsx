@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Avatar from "@/components/research/avatar";
 import { EVERYONE, memberOf, type Session, type StudyRecord } from "@/lib/study";
 
@@ -54,20 +55,33 @@ export function SheetHeading({
 }
 
 /** Name with the member's photo: the study's people are site members, so
-    the same face that stands in the Authors directory stands here. */
+    the same face that stands in the Authors directory stands here — and when
+    the person is one of those members the whole cell links to their profile,
+    the same /research/author/[slug] the directory opens. A name we don't know
+    (not in STUDY_MEMBERS) stays plain text rather than linking into a 404. */
 function Presenter({ name }: { name: string }) {
   const m = memberOf(name);
-  return (
+  const cell = (
     <div className="flex items-center gap-3 md:flex-row-reverse">
       <Avatar
         name={name}
         src={m?.avatar ?? null}
-        className="h-9 w-9 shrink-0 text-sm"
+        className="h-9 w-9 shrink-0 text-sm transition-[box-shadow] group-hover/who:ring-2 group-hover/who:ring-bay-400/45"
       />
-      <p className="font-body text-[15px] leading-tight font-medium whitespace-nowrap text-white">
+      <p className="font-body text-[15px] leading-tight font-medium whitespace-nowrap text-white transition-colors group-hover/who:text-bay-100">
         {name}
       </p>
     </div>
+  );
+
+  if (!m) return cell;
+  return (
+    <Link
+      href={`/research/author/${m.slug}`}
+      className="group/who -m-1 rounded-xl p-1 transition-colors hover:bg-white/5"
+    >
+      {cell}
+    </Link>
   );
 }
 
