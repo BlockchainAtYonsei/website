@@ -37,6 +37,13 @@ export class MediaController {
     if (obj.contentLength !== undefined) res.setHeader("Content-Length", obj.contentLength);
     if (obj.etag) res.setHeader("ETag", obj.etag);
     res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    /* These are public, immutable, content-hashed images whose whole job is to
+       be embedded by the frontend on another origin. helmet() defaults every
+       response to Cross-Origin-Resource-Policy: same-origin, which makes a
+       browser refuse the cross-origin <img> (curl and the /_next/image
+       optimizer fetch server-side, so they never saw it) — override it here so
+       the media route is actually loadable where it's used. */
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     obj.body.pipe(res);
   }
 }
