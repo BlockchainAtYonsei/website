@@ -70,11 +70,12 @@ function StudyCover() {
 /* One card in the hub row. The whole card is a single link to its surface —
    not to the taster item — because these three stand for the surfaces, and a
    card whose picture opens one thing and whose title opens another is two
-   links wearing one box. The label sits in the body, above the title, on the
-   card's solid dark ground rather than over the photo — over a bright or busy
-   picture the top-left pill washed out, and a label you have to hunt for is a
-   label that failed. It's the eyebrow the title hangs from; the line under the
-   title is the freshest thing on the surface, proof it's alive. */
+   links wearing one box. The label sits above the card as its section header,
+   not inside it: a first-time visitor should be told the three surfaces are
+   Research, News and Study before reading into any one of them, rather than
+   inferring the structure the way someone who already knows the site would.
+   The picture and the line under the title are that surface's freshest thing,
+   proof it's alive. */
 function HubCard({
   href,
   label,
@@ -89,22 +90,21 @@ function HubCard({
   meta: React.ReactNode;
 }) {
   return (
-    <Link
-      href={href}
-      className="group flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors hover:border-white/25"
-    >
-      <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
-      <div className="flex flex-1 flex-col p-6">
-        <p className="font-mono flex items-center justify-between text-[11px] tracking-[0.18em] text-bay-200 uppercase">
-          {label}
-          <ArrowUpRight className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-bay-200" />
-        </p>
-        <h2 className="font-heading mt-3 line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
-          {title}
-        </h2>
-        <p className="font-mono mt-auto pt-4 text-[10px] tracking-[0.18em] text-white/40 uppercase">
-          {meta}
-        </p>
+    <Link href={href} className="group flex h-full flex-col">
+      <p className="font-mono mb-3 flex items-center justify-between text-[11px] tracking-[0.2em] text-bay-200 uppercase">
+        {label}
+        <ArrowUpRight className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-bay-200" />
+      </p>
+      <div className="flex flex-1 flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors group-hover:border-white/25">
+        <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
+        <div className="flex flex-1 flex-col p-6">
+          <h2 className="font-heading line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
+            {title}
+          </h2>
+          <p className="font-mono mt-auto pt-4 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+            {meta}
+          </p>
+        </div>
       </div>
     </Link>
   );
