@@ -1,138 +1,172 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/icons";
-import ArticleThumb from "@/components/research/article-thumb";
 import HomeHero from "@/components/research/home-hero";
-import NewsThumb from "@/components/research/news-thumb";
 import Reveal from "@/components/research/reveal";
 import { getNews } from "@/lib/news";
-import { formatDate, getFeatured, type Accent } from "@/lib/research";
-import { findSession, nextSessionNo, SESSIONS } from "@/lib/study";
+import { formatDate, getArticlesPage, getFeatured } from "@/lib/research";
+import {
+  findSession,
+  nextSessionNo,
+  pad2,
+  SESSIONS,
+  sessionDate,
+} from "@/lib/study";
 
-/* The property's front door. Research, News and Study each own a tab; this
-   page's job is to say what the team publishes and hand over the newest of
-   each, so everything on it is a taster.
+/* The property's front door, as a landing page. Research, News and Study each
+   own a tab; this page's job is to receive a visitor who doesn't know the site
+   yet and walk them to each of the three rooms.
 
-   One centred phrase over three equal cards — the three content surfaces,
-   left to right, each showing its freshest thing. It used to be two mirrored
-   full-bleed rows instead, which read as a composed front page on a laptop
-   and as a mistake on a 27" monitor: a full-bleed picture has no width of its
-   own, so the bigger the display the bigger it got — one picture taking half
-   of 2560px and standing 720px tall, the row growing taller than the viewport.
+   So it is built as four screens, one per scroll: the masthead, then one
+   full-height panel per surface. Each panel leads with the surface's number,
+   name and a line saying what it does — that's the thing a newcomer can't
+   infer from a photo or a headline — and carries the surface's three freshest
+   items under it as proof the room is in use. No pictures: an EigenCloud
+   wordmark or a bond scan tells a stranger nothing about what a section IS.
 
-   So the cards are the thing bounded now. They sit in the header's box
-   (mx-auto max-w-6xl px-6, the exact classes research-header.tsx uses) as a
-   three-column grid, which means a picture ends where the wordmark and the
-   tabs end however wide the screen is, and each card's height is its own
-   contents, not the viewport's.
-
-   Glass appears exactly once, on the Medium band, because that is the only
-   thing here asking to be clicked-through rather than browsed into. */
+   The panels are min-h (not h) of the viewport: a panel holds its screen on
+   any monitor, but a phone whose list runs long grows rather than clips. The
+   4rem subtracted is the sticky header's h-16, so a panel lands exactly at the
+   bottom of the window rather than a header's-worth past it; svh so a phone's
+   collapsing toolbar doesn't push the floor under its own chrome. */
 
 /* The header's own box, copied from research-header.tsx rather than
    approximated: the two are aligned or they are not, and a second formula
    drifting from the first is how they stop being. */
 const PAGE_BOX = "mx-auto max-w-6xl px-6";
+const SCREEN = "min-h-[calc(100svh-4rem)]";
 
-/* Generated art only shows when a story ships no picture of its own, but when
-   it does the colour has to be the one the news page already gives that topic
-   — same hash, same table, so a story doesn't change colour between here and
-   the feed. */
-const ACCENTS: Accent[] = ["blue", "violet", "teal", "indigo"];
-function accentOf(topic: string): Accent {
-  let h = 0;
-  for (let i = 0; i < topic.length; i++) h = (h * 31 + topic.charCodeAt(i)) >>> 0;
-  return ACCENTS[h % ACCENTS.length];
-}
-
-/* The study card's picture. The study surface ships no photography of its own
-   — its cards are glass and type — so this is a fixed house cover the surface
-   owns rather than a per-session figure: one image under a stable path that
-   stays put as the 주차 (next session) rolls over, wearing the same bottom
-   vignette the other two cards' pictures carry so the row reads as three real
-   pictures rather than two-and-a-placeholder. Deliberately takes no session
-   argument: do not wire this to studySession, or the cover would flip weekly. */
-function StudyCover() {
+/* A row in a panel's list: the item on the left, its one fact on the right,
+   hairline under. Links go to the item itself — inside a panel the surface is
+   already named, so this is where the reader drills in. */
+function Row({ href, title, meta }: { href: string; title: string; meta: string }) {
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#0a1420]">
-      <Image
-        src="/study/cover.jpg"
-        alt=""
-        fill
-        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-    </div>
+    <li className="border-t border-white/8 first:border-t-0">
+      <Link
+        href={href}
+        className="group/row flex items-baseline justify-between gap-6 py-5 transition-colors hover:text-white"
+      >
+        <span className="font-body min-w-0 truncate text-[17px] leading-snug text-slate-300 transition-colors group-hover/row:text-white">
+          {title}
+        </span>
+        <span className="font-mono shrink-0 text-[10px] tracking-[0.14em] whitespace-nowrap text-white/35 uppercase">
+          {meta}
+        </span>
+      </Link>
+    </li>
   );
 }
 
-/* One card in the hub row. The whole card is a single link to its surface —
-   not to the taster item — because these three stand for the surfaces, and a
-   card whose picture opens one thing and whose title opens another is two
-   links wearing one box. The label sits above the card as its section header,
-   not inside it: a first-time visitor should be told the three surfaces are
-   Research, News and Study before reading into any one of them, rather than
-   inferring the structure the way someone who already knows the site would.
-   The picture and the line under the title are that surface's freshest thing,
-   proof it's alive. */
-function HubCard({
-  href,
+/* Each panel's atmosphere: a radial glow in the hero's blue, placed on
+   alternate sides so the three screens don't read as one repeated template,
+   at a fraction of the hero's strength so the hero stays the loudest screen.
+   Bare ink behind a paragraph and three rows was the first cut, and it read as
+   an empty room — the glow is what makes a panel a place rather than a gap. */
+const GLOW = [
+  "radial-gradient(50% 60% at 15% 50%, rgba(47,107,255,0.16) 0%, transparent 70%)",
+  "radial-gradient(50% 60% at 85% 45%, rgba(124,98,210,0.14) 0%, transparent 70%)",
+  "radial-gradient(50% 60% at 20% 60%, rgba(45,160,185,0.12) 0%, transparent 70%)",
+];
+
+/* One surface, as one screen. Left: the number, the name, the blurb, and the
+   way in. Right: the surface's three freshest items. On a phone the two stack,
+   blurb first, so the room is introduced before its contents. */
+function Panel({
+  index,
   label,
-  media,
-  title,
-  meta,
+  blurb,
+  href,
+  cta,
+  listTitle,
+  rows,
 }: {
-  href: string;
+  index: number;
   label: string;
-  media: React.ReactNode;
-  title: string;
-  meta: React.ReactNode;
+  blurb: string;
+  href: string;
+  cta: string;
+  listTitle: string;
+  rows: { href: string; title: string; meta: string }[];
 }) {
   return (
-    <Link href={href} className="group flex h-full flex-col">
-      <p className="font-mono mb-3 text-[11px] tracking-[0.2em] text-bay-200 uppercase">
-        {label}
-      </p>
-      <div className="flex flex-1 flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors group-hover:border-white/25">
-        <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
-        <div className="flex flex-1 flex-col p-6">
-          <h2 className="font-heading line-clamp-3 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
-            {title}
-          </h2>
-          <p className="font-mono mt-auto pt-4 text-[10px] tracking-[0.18em] text-white/40 uppercase">
-            {meta}
+    <section
+      className={`relative flex flex-col justify-center overflow-hidden border-t border-white/10 ${SCREEN}`}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ background: GLOW[(index - 1) % GLOW.length] }}
+      />
+      <div aria-hidden className="bg-grid absolute inset-0 opacity-[0.12]" />
+      <Reveal
+        className={`relative grid w-full grid-cols-1 gap-12 py-16 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-20 md:py-20 ${PAGE_BOX}`}
+      >
+        <div className="flex flex-col">
+          <p className="font-mono flex items-center gap-4 text-[11px] tracking-[0.2em] text-bay-200 uppercase">
+            <span className="text-white/25 tabular-nums">0{index}</span>
+            {label}
           </p>
+          <h2 className="font-heading mt-6 text-[2rem] leading-[1.15] tracking-[-1px] break-keep text-white md:text-[2.75rem]">
+            {blurb}
+          </h2>
+          <Link
+            href={href}
+            className="font-body mt-10 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 px-5 py-2.5 text-sm text-white transition-colors hover:border-bay-300 hover:text-bay-100"
+          >
+            {cta}
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
-      </div>
-    </Link>
+
+        <div className="flex flex-col justify-center">
+          <p className="font-mono mb-2 text-[10px] tracking-[0.18em] text-white/40 uppercase">
+            {listTitle}
+          </p>
+          {rows.length > 0 ? (
+            <ul>
+              {rows.map((r) => (
+                <Row key={r.href} {...r} />
+              ))}
+            </ul>
+          ) : (
+            <p className="font-body border-t border-white/8 pt-4 text-sm font-light text-slate-500">
+              곧 채워집니다.
+            </p>
+          )}
+        </div>
+      </Reveal>
+    </section>
   );
 }
 
 export default async function ResearchHome() {
-  /* The pinned piece, not the newest one. A front door shows the work the
-     team wants read first, and the archive is where recency belongs — the
-     flag is a Featured checkbox in Notion, so which piece stands here is an
-     editorial decision the 리서치팀 makes without touching this file. Falls
-     back to the newest published piece API-side, so the slot is never empty
-     just because nobody has ticked the box. */
-  const [article, news] = await Promise.all([getFeatured(), getNews()]);
-  const latestNews = news[0];
+  /* Research leads with the pinned piece — a Featured checkbox in Notion, an
+     editorial call the 리서치팀 makes without touching this file — then the
+     newest ones after it, deduped so the pin doesn't appear twice. News is the
+     three freshest stories. Study is the next session and the two after it
+     (or the last three once the series is done), so the list always reads as
+     a calendar rather than a history. */
+  const [featured, page, news] = await Promise.all([
+    getFeatured(),
+    getArticlesPage(1, 4),
+    getNews(),
+  ]);
+  const articles = [
+    ...(featured ? [featured] : []),
+    ...page.items.filter((a) => a.slug !== featured?.slug),
+  ].slice(0, 3);
 
-  /* The study card wears the next session that hasn't happened yet — the same
-     one the study page badges 다음 세션 — falling back to the last one on the
-     calendar once the series is done, so the card is never empty. */
   const nextNo = nextSessionNo(new Date());
-  const studySession =
-    (nextNo != null ? findSession(nextNo) : undefined) ??
-    SESSIONS[SESSIONS.length - 1];
-
-  const CARD_SIZES = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
+  const from = nextNo != null ? SESSIONS.findIndex((s) => s.no === nextNo) : -1;
+  const sessions =
+    from >= 0 ? SESSIONS.slice(from, from + 3) : SESSIONS.slice(-3);
+  /* The badge the study page gives the next session, kept identical here. */
+  const next = nextNo != null ? findSession(nextNo) : undefined;
 
   return (
     <main className="overflow-x-clip">
-      {/* Masthead — poster atmosphere behind a staggered type entrance */}
-      <section className="relative overflow-hidden">
+      {/* Screen 1 — masthead. Poster atmosphere behind a staggered type
+          entrance, and a hint that the rooms are below. */}
+      <section className={`relative flex flex-col justify-center overflow-hidden ${SCREEN}`}>
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -142,110 +176,63 @@ export default async function ResearchHome() {
           }}
         />
         <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
-        <div className={`relative pt-12 pb-8 md:pt-16 md:pb-10 ${PAGE_BOX}`}>
+        <div className={`relative w-full ${PAGE_BOX}`}>
           <HomeHero />
+          <p className="font-mono mt-16 flex items-center justify-center gap-6 text-[10px] tracking-[0.2em] text-white/35 uppercase">
+            <span>Research</span>
+            <span className="text-white/15">·</span>
+            <span>News</span>
+            <span className="text-white/15">·</span>
+            <span>Study</span>
+          </p>
         </div>
       </section>
 
-      {/* The hub — three surfaces, three equal cards, newest of each */}
-      <section className="border-t border-white/12">
-        <Reveal
-          className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
-        >
-          {/* Research — the pinned piece, so no "Latest": a label promising
-              recency next to a piece from three months ago reads as a stale
-              site rather than a chosen one. */}
-          {article ? (
-            <HubCard
-              href="/research/articles"
-              label="Research"
-              media={
-                <ArticleThumb
-                  article={article}
-                  sizes={CARD_SIZES}
-                  priority
-                  large
-                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              }
-              title={article.title}
-              meta={
-                <>
-                  {article.tag}
-                  <span className="px-2 text-white/20">·</span>
-                  {article.readingMinutes} min read
-                </>
-              }
-            />
-          ) : (
-            <div className="flex min-h-[16rem] flex-col justify-end rounded-[1.25rem] border border-white/10 bg-white/[0.02] p-6">
-              <p className="font-mono text-[10px] tracking-[0.18em] text-bay-300 uppercase">
-                Research
-              </p>
-              <p className="font-body mt-3 text-sm font-light text-slate-500">
-                아직 발행된 리서치가 없습니다.
-              </p>
-            </div>
-          )}
+      {/* Screens 2–4 — one per surface */}
+      <Panel
+        index={1}
+        label="Research"
+        blurb="프로토콜·ZK·DeFi·거버넌스, 시장을 구조로 읽어내는 자체 리서치"
+        href="/research/articles"
+        cta="리서치 아카이브"
+        listTitle="추천 · 최신"
+        rows={articles.map((a) => ({
+          href: `/research/${a.slug}`,
+          title: a.title,
+          meta: `${a.tag} · ${a.readingMinutes} min`,
+        }))}
+      />
 
-          {/* News — the freshest curated story */}
-          {latestNews ? (
-            <HubCard
-              href="/research/news"
-              label="News tracking"
-              media={
-                <NewsThumb
-                  item={latestNews}
-                  accent={accentOf(latestNews.categories[0] ?? "")}
-                  sizes={CARD_SIZES}
-                  large
-                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              }
-              title={latestNews.title}
-              meta={
-                <>
-                  {formatDate(latestNews.date)}
-                  <span className="px-2 text-white/20">·</span>
-                  <span className="text-bay-300/70">
-                    {latestNews.sourceName}
-                  </span>
-                </>
-              }
-            />
-          ) : (
-            <div className="flex min-h-[16rem] flex-col justify-end rounded-[1.25rem] border border-white/10 bg-white/[0.02] p-6">
-              <p className="font-mono text-[10px] tracking-[0.18em] text-bay-300 uppercase">
-                News tracking
-              </p>
-              <p className="font-body mt-3 text-sm font-light text-slate-500">
-                아직 큐레이션된 뉴스가 없습니다.
-              </p>
-            </div>
-          )}
+      <Panel
+        index={2}
+        label="News tracking"
+        blurb="시장에서 골라 온 소식에 큐레이터의 한 줄을 얹습니다"
+        href="/research/news"
+        cta="뉴스트래킹"
+        listTitle="최신"
+        rows={news.slice(0, 3).map((n) => ({
+          href: `/research/news/${n.slug}`,
+          title: n.title,
+          meta: formatDate(n.date),
+        }))}
+      />
 
-          {/* Study — the next session up. It ships no photo (see StudyCover),
-              so the slot wears the study's own type-and-atmosphere identity
-              rather than art borrowed from the article idiom. */}
-          <HubCard
-            href="/research/study"
-            label="RWA Study"
-            media={
-              <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]">
-                <StudyCover />
-              </div>
-            }
-            title={`${studySession.title.accent} ${studySession.title.rest}`}
-            meta={
-              <>
-                {`${String(studySession.no).padStart(2, "0")}회차`}
-                <span className="px-2 text-white/20">·</span>
-                {studySession.topic}
-              </>
-            }
-          />
-        </Reveal>
-      </section>
+      <Panel
+        index={3}
+        label="RWA Study"
+        blurb="Xangle RWA Series를 아홉 번에 걸쳐 함께 완독합니다"
+        href="/research/study"
+        cta="스터디 아카이브"
+        listTitle="다음 세션"
+        rows={sessions.map((s) => ({
+          href: `/research/study/${s.no}`,
+          title: `${pad2(s.no)}회차 · ${s.topic}`,
+          meta:
+            s.no === next?.no
+              ? "다음"
+              : (sessionDate(s.date)?.short ?? ""),
+        }))}
+      />
 
       {/* Medium — the page's one glass object */}
       <section className="border-t border-white/12">
