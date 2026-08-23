@@ -143,7 +143,7 @@ export default async function ResearchHome() {
           }}
         />
         <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
-        <div className={`relative pt-20 pb-14 md:pt-28 md:pb-16 ${PAGE_BOX}`}>
+        <div className={`relative pt-12 pb-8 md:pt-16 md:pb-10 ${PAGE_BOX}`}>
           <HomeHero />
         </div>
       </section>
@@ -151,7 +151,7 @@ export default async function ResearchHome() {
       {/* The hub — three surfaces, three equal cards, newest of each */}
       <section className="border-t border-white/12">
         <Reveal
-          className={`grid grid-cols-1 gap-6 py-12 sm:grid-cols-2 md:py-16 lg:grid-cols-3 ${PAGE_BOX}`}
+          className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
         >
           {/* Research — the pinned piece, so no "Latest": a label promising
               recency next to a piece from three months ago reads as a stale
