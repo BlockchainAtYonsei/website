@@ -88,27 +88,38 @@ export default async function ResearchHome() {
 
   return (
     <main className="overflow-x-clip">
-      {/* Masthead — poster atmosphere behind a staggered type entrance */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(55% 65% at 22% 25%, rgba(47,107,255,0.26) 0%, transparent 68%), radial-gradient(40% 45% at 82% 80%, rgba(124,98,210,0.15) 0%, transparent 70%)",
-          }}
-        />
-        <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
-        <div className={`relative pt-12 pb-8 md:pt-16 md:pb-10 ${PAGE_BOX}`}>
-          <HomeHero />
-        </div>
-      </section>
+      {/* First screen — masthead + the three cards, sized to the viewport so
+          the lobby lands as exactly the hero and the three surfaces on any
+          monitor; the Medium band and the footer wait below the fold. The
+          4rem subtracted is the sticky header's h-16, so the block ends right
+          at the bottom of the window rather than a header's-worth past it.
+          svh, not vh, so a phone's collapsing toolbar doesn't push the cards
+          under its own chrome. */}
+      <div className="flex min-h-[calc(100svh-4rem)] flex-col">
+        {/* Masthead — poster atmosphere behind a staggered type entrance */}
+        <section className="relative overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(55% 65% at 22% 25%, rgba(47,107,255,0.26) 0%, transparent 68%), radial-gradient(40% 45% at 82% 80%, rgba(124,98,210,0.15) 0%, transparent 70%)",
+            }}
+          />
+          <div aria-hidden className="bg-grid absolute inset-0 opacity-25" />
+          <div className={`relative pt-12 pb-8 md:pt-16 md:pb-10 ${PAGE_BOX}`}>
+            <HomeHero />
+          </div>
+        </section>
 
-      {/* The hub — three surfaces, three equal cards, what each one is */}
-      <section className="border-t border-white/12">
-        <Reveal
-          className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
-        >
+        {/* The hub — three surfaces, three equal cards, what each one is.
+            flex-1 + justify-center takes the leftover height under the hero and
+            centres the cards in it, so a tall monitor spreads the space above
+            and below the row rather than leaving it all under the cards. */}
+        <section className="flex flex-1 flex-col justify-center border-t border-white/12">
+          <Reveal
+            className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
+          >
           {/* Research — the pinned piece, tagged 추천 not 최신: a promise of
               recency next to an editorial pick reads as a stale site. */}
           <HubCard
@@ -140,8 +151,9 @@ export default async function ResearchHome() {
               text: `${String(studySession.no).padStart(2, "0")}회차 · ${studySession.topic}`,
             }}
           />
-        </Reveal>
-      </section>
+          </Reveal>
+        </section>
+      </div>
 
       {/* Medium — the page's one glass object */}
       <section className="border-t border-white/12">
