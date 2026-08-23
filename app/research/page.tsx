@@ -25,20 +25,25 @@ import { findSession, nextSessionNo, SESSIONS } from "@/lib/study";
    drifting from the first is how they stop being. */
 const PAGE_BOX = "mx-auto max-w-6xl px-6";
 
-/* One card in the hub row. The whole card is a single link to its surface —
-   these three stand for the surfaces, not for the items showing under them.
-   `label` names the surface, `blurb` says what it does, and `latest` is the
-   freshest thing on it: a small role word (추천/최신/다음) and the item,
-   pinned to the card's floor so the three align however long the blurbs run.
-   `latest` is optional — a section with nothing published yet still stands on
-   its name and blurb rather than needing a separate empty state. */
-function HubCard({
+/* One surface, as a full-width row rather than a card. The lobby used to lay
+   these out as three small cards in a top strip, which on a laptop left the
+   bottom half of the screen empty — three matchbooks under a big headline. The
+   row instead is `flex-1`: the three of them split the height under the hero
+   between them, so the section fills the screen it's given on any monitor
+   instead of pooling the slack at the bottom. A hairline separates rows; the
+   only box is the page. The whole row links to its surface — the number/label
+   and the blurb say what the surface is, the right column carries its freshest
+   item (role word 추천/최신/다음 + the item) as proof it's alive. `latest` is
+   optional: a surface with nothing published yet still stands on its blurb. */
+function HubRow({
   href,
+  index,
   label,
   blurb,
   latest,
 }: {
   href: string;
+  index: number;
   label: string;
   blurb: string;
   latest?: { role: string; text: string };
@@ -46,22 +51,29 @@ function HubCard({
   return (
     <Link
       href={href}
-      className="group flex h-full min-h-[12rem] flex-col rounded-[1.25rem] border border-white/10 bg-white/[0.02] p-7 transition-colors hover:border-white/25"
+      className="group flex flex-1 flex-col justify-center gap-5 border-t border-white/10 py-8 transition-colors first:border-t-0 hover:bg-white/[0.015] sm:flex-row sm:items-center sm:gap-10"
     >
-      <p className="font-mono text-[11px] tracking-[0.2em] text-bay-200 uppercase">
-        {label}
-      </p>
-      <h2 className="font-heading mt-4 text-xl leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
-        {blurb}
-      </h2>
+      <div className="flex min-w-0 flex-1 items-baseline gap-5">
+        <span className="font-mono shrink-0 pt-1 text-[11px] tracking-[0.14em] text-white/25 tabular-nums">
+          0{index}
+        </span>
+        <div className="min-w-0">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-bay-200 uppercase">
+            {label}
+          </p>
+          <h2 className="font-heading mt-2.5 text-2xl leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-[1.75rem]">
+            {blurb}
+          </h2>
+        </div>
+      </div>
       {latest && (
-        <div className="mt-auto flex items-baseline gap-2.5 border-t border-white/8 pt-4">
-          <span className="font-mono shrink-0 text-[10px] tracking-[0.16em] text-white/40 uppercase">
+        <div className="shrink-0 border-l border-white/8 pl-5 sm:w-56 sm:pl-8">
+          <p className="font-mono text-[10px] tracking-[0.16em] text-white/40 uppercase">
             {latest.role}
-          </span>
-          <span className="font-body min-w-0 flex-1 truncate text-[13px] font-light text-slate-300">
+          </p>
+          <p className="font-body mt-2 line-clamp-2 text-[13px] leading-relaxed font-light break-keep text-slate-300 transition-colors group-hover:text-slate-200">
             {latest.text}
-          </span>
+          </p>
         </div>
       )}
     </Link>
@@ -112,48 +124,49 @@ export default async function ResearchHome() {
           </div>
         </section>
 
-        {/* The hub — three surfaces, three equal cards, what each one is.
-            flex-1 with the cards at its top (justify-start) keeps them close
-            under the hero rather than floating in the middle; the leftover
-            height on a tall monitor trails below the row as breathing room,
-            and still holds the Medium band under the fold. No rule between the
-            hero and the cards — the change in ground already reads as the
-            seam, and the line only underscored the gap. */}
-        <section className="flex flex-1 flex-col justify-start">
-          <Reveal
-            className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
-          >
-          {/* Research — the pinned piece, tagged 추천 not 최신: a promise of
-              recency next to an editorial pick reads as a stale site. */}
-          <HubCard
-            href="/research/articles"
-            label="Research"
-            blurb="프로토콜·ZK·DeFi·거버넌스, 시장을 구조로 읽어내는 자체 리서치"
-            latest={
-              article ? { role: "추천", text: article.title } : undefined
-            }
-          />
+        {/* The hub — the three surfaces as a full-height index. The rows split
+            the leftover height between them (each HubRow is flex-1), so the
+            section fills the screen under the hero rather than leaving the
+            bottom half empty. No rule between the hero and the first row — the
+            change in ground already reads as the seam. */}
+        <section className="flex flex-1 flex-col">
+          <Reveal className={`flex flex-1 flex-col ${PAGE_BOX}`}>
+            {/* Research — the pinned piece, tagged 추천 not 최신: a promise of
+                recency next to an editorial pick reads as a stale site. */}
+            <HubRow
+              href="/research/articles"
+              index={1}
+              label="Research"
+              blurb="프로토콜·ZK·DeFi·거버넌스, 시장을 구조로 읽어내는 자체 리서치"
+              latest={
+                article ? { role: "추천", text: article.title } : undefined
+              }
+            />
 
-          {/* News — the freshest curated story */}
-          <HubCard
-            href="/research/news"
-            label="News tracking"
-            blurb="시장에서 골라 온 소식에 큐레이터의 한 줄을 얹습니다"
-            latest={
-              latestNews ? { role: "최신", text: latestNews.title } : undefined
-            }
-          />
+            {/* News — the freshest curated story */}
+            <HubRow
+              href="/research/news"
+              index={2}
+              label="News tracking"
+              blurb="시장에서 골라 온 소식에 큐레이터의 한 줄을 얹습니다"
+              latest={
+                latestNews
+                  ? { role: "최신", text: latestNews.title }
+                  : undefined
+              }
+            />
 
-          {/* Study — the next session up */}
-          <HubCard
-            href="/research/study"
-            label="RWA Study"
-            blurb="Xangle RWA Series를 아홉 번에 걸쳐 함께 완독합니다"
-            latest={{
-              role: "다음",
-              text: `${String(studySession.no).padStart(2, "0")}회차 · ${studySession.topic}`,
-            }}
-          />
+            {/* Study — the next session up */}
+            <HubRow
+              href="/research/study"
+              index={3}
+              label="RWA Study"
+              blurb="Xangle RWA Series를 아홉 번에 걸쳐 함께 완독합니다"
+              latest={{
+                role: "다음",
+                text: `${String(studySession.no).padStart(2, "0")}회차 · ${studySession.topic}`,
+              }}
+            />
           </Reveal>
         </section>
       </div>
