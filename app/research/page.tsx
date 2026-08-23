@@ -91,9 +91,8 @@ function HubCard({
 }) {
   return (
     <Link href={href} className="group flex h-full flex-col">
-      <p className="font-mono mb-3 flex items-center justify-between text-[11px] tracking-[0.2em] text-bay-200 uppercase">
+      <p className="font-mono mb-3 text-[11px] tracking-[0.2em] text-bay-200 uppercase">
         {label}
-        <ArrowUpRight className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-bay-200" />
       </p>
       <div className="flex flex-1 flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02] transition-colors group-hover:border-white/25">
         <div className="aspect-[16/10] w-full overflow-hidden">{media}</div>
