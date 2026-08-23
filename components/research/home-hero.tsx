@@ -36,12 +36,6 @@ export default function HomeHero() {
         </span>
         를 읽어냅니다
       </motion.h1>
-      <motion.p
-        {...reveal(0.3)}
-        className="font-body mx-auto mt-7 max-w-xl text-sm leading-relaxed font-light break-keep text-slate-400 md:text-base"
-      >
-        연세대학교 블록체인 학회 BAY의 리서치 및 뉴스트레킹
-      </motion.p>
     </div>
   );
 }
