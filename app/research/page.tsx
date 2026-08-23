@@ -179,11 +179,11 @@ export default async function ResearchHome() {
         <div className={`relative w-full ${PAGE_BOX}`}>
           <HomeHero />
           <p className="font-mono mt-16 flex items-center justify-center gap-6 text-[10px] tracking-[0.2em] text-white/35 uppercase">
-            <span>01 Research</span>
+            <span>Research</span>
             <span className="text-white/15">·</span>
-            <span>02 News</span>
+            <span>News</span>
             <span className="text-white/15">·</span>
-            <span>03 Study</span>
+            <span>Study</span>
           </p>
         </div>
       </section>
