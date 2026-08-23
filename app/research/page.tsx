@@ -113,10 +113,13 @@ export default async function ResearchHome() {
         </section>
 
         {/* The hub — three surfaces, three equal cards, what each one is.
-            flex-1 + justify-center takes the leftover height under the hero and
-            centres the cards in it, so a tall monitor spreads the space above
-            and below the row rather than leaving it all under the cards. */}
-        <section className="flex flex-1 flex-col justify-center border-t border-white/12">
+            flex-1 with the cards at its top (justify-start) keeps them close
+            under the hero rather than floating in the middle; the leftover
+            height on a tall monitor trails below the row as breathing room,
+            and still holds the Medium band under the fold. No rule between the
+            hero and the cards — the change in ground already reads as the
+            seam, and the line only underscored the gap. */}
+        <section className="flex flex-1 flex-col justify-start">
           <Reveal
             className={`grid grid-cols-1 gap-6 py-8 sm:grid-cols-2 md:py-10 lg:grid-cols-3 ${PAGE_BOX}`}
           >
