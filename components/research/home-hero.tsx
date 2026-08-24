@@ -10,8 +10,8 @@ import { motion } from "framer-motion";
 
    Centred, because it sits over three equal cards: a left-set headline above
    a symmetric row reads as a caption for the first card rather than a title
-   for all three. The phrase is the hub's one piece of voice — the cards say
-   what, this says why. */
+   for all three. The phrase names the hub and what it's for — the wordmark
+   the three cards below then break into rooms. */
 
 const HIDDEN = { filter: "blur(10px)", opacity: 0, y: 20 };
 const VISIBLE = { filter: "blur(0px)", opacity: 1, y: 0 };
@@ -29,12 +29,11 @@ export default function HomeHero() {
         {...reveal(0.16)}
         className="font-heading mx-auto max-w-4xl text-4xl leading-[1.08] tracking-[-2px] break-keep text-white md:text-6xl"
       >
-        기술 너머
+        Blockchain Research Hub
         <br />
         <span className="bg-gradient-to-r from-bay-100 via-bay-200 to-bay-400 bg-clip-text text-transparent">
-          시장과 경제의 구조
+          Trends · Data · Insights
         </span>
-        를 읽어냅니다
       </motion.h1>
     </div>
   );
