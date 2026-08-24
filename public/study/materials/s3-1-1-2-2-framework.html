@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>토큰화 주식 · 그 토큰, 진짜 주식일까?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#FFFFFF; --ink:#000000;
+  --link:#0000FF;            /* 하이퍼링크 전용. 다른 용도 사용 금지 */
+  --ok:#008000; --warn:#FFA500; --err:#FF0000;
+  --sunken:#F0F0F0; --dis:#CCCCCC;
+}
+*{box-sizing:border-box;border-radius:0 !important;box-shadow:none !important}
+html,body{margin:0;padding:0;height:100%;background:var(--sunken);overflow:hidden}
+body{font-family:"Work Sans","Pretendard",system-ui,sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased}
+.hd,h1,h2,h3{font-family:"Archivo Black","Pretendard",sans-serif;font-weight:900}
+.mono{font-family:"Space Mono","Pretendard",monospace}
+a{color:var(--link)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:50% 50%}
+
+/* ---------- slide frame ---------- */
+.slide{position:absolute;inset:0;background:var(--bg);padding:56px 92px 108px;
+  opacity:0;visibility:hidden;overflow:hidden;display:flex;flex-direction:column;
+  border-top:10px solid var(--ink)}
+.slide.on{opacity:1;visibility:visible;z-index:2}
+.slide.inv{background:var(--ink);color:var(--bg)}
+
+.s-kicker{display:flex;align-items:center;gap:16px;font-size:20px;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase}
+.s-kicker b{display:inline-flex;align-items:center;justify-content:center;min-width:52px;height:38px;
+  padding:0 12px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono","Pretendard",monospace;font-size:20px;font-weight:700;letter-spacing:1px}
+h2.s-title{margin:18px 0 0;font-size:62px;line-height:1.05;letter-spacing:-1px}
+p.s-lead{margin:20px 0 0;padding-left:20px;border-left:8px solid var(--ink);
+  font-size:29px;line-height:1.35;font-weight:600}
+.s-body{flex:1;margin-top:30px;min-height:0}
+.s-basis{margin-top:auto;padding-top:12px;font-family:"Space Mono","Pretendard",monospace;
+  font-size:17px;line-height:1.4}
+.s-next{margin-top:18px;padding:16px 24px;background:var(--ink);color:var(--bg);
+  display:flex;align-items:center;gap:20px;font-size:23px;line-height:1.35}
+.s-next::before{content:"NEXT →";flex:0 0 auto;font-family:"Space Mono",monospace;
+  font-size:17px;font-weight:700;letter-spacing:2px;border:2px solid var(--bg);padding:4px 10px}
+.s-next b{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- generic blocks ---------- */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.g23{display:grid;grid-template-columns:1.15fr .85fr;gap:32px}
+.g32{display:grid;grid-template-columns:.85fr 1.15fr;gap:32px}
+.card{background:var(--bg);border:3px solid var(--ink);padding:24px 26px}
+.card.hv{border-width:5px}                     /* elevated: 두꺼운 보더 = 더 중요 */
+.card h4{margin:0 0 14px;font-size:28px;line-height:1.2;font-weight:700}
+.card h4 .n{display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;margin-right:12px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:20px;font-weight:700}
+.card p{margin:0 0 10px;font-size:24px;line-height:1.5}
+.card p:last-child{margin-bottom:0}
+ul.bl{list-style:none;margin:0;padding:0}
+ul.bl>li{position:relative;padding-left:30px;margin-bottom:16px;font-size:25px;line-height:1.5}
+ul.bl>li:last-child{margin-bottom:0}
+ul.bl>li::before{content:"";position:absolute;left:2px;top:13px;width:12px;height:12px;background:var(--ink)}
+ul.bl>li b{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+ul.bl.sm>li{font-size:23px;margin-bottom:12px}
+.hl{font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.callout{position:relative;border:3px solid var(--ink);padding:28px 26px 20px;font-size:24px;line-height:1.5}
+.callout::before{content:"NOTE";position:absolute;left:-3px;top:-18px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:15px;font-weight:700;letter-spacing:2px;padding:4px 12px}
+.callout b{font-weight:700}
+.tag{display:inline-block;padding:4px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);
+  font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.tag.fill{background:var(--ink);color:var(--bg)}
+.tag.ok{border-color:var(--ok);color:var(--ok)}
+.tag.warn{border-color:var(--warn);color:var(--warn)}
+.tag.err{border-color:var(--err);color:var(--err)}
+table.tbl{width:100%;border-collapse:collapse}
+table.tbl th,table.tbl td{border:3px solid var(--ink);padding:16px 20px;font-size:24px;line-height:1.4;
+  text-align:left;vertical-align:top}
+table.tbl thead th{background:var(--ink);color:var(--bg);font-family:"Archivo Black","Pretendard",sans-serif;
+  font-weight:900;font-size:21px;text-transform:uppercase;letter-spacing:1px}
+table.tbl tbody th{background:var(--sunken);font-weight:700;width:230px}
+
+/* ---------- flow ---------- */
+.flow{display:flex;align-items:stretch;gap:0}
+.flow .st{flex:1;border:3px solid var(--ink);padding:16px 14px;text-align:center;
+  font-size:23px;line-height:1.35;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.flow .st i{display:block;font-style:normal;font-family:"Space Mono",monospace;
+  font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.flow .st b{font-weight:700}
+.flow .st.fin{background:var(--ink);color:var(--bg)}
+.flow .ar{flex:0 0 44px;display:flex;align-items:center;justify-content:center;
+  font-family:"Space Mono",monospace;font-size:30px;font-weight:700}
+
+/* ---------- chain diagram ---------- */
+.chain{display:flex;align-items:center;gap:0}
+.blk{flex:1;border:3px solid var(--ink);background:var(--bg);color:var(--ink);overflow:hidden}
+.blk .bh{background:var(--ink);color:var(--bg);padding:10px 14px;font-size:20px;font-weight:700;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.blk .bb{padding:14px}
+.blk .row{font-size:19px;margin-bottom:8px;line-height:1.3}
+.blk .row:last-child{margin-bottom:0}
+.blk .row s{display:block;font-size:15px;text-decoration:none;text-transform:uppercase;letter-spacing:1px;
+  font-family:"Space Mono",monospace}
+.blk .row .v{font-family:"Space Mono",monospace;font-size:19px;font-weight:700}
+.blk.bad{border-color:var(--err)}
+.blk.bad .bh{background:var(--err);color:var(--bg)}
+.blk.warn{border-color:var(--warn)}
+.blk.warn .bh{background:var(--warn);color:var(--ink)}
+.link{flex:0 0 52px;text-align:center;font-family:"Space Mono",monospace;font-size:24px;font-weight:700}
+.link.bad{color:var(--err)}
+
+/* ---------- bars ---------- */
+.bars{display:flex;flex-direction:column;gap:24px}
+.bar{display:grid;grid-template-columns:260px 1fr;align-items:center;gap:22px}
+.bar .nm{font-size:26px;font-weight:700}
+.bar .nm s{display:block;text-decoration:none;font-size:18px;font-weight:400;margin-top:4px;
+  font-family:"Space Mono",monospace}
+.bar .tr{height:54px;background:var(--bg);border:3px solid var(--ink);position:relative}
+.bar .fl{position:absolute;left:0;top:0;bottom:0;background:var(--ink);
+  display:flex;align-items:center;justify-content:flex-end;padding-right:14px}
+.bar .fl span{font-family:"Space Mono",monospace;font-size:21px;font-weight:700;color:var(--bg);white-space:nowrap}
+.bar .fl.min span{position:absolute;left:calc(100% + 14px);color:var(--ink)}
+
+/* ---------- section cover ---------- */
+.cover{justify-content:center;padding:70px 110px 120px}
+.cover-wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:70px;align-items:center}
+.cover .cn{font-size:230px;line-height:.85;letter-spacing:-6px;
+  color:var(--bg);-webkit-text-stroke:6px var(--ink);text-stroke:6px var(--ink)}
+.slide.inv .cn{color:var(--ink);-webkit-text-stroke:6px var(--bg)}
+.cover .cl{display:inline-block;margin-top:20px;padding:6px 16px;background:var(--ink);color:var(--bg);
+  font-family:"Space Mono",monospace;font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.slide.inv .cl{background:var(--bg);color:var(--ink)}
+.cover h2{margin:22px 0 0;font-size:74px;line-height:1.1;letter-spacing:-1px;max-width:1000px}
+.cover .cq{margin:26px 0 0;padding-top:20px;border-top:3px solid var(--ink);
+  font-size:30px;line-height:1.4;font-weight:600;max-width:960px}
+.slide.inv .cq{border-top-color:var(--bg)}
+.cover .toc{border:5px solid var(--ink);padding:28px 30px}
+.slide.inv .toc{border-color:var(--bg)}
+.cover .toc .th{font-family:"Space Mono",monospace;font-size:17px;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.cover .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+.cover .toc li{counter-increment:t;display:flex;gap:16px;align-items:baseline;
+  padding:12px 0;border-top:3px solid var(--ink);font-size:24px;line-height:1.35}
+.slide.inv .toc li{border-top-color:var(--bg)}
+.cover .toc li::before{content:counter(t,decimal-leading-zero);
+  font-family:"Space Mono",monospace;font-size:19px;font-weight:700;flex:0 0 44px}
+
+/* ---------- title slide ---------- */
+.title{justify-content:center;padding:90px 110px}
+.title .tk{display:inline-block;align-self:flex-start;padding:6px 16px;border:3px solid var(--ink);
+  font-family:"Space Mono",monospace;font-size:21px;font-weight:700;letter-spacing:4px;text-transform:uppercase}
+.slide.inv .title-border{border-color:var(--bg)}
+.title h1{margin:34px 0 0;font-size:104px;line-height:1.0;letter-spacing:-3px}
+.title .ts{margin:28px 0 0;font-size:31px;line-height:1.45;max-width:1500px}
+.title .tq{margin:44px 0 0;max-width:1400px;border:5px solid var(--ink)}
+.title .tq span{display:block;background:var(--ink);color:var(--bg);padding:8px 22px;
+  font-family:"Space Mono",monospace;font-size:17px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.title .tq p{margin:0;padding:20px 24px;font-size:33px;line-height:1.35;font-weight:700}
+.title .tf{margin-top:52px;font-family:"Space Mono",monospace;font-size:21px;line-height:1.5}
+
+/* ---------- bottom chrome ---------- */
+#bar{position:absolute;left:0;right:0;bottom:0;height:68px;padding:0 92px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-top:3px solid var(--ink);z-index:5}
+#secs{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;overflow:hidden}
+#secs .sc{font-size:16px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  padding:5px 14px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);
+  white-space:nowrap;cursor:pointer}
+#secs .sc:hover{background:var(--ink);color:var(--bg)}
+#secs .sc.on{background:var(--ink);color:var(--bg)}
+#pg{font-family:"Space Mono",monospace;font-size:19px;white-space:nowrap;flex:0 0 auto;margin-left:20px}
+#pg b{font-size:23px}
+#prog{position:absolute;left:0;bottom:0;height:6px;background:var(--ink);width:0;z-index:6}
+
+h2.s-title.sm{font-size:44px;margin-top:14px}
+.cite{margin-top:10px;font-family:"Space Mono","Pretendard",monospace;font-size:18px;color:var(--ink)}
+.fig{border:3px solid var(--ink);background:var(--bg);padding:10px}
+.fig img{display:block;width:100%;height:430px;object-fit:contain;background:#fff}
+.fig .cap{margin-top:8px;font-family:"Space Mono","Pretendard",monospace;font-size:15px;line-height:1.4;letter-spacing:.3px}
+.lim{margin-top:24px;border:3px solid var(--err);padding:14px 16px;font-size:20px;line-height:1.45;display:flex;gap:12px;align-items:flex-start}
+.lim .tag{flex:0 0 auto;margin-top:2px}
+.callout.use{font-size:21px;padding:22px 22px 16px}
+.callout.use::before{content:"제안서 활용"}
+.toc.dense li{font-size:19px;padding:7px 0}
+ul.bl.sm>li{font-size:22px;margin-bottom:12px}
+.terms{margin-top:14px;display:flex;gap:14px;align-items:flex-start;border:2px solid var(--ink);background:var(--sunken);padding:10px 14px;font-size:16.5px;line-height:1.5}
+.terms .tl{flex:0 0 auto;font-family:"Space Mono","Pretendard",monospace;font-size:13px;font-weight:700;letter-spacing:2px;background:var(--ink);color:var(--bg);padding:3px 10px;margin-top:1px}
+.terms b{font-weight:700}
+
+.slide.inv ul.bl>li::before{background:var(--bg)}</style>
+</head><body>
+<a href="../session.html?s=3" style="position:fixed;right:14px;top:14px;z-index:9999;background:#fff;border:2px solid #000;padding:7px 13px;font-size:13px;font-weight:700;color:#000;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; 3회차 진행안</a>
+<div id="stage">
+<section class="slide title on" data-sec="0">
+  <span class="tk">RWA 스터디 · 토큰화 주식 · 25분</span>
+  <h1>그 토큰,<br>진짜 주식일까?</h1>
+  <p class="ts">같은 "테슬라 토큰"이 <b class="hl">다섯 가지 전혀 다른 물건</b>일 수 있음. 공통 프레임 하나로 다섯을 전부 구별하는 것이 오늘의 목표임.</p>
+  <div class="tq"><span>이 강의를 관통하는 판별 질문</span><p>"이 토큰을 보유하면, 어떤 권리를 갖는가?"</p></div>
+  <p class="tf">초보자 눈높이 · 클릭 또는 방향키로 진행함</p>
+</section><section class="slide" data-sec="0">
+  <div class="s-kicker"><b>GOAL</b> 오늘의 목표</div>
+  <h2 class="s-title">이 5가지를 할 수 있으면 성공임</h2>
+  <div class="s-body">
+    <div class="g3" style="margin-top:14px">
+      <div class="card"><h4><span class="n">1</span>약자 읽기</h4><p>DTC · DRS · CFD · Perp 같은 영어 약자를 풀어서 말할 수 있음</p></div>
+      <div class="card"><h4><span class="n">2</span>갈림길 구분</h4><p>발행자 주도형과 제3자 주도형의 차이를 예시로 설명할 수 있음</p></div>
+      <div class="card"><h4><span class="n">3</span>3층 구조</h4><p>앱의 "10주"가 실제로 어느 장부에 적혀 있는지 답할 수 있음</p></div>
+    </div>
+    <div class="g2" style="margin-top:24px">
+      <div class="card"><h4><span class="n">4</span>5방식 판별</h4><p>어떤 토큰이든 "어느 층에 꽂히는가" 하나로 ①~⑤ 중 하나로 분류할 수 있음</p></div>
+      <div class="card"><h4><span class="n">5</span>트레이드오프</h4><p>층에서 멀어질수록 권리는 옅어지고 접근성은 커진다는 것을 예시로 말할 수 있음</p></div>
+    </div>
+  </div>
+</section><section class="slide" data-sec="1">
+  <div class="s-kicker"><b>ABC</b> 영어 약자 사전 1 — 기관 · 제도</div>
+  <h2 class="s-title sm">이 약자들을 모르면 오늘 수업이 안 읽힘</h2>
+  <div class="s-body">
+    <table class="tbl" style="margin-top:10px">
+      <thead><tr><th style="width:170px">약자</th><th style="width:520px">원어</th><th>무슨 뜻 · 어디에 쓰임</th></tr></thead>
+      <tbody>
+        <tr><td class="mono"><b>RWA</b></td><td>Real World Asset</td><td>실물 자산 — 주식·채권·부동산처럼 현실에 있는 자산. "RWA 토큰화" = 실물 자산의 권리를 블록체인에 올리는 일</td></tr>
+        <tr><td class="mono"><b>SEC</b></td><td>Securities and Exchange Commission</td><td>미국 증권거래위원회 — 미국 증권시장의 감독기관. 오늘의 5방식 분류도 SEC의 구분에서 출발함</td></tr>
+        <tr><td class="mono"><b>DTC</b></td><td>Depository Trust Company</td><td>미국 증권의 중앙 예탁기관 — 나라 전체의 주식을 한곳에 맡아 두는 "중앙 창고". 모회사는 DTCC(Depository Trust &amp; Clearing Corporation)</td></tr>
+        <tr><td class="mono"><b>Cede &amp; Co.</b></td><td>(약자 아님 · cede = 양도하다)</td><td>DTC가 주주명부에 이름을 올릴 때 쓰는 법적 명의 — 대부분의 미국 주식 주주명부에는 이 이름이 적혀 있음</td></tr>
+        <tr><td class="mono"><b>DRS</b></td><td>Direct Registration System</td><td>직접등록제도 — 투자자가 증권사를 거치지 않고 주주명부에 본인 이름을 직접 올리는 제도</td></tr>
+        <tr><td class="mono"><b>KYC</b></td><td>Know Your Customer</td><td>고객확인제도 — 금융회사가 거래 전에 신원을 확인하는 절차. 규제형 토큰 거래의 입장권</td></tr>
+        <tr><td class="mono"><b>NYSE</b></td><td>New York Stock Exchange</td><td>뉴욕증권거래소 — 세계 최대 주식 거래소</td></tr>
+        <tr><td class="mono"><b>MOU</b></td><td>Memorandum of Understanding</td><td>업무협약 — 법적 구속력은 약하지만 "함께 하겠다"는 공식 약속</td></tr>
+        <tr><td class="mono"><b>ADGM</b></td><td>Abu Dhabi Global Market</td><td>아부다비 국제금융센터 — 자체 금융 규제를 갖춘 특구. 일부 토큰 발행사가 여기서 인가를 받음</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section><section class="slide" data-sec="1">
+  <div class="s-kicker"><b>ABC</b> 영어 약자 사전 2 — 상품 · 기술 · 티커</div>
+  <h2 class="s-title sm">AAPL은 회사 이름이 아니라 "부르는 코드"임</h2>
+  <div class="s-body">
+    <table class="tbl" style="margin-top:10px">
+      <thead><tr><th style="width:170px">약자</th><th style="width:520px">원어</th><th>무슨 뜻 · 어디에 쓰임</th></tr></thead>
+      <tbody>
+        <tr><td class="mono"><b>티커</b></td><td>Ticker Symbol</td><td>거래소가 종목을 부르는 짧은 코드 — <b>AAPL</b>=Apple, <b>TSLA</b>=Tesla, <b>EXOD</b>=Exodus, <b>GLXY</b>=Galaxy Digital. 토큰명 끝의 x(AAPLx)는 "토큰판"이라는 표시</td></tr>
+        <tr><td class="mono"><b>ETF</b></td><td>Exchange-Traded Fund</td><td>상장지수펀드 — 여러 종목을 묶어 주식처럼 사고파는 펀드 (예: SPY=미국 대표 500개 기업 묶음)</td></tr>
+        <tr><td class="mono"><b>CFD</b></td><td>Contract for Difference</td><td>차액결제계약 — 자산을 사지 않고 가격의 오르내림 차액만 정산하기로 하는 계약. 방식 ④의 정체</td></tr>
+        <tr><td class="mono"><b>Perp</b></td><td>Perpetual Futures</td><td>무기한 선물 — 만기가 없는 선물 계약. 펀딩비(Funding Fee)로 실제 시세에 붙들어 둠. 방식 ⑤의 정체</td></tr>
+        <tr><td class="mono"><b>USDC</b></td><td>USD Coin</td><td>1개 = 1달러에 고정되도록 설계된 스테이블코인 — 무기한 선물의 증거금으로 흔히 쓰임</td></tr>
+        <tr><td class="mono"><b>DeFi</b></td><td>Decentralized Finance</td><td>탈중앙 금융 — 은행·증권사 없이 블록체인 프로그램으로 돌아가는 금융 서비스</td></tr>
+        <tr><td class="mono"><b>HIP-3</b></td><td>Hyperliquid Improvement Proposal 3</td><td>하이퍼리퀴드 개선 제안 3호 — 외부 개발자가 직접 무기한 선물 시장을 배포할 수 있게 한 규격</td></tr>
+        <tr><td class="mono"><b>MT5</b></td><td>MetaTrader 5</td><td>외환·CFD 거래에 널리 쓰이는 거래 플랫폼 프로그램</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section><section class="slide" data-sec="2">
+  <div class="s-kicker"><b>01</b> 본론 시작 — 첫 갈림길</div>
+  <h2 class="s-title">발행자 주도형 vs 제3자 주도형</h2>
+  <p class="s-lead">모든 토큰화 주식의 첫 질문 — 누가 토큰화를 주도하는가 (SEC의 분류 기준)</p>
+  <div class="s-body">
+    <div class="g2" style="margin-top:8px">
+      <div class="card hv"><h4><span class="n">A</span>발행자 주도형</h4>
+        <p>기초 증권의 <b class="hl">발행자가 직접</b> 토큰화를 수행함. 예: Apple이 Apple 주식 토큰을 발행.</p>
+        <p>회사의 공식 기록과 토큰이 <b>한 몸</b>이 될 수 있음.</p>
+        <p class="mono" style="font-size:19px">→ 방식 ① 직접 발행형</p></div>
+      <div class="card hv"><h4><span class="n">B</span>제3자 주도형</h4>
+        <p>발행자와 무관한 <b class="hl">제3자가 토큰화</b>함. 예: 다른 회사가 Apple 주식을 사서 만든 AAPLx.</p>
+        <p>Apple은 이 일과 무관 — 토큰의 실질은 <b>제3자가 설계한 구조</b>가 결정함.</p>
+        <p class="mono" style="font-size:19px">→ 방식 ② 증권 권리 · ③ 연계 증권 · ④ 파생 계약 · ⑤ 무기한 선물</p></div>
+    </div>
+    <div class="callout" style="margin-top:26px">제3자 주도형은 다시 넷으로 갈라짐 — <b>장부상 권리를 토큰으로</b>(②), <b>1:1 담보 연동 증권</b>(③), <b>차액만 정산하는 계약</b>(④), <b>가격 포지션 게임</b>(⑤). 이 구분을 하려면 먼저 "주식이 어디에 적혀 있는지"를 알아야 함.</div>
+  </div>
+</section><section class="slide" data-sec="3">
+  <div class="s-kicker"><b>02</b> 판별 도구</div>
+  <h2 class="s-title sm">내 주식은 3층 건물에 산다</h2>
+  <p class="s-lead">앱에서 AAPL 10주를 사면 — 내 이름은 3층에만 적히고, 1층 주주명부에는 DTC의 명의(Cede &amp; Co.)가 올라감</p>
+  <div class="s-body">
+    <div class="chain" style="margin-top:10px">
+      <div class="blk"><div class="bh">1층 · 공식 주주명부 <span class="mono">발행회사</span></div><div class="bb">
+        <div class="row"><s>관리</s>발행회사 · 명의개서대리인</div>
+        <div class="row"><s>기재된 이름</s><span class="v">Cede &amp; Co. (DTC 명의)</span></div></div></div>
+      <div class="link">↑</div>
+      <div class="blk"><div class="bh">2층 · DTC 장부 <span class="mono">중앙 창고</span></div><div class="bb">
+        <div class="row"><s>정체</s>미국 증권의 중앙 예탁기관</div>
+        <div class="row"><s>기재 내용</s>증권사별 보유 수량</div></div></div>
+      <div class="link">↑</div>
+      <div class="blk"><div class="bh">3층 · 증권사 장부 <span class="mono">내 계좌</span></div><div class="bb">
+        <div class="row"><s>기재된 이름</s><span class="v">나 — "AAPL 10주"</span></div>
+        <div class="row"><s>정체</s>증권사 내부 계좌 기록임</div></div></div>
+    </div>
+    <div class="terms"><span class="tl">용어</span><span><b>DRS</b>(직접등록제도) — 1층에 본인 이름을 직접 올리는 제도. 가능하지만 번거로워 드묾. <b>오늘 배울 다섯 방식은 전부 "이 건물의 무엇을 토큰으로 만들었는가"에 대한 다섯 가지 답임 — 방식마다 이 건물이 다시 등장함.</b></span></div>
+  </div>
+</section><section class="slide" data-sec="4">
+  <div class="s-kicker"><b>MAP</b> 주식 토큰화 지도</div>
+  <h2 class="s-title sm">5가지 방식 — 어디에 꽂히는가</h2>
+  <div class="s-body">
+    <table class="tbl" style="margin-top:10px">
+      <thead><tr><th style="width:70px">#</th><th>방식</th><th>한 줄 비유</th><th>꽂히는 곳</th><th>대표 플레이어</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">①</td><td><b>직접 발행형</b></td><td>공장이 직접 새긴 각인 성냥갑</td><td><b>1층 — 내 이름</b></td><td>Securitize · Superstate</td></tr>
+        <tr><td class="mono">②</td><td><b>증권 권리형</b></td><td>창고 보관증</td><td><b>2·3층 — 장부의 권리</b></td><td>DTC · Backpack · bStocks</td></tr>
+        <tr><td class="mono">③</td><td><b>연계 증권형</b></td><td>1:1 담보 교환권</td><td><b>3층 — 발행사 명의 담보</b></td><td>Backed xStocks · Ondo</td></tr>
+        <tr><td class="mono">④</td><td><b>파생 계약형</b></td><td>차액 정산 쪽지</td><td><b>건물 어디에도 없음</b></td><td>Robinhood EU · Bybit CFD</td></tr>
+        <tr><td class="mono">⑤</td><td><b>무기한 선물형</b></td><td>가격 내기판</td><td><b>건물 밖 — 시세만</b></td><td>Binance · Coinbase · Hyperliquid</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section><section class="slide" data-sec="5">
+  <div class="s-kicker"><b>①</b> 방식 ①</div>
+  <h2 class="s-title sm">직접 발행형 — 공장이 직접 새긴 성냥갑</h2>
+  <p class="s-lead">토큰 기록이 곧 1층 공식 주주명부와 연결됨 — 토큰 보유자 = 공식 주주</p>
+  <div class="s-body">
+    <div class="g23" style="margin-top:10px">
+      <div><div class="chain"><div class="blk"><div class="bh">1층 주주명부 <span class="mono">★ 내 이름</span></div><div class="bb"><div class="row"><s>기재</s><span class="v">토큰 보유자 = 나</span></div></div></div><div class="link">·</div><div class="blk" style="opacity:.35"><div class="bh">2층 DTC 장부 <span class="mono">경유 안 함</span></div></div><div class="link">·</div><div class="blk" style="opacity:.35"><div class="bh">3층 증권사 장부 <span class="mono">경유 안 함</span></div></div></div><div class="terms" style="margin-top:18px"><span class="tl">이야기</span><span><b>성냥 공장 이야기</b> — 성냥 공장(발행회사)이 성냥갑 겉면에 일련번호 <b>001</b>을 새기고, 공장 대장(주주명부)에 <b>"001의 주인 = 나"</b>라고 적어 줌. 이 성냥갑을 친구에게 넘기려면 성냥갑만 건네서는 무효이고, <b>반드시 공장 대장도 함께 고쳐 적어야</b> 거래가 성립함. 성냥갑(토큰)과 대장(명부)이 <b>한 몸</b>으로 움직이므로 — 성냥갑을 든 사람이 곧 진짜 주인임.</span></div>
+      <div class="terms" style="margin-top:14px"><span class="tl">권리</span><span>갖는 것: <b>공식 주주 지위·배당·의결권</b> / 못 갖는 것: 아무 데서나 사고팔 자유 — 공장이 인정한 가게(KYC·규제형 시장)에서만 사고팔 수 있음</span></div></div>
+      <div class="blk"><div class="bh">이 방식의 플레이어 <span class="mono">PLAYERS</span></div><div class="bb"><div class="row"><s>Securitize</s>발행·명의개서·투자자 검증·2차 거래까지 담당하는 토큰화 인프라 — 관리 자산 40억 달러+, 2026.3 NYSE(뉴욕증권거래소)와 MOU(업무협약)</div><div class="row"><s>Superstate</s>Opening Bell 플랫폼으로 상장주식을 직접 토큰화 — Galaxy Digital(GLXY) 등, 토큰화 자산 12억 달러+</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">실제 사례: Exodus의 <b>EXOD</b>, Galaxy Digital의 <b>GLXY</b>. 권리는 가장 강하고, 문은 가장 좁음.</div>
+  </div>
+</section><section class="slide" data-sec="6">
+  <div class="s-kicker"><b>②</b> 방식 ②</div>
+  <h2 class="s-title sm">증권 권리형 — 창고가 직접 만드는 보관증 토큰</h2>
+  <p class="s-lead">2·3층 장부에 적힌 "증권 권리"를 토큰으로 만듦 — 1층 주주명부는 그대로 둠</p>
+  <div class="s-body">
+    <div class="g23" style="margin-top:10px">
+      <div><div class="chain"><div class="blk" style="opacity:.35"><div class="bh">1층 주주명부 <span class="mono">그대로</span></div></div><div class="link">·</div><div class="blk"><div class="bh">2층 DTC 장부 <span class="mono">★</span></div><div class="bb"><div class="row"><s>누가</s>DTC가 직접</div><div class="row"><s>토큰화 대상</s>창고 장부의 권리</div></div></div><div class="link">·</div><div class="blk"><div class="bh">3층 증권사 장부 <span class="mono">★</span></div><div class="bb"><div class="row"><s>누가</s>Backpack 등이 여기서</div><div class="row"><s>토큰화 대상</s>증권사 계좌의 권리</div></div></div></div><div class="terms" style="margin-top:18px"><span class="tl">의미</span><span>3층 체계의 주인(DTC)이 직접 나섰다는 것 = 기존 금융의 심장부가 이미 움직이기 시작했다는 신호임. SEC의 노액션 레터(No-Action Letter)는 "이 방식이면 제재하지 않겠다"는 사전 답변임</span></div></div>
+      <div class="blk"><div class="bh">이 방식의 플레이어 <span class="mono">PLAYERS</span></div><div class="bb"><div class="row"><s>DTC 토큰화 서비스</s><b>2층의 주인이 직접</b> — 114조 달러 창고의 참전. 2025.12 SEC 노액션, 2026년 서비스 일정 (러셀1000·주요 ETF·미 국채)</div><div class="row"><s>Backpack</s><b>3층에서 출발</b> — 증권사 계좌에 보유한 지분의 권리를 Solana 토큰으로 전환. SpaceX 지분 토큰 $SPCX가 대표 사례</div><div class="row"><s>Binance bStocks</s>인가 법인(ADGM·아부다비 금융특구)이 <b>자기 계좌(3층)에 보유한 권리</b>를 토큰으로 발행 — 배당·주식분할 자동 반영</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">기존 금융의 심장부가 토큰화를 <b>흡수</b>하는 칸 — 지금 가장 뜨거운 자리임.</div>
+  </div>
+</section><section class="slide" data-sec="7">
+  <div class="s-kicker"><b>③</b> 방식 ③</div>
+  <h2 class="s-title sm">연계 증권형 — 1:1 담보 교환권</h2>
+  <p class="s-lead">발행사가 진짜 주식을 사서 3층(증권사 계좌)에 자기 명의로 보관하고, 그 가격에 1:1 연동되는 교환권을 발행함</p>
+  <div class="s-body">
+    <div class="g23" style="margin-top:10px">
+      <div><div class="chain"><div class="blk"><div class="bh">3층 증권사 계좌 <span class="mono">명의: 발행사(금고)</span></div><div class="bb"><div class="row"><s>보관</s>진짜 주식 1:1 분리 보관</div><div class="row"><s>주의</s><span class="v">내 이름 아님</span></div></div></div><div class="link">⇢</div><div class="blk"><div class="bh">교환권 토큰 <span class="mono">내 손</span></div><div class="bb"><div class="row"><s>내가 가진 것</s><span class="v">1:1 담보 교환권</span></div><div class="row"><s>아닌 것</s>주주 지위·의결권</div></div></div></div><div class="terms" style="margin-top:18px"><span class="tl">권리</span><span>건물에서 확인: 1층엔 Cede &amp; Co., <b>3층엔 발행사(금고) 이름</b> — 내 이름은 건물 어디에도 없고, 손에는 교환권만 있음. 갖는 것: 24시간 거래·자기수탁·DeFi 활용 / 가치는 전적으로 3층의 1:1 담보가 지킴</span></div></div>
+      <div class="blk"><div class="bh">이 방식의 플레이어 <span class="mono">PLAYERS</span></div><div class="bb"><div class="row"><s>Backed xStocks</s>대표 상품 AAPLx — 100개+ 상품. 2025.12 Kraken이 Backed를 인수(누적 거래 100억 달러 후) — 거래소가 발행사를 통째로 사들인 수직 통합</div><div class="row"><s>Ondo Global Markets</s>430개+ 상품을 3개 체인에서, 미국인 제외 — 위임투표·공시 접근까지 제공하는 실험 중</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">토큰 보유자는 주주가 아님 — 하지만 금고 속 진짜 주식이 <b>1:1로 가치를 담보</b>함.</div>
+  </div>
+</section><section class="slide" data-sec="8">
+  <div class="s-kicker"><b>④</b> 방식 ④</div>
+  <h2 class="s-title sm">파생 계약형 — 차액 정산 쪽지</h2>
+  <p class="s-lead">주식도 금고도 없이, 주가 차액을 정산해 주겠다는 계약(CFD·스왑)만 있음 — 그 계약을 토큰으로 표시함</p>
+  <div class="s-body">
+    <div class="g23" style="margin-top:10px">
+      <div><div class="chain"><div class="blk" style="opacity:.35"><div class="bh">3층 건물 전체 <span class="mono">아무 층에도 없음</span></div><div class="bb"><div class="row"><s>1·2·3층</s>내 이름도, 나를 위한 담보 주식도 없음</div></div></div><div class="link bad">✕</div><div class="blk bad"><div class="bh">계약서 한 장 <span class="mono">차액 정산</span></div><div class="bb"><div class="row"><s>실체</s>CFD(차액결제계약)·스왑</div><div class="row"><s>담보</s><span class="v">발행사의 약속뿐</span></div></div></div></div><div class="lim"><span class="tag err">주의</span><span>실제 사건 — "OpenAI 토큰"에 OpenAI가 <b>"우리 지분이 아니다"</b>라고 공개 반박한 곳이 정확히 이 칸임. 판별 질문을 가장 엄격하게 던질 것.</span></div></div>
+      <div class="blk"><div class="bh">이 방식의 플레이어 <span class="mono">PLAYERS</span></div><div class="bb"><div class="row"><s>Robinhood Stock Tokens</s>EU 대상 2,000개+ — 외부 지갑 이전 불가. 2026년 자체 체인 메인넷으로 확장 중이나 "토큰 보유 ≠ 주식 소유"는 여전함</div><div class="row"><s>Bybit TradFi</s>MT5(메타트레이더5) 기반 미국 주식 CFD — 최대 5배 레버리지, 실제 주식 없음</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">접근은 가장 쉽고, 권리는 가장 옅음 — <b>쪽지의 가치는 발행사의 약속</b>이 전부임.</div>
+  </div>
+</section><section class="slide" data-sec="9">
+  <div class="s-kicker"><b>⑤</b> 방식 ⑤</div>
+  <h2 class="s-title sm">무기한 선물형 — 가격 내기판</h2>
+  <p class="s-lead">주식도 토큰도 없이 가격의 오르내림에 포지션을 잡음 — 만기 없이 펀딩비로 시세에 붙들어 둠</p>
+  <div class="s-body">
+    <div class="g23" style="margin-top:10px">
+      <div><div class="chain"><div class="blk" style="opacity:.35"><div class="bh">3층 건물 <span class="mono">건물 밖</span></div><div class="bb"><div class="row"><s>건너오는 것</s>건물 안 주식의 시세뿐</div></div></div><div class="link">·</div><div class="blk warn"><div class="bh">시세판 <span class="mono">기준가</span></div><div class="bb"><div class="row"><s>역할</s>내기판의 기준 가격</div></div></div><div class="link">→</div><div class="blk"><div class="bh">무기한 내기판 <span class="mono">Perp</span></div><div class="bb"><div class="row"><s>보유</s><span class="v">포지션만 있음</span></div><div class="row"><s>유지</s>펀딩비를 주고받음</div></div></div></div><div class="terms" style="margin-top:18px"><span class="tl">핵심</span><span>내기판의 생명은 시세판(기준가) — 외부 가격을 블록체인에 전달하는 <b>오라클</b>이 여기에 쓰임. 시세판이 흔들리면 판 전체가 흔들림</span></div></div>
+      <div class="blk"><div class="bh">이 방식의 플레이어 <span class="mono">PLAYERS</span></div><div class="bb"><div class="row"><s>Binance · Coinbase</s>개별주+ETF 무기한 선물 — USDC 등 스테이블코인 증거금, 개별주 10배·ETF 20배(Coinbase)</div><div class="row"><s>Kraken xStocks Perps</s>기준가를 온체인 24/7 xStocks 가격에서 참조 — ③이 ⑤의 시세판이 되는 연쇄</div><div class="row"><s>Hyperliquid HIP-3</s>외부 개발자가 시장을 직접 배포 — 44개 계약, 2026.7 기준 무기한 거래량의 절반에 육박</div></div></div>
+    </div>
+    <div class="callout" style="margin-top:22px">가장 넓은 문, 가장 옅은 권리 — 스펙트럼의 <b>오른쪽 끝</b>임.</div>
+  </div>
+</section><section class="slide" data-sec="10">
+  <div class="s-kicker"><b>03</b> 한 장 비교</div>
+  <h2 class="s-title sm">권리는 왼쪽으로, 접근성은 오른쪽으로</h2>
+  <p class="s-lead">왼쪽일수록 실물·권리에 가깝고, 오른쪽일수록 약속·노출에 가까움 — 공짜 점심은 없음</p>
+  <div class="s-body">
+    <div class="bars" style="margin-top:8px">
+      <div class="bar"><div class="nm">① 직접 발행<s>주식 권리 연결성</s></div><div class="tr"><div class="fl" style="width:96%"><span>주주명부 직결</span></div></div></div>
+      <div class="bar"><div class="nm">② 증권 권리<s>장부상 권리</s></div><div class="tr"><div class="fl" style="width:76%"><span>2·3층 장부 연결</span></div></div></div>
+      <div class="bar"><div class="nm">③ 연계 증권<s>1:1 담보</s></div><div class="tr"><div class="fl" style="width:46%"><span>3층의 담보가 지킴</span></div></div></div>
+      <div class="bar"><div class="nm">④ 파생 계약<s>약속뿐</s></div><div class="tr"><div class="fl min" style="width:20%"><span>계약 상대방 신용</span></div></div></div>
+      <div class="bar"><div class="nm">⑤ 무기한<s>포지션</s></div><div class="tr"><div class="fl min" style="width:10%"><span>시세판·거래소</span></div></div></div>
+    </div>
+    <div class="callout" style="margin-top:26px"><b>결론 — 주식 토큰화는 결국 제도권으로 향함.</b> 단기엔 미국 안(①②)과 밖(③④⑤)이 병존하지만, 기관 자금은 권리의 법적 안정성·보관 구조·투자자 보호·규제형 유통이 갖춰진 쪽으로 흐름.</div>
+  </div>
+</section><section class="slide" data-sec="11">
+  <div class="s-kicker"><b>Q</b> 케이스 판별 훈련</div>
+  <h2 class="s-title sm">①~⑤ 중 무엇일까 — 전부 실제 상품임</h2>
+  <div class="s-body">
+    <div class="g3" style="margin-top:10px">
+      <div class="card"><h4><span class="n">1</span>EXOD</h4><p>Exodus가 자사 주식을 디지털 증권으로 발행 — 토큰 기록이 곧 공식 주주명부임</p></div>
+      <div class="card"><h4><span class="n">2</span>$SPCX</h4><p>전통 증권사 보유분을 Solana 토큰으로 전환해 거래함</p></div>
+      <div class="card"><h4><span class="n">3</span>AAPLx</h4><p>제3자가 진짜 AAPL 주식을 1:1 금고에 넣고 발행한 교환권 — 의결권 없음</p></div>
+    </div>
+    <div class="g3" style="margin-top:20px">
+      <div class="card"><h4><span class="n">4</span>OpenAI 토큰</h4><p>가격 차액을 정산해 주는 금융계약 — 외부 지갑 이전 불가</p></div>
+      <div class="card"><h4><span class="n">5</span>TSLA-PERP</h4><p>USDC 증거금으로 가격에 포지션 — 만기 없이 펀딩비를 주고받음</p></div>
+      <div class="card"><h4><span class="n">6</span>함정</h4><p>DRS로 Apple 주주명부에 내 이름을 직접 등록했음 — 몇 번 방식일까?</p></div>
+    </div>
+  </div>
+</section><section class="slide" data-sec="11">
+  <div class="s-kicker"><b>A</b> 케이스 판별 정답</div>
+  <h2 class="s-title sm">판별 질문 하나면 전부 풀림</h2>
+  <div class="s-body">
+    <table class="tbl" style="margin-top:10px">
+      <thead><tr><th style="width:230px">케이스</th><th style="width:230px">정답</th><th>판별 근거 — 어디에 꽂히는가</th></tr></thead>
+      <tbody>
+        <tr><td><b>EXOD</b></td><td class="mono">① 직접 발행형</td><td>1층 주주명부에 내 이름이 올라감</td></tr>
+        <tr><td><b>$SPCX</b></td><td class="mono">② 증권 권리형</td><td>3층 증권사 계좌의 권리를 토큰으로 바꿈 (2·3층)</td></tr>
+        <tr><td><b>AAPLx</b></td><td class="mono">③ 연계 증권형</td><td>3층에 발행사 이름으로 1:1 보관 — 내 손엔 교환권만</td></tr>
+        <tr><td><b>OpenAI 토큰</b></td><td class="mono">④ 파생 계약형</td><td>건물 어디에도 없음 — 발행사의 약속뿐 (OpenAI: "우리 지분 아님")</td></tr>
+        <tr><td><b>TSLA-PERP</b></td><td class="mono">⑤ 무기한 선물형</td><td>건물 밖 시세만 중계됨 — 주식도 토큰도 없음</td></tr>
+        <tr><td><b>DRS 직접등록</b></td><td class="mono">토큰화 아님</td><td>블록체인이 등장하지 않음 — 전통 제도(1층 직접 등록)일 뿐임</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section><section class="slide inv" data-sec="12">
+  <div class="s-kicker"><b>END</b> 오늘의 세 문장</div>
+  <h2 class="s-title">초보자가 가져갈 이해점</h2>
+  <div class="s-body">
+    <ul class="bl" style="margin-top:26px">
+      <li style="font-size:34px;line-height:1.5">같은 이름의 토큰이 <b>전혀 다른 5가지 물건</b>일 수 있다 — 겉모습으로 판단하지 않는다.</li>
+      <li style="font-size:34px;line-height:1.5">판별 질문은 하나다 — <b>"이 토큰은 3층 구조의 어느 층에 연결되는가."</b></li>
+      <li style="font-size:34px;line-height:1.5">층에서 멀어질수록 권리는 옅어지고 접근성은 커진다 — <b>공짜 점심은 없다.</b></li>
+    </ul>
+  </div>
+  <p style="margin-top:auto;font-family:'Space Mono','Pretendard',monospace;font-size:17px;color:#CCCCCC">교육용 자료이며 투자 권유가 아님</p>
+</section>
+<div id="bar"><div id="secs"></div><div id="pg"></div></div>
+<div id="prog"></div>
+</div>
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var secs=document.getElementById('secs');
+  var pg=document.getElementById('pg');
+  var prog=document.getElementById('prog');
+  var NAMES=["시작", "약자 사전", "갈림길", "3층 구조", "지도", "①직접", "②권리", "③연계", "④파생", "⑤무기한", "비교", "판별", "정리"];
+  secs.innerHTML='';
+  NAMES.forEach(function(n,i){
+    var d=document.createElement('div');
+    d.className='sc';
+    d.textContent=n;
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      for(var k=0;k<slides.length;k++){if(+slides[k].getAttribute('data-sec')===i){go(k);break;}}
+    });
+    secs.appendChild(d);
+  });
+  var cur=0;
+  function render(){
+    for(var i=0;i<slides.length;i++){
+      if(i===cur){slides[i].classList.add('on');}else{slides[i].classList.remove('on');}
+    }
+    var sec=+slides[cur].getAttribute('data-sec');
+    var chips=secs.children;
+    for(var j=0;j<chips.length;j++){
+      if(j===sec){chips[j].classList.add('on');}else{chips[j].classList.remove('on');}
+    }
+    pg.innerHTML='<b>'+(cur+1)+'</b> / '+slides.length+' · '+NAMES[sec];
+    prog.style.width=((cur+1)/slides.length*100)+'%';
+    if(history.replaceState){history.replaceState(null,'','#'+(cur+1));}
+  }
+  function go(n){
+    if(n<0){n=0;}
+    if(n>slides.length-1){n=slides.length-1;}
+    if(n===cur){return;}
+    cur=n;render();
+  }
+  function next(){go(cur+1);}
+  function prev(){go(cur-1);}
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'||k==='Enter'){next();e.preventDefault();}
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){prev();e.preventDefault();}
+    else if(k==='Home'){go(0);e.preventDefault();}
+    else if(k==='End'){go(slides.length-1);e.preventDefault();}
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('#bar')){return;}
+    next();
+  });
+  document.addEventListener('contextmenu',function(e){e.preventDefault();prev();});
+  function fit(){
+    var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+    stage.style.transform='translate(-50%,-50%) scale('+s+')';
+  }
+  /* 폰트 환경이 달라 본문이 넘칠 경우 슬라이드 안으로 축소 보정함 */
+  function fitBodies(){
+    slides.forEach(function(el){
+      var b=el.querySelector('.s-body');
+      if(!b){return;}
+      b.style.transform='';b.style.width='';
+      var over=b.scrollHeight-b.clientHeight;
+      if(over>1&&b.scrollHeight>0){
+        var k=b.clientHeight/b.scrollHeight;
+        if(k<0.84){k=0.84;}
+        b.style.transformOrigin='top left';
+        b.style.transform='scale('+k+')';
+        b.style.width=(100/k)+'%';
+      }
+    });
+  }
+  window.addEventListener('resize',fit);
+  window.addEventListener('load',fitBodies);
+  fit();
+  fitBodies();
+  var h=parseInt((location.hash||'').replace('#',''),10);
+  if(h>0&&h<=slides.length){cur=h-1;}
+  render();
+})();
+</script>
+</body></html>

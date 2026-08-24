@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3-3 연계 증권형 · 상세 학습 노트</title>
+<script>
+try{
+  if(localStorage.getItem('jl-lend-theme') === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  }
+}catch(e){}
+try{
+  if(/^#s\d+$/.test(location.hash)){
+    history.replaceState(null, document.title, location.href.replace(/#.*$/, ''));
+  }
+}catch(e){}
+</script>
+<style>
+/* ══════════════════════════════════════════════════════
+   TOKENS  (Jupiter Lend · Loopscale과 동일한 디자인 시스템)
+   ══════════════════════════════════════════════════════ */
+:root{
+  color-scheme: dark;
+
+  --surface:#161615;
+  --surface-2:#1e1e1d;
+
+  --ink:#ffffff;
+  --ink-2:#c9c8be;
+  --muted:#8b8983;
+  --faint:#5f5e59;
+
+  --hair:rgba(255,255,255,.11);
+  --hair-2:rgba(255,255,255,.2);
+
+  --blue:#3987e5;
+  --blue-border:rgba(57,135,229,.42);
+  --blue-soft:rgba(57,135,229,.14);
+  --red:#e66767;
+
+  --side-bg:var(--surface);
+  --side-ink:var(--ink-2);
+  --side-muted:var(--muted);
+  --side-line:rgba(255,255,255,.13);
+  --side-blue:var(--blue);
+
+  --t-h:34px;
+  --t-sub:15px;
+  --t-body:16.5px;
+  --t-lb:11.5px;
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+
+  --surface:#ffffff;
+  --surface-2:#f2f5f8;
+
+  --ink:#14151a;
+  --ink-2:#3f414a;
+  --muted:#52545a;
+  --faint:#6b6d73;
+
+  --hair:rgba(0,0,0,.10);
+  --hair-2:rgba(0,0,0,.18);
+
+  --blue:#1c5cab;
+  --blue-border:rgba(28,92,171,.35);
+  --blue-soft:rgba(28,92,171,.08);
+  --red:#c23b3b;
+
+  --side-bg:var(--surface);
+  --side-ink:var(--ink-2);
+  --side-muted:var(--muted);
+  --side-line:rgba(19,38,63,.12);
+  --side-blue:var(--blue);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--surface-2);color:var(--ink);
+  font-family:Pretendard,"Apple SD Gothic Neo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:var(--t-body);line-height:1.62;letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ══════════ 뼈대 : 사이드 목차 + 본문 ══════════ */
+.wrap{display:grid;grid-template-columns:268px minmax(0,1fr);width:100%;min-height:100vh;background:var(--surface-2)}
+
+.side{
+  position:sticky;top:0;align-self:start;height:100vh;
+  display:flex;align-items:flex-start;padding:28px 20px;
+  background:var(--side-bg);border-right:1px solid var(--side-line);
+}
+.side nav{width:100%;max-height:calc(100vh - 56px);margin:0 auto;overflow-y:auto;padding:6px 4px 6px 0;scrollbar-width:thin}
+.toc{list-style:none;margin:0;padding:0}
+.toc .grp{
+  margin:18px 0 7px;padding:15px 10px 0;border-top:1px solid var(--side-line);
+  font-size:15px;font-weight:850;letter-spacing:-.015em;color:var(--ink);
+}
+.toc .grp:first-child{margin-top:0;padding-top:0;border-top:0}
+.toc a{
+  display:flex;align-items:baseline;gap:8px;padding:6px 10px;border-left:2px solid transparent;border-radius:0 7px 7px 0;
+  font-size:13.5px;font-weight:650;color:var(--side-muted);text-decoration:none;letter-spacing:-.02em;
+}
+.toc a .n{flex:none;width:22px;color:var(--side-muted);font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.toc a:hover{color:var(--ink)}
+.toc a.on{color:var(--ink);font-weight:800;background:var(--blue-soft);border-left-color:var(--side-blue)}
+.toc a.on .n{color:var(--side-blue)}
+.toc a:focus-visible{outline:2px solid var(--side-blue);outline-offset:2px;border-radius:2px}
+
+.main{padding:24px 28px 56px;min-width:0;background:var(--surface-2)}
+
+/* ══════════ 표제 ══════════ */
+.top{
+  margin:0 0 18px;padding:34px 38px;
+  background:var(--surface);border:1px solid var(--side-line);border-radius:12px
+}
+.top .study,
+.top .source,
+.top .presenter{margin:0;font-size:14px;font-weight:750;line-height:1.45;letter-spacing:-.02em}
+.top .study{color:var(--blue)}
+.top .source{margin-top:2px;color:var(--muted)}
+.top h1{margin:18px 0;font-size:clamp(40px,4.4vw,58px);font-weight:850;letter-spacing:-.05em;line-height:1.14}
+.top h1 em{font-style:normal;color:var(--ink)}
+.top .presenter{color:var(--ink-2)}
+.top .presenter span{margin:0 9px;color:var(--hair-2)}
+
+/* ══════════ 섹션 ══════════ */
+.chapter-group{
+  margin:0 0 18px;padding:28px 36px 0;
+  background:var(--surface);border:1px solid var(--side-line);border-radius:12px
+}
+.chapter-group:last-child{margin-bottom:0}
+.chapter-title{
+  margin:0;padding:44px 0 0;border-top:1px solid var(--hair-2);
+  font-size:28px;font-weight:850;letter-spacing:-.04em;color:var(--ink);
+}
+.chapter-group .chapter-title{display:flex;align-items:center;gap:12px;padding:0 0 18px;border-top:0}
+.chapter-group .chapter-title::before{content:"";width:4px;height:24px;flex:none;background:var(--blue);border-radius:2px}
+.chapter-title em{font-style:normal;color:var(--ink)}
+.chapter-title + .sec{padding-top:24px;border-top:0}
+.chapter-group .chapter-title + .sec{padding-top:8px}
+.chapter-group > .sec:first-child{padding-top:8px;border-top:0}
+.chapter-group .sec:last-child{padding-bottom:28px}
+.sec{padding:34px 0 36px;border-top:1px solid var(--hair);scroll-margin-top:24px}
+.chapter-group .sec + .sec{border-top:1px solid var(--hair)}
+#s2,#s3{padding-top:40px;border-top:0}
+#s5,#s6,#s7{padding-top:42px;border-top:0}
+#s9,#s10{padding-top:42px;border-top:0}
+#s12,#s13{padding-top:42px;border-top:0}
+#s14,#s17{padding-top:42px;border-top:0}
+.sec-head{margin-bottom:24px}
+.lb{margin:0 0 18px;font-size:var(--t-h);font-weight:850;letter-spacing:-.045em;line-height:1.26;color:var(--ink)}
+.h{margin:0;font-size:var(--t-h);font-weight:850;letter-spacing:-.045em;line-height:1.26}
+.h em{font-style:normal;color:var(--blue)}
+.sub{margin:11px 0 0;font-size:var(--t-sub);color:var(--muted);letter-spacing:-.015em}
+.warmup-head{margin-bottom:18px}
+.warmup-copy{max-width:1000px;color:var(--ink-2);font-size:17.5px;line-height:1.7;letter-spacing:-.015em}
+.warmup-copy p{margin:0}
+.warmup-intro{max-width:860px;font-size:19px;line-height:1.65}
+.warmup-copy ul{margin:19px 0 0;padding-left:24px}
+.warmup-copy li{padding-left:3px}
+.warmup-copy li + li{margin-top:9px}
+.warmup-copy b{color:var(--ink);font-weight:850}
+.warmup-copy b.blue{color:var(--blue)}
+.synthetic-note{margin-left:5px;font-size:14px;font-weight:650;color:var(--faint);white-space:nowrap}
+.synthetic-help{margin:10px 0 0 27px!important;font-size:13.5px;color:var(--faint);line-height:1.55}
+.synthetic-help b{color:var(--ink-2);font-weight:800}
+.term-underline{color:var(--ink);font-weight:850;text-decoration:underline;text-decoration-color:var(--blue);text-decoration-thickness:2px;text-underline-offset:4px}
+.section-lead-list{margin:0;padding-left:23px;font-size:17.5px;color:var(--ink-2);line-height:1.7;letter-spacing:-.02em}
+.section-lead-list li{padding-left:3px}
+.section-lead-list li + li{margin-top:7px}
+.section-lead-list b{color:var(--ink);font-weight:850}
+.backed-bullets{width:100%;margin:0;padding-left:25px;font-size:17.5px;color:var(--ink-2);line-height:1.72;letter-spacing:-.018em}
+.backed-bullets > li{padding-left:4px}
+.backed-bullets > li::marker{color:var(--blue)}
+.backed-bullets > li + li{margin-top:13px}
+.backed-bullets ul{margin:8px 0 0;padding-left:30px;list-style-type:circle;font-size:16px;color:var(--muted);line-height:1.68}
+.backed-bullets ul > li{padding-left:3px}
+.backed-bullets ul > li::marker{color:var(--blue)}
+.backed-bullets ul > li + li{margin-top:8px}
+.backed-bullets ul ul{margin-top:8px;padding-left:27px;list-style:none;font-size:15.5px;color:var(--muted)}
+.backed-bullets ul ul > li{position:relative;padding-left:17px}
+.backed-bullets ul ul > li::before{content:"–";position:absolute;left:0;color:var(--blue);font-weight:850}
+.backed-bullets b{color:var(--ink);font-weight:850}
+
+/* 연계 증권형 구조 : 가로 프로세스 흐름 */
+.linked-structure{
+  display:grid;
+  grid-template-columns:minmax(130px,1fr) 30px minmax(130px,1fr) 30px minmax(130px,1fr) 30px minmax(130px,1fr) 30px minmax(130px,1fr);
+  align-items:start;width:100%;max-width:none;margin:0;padding:6px 0 2px;overflow-x:auto;scrollbar-width:thin
+}
+.structure-step{
+  min-width:0;padding:4px 6px
+}
+.structure-no{display:block;margin-bottom:9px;font-size:14px;font-weight:850;letter-spacing:.06em;color:var(--blue);font-variant-numeric:tabular-nums}
+.structure-copy strong{display:block;font-size:18px;font-weight:850;letter-spacing:-.03em;color:var(--ink);line-height:1.35}
+.structure-copy p{margin:5px 0 0;font-size:14px;color:var(--muted);line-height:1.45}
+.structure-flow-arrow{padding-top:37px;text-align:center;color:var(--blue);font-size:18px;font-weight:850;line-height:1}
+.structure-result{margin:10px 0 0;font-size:14px;font-weight:800;color:var(--blue);line-height:1.45}
+
+/* 아티클 본문과 해석 */
+.reading-stack{display:grid}
+.reading-pair{
+  display:grid;grid-template-columns:minmax(0,45fr) minmax(48px,10fr) minmax(0,45fr);
+  align-items:center;padding:24px 0;border-bottom:1px solid var(--hair)
+}
+.reading-pair:first-child{padding-top:0}
+.reading-pair:last-child{padding-bottom:0;border-bottom:0}
+.reading-label{display:block;margin:0 0 9px;font-size:12px;font-weight:850;letter-spacing:.08em;color:var(--blue)}
+.article-quote{margin:0;padding:1px 0 1px 16px;border-left:3px solid var(--blue);font-size:16.5px;font-style:italic;color:var(--muted);line-height:1.68}
+.reading-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px;font-weight:850;line-height:1}
+.reading-explain-list{margin:0;padding-left:20px;font-size:17px;font-weight:650;color:var(--ink-2);line-height:1.62;letter-spacing:-.02em}
+.reading-explain-list li{padding-left:2px}
+.reading-explain-list li::marker{color:var(--blue)}
+.reading-explain-list li + li{margin-top:7px}
+.reading-explain-list b{color:var(--ink);font-weight:850}
+
+/* 05 장단점 · 06 확인 항목 */
+.tradeoff-item{display:flex;flex-direction:column;justify-content:center;min-height:82px}
+.tradeoff-item strong{display:block;font-size:17px;font-weight:850;letter-spacing:-.025em;color:var(--ink)}
+.tradeoff-item span{display:block;margin-top:4px;font-size:14.5px;color:var(--muted);line-height:1.5}
+.tradeoff-item span b{color:var(--blue);font-weight:850}
+.check-list{max-width:1080px;border-bottom:0}
+.check-item{display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--hair)}
+.check-no{padding-top:2px;font-size:14px;font-weight:850;letter-spacing:.08em;color:var(--blue);font-variant-numeric:tabular-nums}
+.check-copy strong{display:block;font-size:19px;font-weight:850;letter-spacing:-.03em;color:var(--ink)}
+.check-copy p{margin:5px 0 0;font-size:16px;color:var(--muted);line-height:1.58}
+.check-copy b{color:var(--blue);font-weight:850}
+
+/* xStocks의 세부 구조 : 발표 순서에 맞춘 세로 흐름 */
+.mechanism-stack{max-width:960px}
+.mechanism-block + .mechanism-block{margin-top:36px}
+.mechanism-title{margin:0;font-size:20px;font-weight:850;letter-spacing:-.03em;color:var(--ink)}
+.mechanism-role{margin:3px 0 0;font-size:13.5px;font-weight:800;color:var(--blue)}
+.mechanism-points{margin:14px 0 0;padding-left:22px;font-size:16px;color:var(--ink-2);line-height:1.6}
+.mechanism-points li{padding-left:3px}
+.mechanism-points li::marker{color:var(--blue)}
+.mechanism-points li + li{margin-top:6px}
+.mechanism-example{margin:12px 0 0;font-size:14.5px;color:var(--muted);line-height:1.55}
+.mechanism-example span{margin-right:9px;font-size:12px;font-weight:800;color:var(--faint)}
+.mechanism-example b{color:var(--ink-2);font-weight:800}
+.mechanism-example i{margin:0 8px;font-style:normal;color:var(--blue);font-weight:850}
+.mechanism-origin{margin:6px 0 0;font-size:13px;color:var(--faint)}
+
+/* ══════════ 행 격자 : 열이 반드시 정렬된다 ══════════ */
+.rows{display:grid}
+.rows.duo{grid-template-columns:1fr 1fr}
+.rows.tri{grid-template-columns:150px 1fr 1fr}
+.rows.key{grid-template-columns:132px 1fr}
+
+.c{padding:14px 34px 14px 0;border-top:1px solid var(--hair);min-width:0}
+.rows.duo .c:nth-child(2n),
+.rows.tri .c:nth-child(3n),
+.rows.tri .c:nth-child(3n-1){padding-left:34px;border-left:1px solid var(--hair)}
+
+.rows .hd{
+  border-top:0;padding-top:0;padding-bottom:15px;
+  font-size:20px;font-weight:850;letter-spacing:-.035em;color:var(--ink-2);
+}
+.rows .hd.pos{color:var(--blue)}
+.rows .hd.neg{color:var(--red)}
+.rows .hd small{
+  display:block;margin-top:5px;font-size:13px;font-weight:650;color:var(--faint);letter-spacing:-.01em;
+}
+.rows.tri .hd{font-size:var(--t-lb);font-weight:850;letter-spacing:.12em;color:var(--faint);padding-bottom:13px}
+.rows.tri .hd.b{font-size:19px;letter-spacing:-.035em;color:var(--ink-2)}
+.rows.tri .hd.o{font-size:19px;letter-spacing:-.035em;color:var(--blue)}
+
+.k{font-size:14.5px;font-weight:800;color:var(--faint);letter-spacing:-.01em}
+.v{font-size:var(--t-body);color:var(--ink-2);letter-spacing:-.02em}
+.v b{color:var(--ink);font-weight:850}
+.v b.t{color:var(--blue)}
+.v b.n{color:var(--red)}
+.v .off{color:var(--faint)}
+.v .note{display:block;margin-top:4px;font-size:14px;color:var(--faint);line-height:1.55}
+
+/* 라벨 좌 · 값 우 정렬 행 */
+.c.kv{display:flex;align-items:baseline;justify-content:space-between;gap:18px}
+.c.kv > span{font-size:16px;font-weight:700;color:var(--ink-2)}
+.c.kv > b{font-size:18.5px;font-weight:850;letter-spacing:-.035em;text-align:right;white-space:nowrap}
+.c.kv > b.dim{color:var(--faint)}
+.c.kv > b.keep{color:var(--blue)}
+.c.kv > b.no{color:var(--red)}
+.sec#s2 .c.kv > span{font-size:18px}
+.sec#s2 .c.kv > b{font-size:21px}
+
+/* ══════════ 마무리 한 줄 ══════════ */
+.punch{
+  margin:26px 0 0;padding-top:0;border-top:0;
+  display:grid;grid-template-columns:78px 1fr;gap:0 16px;align-items:baseline;
+}
+.punch .pl{font-size:18px;font-weight:850;letter-spacing:.03em;color:var(--blue)}
+.punch p{margin:0;font-size:22px;font-weight:700;color:var(--ink-2);letter-spacing:-.025em;line-height:1.6}
+.punch b{color:var(--ink);font-weight:850}
+.punch .n{color:var(--red);font-weight:850}
+
+/* ══════════ 용어 ══════════ */
+.terms{display:block}
+.terms > div{display:grid;grid-template-columns:230px minmax(0,1fr);gap:36px;padding:22px 0;border-top:0}
+.terms > div:first-child{border-top:0;padding-top:0}
+.terms dt{font-size:20px;font-weight:850;letter-spacing:-.035em;color:var(--ink)}
+.terms dt span{display:block;margin-top:4px;font-size:14px;font-weight:800;color:var(--blue);letter-spacing:-.01em}
+.terms dd{margin:0;font-size:16px;color:var(--ink-2);line-height:1.6;letter-spacing:-.015em}
+.terms dd ul{margin:0;padding-left:21px}
+.terms dd li{padding-left:3px}
+.terms dd li::marker{color:var(--blue)}
+.terms dd li + li{margin-top:6px}
+.terms dd b{color:var(--ink);font-weight:850}
+
+/* ══════════ 링크 · 목록 ══════════ */
+.v ul{margin:0;padding:0;list-style:none}
+.v li + li{margin-top:6px}
+.v a{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue-border)}
+.v a:hover{border-bottom-color:var(--blue)}
+.v a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* ══════════ 테마 토글 ══════════ */
+.theme-toggle{
+  position:fixed;top:18px;right:18px;z-index:500;
+  display:inline-flex;align-items:center;gap:9px;
+  padding:10px 16px 10px 13px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--hair-2);
+  color:var(--ink-2);font-family:inherit;font-size:12.5px;font-weight:750;letter-spacing:-.01em;
+  cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.14);
+}
+.theme-toggle:hover{border-color:var(--blue-border);color:var(--ink)}
+.theme-toggle .ico{width:15px;height:15px;flex:none;display:flex;color:var(--blue)}
+.theme-toggle .ico svg{width:100%;height:100%}
+.theme-toggle .ico.moon{display:none}
+:root[data-theme="light"] .theme-toggle .ico.sun{display:none}
+:root[data-theme="light"] .theme-toggle .ico.moon{display:flex}
+
+/* ══════════ 반응형 ══════════ */
+@media(max-width:1180px){ .main{padding:16px 18px 40px} }
+@media(max-width:960px){
+  :root{--t-h:26px;--t-body:15.5px}
+  .wrap{grid-template-columns:1fr}
+  .side{
+    position:static;height:auto;display:block;border-right:0;border-bottom:1px solid var(--side-line);
+    padding:22px 24px;
+  }
+  .side nav{max-height:none;margin:0;overflow:visible;padding:0}
+  .toc{display:flex;flex-wrap:wrap;gap:4px 18px}
+  .toc .grp{width:100%;margin:12px 0 2px;padding:12px 0 0}
+  .toc .grp:first-child{margin-top:0;padding-top:0}
+  .main{padding:14px 16px 36px}
+  .top{margin-bottom:14px;padding:24px 20px}
+  .chapter-group{margin-bottom:14px;padding:20px 20px 0;border-radius:14px}
+  .chapter-group .chapter-title{padding-top:0}
+  .chapter-group .sec:last-child{padding-bottom:20px}
+  .chapter-title{padding-top:30px;font-size:23px}
+  .chapter-title + .sec{padding-top:18px}
+  .structure-step{padding:4px}
+  .structure-copy strong{font-size:18px}
+  .article-quote{font-size:16.5px}
+  .reading-explain-list{font-size:17px}
+  .backed-bullets{font-size:16px}
+  .backed-bullets ul{font-size:15px}
+  .backed-bullets ul ul{font-size:14.5px}
+  .mechanism-block + .mechanism-block{margin-top:30px}
+  .rows.duo,.rows.tri,.rows.key{grid-template-columns:1fr}
+  .c,.rows.duo .c:nth-child(2n),.rows.tri .c:nth-child(3n),
+  .rows.tri .c:nth-child(3n-1){padding-left:0;border-left:0}
+  .rows .hd{border-top:1px solid var(--hair);padding-top:15px;padding-bottom:5px}
+  .rows .hd:first-child{border-top:0;padding-top:0}
+  .rows.tri .hd:not(.b):not(.o){display:none}
+  .terms > div{grid-template-columns:1fr;gap:10px}
+  .theme-toggle .tt-label{display:none}
+  .theme-toggle{padding:9px;border-radius:50%}
+}
+
+@media(max-width:680px){
+  .reading-pair{grid-template-columns:1fr;padding:22px 0}
+  .reading-arrow{justify-content:flex-start;margin:12px 0 12px 16px}
+}
+
+@media print{
+  .side,.theme-toggle{display:none}
+  .wrap{grid-template-columns:1fr}
+  .main{padding:0}
+  .sec{page-break-after:always;break-after:page;border-top:0}
+  .sec:last-child{page-break-after:auto;break-after:auto}
+}
+</style>
+</head>
+<body>
+<a href="../session.html?s=3" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 3회차 진행안으로</a>
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="다크·라이트 모드 전환">
+  <span class="ico sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg></span>
+  <span class="ico moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.6A8.6 8.6 0 1 1 9.4 4a7 7 0 0 0 10.6 10.6Z"/></svg></span>
+  <span class="tt-label">라이트 모드</span>
+</button>
+
+<div class="wrap">
+
+<!-- ══════════ 사이드 목차 ══════════ -->
+<aside class="side">
+  <nav>
+    <ul class="toc">
+      <li class="grp">웜업</li>
+      <li><a href="#s1"><span class="n">01</span>정의</a></li>
+      <li><a href="#s2"><span class="n">02</span>왜 제3자가 발행할까?</a></li>
+      <li><a href="#s3"><span class="n">03</span>기업은 무엇을 얻을까?</a></li>
+
+      <li class="grp">연계 증권형</li>
+      <li><a href="#s4"><span class="n">04</span>구조</a></li>
+      <li><a href="#s5"><span class="n">05</span>장단점</a></li>
+      <li><a href="#s6"><span class="n">06</span>유의사항</a></li>
+      <li><a href="#s7"><span class="n">07</span>다시 보는 본문</a></li>
+
+      <li class="grp">사례 1 · Backed</li>
+      <li><a href="#s8"><span class="n">08</span>개요</a></li>
+      <li><a href="#s9"><span class="n">09</span>세부 내용</a></li>
+      <li><a href="#s10"><span class="n">10</span>발행과 유통</a></li>
+
+      <li class="grp">사례 2 · Ondo</li>
+      <li><a href="#s11"><span class="n">11</span>개요</a></li>
+      <li><a href="#s12"><span class="n">12</span>배당 반영 비교</a></li>
+      <li><a href="#s13"><span class="n">13</span>의결권</a></li>
+      <li><a href="#s14"><span class="n">14</span>두 가지 포인트</a></li>
+
+      <li class="grp">마무리</li>
+      <li><a href="#s15"><span class="n">15</span>Backed vs Ondo</a></li>
+      <li><a href="#s16"><span class="n">16</span>새로 알게 된 용어</a></li>
+      <li><a href="#s17"><span class="n">17</span>자료 출처</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ══════════ 본문 ══════════ -->
+<main class="main">
+
+<header class="top">
+  <p class="study">RWA 스터디 3회차</p>
+  <p class="source">Xangle 토큰화 주식</p>
+  <h1>3-3 <em>연계 증권형</em></h1>
+  <p class="presenter">발표<span>|</span>이성재</p>
+</header>
+
+<div class="chapter-group">
+
+<!-- ═══ 01 ═══ -->
+<section class="sec" id="s1">
+  <div class="sec-head warmup-head">
+    <p class="lb">연계 증권의 정의</p>
+  </div>
+
+  <div class="warmup-copy">
+    <p class="warmup-intro">SEC는 제3자가 다른 회사의 주식·ETF를 참조해 <b>별도 증권을 발행</b>하는 구조를 Linked Security로 분류한다.</p>
+    <ul>
+      <li>제3자가 직접 발행하는 <b class="blue">별도 증권</b></li>
+      <li>기초자산의 가격 변동에 따른 <b class="blue">경제적 효과를 추종</b><span class="synthetic-note">(Synthetic Exposure · 합성 노출)</span></li>
+      <li>기초기업의 <b class="blue">직접 주주는 아님</b></li>
+    </ul>
+
+    <p class="synthetic-help"><b>Synthetic Exposure · 합성 노출</b> — 실제 자산을 직접 소유하지 않고 가격 변동에 따른 손익만 따라가는 구조</p>
+  </div>
+</section>
+
+<!-- ═══ 02 ═══ -->
+<section class="sec" id="s2">
+  <div class="sec-head">
+    <p class="lb">왜 제3자가 발행할까?</p>
+  </div>
+
+  <div class="rows duo">
+    <div class="c hd">기업 직접 발행<small>Issuer-Sponsored Tokenized Security</small></div>
+    <div class="c hd pos">제3자 별도 발행<small>Linked Security</small></div>
+
+    <div class="c kv"><span>기업 협력</span><b class="dim">필수</b></div>
+    <div class="c kv"><span>기업 협력</span><b class="keep">불필요</b></div>
+
+    <div class="c kv"><span>상품 확대</span><b class="dim"> 느림</b></div>
+    <div class="c kv"><span>상품 확대</span><b class="keep">빠름</b></div>
+  </div>
+
+
+</section>
+
+<!-- ═══ 03 ═══ -->
+<section class="sec" id="s3">
+  <div class="sec-head">
+    <p class="lb">기업은 무엇을 얻을까?</p>
+  </div>
+
+  <div class="rows duo">
+    <div class="c hd">직접적 수익<small></small></div>
+    <div class="c hd pos">간접적 효과<small></small></div>
+
+    <div class="c kv"><span>기업 매출</span><b class="dim">곧바로 늘지 않음</b></div>
+    <div class="c kv"><span>접근성</span><b class="keep">증가</b></div>
+
+    <div class="c kv"><span>신규 자금 조달</span><b class="dim">관련 없음</b></div>
+    <div class="c kv"><span>인지도</span><b class="keep">확대</b></div>
+
+  </div>
+</section>
+
+</div>
+
+<div class="chapter-group">
+<h2 class="chapter-title"><em>연계 증권</em></h2>
+
+<!-- ═══ 04 ═══ -->
+<section class="sec" id="s4">
+  <div class="sec-head">
+    <p class="lb">구조</p>
+  </div>
+
+  <div class="linked-structure" aria-label="연계 증권형 토큰화 구조">
+    <div class="structure-step">
+      <span class="structure-no">01</span>
+      <div class="structure-copy">
+        <strong>기초 주식·ETF</strong>
+        <p>가격과 수익률을 따라갈 대상</p>
+      </div>
+    </div>
+
+    <div class="structure-flow-arrow" aria-hidden="true">→</div>
+
+    <div class="structure-step">
+      <span class="structure-no">02</span>
+      <div class="structure-copy">
+        <strong>제3자 발행자</strong>
+        <p>기초자산 연동되는 별도 상품</p>
+      </div>
+    </div>
+
+    <div class="structure-flow-arrow" aria-hidden="true">→</div>
+
+    <div class="structure-step">
+      <span class="structure-no">03</span>
+      <div class="structure-copy">
+        <strong>기초자산 매입·보관</strong>
+        <p>발행량 맞춰 주식·ETF 확보</p>
+      </div>
+    </div>
+
+    <div class="structure-flow-arrow" aria-hidden="true">→</div>
+
+    <div class="structure-step">
+      <span class="structure-no">04</span>
+      <div class="structure-copy">
+        <strong>연계 증권 발행</strong>
+        <p>AAPLx · NVDAx</p>
+      </div>
+    </div>
+
+    <div class="structure-flow-arrow" aria-hidden="true">→</div>
+
+    <div class="structure-step is-last">
+      <span class="structure-no">05</span>
+      <div class="structure-copy">
+        <strong>투자자</strong>
+        <p>연계 증권 보유</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 05 ═══ -->
+<section class="sec" id="s5">
+  <div class="sec-head">
+    <p class="lb">장단점</p>
+  </div>
+
+  <div class="rows duo">
+    <div class="c hd pos">장점</div>
+    <div class="c hd neg">단점</div>
+
+    <div class="c tradeoff-item">
+      <strong>거래 시간 확대</strong>
+      <span>온체인 거래 24/7 가능</span>
+    </div>
+    <div class="c tradeoff-item">
+      <strong>직접 주주권 없음</strong>
+      <span>의결권 등 실제 주주의 권리 제한</span>
+    </div>
+
+    <div class="c tradeoff-item">
+      <strong>빠른 온체인 이전</strong>
+      <span>지갑 간 이동과 거래 반영이 빠름</span>
+    </div>
+    <div class="c tradeoff-item">
+      <strong>발행자 의존</strong>
+      <span>배당 · 기업행위 · 환매 처리</span>
+    </div>
+
+    <div class="c tradeoff-item">
+      <strong>자기수탁 가능</strong>
+      <span>개인 지갑 보관·전송</span>
+    </div>
+    <div class="c tradeoff-item">
+      <strong>수탁기관 의존</strong>
+      <span>실제 기초자산 보관을 제3자에게 의존</span>
+    </div>
+
+    <div class="c tradeoff-item">
+      <strong>DeFi 활용</strong>
+      <span>DEX · 대출 담보 등</span>
+    </div>
+    <div class="c tradeoff-item">
+      <strong>추가적인 구조적 리스크</strong>
+      <span>기존 주식 위험 외 발행자 · 수탁 · 온체인 리스크 추가</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══ 06 ═══ -->
+<section class="sec" id="s6">
+  <div class="sec-head">
+    <p class="lb">유의사항</p>
+  </div>
+
+  <div class="check-list">
+    <div class="check-item">
+      <span class="check-no">01</span>
+      <div class="check-copy">
+        <strong>실제 주주 X</strong>
+        <p>토큰이 주가를 따라가더라도 <b>기초기업의 직접 주주권</b>을 주는 것은 아님</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <span class="check-no">02</span>
+      <div class="check-copy">
+        <strong>실제 담보는 어디에?</strong>
+        <p>어떤 자산이 1:1로 담보되는지, <b>누가 실제 기초자산을 보관하는지</b> 확인 필요</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <span class="check-no">03</span>
+      <div class="check-copy">
+        <strong>배당·환매는 누가 처리?</strong>
+        <p>배당, 주식분할, 환매 방식은 <b>발행자의 약관과 운영 구조</b>에 의존</p>
+      </div>
+    </div>
+
+    <div class="check-item">
+      <span class="check-no">04</span>
+      <div class="check-copy">
+        <strong>항상 주가와 같을까?</strong>
+        <p>주식시장이 닫혀 있거나 유동성이 부족하면 <b>토큰 가격과 실제 주가가 괴리</b>발생</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══ 07 ═══ -->
+<section class="sec" id="s7">
+  <div class="sec-head">
+    <p class="lb">다시 보는 본문</p>
+  </div>
+
+  <div class="reading-stack">
+    <div class="reading-pair">
+      <div class="reading-source">
+        <span class="reading-label">본문</span>
+        <blockquote class="article-quote">배당, 주식분할, 병합, 상장폐지, 환매 같은 이벤트는 연계증권 발행자가 정한 약관과 운영 절차에 따라 토큰 가격, 수량, 현금 지급, 환매 가치 등에 반영된다</blockquote>
+      </div>
+      <div class="reading-arrow" aria-hidden="true">→</div>
+      <div class="reading-interpretation">
+        <span class="reading-label">해석</span>
+        <ul class="reading-explain-list">
+          <li>배당·액면분할 등의 처리는 <b>기업이 아니라 토큰 발행자가 정한 규칙</b>에 따라 처리</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reading-pair">
+      <div class="reading-source">
+        <span class="reading-label">본문</span>
+        <blockquote class="article-quote">투자자는 이러한 처리를 기초회사에 직접 요구하는 게 아니라, 연계증권 발행자에게 약관상 권리로 요구할 수 있다</blockquote>
+      </div>
+      <div class="reading-arrow" aria-hidden="true">→</div>
+      <div class="reading-interpretation">
+        <span class="reading-label">해석</span>
+        <ul class="reading-explain-list">
+          <li>배당 지급 누락이나 문제가 발생하면 주주권을 직접 행사하는 대신, <b>발행자의 약관 안에서 권리</b>를 요구</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="chapter-group">
+<h2 class="chapter-title"><em>사례 1 · Backed</em></h2>
+
+<!-- ═══ 08 ═══ -->
+<section class="sec" id="s8">
+  <div class="sec-head">
+    <p class="lb">개요</p>
+    <ul class="section-lead-list">
+      <li>Backed가 발행한 <b>미국 주식·ETF 연계형 토큰화 상품</b></li>
+    </ul>
+  </div>
+
+  <div class="rows key">
+    <div class="c k">법적 성격</div>
+    <div class="c v"><span class="term-underline">Tokenized Tracker Certificates</span><span class="note">실제 주식 자체가 아니라 주가를 따라가도록 만든 별도 증권</span></div>
+
+    <div class="c k">담보</div>
+    <div class="c v">기초 주식·ETF를 <b class="t">1:1로 담보</b></div>
+
+    <div class="c k">수탁</div>
+    <div class="c v">규제받는 수탁기관의 <b>별도 계좌에 보관</b></div>
+
+    <div class="c k">주주권</div>
+    <div class="c v"><b>기초기업의 직접 주주는 아님</b></div>
+
+    <div class="c k">배당·기업행위</div>
+    <div class="c v">Backed의 <b>구조와 약관</b>에 따라 반영</div>
+  </div>
+</section>
+
+<!-- ═══ 09 ═══ -->
+<section class="sec" id="s9">
+  <div class="sec-head">
+    <p class="lb">세부 내용</p>
+  </div>
+
+  <div class="mechanism-stack">
+    <div class="mechanism-block">
+      <h3 class="mechanism-title">Bankruptcy-remote structure</h3>
+      <p class="mechanism-role">담보자산 보호</p>
+      <ul class="mechanism-points">
+        <li>기초자산을 발행사 일반 재산과 법적으로 분리</li>
+        <li>Backed가 파산하더라도 담보자산이 함께 묶이는 위험을 최소화</li>
+      </ul>
+      <p class="mechanism-example"><span>예시</span><b>AAPLx 100개 발행</b><i>→</i>실제 Apple 주식 100주를 별도로 담보</p>
+    </div>
+
+    <div class="mechanism-block">
+      <h3 class="mechanism-title">Rebasing mechanism</h3>
+      <p class="mechanism-role">배당 효과 반영</p>
+      <ul class="mechanism-points">
+        <li>배당의 경제적 효과를 토큰 잔고에 반영</li>
+        <li>토큰 가격이 아니라 보유 수량 자체를 조정</li>
+      </ul>
+      <p class="mechanism-example"><span>예시</span><b>AAPLx 10.0개</b><i>→</i>10.1개</p>
+      <p class="mechanism-origin">re = 다시 / base = 기준</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 10 ═══ -->
+<section class="sec" id="s10">
+  <div class="sec-head">
+    <p class="lb">발행과 유통</p>
+    <ul class="section-lead-list">
+    </ul>
+  </div>
+
+  <div class="rows duo">
+    <div class="c hd neg">발행 · 환매<small>카지노 환전소</small></div>
+    <div class="c hd pos">온체인 유통<small>게임장 내부</small></div>
+
+    <div class="c v"><b class="n">언제</b><span class="note">실물 자산을 담보로 토큰을 처음 찍어낼 때, 또는 반납하고 현금으로 돌려받을 때</span></div>
+    <div class="c v"><b class="t">언제</b><span class="note">심사를 거쳐 이미 퍼블릭 블록체인으로 지급된 토큰을 다룰 때</span></div>
+
+    <div class="c v"><b class="n">왜 엄격한가</b><span class="note">전통 금융과 블록체인이 직접 맞닿는 관문, 자금세탁 방지법과 미국 증권법을 철저히 지켜야 함</span></div>
+    <div class="c v"><b class="t">왜 자유로운가</b><span class="note">일단 체인 위로 올라오면 일반 가상자산과 기술적으로 똑같은 형태, 발행자의 손을 떠난 상태</span></div>
+
+    <div class="c v"><b class="n">누가 가능한가</b><span class="note">까다로운 KYC를 통과한 소수의 적격투자자와 기관만 발행자와 직접 거래</span></div>
+    <div class="c v"><b class="t">무엇이 가능한가</b><span class="note">개인 지갑 보관·전송, DEX에서 24시간 매매, 디파이 대출 담보로 활용</span></div>
+  </div>
+</section>
+
+</div>
+
+<div class="chapter-group">
+<h2 class="chapter-title"><em>사례 2 · Ondo</em></h2>
+
+<!-- ═══ 11 ═══ -->
+<section class="sec" id="s11">
+  <div class="sec-head">
+    <p class="lb">개요</p>
+    <ul class="section-lead-list">
+      <li>Ondo는 국채 토큰화에서 쌓은 신뢰와 DeFi 파트너십을 <b>주식으로 확장</b></li>
+    </ul>
+  </div>
+
+  <div class="rows key">
+    <div class="c k">법적 성격</div>
+    <div class="c v"><b>구조화 채권</b></div>
+
+    <div class="c k">지원 자산</div>
+    <div class="c v">출시 초기 100개 → <b>440개 이상</b>으로 확대</div>
+
+    <div class="c k">수탁</div>
+    <div class="c v">Alpaca Securities 등 <b>미국 등록 수탁 브로커딜러</b></div>
+
+    <div class="c k">배당 반영</div>
+    <div class="c v">세금 차감 후 재투자 — <b class="t">Total Return</b> 방식</div>
+
+    <div class="c k">의결권</div>
+    <div class="c v">Broadridge 협력으로 <b class="t">간접 지원</b></div>
+
+    <div class="c k">체인</div>
+    <div class="c v">Ethereum · Solana · BNB Chain 등 멀티체인</div>
+
+    <div class="c k">발행 대상</div>
+    <div class="c v"><b class="n">미국인 · 미국 내 투자자 배제</b></div>
+  </div>
+</section>
+
+<!-- ═══ 12 ═══ -->
+<section class="sec" id="s12">
+  <div class="sec-head">
+    <p class="lb">배당 반영 비교</p>
+    <ul class="section-lead-list">
+      <li>같은 배당도 상품에 따라 <b>다르게 표현</b></li>
+    </ul>
+  </div>
+
+  <div class="rows tri">
+    <div class="c hd">구분</div>
+    <div class="c hd b">Backed xStocks</div>
+    <div class="c hd o">Ondo Stocks</div>
+
+    <div class="c k">방식</div>
+    <div class="c v"><b>Rebasing</b></div>
+    <div class="c v"><b class="t">Total Return</b></div>
+
+    <div class="c k">움직이는 것</div>
+    <div class="c v">토큰 수량</div>
+    <div class="c v">토큰 가치</div>
+
+    <div class="c k">결과</div>
+    <div class="c v">10 AAPLx → 10.1 AAPLx</div>
+    <div class="c v">순배당금을 재투자한 것으로 계산해 반영</div>
+
+    <div class="c k">체감</div>
+    <div class="c v">잔고가 늘어난다</div>
+    <div class="c v">가격 변화 + 재투자 배당이 함께 반영된다</div>
+  </div>
+
+  <div class="punch">
+
+</section>
+
+<!-- ═══ 13 ═══ -->
+<section class="sec" id="s13">
+  <div class="sec-head">
+    <p class="lb">의결권</p>
+    <ul class="section-lead-list">
+      <li>원래 연계 증권형은 의결권이 없는 것이 일반적</li>
+      <li>연계 증권형인데도 투표를<b> 간접적으로 지원</b></li>
+    </ul>
+  </div>
+
+  <div class="rows key">
+    <div class="c k">방식</div>
+    <div class="c v">글로벌 주주 인프라 기업 <b>Broadridge</b>와 시스템 연동</div>
+
+    <div class="c k">시점 · 범위</div>
+    <div class="c v">2026년 4월부터 협력 · <b>250개 이상</b>의 토큰화 주식·ETF</div>
+
+    <div class="c k">할 수 있는 것</div>
+    <div class="c v"><b class="t">voting preference 제출</b><span class="note">기업이 주주에게 제공하는 공식 공시 자료와 중요 소식도 열람 가능</span></div>
+  </div>
+
+  <div class="rows duo" style="margin-top:30px">
+    <div class="c hd neg">오해하기 쉬운 것</div>
+    <div class="c hd pos">정확한 표현</div>
+    <div class="c v"><span class="off">Ondo 토큰 보유자가 실제 주주 의결권을 갖는다</span></div>
+    <div class="c v">발행자에게 <b class="t">“어떻게 의결했으면 좋겠다”는 신호를 전달하는 권리</b>를 가짐</div>
+  </div>
+</section>
+
+<!-- ═══ 14 ═══ -->
+<section class="sec" id="s14">
+  <div class="sec-head">
+    <p class="lb">두 가지 포인트</p>
+    <ul class="section-lead-list">
+    </ul>
+  </div>
+
+  <div class="rows duo">
+    <div class="c hd">1 Regulation S 전략<small>발행 대상의 제한</small></div>
+    <div class="c hd">2 고정 분류 금지<small>7월 custodial 모델 출시</small></div>
+
+    <div class="c v">발행·환매 KYC에서 <b>거주 관할권을 확인</b>해 허용된 국가의 투자자만 통과시킨다</div>
+    <div class="c v">BlackRock <b>IVV</b> ETF와 Micron 주식을 대상으로 실제 기초 증권에 대한 <b>entitlement를 토큰화</b>한다</div>
+
+    <div class="c v">미국 시민권자·영주권자·미국 내 거주자는 <b class="n">발행 대상에서 배제</b>된다</div>
+    <div class="c v">Broadridge를 통해 <b class="t">주주 커뮤니케이션과 proxy voting</b>까지 제공한다</div>
+
+    <div class="c v">미국 밖에서 미국 외 투자자만을 대상으로 발행하는 <b class="t">safe harbor</b>를 택했다<span class="note">복잡한 등록 절차, 막대한 법적 비용, 까다로운 공시 의무를 피할 수 있다</span></div>
+    <div class="c v">해외 Global Markets는 <b>연계 증권형이 맞다</b><span class="note">그러나 미국 내 custodial model은 SEC의 custodial tokenized securities 구조</span></div>
+  </div>
+
+  <div class="punch">
+  </div>
+</section>
+
+</div>
+
+<div class="chapter-group">
+<h2 class="chapter-title"><em>마무리</em></h2>
+
+<!-- ═══ 15 ═══ -->
+<section class="sec" id="s15">
+  <div class="sec-head">
+    <p class="lb">Backed vs Ondo</p>
+    <ul class="section-lead-list">
+      <li>같은 연계 증권형이지만 <b>서로 다른 선택</b></li>
+    </ul>
+  </div>
+
+  <div class="rows tri">
+    <div class="c hd">구분</div>
+    <div class="c hd b">Backed xStocks</div>
+    <div class="c hd b">Ondo Global Markets</div>
+
+    <div class="c k">운영 주체</div>
+    <div class="c v">Backed <b>(Kraken이 인수)</b></div>
+    <div class="c v">Ondo Finance</div>
+
+    <div class="c k">법적 구조</div>
+    <div class="c v">토큰화 <b>추적 증서</b></div>
+    <div class="c v">구조화 채권</div>
+
+    <div class="c k">지원 자산</div>
+    <div class="c v">100개 이상 주식·ETF</div>
+    <div class="c v"><b>440개 이상</b> 주식·ETF</div>
+
+    <div class="c k">주주 의결권</div>
+    <div class="c v"><b>미지원</b></div>
+    <div class="c v"><b>간접 지원</b> · Broadridge 통한 위임 투표</div>
+
+    <div class="c k">배당 반영</div>
+    <div class="c v"><b>Rebasing</b> · 토큰 수량 조정</div>
+    <div class="c v"><b>Total Return</b> · 재투자 반영</div>
+
+    <div class="c k">기초자산 수탁</div>
+    <div class="c v">Alpaca Securities 등 기관에 분리 보관</div>
+    <div class="c v">Alpaca Securities 등 미국 등록 수탁 브로커딜러</div>
+
+    <div class="c k">온체인 유통</div>
+    <div class="c v">퍼블릭 체인에서 DEX · DeFi로 자유</div>
+    <div class="c v">동일 · 멀티체인 확장 적극적</div>
+
+    <div class="c k">KYC</div>
+    <div class="c v">발행·환매 시 엄격한 신원 인증</div>
+    <div class="c v">동일 <b>+ 미국 투자자 배제</b></div>
+  </div>
+
+  <div class="punch">
+  </div>
+</section>
+
+<!-- ═══ 16 ═══ -->
+<section class="sec" id="s16">
+  <div class="sec-head">
+    <p class="lb">새로 알게 된 용어</p>
+  </div>
+
+  <dl class="terms">
+    <div>
+      <dt>Synthetic Exposure<span>합성 노출</span></dt>
+      <dd>
+        <ul>
+          <li>자산을 직접 소유하지 않고 가격 변동에 노출되는 구조</li>
+          <li>가격 변화에 따른 수익·손실 효과만 동일하게 반영</li>
+        </ul>
+      </dd>
+    </div>
+    <div>
+      <dt>Bankruptcy-remote<span>파산 격리 구조</span></dt>
+      <dd>
+        <ul>
+          <li>담보자산을 발행사 일반 재산과 법적으로 분리</li>
+          <li>발행사가 파산해도 채권자에게 함께 묶일 위험을 낮춤</li>
+        </ul>
+      </dd>
+    </div>
+    <div>
+      <dt>Rebasing<span>수량 재조정</span></dt>
+      <dd>
+        <ul>
+          <li>토큰 가격이 아니라 보유 수량 자체를 자동 조정</li>
+          <li>re(다시) + base(기준): 수량 계산 기준을 다시 설정</li>
+        </ul>
+      </dd>
+    </div>
+    <div>
+      <dt>Total Return<span>총수익</span></dt>
+      <dd>
+        <ul>
+          <li>가격 변화와 재투자된 배당을 함께 반영</li>
+          <li>자산의 전체 경제적 성과를 계산하는 방식</li>
+        </ul>
+      </dd>
+    </div>
+    <div>
+      <dt>Regulation S<span>세이프 하버</span></dt>
+      <dd>
+        <ul>
+          <li>미국 밖에서 이루어지는 증권의 offer·sale에 적용</li>
+          <li>일정 조건에서 미국 증권법 등록 의무를 피할 수 있게 하는 규정</li>
+        </ul>
+      </dd>
+    </div>
+    <div>
+      <dt>Entitlement · Proxy Voting<span>권리 토큰화 · 위임 투표</span></dt>
+      <dd>
+        <ul>
+          <li>Entitlement: 주식에 대해 가진 권리를 토큰으로 표현</li>
+          <li>Proxy Voting: 주총에 직접 가지 않고 온라인으로 찬반 의사를 제출</li>
+        </ul>
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<!-- ═══ 17 ═══ -->
+<section class="sec" id="s17">
+  <div class="sec-head">
+    <p class="lb">자료 출처</p>
+  </div>
+
+  <div class="rows key">
+    <div class="c k">아티클 원문</div>
+    <div class="c v"><a href="https://xangle.io/research/detail/2496" target="_blank" rel="noopener">Xangle · RWA Series 토큰화 주식</a> — 연계 증권형 파트</div>
+
+    <div class="c k">추가 조사</div>
+    <div class="c v">
+      <ul>
+        <li><a href="https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities" target="_blank" rel="noopener">SEC · Statement on Tokenized Securities</a><span class="note">Linked Security 공식 정의 및 토큰화 증권 분류</span></li>
+        <li><a href="https://assets.backed.fi/legal-documentation" target="_blank" rel="noopener">Backed · Product / Legal Documentation</a><span class="note">xStocks의 Tracker Certificate, 1:1 담보, 법적 구조</span></li>
+        <li><a href="https://support.kraken.com/articles/xstocks-faq" target="_blank" rel="noopener">Kraken · xStocks FAQ</a><span class="note">배당, 기업행위, 자기수탁, 온체인 유통</span></li>
+        <li><a href="https://ondo.finance/blog/global-markets-is-live" target="_blank" rel="noopener">Ondo Finance · Global Markets / Ondo Stocks</a><span class="note">연계 증권형 구조, 1:1 backing, Total Return 방식</span></li>
+      </ul>
+    </div>
+
+    <div class="c k">개인 블로그</div>
+    <div class="c v"><a href="https://sungjae0309.tistory.com/189" target="_blank" rel="noopener">성재의 블로그 · RWA 토큰화 주식: 연계 증권형</a></div>
+  </div>
+</section>
+
+</div>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var KEY = 'jl-lend-theme';
+
+  function isLight(){ return root.getAttribute('data-theme') === 'light'; }
+  function paint(){
+    var l = document.querySelector('#themeToggle .tt-label');
+    if(l) l.textContent = isLight() ? '다크 모드' : '라이트 모드';
+  }
+  function toggle(){
+    if(isLight()){ root.removeAttribute('data-theme'); }
+    else{ root.setAttribute('data-theme','light'); }
+    try{ localStorage.setItem(KEY, isLight() ? 'light' : 'dark'); }catch(e){}
+    paint();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    paint();
+    var btn = document.getElementById('themeToggle');
+    if(btn) btn.addEventListener('click', toggle);
+
+    /* 화면에 보이는 본문과 사이드 목차를 같은 기준으로 표시 */
+    var links = {};
+    Array.prototype.forEach.call(document.querySelectorAll('.toc a'), function(a){
+      links[a.getAttribute('href').slice(1)] = a;
+
+      a.addEventListener('click', function(e){
+        var id = a.getAttribute('href').slice(1);
+        var target = document.getElementById(id);
+        if(!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior:'smooth', block:'start' });
+        try{
+          history.replaceState(null, document.title, location.href.replace(/#.*$/, ''));
+        }catch(err){}
+      });
+    });
+    var secs = document.querySelectorAll('.sec');
+    if(!secs.length) return;
+
+    var ticking = false;
+    function syncToc(){
+      var marker = Math.min(window.innerHeight * .3, 260);
+      var active = secs[0].id;
+      Array.prototype.forEach.call(secs, function(s){
+        if(s.getBoundingClientRect().top <= marker) active = s.id;
+      });
+      if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2){
+        active = secs[secs.length - 1].id;
+      }
+      Object.keys(links).forEach(function(id){ links[id].classList.toggle('on', id === active); });
+      ticking = false;
+    }
+
+    function requestSync(){
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(syncToc);
+    }
+
+    syncToc();
+    window.addEventListener('scroll', requestSync, { passive:true });
+    window.addEventListener('resize', requestSync);
+  });
+})();
+</script>
+</body>
+</html>

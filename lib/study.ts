@@ -442,7 +442,50 @@ export const SESSIONS: Session[] = [
         focus: "무기한 선물형의 구조와 장단점 / 5개 방식 비교와 글 전체 결론"
       }
     ],
-    records: []
+    records: [
+      {
+        kind: "발표자료",
+        title: "1-1 ~ 2-2. 그 토큰, 진짜 주식일까?",
+        who: "신영환",
+        part: "약자 사전 · 3층 장부 구조 · 5방식 판별 프레임 · 케이스 훈련",
+        url: "/study/materials/s3-1-1-2-2-framework.html"
+      },
+      {
+        kind: "PDF",
+        title: "3-1 · 4-1. 직접 발행형",
+        who: "노제희",
+        part: "슬라이드 9장 · Securitize · Superstate · 권리와 유통의 균형",
+        url: "/study/materials/s3-3-1-direct-issuance.pdf"
+      },
+      {
+        kind: "발표자료",
+        title: "3-2 · 4-2. 증권 권리형",
+        who: "배예림",
+        part: "원문 문단별 해설 · DTC 노액션 레터 · 간접 보유 구조",
+        url: "/study/materials/s3-3-2-security-entitlement.html"
+      },
+      {
+        kind: "발표자료",
+        title: "3-3 · 4-3. 연계 증권형",
+        who: "이성재",
+        part: "Backed xStocks vs Ondo · Rebasing vs Total Return · 의결권",
+        url: "/study/materials/s3-3-3-linked-security.html"
+      },
+      {
+        kind: "발표자료",
+        title: "3-4 · 4-4. 파생 계약형",
+        who: "장윤선",
+        part: "CFD 구조 · 플랫폼의 헤지와 상계 · Robinhood · Bybit",
+        url: "/study/materials/s3-3-4-derivative.html"
+      },
+      {
+        kind: "발표자료",
+        title: "3-5 · 4-5. 무기한 선물형과 Neobank",
+        who: "이재환",
+        part: "5방식 비교 · 제도권으로 향하는 이유 · RWA 유통 레이어",
+        url: "/study/materials/s3-3-5-neobank.html"
+      }
+    ]
   },
   {
     no: 4,
