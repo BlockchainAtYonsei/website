@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ogImageFrom } from "./og-image";
+import { msnDetailApi, msnPick, ogImageFrom } from "./og-image";
 
 const PAGE = "https://news.example.com/story/123";
 
@@ -52,5 +52,56 @@ describe("ogImageFrom", () => {
     expect(
       ogImageFrom(`<meta property="og:image" content="data:image/png;base64,AAAA">`, PAGE),
     ).toBeUndefined();
+  });
+});
+
+describe("msnDetailApi", () => {
+  it("maps an MSN article URL to its content API, stripping ar- and keeping the locale", () => {
+    expect(
+      msnDetailApi(
+        "https://www.msn.com/ko-kr/news/other/some-title/ar-AA2aMSKi?ocid=BingNewsSerp",
+      ),
+    ).toBe("https://assets.msn.com/content/view/v2/Detail/ko-kr/AA2aMSKi");
+  });
+
+  it("defaults the locale to en-us when the path has none", () => {
+    expect(msnDetailApi("https://www.msn.com/news/ar-AB12cd34")).toBe(
+      "https://assets.msn.com/content/view/v2/Detail/en-us/AB12cd34",
+    );
+  });
+
+  it("returns undefined for a non-MSN host", () => {
+    expect(msnDetailApi("https://www.insight.co.kr/news/569767")).toBeUndefined();
+  });
+
+  it("returns undefined for an MSN URL with no ar- article id", () => {
+    expect(msnDetailApi("https://www.msn.com/ko-kr/news")).toBeUndefined();
+  });
+
+  it("does not match a look-alike host", () => {
+    expect(msnDetailApi("https://www.msn.com.evil.example/ar-AA1")).toBeUndefined();
+  });
+});
+
+describe("msnPick", () => {
+  it("reads sourceHref and the first image resource", () => {
+    expect(
+      msnPick({
+        sourceHref: "https://www.insight.co.kr/news/569767",
+        imageResources: [
+          { url: "https://img-s-msn-com.akamaized.net/a.img" },
+          { url: "https://img-s-msn-com.akamaized.net/b.img" },
+        ],
+      }),
+    ).toEqual({
+      sourceHref: "https://www.insight.co.kr/news/569767",
+      image: "https://img-s-msn-com.akamaized.net/a.img",
+    });
+  });
+
+  it("returns an empty object when the payload carries neither", () => {
+    expect(msnPick({})).toEqual({});
+    expect(msnPick(null)).toEqual({});
+    expect(msnPick({ imageResources: [] })).toEqual({});
   });
 });
