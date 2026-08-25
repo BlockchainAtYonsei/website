@@ -56,36 +56,50 @@ export default function Mission() {
   const copy = MISSION[lang];
 
   return (
-    /* Asymmetric vertical padding: the top gap opens the section after the
-       hero, but the bottom only has to clear the label rhythm inside — the
-       full py-36 left a void between the mission copy and "// What we do". */
-    <section id="about" className="relative bg-ink pt-28 pb-24 md:pt-36 md:pb-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="font-body mb-6 text-sm font-light text-white/80">
-          {"// What is BAY"}
-        </p>
-        <p className="font-heading mb-8 max-w-4xl text-3xl leading-[1.15] tracking-[-1px] text-balance break-keep text-white md:mb-10 md:text-4xl lg:text-5xl">
-          {copy.heading}
-        </p>
-        <p className="font-body max-w-2xl leading-relaxed font-light break-keep text-slate-400">
-          {copy.intro.pre}
-          <span className="text-white">{copy.intro.highlight}</span>
-          {copy.intro.post}
-        </p>
-        <p className="font-body mt-6 mb-16 max-w-2xl leading-relaxed font-light break-keep text-slate-400 md:mb-20">
-          {copy.body}
-        </p>
-        <p className="font-body mb-6 text-sm font-light text-white/80">
-          {"// Our mission"}
-        </p>
-        <BlurText
-          justify="start"
-          text={copy.slogan}
-          className="font-heading text-5xl leading-[1.05] tracking-[-3px] text-white md:text-6xl lg:text-[5.5rem]"
-        />
-        <p className="font-body mt-8 max-w-2xl leading-relaxed font-light break-keep text-slate-400">
-          {copy.closing}
-        </p>
+    /* Phrase-by-phrase: two snap panels, one per topic. "What is BAY" keeps its
+       heading and the prose that answers it together on one screen — splitting
+       the question from its answer across two forced pages read as a non
+       sequitur. "Our mission" is the second panel. See .snap-panel /
+       scroll-snap-type in globals.css. */
+    <section id="about" className="relative bg-ink">
+      {/* Panel 1 — "// What is BAY": eyebrow + heading + the prose that answers
+          it, all on one screen. */}
+      <div className="snap-panel flex min-h-svh flex-col justify-center px-6 py-24">
+        <div className="mx-auto w-full max-w-6xl">
+          <p className="font-body mb-6 text-sm font-light text-white/80">
+            {"// What is BAY"}
+          </p>
+          <p className="font-heading mb-8 max-w-4xl text-3xl leading-[1.15] tracking-[-1px] text-balance break-keep text-white md:mb-10 md:text-4xl lg:text-5xl">
+            {copy.heading}
+          </p>
+          <p className="font-body max-w-2xl leading-relaxed font-light break-keep text-slate-400">
+            {copy.intro.pre}
+            <span className="text-white">{copy.intro.highlight}</span>
+            {copy.intro.post}
+          </p>
+          <p className="font-body mt-6 max-w-2xl leading-relaxed font-light break-keep text-slate-400">
+            {copy.body}
+          </p>
+        </div>
+      </div>
+
+      {/* Panel 2 — "// Our mission" + slogan + closing, centered. BlurText's
+          word-by-word reveal fires as this panel scrolls into view, so it
+          doubles as the panel's entrance. */}
+      <div className="snap-panel flex min-h-svh flex-col justify-center px-6 py-24">
+        <div className="mx-auto w-full max-w-6xl">
+          <p className="font-body mb-6 text-sm font-light text-white/80">
+            {"// Our mission"}
+          </p>
+          <BlurText
+            justify="start"
+            text={copy.slogan}
+            className="font-heading text-5xl leading-[1.05] tracking-[-3px] text-white md:text-6xl lg:text-[5.5rem]"
+          />
+          <p className="font-body mt-8 max-w-2xl leading-relaxed font-light break-keep text-slate-400">
+            {copy.closing}
+          </p>
+        </div>
       </div>
     </section>
   );

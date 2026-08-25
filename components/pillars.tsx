@@ -44,8 +44,11 @@ export default function Pillars() {
   const { lang } = useLang();
 
   return (
-    <section id="activities" className="bg-ink pb-28 md:pb-36">
-      <div className="mx-auto max-w-6xl px-6">
+    <section
+      id="activities"
+      className="snap-panel flex min-h-svh flex-col justify-center bg-ink py-24 md:py-28"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6">
         <p className="font-body mb-6 text-sm font-light text-white/80">
           {"// What we do"}
         </p>

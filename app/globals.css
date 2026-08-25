@@ -26,6 +26,41 @@
 
 html {
   scroll-behavior: smooth;
+  /* Phrase-by-phrase landing: every text section is promoted to a full-viewport
+     panel (min-h-svh + .snap-panel below) and mandatory snap forces one screen
+     per rest, so each line gets undivided focus. The one exception is the
+     HistoryTimeline: it drives its own horizontal scrub from raw vertical
+     scroll, so it is left WITHOUT a snap-align. Because that section is taller
+     than the viewport, mandatory snap's large-content rule lets you rest and
+     scrub freely inside it — you page through the copy, then scrub the decade,
+     then page on to the CTA. */
+  scroll-snap-type: y mandatory;
+}
+
+/* A full-viewport landing panel. Kept as a class (not inline utilities) so the
+   snap-align and the scroll-margin that offsets the fixed-ish header stay in
+   one place across hero, mission, and CTA. */
+.snap-panel {
+  scroll-snap-align: start;
+  /* always: a single scroll gesture can never fly past a panel — it commits to
+     the very next one and stops. One flick, one page. (Ignored while the
+     timeline drops the page to scroll-snap-type: none.) */
+  scroll-snap-stop: always;
+}
+
+/* The HistoryTimeline flips this on while it is in view (see its
+   IntersectionObserver): its sideways scrub is incompatible with mandatory
+   snap, so the whole page drops to free scroll for the length of that section. */
+html[data-snap="off"] {
+  scroll-snap-type: none;
+}
+
+/* The scroll-snap settling fights a manual smooth-scroll to an anchor, and the
+   reduced-motion crowd should not be nudged around at all. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+  }
 }
 
 body {

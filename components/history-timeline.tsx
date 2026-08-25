@@ -42,6 +42,31 @@ export default function HistoryTimeline() {
     };
   }, []);
 
+  /* The rest of the landing is mandatory scroll-snap (one screen per phrase),
+     but this section scrubs a decade sideways off raw vertical scroll — and
+     mandatory snap fights that scrub, pinning the page at the section edge and
+     making the track unreachable. So while any part of this section is on
+     screen, switch the page off snap; page-snapping resumes once it is fully
+     scrolled past. Ignored when the user prefers reduced motion (snap is off
+     for them already). */
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) root.dataset.snap = "off";
+        else delete root.dataset.snap;
+      },
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      delete root.dataset.snap;
+    };
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
