@@ -7,7 +7,7 @@ import {
   SessionCard,
   StudyHero,
 } from "@/components/research/study-ui";
-import { nextSessionNo, SESSIONS, STUDY_META } from "@/lib/study";
+import { SESSIONS, STUDY_META } from "@/lib/study";
 
 export const metadata: Metadata = {
   title: "RWA Study",
@@ -15,15 +15,7 @@ export const metadata: Metadata = {
     "BAY 리서치팀이 Xangle RWA Series를 9주에 걸쳐 완독합니다. 회차별 진행안, 담당 배분, 발표 자료.",
 };
 
-/* Everything on this page is static except which card wears the 다음 세션 badge,
-   and that answer changes at most once a day. Rebuilding hourly keeps the badge
-   honest without making the page dynamic; the alternative — reading the clock in
-   the browser — would flash the badge onto the wrong card during hydration. */
-export const revalidate = 3600;
-
 export default function StudyIndex() {
-  const nextNo = nextSessionNo(new Date());
-
   return (
     <main className="overflow-x-clip">
       <StudyHero>
@@ -62,7 +54,7 @@ export default function StudyIndex() {
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SESSIONS.map((s) => (
-              <SessionCard key={s.no} session={s} isNext={s.no === nextNo} />
+              <SessionCard key={s.no} session={s} />
             ))}
           </div>
         </Reveal>

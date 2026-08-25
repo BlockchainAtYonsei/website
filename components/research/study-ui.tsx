@@ -58,22 +58,7 @@ export function Frame({
   );
 }
 
-/* ---- status badges ------------------------------------------------------ */
-
-const BADGE: Record<string, { text: string; className: string }> = {
-  ready: {
-    text: "진행안 확정",
-    className: "border-bay-400/30 bg-bay-500/12 text-bay-200",
-  },
-  done: {
-    text: "진행 완료",
-    className: "border-white/15 bg-white/8 text-white/75",
-  },
-  tbd: {
-    text: "준비 전",
-    className: "border-white/10 bg-white/4 text-white/40",
-  },
-};
+/* ---- badges -------------------------------------------------------------- */
 
 function Badge({
   children,
@@ -185,15 +170,8 @@ export function StepsBar({ session }: { session?: Session }) {
 
 /* ---- 회차 카드 ---------------------------------------------------------- */
 
-export function SessionCard({
-  session,
-  isNext,
-}: {
-  session: Session;
-  isNext: boolean;
-}) {
+export function SessionCard({ session }: { session: Session }) {
   const tbd = session.status === "tbd";
-  const badge = BADGE[session.status] ?? BADGE.tbd;
   const d = sessionDate(session.date);
   /* Only landed files count — a pending row is a placeholder, and a card that
      promised "자료 3" then opened onto three "준비 중" lines would read as a
@@ -207,25 +185,17 @@ export function SessionCard({
   return (
     <Link
       href={`/research/study/${session.no}`}
-      className={`liquid-glass group flex flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:-translate-y-1 ${
-        isNext ? "ring-1 ring-bay-400/45" : ""
-      } ${tbd ? "opacity-60" : ""}`}
+      className={`liquid-glass group flex flex-col rounded-[1.25rem] p-6 transition-transform duration-300 hover:-translate-y-1 ${tbd ? "opacity-60" : ""}`}
     >
       <div className="flex items-center gap-2">
         <span className="font-heading mr-auto text-2xl leading-none tracking-[-1px] text-white/85">
           {pad2(session.no)}
         </span>
-        {isNext && (
-          <Badge className="border-bay-400/50 bg-bay-500/25 text-bay-100">
-            다음 세션
-          </Badge>
-        )}
         {materials > 0 && (
           <Badge className="border-white/15 bg-white/8 text-white/75">
             자료
           </Badge>
         )}
-        <Badge className={badge.className}>{badge.text}</Badge>
       </div>
 
       <h3 className="font-heading mt-5 text-lg leading-snug tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100">
