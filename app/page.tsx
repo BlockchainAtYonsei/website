@@ -6,6 +6,7 @@ import Mission from "@/components/mission";
 // import Partners from "@/components/partners";
 import Pillars from "@/components/pillars";
 import ScrollPager from "@/components/scroll-pager";
+import SectionNav from "@/components/section-nav";
 import SiteFooter from "@/components/site-footer";
 
 export default function Home() {
@@ -14,6 +15,10 @@ export default function Home() {
       {/* Pointer-device pager: one wheel flick advances exactly one panel.
           Touch and keyboard keep the CSS scroll-snap underneath. */}
       <ScrollPager />
+
+      {/* Right-edge dot nav — one dot per [data-nav] section, tracks the active
+          panel and jumps to it on click. Desktop only. */}
+      <SectionNav />
 
       <Hero />
 
@@ -37,7 +42,7 @@ export default function Home() {
       {/* Last screen — the CTA and the footer share one full-viewport snap
           panel: the CTA grows to fill and centers, the footer rides the bottom
           edge, so landing here shows both without a further scroll. */}
-      <div className="snap-panel flex min-h-svh flex-col">
+      <div data-nav="Apply" className="snap-panel flex min-h-svh flex-col">
         <section
           id="apply"
           className="relative flex flex-1 items-center justify-center overflow-hidden bg-ink py-24"

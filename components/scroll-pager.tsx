@@ -25,19 +25,34 @@ export default function ScrollPager() {
     if (reduce) return;
 
     let locked = false;
-    let unlock: ReturnType<typeof setTimeout>;
+    let target = 0;
+    let started = 0;
     const EDGE = 4; // px tolerance when testing "am I at this boundary"
 
     const top = (el: Element) =>
       Math.round(el.getBoundingClientRect().top + window.scrollY);
 
+    // Release the lock the instant the smooth scroll reaches its target, not on
+    // a fixed timer — so the very next flick lands immediately and the page
+    // never feels stuck. A hard cap guards against a scroll that never settles.
+    const releaseWhenSettled = () => {
+      if (!locked) return;
+      if (
+        Math.abs(window.scrollY - target) <= 2 ||
+        performance.now() - started > 800
+      ) {
+        locked = false;
+        return;
+      }
+      requestAnimationFrame(releaseWhenSettled);
+    };
+
     const go = (y: number) => {
+      target = y;
+      started = performance.now();
       locked = true;
       window.scrollTo({ top: y, behavior: "smooth" });
-      clearTimeout(unlock);
-      // long enough to cover the smooth scroll and swallow the inertia tail of
-      // the same gesture, short enough that a deliberate next flick lands
-      unlock = setTimeout(() => (locked = false), 650);
+      requestAnimationFrame(releaseWhenSettled);
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -46,12 +61,9 @@ export default function ScrollPager() {
       const dir = Math.sign(e.deltaY);
       if (!dir) return;
       if (locked) {
-        // swallow the momentum tail of the gesture that's already paging, and
-        // keep the lock alive until the wheel actually goes quiet — otherwise a
-        // strong fling's inertia trips a second page the instant the timer ends
+        // ignore input while the current page-scroll is still animating; do NOT
+        // extend the lock — that was what made a second flick feel swallowed
         e.preventDefault();
-        clearTimeout(unlock);
-        unlock = setTimeout(() => (locked = false), 650);
         return;
       }
 
@@ -113,7 +125,7 @@ export default function ScrollPager() {
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       window.removeEventListener("wheel", onWheel);
-      clearTimeout(unlock);
+      locked = false;
     };
   }, []);
 

@@ -56,7 +56,10 @@ export default function Hero() {
   });
 
   return (
-    <section className="snap-panel relative h-svh w-full overflow-hidden bg-ink">
+    <section
+      data-nav="Intro"
+      className="snap-panel relative h-svh w-full overflow-hidden bg-ink"
+    >
       {/* poster-style deep-blue atmosphere behind the transparent canvas */}
       <div
         className="absolute inset-0"

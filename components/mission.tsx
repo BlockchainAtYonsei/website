@@ -63,9 +63,27 @@ export default function Mission() {
        scroll-snap-type in globals.css. */
     <section id="about" className="relative bg-ink">
       {/* Panel 1 — "// What is BAY": eyebrow + heading + the prose that answers
-          it, all on one screen. */}
-      <div className="snap-panel flex min-h-svh flex-col justify-center px-6 py-24">
-        <div className="mx-auto w-full max-w-6xl">
+          it, all on one screen. A drifting blue glow and an oversized "2017"
+          watermark keep the screen from being flat black under the copy. */}
+      <div
+        data-nav="About"
+        className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-[6%] -left-[8%] h-[520px] w-[640px] rounded-full opacity-60 blur-[130px]"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgba(47,107,255,0.20), transparent)",
+          }}
+        />
+        <span
+          aria-hidden
+          className="font-display pointer-events-none absolute -right-[0.04em] -bottom-[0.14em] leading-none font-bold tracking-tighter text-white/[0.03] select-none [font-size:26vw] md:[font-size:20vw]"
+        >
+          2017
+        </span>
+        <div className="relative z-10 mx-auto w-full max-w-6xl">
           <p className="font-body mb-6 text-sm font-light text-white/80">
             {"// What is BAY"}
           </p>
@@ -85,9 +103,27 @@ export default function Mission() {
 
       {/* Panel 2 — "// Our mission" + slogan + closing, centered. BlurText's
           word-by-word reveal fires as this panel scrolls into view, so it
-          doubles as the panel's entrance. */}
-      <div className="snap-panel flex min-h-svh flex-col justify-center px-6 py-24">
-        <div className="mx-auto w-full max-w-6xl">
+          doubles as the panel's entrance. A violet glow bottom-right and a
+          giant "BAY" watermark give the slogan something to sit on. */}
+      <div
+        data-nav="Mission"
+        className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-[6%] -bottom-[10%] h-[560px] w-[680px] rounded-full opacity-50 blur-[140px]"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgba(124,98,210,0.20), transparent)",
+          }}
+        />
+        <span
+          aria-hidden
+          className="font-display pointer-events-none absolute -top-[0.08em] -left-[0.05em] leading-none font-bold tracking-tighter text-white/[0.03] select-none [font-size:30vw] md:[font-size:24vw]"
+        >
+          BAY
+        </span>
+        <div className="relative z-10 mx-auto w-full max-w-6xl">
           <p className="font-body mb-6 text-sm font-light text-white/80">
             {"// Our mission"}
           </p>
