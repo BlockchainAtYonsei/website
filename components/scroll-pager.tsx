@@ -27,7 +27,14 @@ export default function ScrollPager() {
     let locked = false;
     let target = 0;
     let started = 0;
+    let lastTs = 0; // timestamp of the previous wheel event, for inertia gating
     const EDGE = 4; // px tolerance when testing "am I at this boundary"
+    // A new, deliberate gesture starts after a quiet gap; a trackpad's inertia
+    // tail fires events far closer together than this. Events that arrive with
+    // a smaller gap in the paged zone are treated as inertia and swallowed, so
+    // one hard fling still advances exactly one panel. Raise if a strong fling
+    // still double-steps; lower if a quick second flick feels dropped.
+    const IDLE = 130;
 
     const top = (el: Element) =>
       Math.round(el.getBoundingClientRect().top + window.scrollY);
@@ -60,6 +67,10 @@ export default function ScrollPager() {
       if (document.querySelector('[aria-modal="true"]')) return;
       const dir = Math.sign(e.deltaY);
       if (!dir) return;
+      // track inter-event spacing for the inertia gate below; keep it current
+      // even while locked so the gap is measured from the last inertia event
+      const gap = performance.now() - lastTs;
+      lastTs = performance.now();
       if (locked) {
         // ignore input while the current page-scroll is still animating; do NOT
         // extend the lock — that was what made a second flick feel swallowed
@@ -99,8 +110,11 @@ export default function ScrollPager() {
         return;
       }
 
-      // Paged zone — advance exactly one panel.
+      // Paged zone — advance exactly one panel. Swallow anything that arrives
+      // too soon after the previous event: that's a trackpad's inertia tail,
+      // not a fresh flick, and acting on it double-steps.
       e.preventDefault();
+      if (gap < IDLE) return;
       let idx = 0;
       for (let i = 0; i < panels.length; i++) if (y >= panels[i] - 6) idx = i;
 

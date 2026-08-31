@@ -77,7 +77,6 @@ export default function HistoryTimeline() {
     <section
       ref={sectionRef}
       id="history"
-      data-nav="History"
       className="bg-ink"
       style={{ height: `calc(100vh + ${overflow}px)` }}
     >

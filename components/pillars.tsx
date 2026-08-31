@@ -46,7 +46,6 @@ export default function Pillars() {
   return (
     <section
       id="activities"
-      data-nav="Activities"
       className="snap-panel flex min-h-svh flex-col justify-center bg-ink py-24 md:py-28"
     >
       <div className="mx-auto w-full max-w-6xl px-6">

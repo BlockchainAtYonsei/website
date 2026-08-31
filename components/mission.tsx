@@ -65,10 +65,7 @@ export default function Mission() {
       {/* Panel 1 — "// What is BAY": eyebrow + heading + the prose that answers
           it, all on one screen. A drifting blue glow and an oversized "2017"
           watermark keep the screen from being flat black under the copy. */}
-      <div
-        data-nav="About"
-        className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24"
-      >
+      <div className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24">
         <div
           aria-hidden
           className="pointer-events-none absolute -top-[6%] -left-[8%] h-[520px] w-[640px] rounded-full opacity-60 blur-[130px]"
@@ -105,10 +102,7 @@ export default function Mission() {
           word-by-word reveal fires as this panel scrolls into view, so it
           doubles as the panel's entrance. A violet glow bottom-right and a
           giant "BAY" watermark give the slogan something to sit on. */}
-      <div
-        data-nav="Mission"
-        className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24"
-      >
+      <div className="snap-panel relative flex min-h-svh flex-col justify-center overflow-hidden px-6 py-24">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-[6%] -bottom-[10%] h-[560px] w-[680px] rounded-full opacity-50 blur-[140px]"
