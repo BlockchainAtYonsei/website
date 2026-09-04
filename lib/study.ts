@@ -996,6 +996,67 @@ export function neighbours(s: Session) {
   return { prev: SESSIONS[i - 1], next: SESSIONS[i + 1] };
 }
 
+/* ---- running order (table-of-contents view) ---------------------------- */
+
+/** One row of the running order: a presenter (or the room) and the run of
+    parts they hold at this point in the article. */
+export type OrderRow = {
+  who: string;
+  parts: Part[];
+  focus?: string;
+  extra?: boolean;
+};
+
+/* Sort key for a part label. Handles the plain "2-1." form, the "(1)" split
+   suffix (a section shared between two presenters), the "1~2" range (ordered by
+   its start), and 회차 5's "채권"/"대체" namespaces — 채권 sorts ahead of 대체 so
+   the two-article session reads one article through, then the next. */
+function tocKey(nRaw: string): [number, number, number, number] {
+  let s = nRaw.trim();
+  let ns = 0;
+  if (s.startsWith("채권")) s = s.slice(2).trim();
+  else if (s.startsWith("대체")) {
+    ns = 1;
+    s = s.slice(2).trim();
+  }
+  const sub = Number(s.match(/\((\d+)\)/)?.[1] ?? 0);
+  s = s.replace(/\([^)]*\)/, "").split("~")[0].trim();
+  const m = s.match(/(\d+)(?:-(\d+))?/);
+  const a = m ? Number(m[1]) : 999;
+  const b = m && m[2] !== undefined ? Number(m[2]) : 0;
+  return [ns, a, b, sub];
+}
+
+/** The assignments flattened to one part each, sorted into the article's table
+    of contents, then re-merged so a presenter's *contiguous* run collapses back
+    into one row. A presenter whose sections are split across the TOC (another
+    presenter's part falls between) appears in more than one row — the order
+    follows the article, not the roster, and a repeated face is expected. */
+export function runningOrder(s: Session): OrderRow[] {
+  const flat = s.assign
+    .flatMap((a) =>
+      a.parts.map((part) => ({
+        who: a.who,
+        part,
+        focus: a.focus,
+        extra: a.extra,
+        key: tocKey(part.n),
+      })),
+    )
+    .sort((x, y) => {
+      for (let i = 0; i < 4; i++) if (x.key[i] !== y.key[i]) return x.key[i] - y.key[i];
+      return 0;
+    });
+
+  const rows: OrderRow[] = [];
+  for (const f of flat) {
+    const last = rows[rows.length - 1];
+    if (last && last.who === f.who) last.parts.push(f.part);
+    else rows.push({ who: f.who, parts: [f.part], focus: f.focus, extra: f.extra });
+  }
+  return rows;
+}
+
 
 /* ---- presenters ---------------------------------------------------------- */
 

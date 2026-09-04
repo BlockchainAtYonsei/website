@@ -9,6 +9,7 @@ import {
   findSession,
   neighbours,
   pad2,
+  runningOrder,
   SESSIONS,
   sessionDate,
   sessionLabel,
@@ -181,7 +182,7 @@ export default async function StudySession(
             <Reveal>
               <SheetHeading
                 title="진행 순서"
-                aside={`${session.assign.length}파트 · ${totalMinutes(session)}분`}
+                aside={`${runningOrder(session).length}파트 · ${totalMinutes(session)}분`}
               />
               <Schedule session={session} />
             </Reveal>

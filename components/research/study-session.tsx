@@ -1,6 +1,12 @@
 import Link from "next/link";
 import Avatar from "@/components/research/avatar";
-import { EVERYONE, memberOf, type Session, type StudyRecord } from "@/lib/study";
+import {
+  EVERYONE,
+  memberOf,
+  runningOrder,
+  type Session,
+  type StudyRecord,
+} from "@/lib/study";
 
 /* The session page as a programme sheet.
 
@@ -236,30 +242,42 @@ export function Schedule({ session }: { session: Session }) {
     );
   };
 
+  /* Rows follow the table of contents, so a presenter with split sections
+     recurs. The focus note describes the whole contribution, so it rides only
+     the first of that presenter's rows — repeating it on every recurrence reads
+     as noise. */
+  const seenFocus = new Set<string>();
+  const rows = runningOrder(session).map((row) => {
+    const key = `${row.who}|${row.focus ?? ""}`;
+    const showFocus = Boolean(row.focus) && !seenFocus.has(key);
+    if (showFocus) seenFocus.add(key);
+    return { row, showFocus };
+  });
+
   return (
     <ol>
-      {session.assign.map((a, i) => {
-        const extras = a.who === EVERYONE ? [] : extrasFor(a.parts);
+      {rows.map(({ row, showFocus }, i) => {
+        const extras = row.who === EVERYONE ? [] : extrasFor(row.parts);
         return (
-        <li key={a.who + i} className={SLOT_ROW}>
-          <span className={`${GUTTER} ${SLOT_GUTTER} text-bay-200`}>
-            Part {i + 1}
-          </span>
-          {a.who !== EVERYONE && (
-            <div className={SLOT_WHO}>
-              <Presenter name={a.who} />
-            </div>
-          )}
-          <div className={a.who === EVERYONE ? SLOT_BODY_ALONE : SLOT_BODY}>
-            <Parts parts={a.parts} linkOf={linkOf} />
-            {a.focus && (
-              <p className="font-body mt-3 text-[13px] leading-relaxed font-light break-keep whitespace-pre-line text-slate-500">
-                {a.focus}
-              </p>
+          <li key={row.who + i} className={SLOT_ROW}>
+            <span className={`${GUTTER} ${SLOT_GUTTER} text-bay-200`}>
+              Part {i + 1}
+            </span>
+            {row.who !== EVERYONE && (
+              <div className={SLOT_WHO}>
+                <Presenter name={row.who} />
+              </div>
             )}
-            {extras.length > 0 && <ExtraDocs records={extras} />}
-          </div>
-        </li>
+            <div className={row.who === EVERYONE ? SLOT_BODY_ALONE : SLOT_BODY}>
+              <Parts parts={row.parts} linkOf={linkOf} />
+              {showFocus && (
+                <p className="font-body mt-3 text-[13px] leading-relaxed font-light break-keep whitespace-pre-line text-slate-500">
+                  {row.focus}
+                </p>
+              )}
+              {extras.length > 0 && <ExtraDocs records={extras} />}
+            </div>
+          </li>
         );
       })}
     </ol>
