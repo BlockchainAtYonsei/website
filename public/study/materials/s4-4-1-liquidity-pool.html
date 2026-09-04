@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>유동성 풀로 직접 시장을 개설하는 방식</title>
+<style>
+:root{
+  --navy:#0c2a42;--blue:#1770b0;--teal:#158a7a;--orange:#d9822b;
+  --sky:#eaf6ff;--mint:#e8f7f2;--peach:#fff4e8;
+  --ink:#16232f;--muted:#5c6c7c;--line:#dbe6ee;--bg:#f4f8fb;--paper:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR",Arial,sans-serif;line-height:1.8;word-break:keep-all}
+.shell{max-width:1120px;margin:auto;padding:42px 24px 72px}
+.hero{background:linear-gradient(125deg,#0c2a42,#1770b0);color:#fff;padding:46px 50px;border-radius:24px;box-shadow:0 14px 34px #0c2a4226}
+.kicker{font-weight:800;font-size:12px;letter-spacing:.13em;color:#bfe3fb}
+.hero h1{font-size:clamp(29px,4.4vw,44px);line-height:1.25;letter-spacing:-.04em;margin:13px 0}
+.hero p{font-size:16.5px;max-width:830px;color:#e7f3fc;margin:0}
+.hero .who{margin-top:14px;font-size:13.5px;color:#cfe6f7}
+.toc{margin-top:22px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;gap:10px;flex-wrap:wrap}
+.toc a{font-size:13px;color:#215c86;text-decoration:none;background:var(--sky);padding:5px 11px;border-radius:20px;font-weight:700}
+section{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:34px;margin-top:22px}
+.label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.1em}
+.title{margin:4px 0 16px;font-size:26px;line-height:1.35;letter-spacing:-.03em}
+.intro{font-size:16.5px;color:#28404f;margin:0 0 16px}
+p{margin:0 0 14px} p:last-child{margin-bottom:0}
+.box{background:var(--sky);border-left:4px solid var(--blue);border-radius:8px;padding:16px 20px;margin:16px 0}
+.box b{color:#0e4468}
+.box.mint{background:var(--mint);border-left-color:var(--teal)}
+.box.mint b{color:#0c5c50}
+
+.qa{margin:14px 0;padding:12px 14px;background:#f8fbfd;border-left:3px solid var(--blue);border-radius:8px}
+.qa .q{font-weight:800;color:#0e4468;font-size:13.5px;margin-bottom:4px}
+.qa .a{font-size:13.5px;color:#3c505f}
+
+.company{margin:18px 0 0;padding:22px 24px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}
+.company .chead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.company h3{margin:0;font-size:19px;color:#0e3557}
+.company .tag2{font-size:12px;font-weight:800;color:var(--teal)}
+.company .meta{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.p-row{margin:10px 0;font-size:13.5px;color:#3c505f}
+.p-row b{display:block;font-size:12px;color:var(--blue);letter-spacing:.03em;margin-bottom:3px}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.compare article{padding:18px 20px;border:1px solid var(--line);border-radius:14px}
+.compare h4{margin:0 0 8px;font-size:15.5px;color:#0e3557}
+.compare p{margin:0;font-size:13.5px;color:#425568}
+.c1{border-top:4px solid var(--orange)}
+.c2{border-top:4px solid var(--teal)}
+
+.flow-steps{margin:16px 0;padding:0;list-style:none;counter-reset:step}
+.flow-steps li{counter-increment:step;position:relative;padding:10px 0 10px 40px;font-size:13.5px;color:#3c505f;border-left:2px dashed #b9d5e8;margin-left:14px}
+.flow-steps li:last-child{border-left:2px dashed transparent}
+.flow-steps li::before{content:counter(step);position:absolute;left:-15px;top:8px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+.flow-steps b{display:block;color:#0e4468;font-size:14px;margin-bottom:2px}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-top:18px}
+table{width:100%;border-collapse:collapse;min-width:760px;font-size:13.5px}
+th,td{padding:13px 14px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;text-align:left}
+th:last-child,td:last-child{border-right:0} tr:last-child td{border-bottom:0}
+thead th{background:var(--sky);color:#0e4468;font-size:12.5px}
+tbody th{background:#f9fbfd;color:#28455c;width:130px}
+
+.num-example{margin-top:10px;padding:12px 14px;border-radius:8px;background:#fff;border:1px dashed #a9cbe3;font-size:13px;color:#2e4a5f}
+.num-example b{color:#0e4468}
+
+.end{background:var(--navy);color:#eaf5ff}
+.end .label{color:#a9d8fc}.end h2{color:#fff}.end p{font-size:16.5px}
+.foot{font-size:12.5px;color:#6c7c8c;margin-top:20px}
+.src-cols{font-size:12px;color:#6c7c8c;line-height:1.85;columns:2;column-gap:34px;margin:0}
+.src-cols a{color:#1770b0;text-decoration:none}
+
+@media(max-width:720px){
+  .shell{padding:18px 13px 50px}
+  .hero,section{padding:26px 21px;border-radius:16px}
+  .compare{grid-template-columns:1fr}
+  .title{font-size:22px}
+  .src-cols{columns:1}
+}
+</style>
+</head>
+<body><a href="../session.html?s=4" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 4회차 진행안으로</a><main class="shell">
+
+<header class="hero">
+  <div class="kicker">TOKENIZED ASSET TRADING · XANGLE RWA SERIES 「디파이: 탈중앙화 거래소」 4-1</div>
+  <h1>유동성 풀로<br>직접 시장을 개설하는 방식</h1>
+  <p>토큰화된 주식·국채 같은 자산을 거래하려면 사고팔 수 있는 "시장" 필요. 가장 기본적인 방법인 AMM(자동화 시장조성자) 유동성 풀을 Uniswap·PancakeSwap·Orca·Curve 네 곳으로 정리.</p>
+  <div class="who">발표자: 장윤선</div>
+</header>
+
+<nav class="toc">
+  <a href="#concept">AMM 개념</a>
+  <a href="#uniswap">Uniswap</a>
+  <a href="#pancake">PancakeSwap</a>
+  <a href="#orca">Orca</a>
+  <a href="#curve">Curve</a>
+  <a href="#compare">총정리</a>
+</nav>
+
+<section id="concept">
+  <div class="label">01 · CONCEPT</div>
+  <h2 class="title">AMM 유동성 풀이란?</h2>
+  <p class="intro">사람이 직접 호가를 부르는 대신, 토큰과 결제자산(USDC 등)을 미리 넣어둔 "풀"이 거래 상대가 되는 구조. 발행사나 외부 유동성 공급자(LP)가 초기 자금을 넣으면, 컨트랙트(자동 프로그램)가 이 풀로 매수·매도를 처리.</p>
+
+  <div class="compare">
+    <article class="c1"><h4>비허가형 풀</h4><p>상장심사 없이 누구나 풀 개설·거래 가능. 일반 가상자산이나 전송 제한이 없는 자산에 적합.</p></article>
+    <article class="c2"><h4>허가형 풀</h4><p>신원확인(KYC)·적격투자자 확인 통과자만 참여 가능. 증권형 토큰화 자산은 대부분 이쪽 필요.</p></article>
+  </div>
+
+  <div class="box"><b>AMM은 어떻게 돈을 버나?</b> 풀에서 스왑(교환)할 때마다 거래금액의 일정 %(보통 0.05%~1%)를 수수료로 부과. 이 수수료는 그 풀에 자금을 넣은 LP들이 지분율대로 배분 — "내 돈을 빌려주는 대가". 일부 프로토콜은 이 수수료 중 일부를 회사·토큰 보유자 몫으로도 추가 징수(Uniswap 편에서 구체적으로 다룸).</div>
+</section>
+
+<section id="uniswap">
+  <div class="label">02 · UNISWAP</div>
+  <h2 class="title">Uniswap — 범용 AMM에서 허가형 시장까지</h2>
+  <p class="intro">가장 범용적인 선택지. 원래는 상장심사 없이 누구나 풀 개설 가능한 비허가형 구조였으나, 2026년 7월부터 증권형 자산을 위한 허가형 풀까지 지원 시작.</p>
+
+  <div class="company">
+    <div class="chead"><h3>허가형 풀 (Permissioned Pools)</h3><span class="tag2">2026.7.23 출시</span></div>
+    <div class="p-row"><b>작동 방식</b> 발행사(이슈어)가 직접 관리하는 "투자 가능 명단(화이트리스트)"을 훅(Hook)이라는 부품을 통해 풀에 연결. 스왑·LP 포지션 생성 시마다 "이 지갑이 명단에 있나"를 자동 확인, 자격 상실 시 포지션 강제 정리도 가능.</div>
+    <div class="p-row"><b>훅(Hook)이란</b> 핵심 컨트랙트를 통째로 새로 만들지 않고, "이 조건 하나만 추가로 검사"하는 부품을 꽂아 넣는 방식. 레고 블록처럼 필요한 규칙만 갈아끼울 수 있어 투자자 검증·거래시간 제한 같은 토큰화 자산 전용 규칙 구현에 유리. Uniswap v4가 처음 도입, PancakeSwap도 최신 버전(Infinity)에서 유사 방식 구현.</div>
+    <div class="p-row"><b>런칭 파트너 (실제 화이트리스트 관리 사례)</b> Superstate(토큰화 주식·펀드 설계 초기 참여), Securitize(자체 발행 토큰의 규정 준수 거래 연동), Dowgo(증권형 토큰 표준 ERC-3643 연동 담당)</div>
+    <div class="p-row"><b>"자격" 기준</b> 통일된 기준 없이 발행사가 직접 결정. 통상 KYC(신원확인) 통과 여부, 적격투자자(소득·자산 기준) 여부, 거주 국가·지역(예: 미국인 제외) 등을 발행사가 판단해 해당 지갑 주소만 화이트리스트 등재.</div>
+  </div>
+
+  <div class="box mint">
+    <b>Uniswap은 이 구조로 얼마를 버나 — Fee Switch(수수료 스위치)</b>
+    <p style="margin-top:8px">10,000달러 스왑 시 0.3% 수수료로 30달러 발생. 원래는 30달러 전부 LP 몫이었으나, 2025년 12월 말 "Fee Switch" 도입 후 이 중 17%(약 5.1달러)를 프로토콜(회사) 몫으로 징수. 남은 82.9%(약 24.9달러)만 LP 배분.</p>
+    <p>징수한 돈으로 시장에서 UNI 토큰을 매입해 영구 소각(buyback &amp; burn). UNI 전체 발행량 감소로 남은 토큰의 희소성 상승, 가치 상승을 노리는 구조 — 자사주 매입·소각과 같은 논리.</p>
+    <div class="num-example"><b>Fee Switch 이전엔 수익이 0이었나 — 아님</b> "프로토콜(누구나 쓰는 컨트랙트)"과 "Uniswap Labs(회사)"는 별개. 프로토콜 차원의 수수료는 원래 전액 LP 몫(회사 몫 0%)이었지만, Uniswap Labs는 2023년 10월부터 자사 웹사이트·앱·API로 스왑하는 사용자에게만 별도 "인터페이스 수수료"(0.15%→2024.4부터 0.25%)를 따로 걷고 있었음. 이 수익이 2024년 중반까지 누적 5,000만 달러 이상, 연환산 약 1억 2,500만 달러(약 1,800억원) 규모로 성장. 2025년 12월 Fee Switch 도입 시 이 별도 인터페이스 수수료는 폐지하고, 대신 프로토콜 차원에서 모든 경로의 사용자에게 걷어 UNI 보유자에게 buyback&amp;burn으로 돌려주는 구조로 전환. 즉 "0%→17%로 급증"이 아니라 "회사가 따로 걷던 수익원을 없애고 프로토콜·토큰 보유자 공유 구조로 재편"한 것.</div>
+    <div class="num-example"><b>실제 매출</b> 2026년 6월 기준 Fee Switch 도입 이후 약 2,315만 달러(약 333억원), 연환산 약 2,600만~5,800만 달러(약 375억~835억원) 수준으로 추정. 2026년 7월 27일 7개 체인의 v4 풀까지 확장, 하루 약 32.5만 달러(약 4.7억원)씩 유입 중. (다른 프로토콜도 구조는 유사 — "거래수수료 분배(LP) + 일부 프로토콜·토큰 보유자 몫")</div>
+  </div>
+</section>
+
+<section id="pancake">
+  <div class="label">03 · PANCAKESWAP</div>
+  <h2 class="title">PancakeSwap — Binance·BNB Chain 생태계 연결</h2>
+  <p class="intro">Binance가 만든 체인인 BNB Chain의 대표 AMM. 최신 버전 "Infinity"에서 Uniswap과 유사한 훅(Hook) 구조를 자체 구현, 거래 전후에 원하는 조건 삽입 가능.</p>
+
+  <div class="box">
+    <b>실제 사고 사례 — 하이퍼리퀴드 SK하이닉스 오라클 오작동 (2026.7)</b>
+    <p style="margin-top:8px">하이퍼리퀴드 위에서 운영되던 SK하이닉스 무기한선물 시장에서 발생. 한국 대체거래소(NextTrade)의 장전시간에 단 한 건의 거래가 전일 대비 -30% 가격에 체결, 오라클이 이 이례적인 단일 가격을 그대로 반영해 실제로는 안 떨어졌는데 시스템이 "폭락"으로 인식. 결과적으로 960개 계정, 약 5,740만 달러(약 826억원) 규모 오청산. (참고: 이 사건 자체는 PancakeSwap이 아닌 하이퍼리퀴드에서 발생한 사고 — 훅으로 이런 사고를 막을 수 있는지 가정해보는 예시로 활용)</p>
+    <p><b>이 사고, 훅이 있었다면 막을 수 있었을까 (가정)</b><br>예: ① "가격이 직전 평균 대비 특정 % 이상 순간적으로 벌어지면 무시"(이상치 필터) ② "오라클 여러 곳의 가격이 서로 일치할 때만 체결 허용"(단일 소스 의존 방지) ③ "기초시장이 실제로 열려있는 정규시간에만 청산 로직 작동"(장전 등 저유동성 시간대 청산 지연). 이런 조건을 거래 체결 "전"에 자동 검사하는 코드가 훅.</p>
+  </div>
+
+  <div class="p-row" style="margin-top:16px"><b>Ondo Global Markets 연동</b> 수백 종의 토큰화 주식·ETF를 PancakeSwap에 연결, PancakeSwapX(체결 계층)·Binance의 bStocks까지 이어짐.</div>
+
+  <div class="box mint">
+    <b>왜 BNB Chain 기반이면 사용자 접근성이 좋은가</b>
+    <p style="margin-top:8px">풀에 담긴 실제 자금은 그 체인 안에만 존재 — BNB Chain 풀은 기본적으로 BNB Chain 안에서만 직접 거래되고, 다른 체인(Ethereum 등)에서 바로 접근 불가. 브리지 같은 크로스체인 인프라를 거치면 우회 접근 가능하나 단계 추가.</p>
+    <p>즉 "어느 체인이냐"가 곧 "누가 쉽게 접근하냐"를 결정. Binance 앱은 세계 최다 사용 거래소 앱으로, bStocks 연결 시 새 지갑 생성이나 낯선 사이트 방문 없이 기존 앱에서 몇 번 터치로 거래 가능. PancakeSwapX는 여러 곳에 흩어진 유동성을 비교해 최적가로 자동 연결, 사용자가 직접 비교할 필요 없음. "좋은 시장이 있다"와 "쉽게 도달한다"는 별개 문제인데, 이 조합이 후자를 해결.</p>
+  </div>
+
+  <div class="box"><b>참고 — 체인마다 강점 상이</b> Uniswap(Ethereum): 자금 규모 최대, 기관 친숙, 수수료 비쌈 · PancakeSwap(BNB Chain): Binance 기존 사용자·지갑과 직결, 수수료 저렴 · Orca(Solana): 처리속도 빠르고 저렴, 리테일 토큰화 주식 거래 활발 · Curve(주로 Ethereum 계열): 국채·수익형 자산처럼 기관 자금 이동에 적합</div>
+</section>
+
+<section id="orca">
+  <div class="label">04 · ORCA</div>
+  <h2 class="title">Orca — 허가형 유동성 풀 실사례</h2>
+  <p class="intro">Solana의 대표 AMM. 증권 규제(투자자 자격 제한)를 지키는 허가형 풀을 실제로 운영한 사례를 보여줌.</p>
+
+  <div class="company">
+    <div class="chead"><h3>허가형 풀 실제 사례 — Streamex의 GLDY (실물 금 연계 토큰)</h3></div>
+    <ol class="flow-steps">
+      <li><b>Streamex (발행사)</b> 실물 금 보관, 이를 대표하는 토큰 GLDY 발행. 매수 가능 대상(KYC·적격투자자) 명단 직접 관리</li>
+      <li><b>Metalayer (전문 유동성 공급자)</b> GLDY와 상대자산(USDC 등)을 Orca 풀에 투입해 실제 거래 가능 물량 확보</li>
+      <li><b>Orca (AMM)</b> 승인된 투자자끼리만 접근 가능하게 풀을 운영</li>
+      <li><b>투자자</b> KYC·자격 확인 통과자만 이 풀에서 GLDY 매매 가능</li>
+    </ol>
+    <p style="margin-top:4px;font-size:13px;color:var(--muted)">한 줄 요약: 발행사가 자산·자격 관리 → 전문 공급자가 실제 자금 투입 → Orca가 그 자금으로 거래소 역할 수행</p>
+  </div>
+
+  <div class="box mint">
+    <b>참고 — Orca의 또 다른 특징: Concentrated Liquidity (위 허가형 풀 사례와는 별개인 기술)</b>
+    <p style="margin-top:8px">GLDY 사례가 "누가 거래할 수 있는가(규제 준수)"에 대한 답이라면, Concentrated Liquidity는 "가격을 얼마나 효율적으로 형성하는가"에 대한 별도 답임 — 서로 원인·결과 관계가 아니라, Orca라는 하나의 AMM이 우연히 두 기능을 함께 갖추고 있는 것.</p>
+    <p>일반 AMM은 자금을 "가격 0원부터 무한대까지" 전체 구간에 고르게 분산 — 실제로 거의 안 쓰이는 극단적 가격대에도 자금이 묶여 낭비. Concentrated Liquidity는 "지금 가격이 100달러 근처면 90~110달러 구간에만 집중"처럼 실제 거래 가능성이 높은 좁은 구간에 자금 집중 배치 — 같은 돈으로도 그 구간 안에서는 훨씬 두꺼운 유동성 형성, 슬리피지 감소. 비유: 편의점 진열대에 전 세계 모든 물건을 조금씩 갖다놓는 대신 "요즘 잘 팔리는 음료 코너"에 재고를 몰아 쌓는 것과 유사.</p>
+  </div>
+</section>
+
+<section id="curve">
+  <div class="label">05 · CURVE</div>
+  <h2 class="title">Curve — 국채·수익형 자산에 특화된 가격 모델</h2>
+  <p class="intro">가격이 서로 비슷하게 움직일 것으로 예상되는 자산 쌍(스테이블코인, 국채 등)에 특화된 AMM. 일반 AMM과 다른 계산 방식(StableSwap)으로 이런 자산의 슬리피지를 대폭 감소.</p>
+
+  <div class="box">
+    <b>먼저, Curve가 아닌 "일반 AMM" 얘기부터 (사탕 항아리로 이해하기)</b>
+    <p style="margin-top:8px">Curve 얘기를 하기 전에, Curve가 "안 쓰는" 일반적인 방식부터 알아야 함. 사탕 10개랑 돈 100원이 든 항아리가 있다고 하자. 이 항아리는 "사탕 개수 × 돈 = 항상 1000"이라는 규칙을 지켜야 함. 그래서 사탕을 하나씩 사갈 때마다, 항아리에 남은 사탕이 적어질수록 다음 사탕 값이 점점 더 비싸짐.</p>
+    <div class="num-example">
+      <b>사탕이 줄어들수록 값이 어떻게 뛰는지 (일반 AMM 방식)</b><br>
+      남은 사탕 10개 → 다음 한 개 값 약 11원<br>
+      남은 사탕 5개 → 다음 한 개 값 약 44원<br>
+      남은 사탕 2개 → 다음 한 개 값 약 250원<br>
+      남은 사탕 1개 → 다음 한 개 값 약 1000원<br>
+      처음엔 10원 조금 넘던 사탕이, 항아리가 거의 비면 그 100배 가격이 됨. Uniswap 같은 "일반 AMM"은 전부 이 방식임.
+    </div>
+  </div>
+
+  <div class="box">
+    <b>왜 하필 47% 손해가 나나 — 사과·바나나로 한 단계씩 보기</b>
+    <p style="margin-top:8px">가게에 사과 10개, 바나나 10개가 있다고 하자. 이 가게의 약속: "사과 개수와 바나나 개수를 곱한 값은 항상 100이어야 한다"(10×10=100).</p>
+    <ol class="flow-steps">
+      <li><b>내가 사과 9개를 갖다 줌</b> 가게 안 사과는 10개+9개=19개가 됨</li>
+      <li><b>약속을 지키려면?</b> 곱해서 100이 되려면 바나나는 100÷19 ≈ 5.3개만 있어야 함</li>
+      <li><b>가게가 나한테 내준 바나나</b> 원래 10개 있던 바나나가 5.3개로 줄어야 하니, 나한테 준 건 10−5.3=4.7개</li>
+      <li><b>결과</b> 사과 9개를 냈는데 바나나는 4.7개만 받음. 9개 냈으면 9개 받는 게 정상인데 4.7개만 받았으니, (9−4.7)÷9 ≈ 47% 손해</li>
+    </ol>
+    <p>핵심: 사과를 너무 많이 갖다 줘서(10개짜리 가게에 9개나 더) 가게 안 비율이 확 뒤집어짐. "곱한 값은 항상 100"이라는 약속을 지키려니, 사과가 갑자기 많아진 만큼 바나나는 억지로 확 줄어들어야 했던 것 — 이 "억지로 줄어든 만큼"이 곧 손해율. (앞서 본 90만 개 예시도 똑같은 상황에 0을 더 붙인 것뿐: 10개→100만 개, 9개→90만 개)</p>
+  </div>
+
+  <div class="box mint">
+    <b>그럼 Curve는 이 사탕 항아리 방식을 안 쓰나? — 맞음, "두 가지 모드"를 오가며 씀</b>
+    <p style="margin-top:8px">일반 AMM(사탕 항아리) 가게는 규칙이 딱 하나뿐임: "적어질수록 무조건 값을 확확 올린다." 손님이 조금만 사가도 이 규칙이 바로바로 세게 적용됨.</p>
+    <p>Curve 가게는 규칙을 두 개 갖고 있고, 상황 봐서 바꿔 씀. <b>평소엔</b>(사람들이 적당한 양만 사갈 때) "그냥 원래 가격 그대로 팔게요"라며 거의 손해 없이 1:1로 바꿔줌. 근데 <b>누가 갑자기 어마어마하게 많이</b>(풀에 있는 걸 거의 다) 사가려고 하면 "이러면 위험한데" 싶어서 그제서야 사탕 항아리 규칙(값 확확 올리기)으로 바꿔서 자기 자신을 보호함.</p>
+    <p>그러니까 아래 비교의 "90만 개" 예시는 일부러 극단적으로 큰 금액을 넣어서 Curve도 결국 사탕 항아리 모드로 넘어가버린 상황이고, 실제로 사람들이 하는 것처럼 훨씬 작은 금액을 바꿀 땐 Curve는 "평소 모드"를 유지해서 손해가 거의 안 남.</p>
+  </div>
+
+  <div class="compare">
+    <article class="c1"><h4>같은 상황, 일반 AMM(사탕 항아리 방식)이면</h4><p>USDC 100만 개 + USDT 100만 개짜리 풀에서 USDC 90만 개를 한꺼번에 USDT로 바꾸면, "곱을 일정하게" 유지하는 규칙 때문에 USDT를 약 47만 개밖에 못 받음 — 90만 개 냈는데 47만 개만 받는 셈(슬리피지 약 47%).</p></article>
+    <article class="c2"><h4>같은 상황, Curve(StableSwap 방식)이면</h4><p>1:1 근처에서는 사탕 항아리 규칙을 안 쓰고 값을 거의 평평하게 유지하기 때문에, 같은 90만 개를 바꿔도 실제로는 거의 1:1에 가깝게(슬리피지 1% 미만 수준) 받을 수 있음.</p></article>
+  </div>
+
+  <div class="p-row"><b>왜 개별 주식엔 안 맞고 국채·수익형 자산엔 맞나</b> 개별 주식은 실적·뉴스에 따라 하루에도 크게 출렁여 "거의 고정비율"을 가정하는 StableSwap 구조와 부적합. 반면 국채(mTBILL, 미국 단기국채 연계 자산)는 만기까지 이자만큼 완만하게 우상향, 달러 대비 가치가 거의 안 흔들려 StableSwap에 적합.</div>
+</section>
+
+<section id="compare">
+  <div class="label">06 · SUMMARY</div>
+  <h2 class="title">네 프로토콜 총정리</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>구분</th><th>Uniswap</th><th>PancakeSwap</th><th>Orca</th><th>Curve</th></tr></thead>
+    <tbody>
+      <tr><th>기반 체인</th><td>Ethereum 등</td><td>BNB Chain</td><td>Solana</td><td>Ethereum 계열</td></tr>
+      <tr><th>한 줄 특징</th><td>범용 + 허가형 확장</td><td>Binance 생태계 연결</td><td>허가형 풀 실사례</td><td>저변동 자산 특화</td></tr>
+      <tr><th>핵심 기술</th><td>v4 훅(Hook)</td><td>Infinity 훅(Hook)</td><td>Concentrated Liquidity</td><td>StableSwap</td></tr>
+      <tr><th>대표 연동 사례</th><td>Superstate·Securitize·Dowgo</td><td>Ondo Global Markets</td><td>Streamex GLDY</td><td>mTBILL</td></tr>
+      <tr><th>수익 구조</th><td>거래수수료 + Fee Switch(17%→UNI 소각)</td><td>거래수수료 분배</td><td>거래수수료 분배</td><td>거래수수료 분배</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="end">
+  <div class="label">KEY TAKEAWAY</div>
+  <h2 class="title">같은 "풀 직접 만들기"도 자산 특성과 생태계에 따라 갈림</h2>
+  <p>네 프로토콜 모두 "토큰과 결제자산을 풀에 넣어 자동으로 거래시킨다"는 기본 원리는 동일. 다만 Uniswap은 범용성과 허가형 확장, PancakeSwap은 Binance라는 거대 생태계와의 연결, Orca는 증권 규제를 지키는 실제 구현, Curve는 자산의 가격 변동성 자체에 맞춘 수학적 구조로 각자 자리를 확보. 결국 "어떤 자산을, 누구에게, 어느 체인에서 거래시킬 것인가"에 따라 적합한 도구가 달라진다는 점을 시사.</p>
+</section>
+
+<section>
+  <div class="label">SOURCES</div>
+  <h2 class="title">주요 출처</h2>
+  <div class="src-cols">
+    <a href="https://xangle.io/research/detail/2532">Xangle RWA Series, 디파이: 탈중앙화 거래소 (2026.8.14)</a><br>
+    <a href="https://blog.uniswap.org/introducing-permissioned-pools-on-uniswap-v4">Uniswap, Introducing Permissioned Pools on Uniswap v4</a><br>
+    <a href="https://cryptobriefing.com/uniswap-23m-revenue-fee-switch/">Uniswap generates nearly $23M in protocol revenue after fee switch</a><br>
+    <a href="https://cryptobriefing.com/uniswap-fee-switch-v4-pools-325k-revenue/">Uniswap activates fee switch on v4 pools</a><br>
+    <a href="https://finance.yahoo.com/markets/crypto/articles/hyperliquid-explains-57-million-sk-114320781.html">Hyperliquid Explains $57M SK Hynix Perp Liquidations After Oracle Anomaly</a>
+  </div>
+</section>
+
+<p class="foot">본 자료는 스터디 발표 준비용으로 제작. 수치·시가총액은 실시간으로 변하므로 발표 시점에 재확인 필요. (환율 1$ ≈ 1,440원 기준)</p>
+
+</main></body></html>

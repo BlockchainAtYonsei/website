@@ -63,6 +63,10 @@ export type Session = {
   status: SessionStatus;
   date: string;
   source: Source | null;
+  /* A double-article session reads two pieces at once, so it carries both
+     links here; `source` stays the single representative one for the card and
+     the metadata, and the detail page lists `sources` when it is set. */
+  sources?: Source[];
   assign: Assignment[];
   records: StudyRecord[];
   /* Per-session overrides. A session that sets any of these runs differently
@@ -489,101 +493,168 @@ export const SESSIONS: Session[] = [
   },
   {
     no: 4,
-    topic: "토큰화 채권",
-    title: { accent: "Tokenized Bonds", rest: "Study Guide" },
-    status: "ready",
-    date: "2026-08-25",
-    source: {
-      label: "Xangle RWA Series · 토큰화 채권",
-      url: "https://xangle.io/research/detail/2508",
-      short: "xangle.io/research/detail/2508"
-    },
-    assign: [
-      {
-        who: "이재환",
-        parts: [
-          { n: "1-1.", t: "채권 시장의 규모: 전통 금융과 온체인" },
-          { n: "1-2.", t: "채권 토큰화의 출발점: 토큰이 나타내는 권리" }
-        ],
-        focus: "온체인 채권 시장의 크기 / 토큰이 담는 권리가 왜 출발점인지 (주식 편과의 연결)"
-      },
-      {
-        who: "신영환",
-        parts: [{ n: "2-1.", t: "직접 발행형" }, { n: "2-2.", t: "증권 권리형" }],
-        focus: "직접 발행형·증권 권리형 채권의 구조와 대표 사례"
-      },
-      {
-        who: "장윤선",
-        parts: [{ n: "2-3.", t: "펀드 지분형" }, { n: "2-4.", t: "연계 증권형" }],
-        focus: "펀드 지분형·연계 증권형의 구조 / 앞 두 방식과의 권리 차이"
-      },
-      {
-        who: "배예림",
-        parts: [{ n: "3-1.", t: "온체인 현금관리" }, { n: "3-2.", t: "디파이 담보" }],
-        focus: "토큰화 채권이 현금관리 수단으로 쓰이는 방식 / 디파이 담보로서의 활용"
-      },
-      {
-        who: "노제희",
-        parts: [{ n: "3-3.", t: "거래소·기관 마진 담보" }, { n: "3-4.", t: "스테이블코인 준비자산" }],
-        focus: "기관 마진 담보 활용 / 스테이블코인 준비자산으로 편입되는 구조"
-      },
-      {
-        who: "이성재",
-        parts: [{ n: "4-1.", t: "한국에서도 시작되는 토큰화 채권 실험" }, { n: "4-2.", t: "앞으로의 관전 포인트" }],
-        focus: "국내 토큰화 채권 동향 / 투자상품에서 담보 인프라로 이동한다는 결론 정리"
-      }
-    ],
-    records: []
-  },
-  {
-    no: 5,
-    topic: "토큰화 대체자산",
-    title: { accent: "Alternative Assets", rest: "Study Guide" },
+    topic: "디파이 : 탈중앙화 거래소",
+    title: { accent: "DeFi DEX", rest: "Study Guide" },
     status: "ready",
     date: "2026-09-01",
     source: {
-      label: "Xangle RWA Series · 토큰화 대체자산",
-      url: "https://xangle.io/research/detail/2517",
-      short: "xangle.io/research/detail/2517"
+      label: "Xangle RWA Series · 디파이 : 탈중앙화 거래소",
+      url: "https://xangle.io/research/detail/2532",
+      short: "xangle.io/research/detail/2532"
     },
     assign: [
       {
-        who: "장윤선",
+        who: "배예림",
         parts: [
-          { n: "1.", t: "토큰화 대체자산: 비유동 자산은 어떻게 온체인 금융상품이 되는가" },
-          { n: "2-1.", t: "대체자산의 종류" },
-          { n: "2-2.", t: "토큰화가 겨냥하는 문제" }
+          { n: "1.", t: "토큰화 자산의 거래" },
+          { n: "2-1.", t: "현물 거래" },
+          { n: "2-2.", t: "무기한 선물 거래" },
+          { n: "3.", t: "토큰화 자산 거래시장을 설계할 때 고려할 요소" },
+          { n: "6.", t: "결론 : 토큰화 자산의 거래시장은 아직 초기 단계" }
         ],
-        focus: "대체자산의 범위 / 비유동성·최소투자금액 등 토큰화가 풀려는 문제: 뒤 4개 자산군의 공통 프레임"
+        focus: "현물·무기한 선물의 구분과 거래시장 설계 요소 · 뒤 다섯 프로토콜을 읽는 공통 프레임과 결론"
       },
       {
-        who: "신영환",
-        parts: [{ n: "3-1.", t: "부동산: 등기와 임대수익을 온체인 지분으로" }],
-        focus: "등기·임대수익이 온체인 지분으로 연결되는 구조 / 부동산 특유의 난점"
-      },
-      {
-        who: "이성재",
-        parts: [{ n: "3-2.", t: "원자재: 금고의 실물을 온체인 청구권으로" }],
-        focus: "실물 보관과 청구권 설계 / 감사·검증이 작동하는 방식"
-      },
-      {
-        who: "이재환",
-        parts: [{ n: "3-3.", t: "수집품: 보관된 실물자산에 대한 권리의 토큰화" }],
-        focus: "수집품 토큰화의 권리 구조 / 가치평가와 유동성 문제"
+        who: "장윤선",
+        parts: [{ n: "4-1.", t: "유동성 풀로 직접 시장을 개설하는 방식" }],
+        focus: "유동성 풀로 시장을 여는 방식의 작동 원리와 한계"
       },
       {
         who: "박의혁",
-        parts: [{ n: "3-4.", t: "신용: 사모신용과 구조화 신용의 토큰화" }],
-        focus: "사모신용·구조화 신용의 토큰화 구조 / 다른 자산군 대비 리스크 성격"
+        parts: [{ n: "4-2.", t: "전문 사업자가 유동성을 운영하는 방식" }],
+        focus: "전문 사업자가 유동성을 운영하는 구조 / 풀 방식과의 차이"
+      },
+      {
+        who: "이성재",
+        parts: [{ n: "4-3.", t: "전문 체결자의 호가를 활용하는 방식" }],
+        focus: "전문 체결자의 호가를 활용한 체결·가격 형성 구조"
       },
       {
         who: "노제희",
+        parts: [{ n: "4-4.", t: "여러 거래 경로를 묶어 사용자에게 연결하는 방식" }],
+        focus: "여러 경로를 묶어 연결하는 구조 · 앞 세 방식을 어떻게 조합하는가"
+      },
+      {
+        who: "이재환",
+        parts: [{ n: "5.", t: "무기한 선물 DEX 프로토콜" }],
+        focus: "무기한 선물 DEX의 구조 / 현물 DEX와의 차이"
+      }
+    ],
+    records: [
+      {
+        kind: "발표자료",
+        title: "1 · 2 · 3 · 6. 토큰화 자산의 거래와 DEX",
+        who: "배예림",
+        part: "Atomic Settlement · Programmability · Composability · AMM vs CLOB · Intent 네 역할",
+        url: "/study/materials/s4-1-3-6-tokenized-assets-dex.html"
+      },
+      {
+        kind: "발표자료",
+        title: "4-1. 유동성 풀로 직접 시장을 개설하는 방식",
+        who: "장윤선",
+        part: "Uniswap 허가형 풀·Fee Switch · PancakeSwap · Orca GLDY · Curve StableSwap",
+        url: "/study/materials/s4-4-1-liquidity-pool.html"
+      },
+      {
+        kind: "PDF",
+        title: "4-2. 전문 사업자가 유동성을 운영하는 방식",
+        who: "박의혁",
+        part: "슬라이드 6장 · LVR · Prop AMM · Inventory Skewing · LaaS 프로토콜 사례",
+        url: "/study/materials/s4-4-2-prop-amm-laas.pdf"
+      },
+      {
+        kind: "발표자료",
+        title: "4-3. 전문 체결자의 호가를 활용하는 방식",
+        who: "이성재",
+        part: "Intent · RFQ · UniswapX · PancakeSwapX · Native · 직접 써본 UI 비교",
+        url: "/study/materials/s4-4-3-rfq-quotes.html"
+      },
+      {
+        kind: "PDF",
+        title: "4-4. 여러 거래 경로를 묶어 사용자에게 연결하는 방식",
+        who: "노제희",
+        part: "슬라이드 10장 · 여러 거래 경로를 묶어 사용자에게 연결하는 구조",
+        url: "/study/materials/s4-4-4-routing.pdf"
+      },
+      {
+        kind: "PDF",
+        title: "5. 무기한 선물 DEX 프로토콜",
+        who: "이재환",
+        part: "슬라이드 10장 · Hyperliquid · Lighter · Aster 비교 · RWA Perp 시장",
+        url: "/study/materials/s4-5-perp-dex.pdf"
+      }
+    ]
+  },
+  {
+    no: 5,
+    topic: "토큰화 채권 · 토큰화 대체자산",
+    title: { accent: "Bonds & Alt Assets", rest: "Study Guide" },
+    status: "ready",
+    date: "2026-09-08",
+    source: {
+      label: "Xangle RWA Series · 토큰화 채권 · 토큰화 대체자산 (2편)",
+      url: "https://xangle.io/research/detail/2508",
+      short: "xangle.io/research/detail/2508"
+    },
+    /* Two articles read in one sitting, so both links ride along; `source`
+       above is the representative one for the card and metadata. */
+    sources: [
+      {
+        label: "토큰화 채권",
+        url: "https://xangle.io/research/detail/2508",
+        short: "xangle.io/research/detail/2508"
+      },
+      {
+        label: "토큰화 대체자산",
+        url: "https://xangle.io/research/detail/2517",
+        short: "xangle.io/research/detail/2517"
+      }
+    ],
+    assign: [
+      {
+        who: "배예림",
         parts: [
-          { n: "4-1.", t: "조각투자를 통해 먼저 실험된 대체자산 토큰화" },
-          { n: "4-2.", t: "토큰증권 제도화와 남아 있는 과제" },
-          { n: "5.", t: "마무리: 자산별로 확장되는 대체자산 토큰화" }
+          { n: "채권 1.", t: "채권 시장의 규모 · 채권 토큰화의 출발점 (1-1 ~ 1-2)" },
+          { n: "채권 4.", t: "한국의 토큰화 채권 실험과 관전 포인트 (4-1 ~ 4-2)" },
+          { n: "대체 1~2.", t: "대체자산의 종류와 토큰화가 겨냥하는 문제 (1 ~ 2-2)" },
+          { n: "대체 4~5.", t: "조각투자 · 토큰증권 제도화와 남은 과제 · 마무리 (4-1 ~ 5)" }
         ],
-        focus: "국내 조각투자 → 토큰증권 제도화 흐름과 남은 과제 / 글 전체 결론 정리"
+        focus: "두 아티클의 도입 프레임(시장 규모·권리 구조 / 대체자산의 범위와 문제)과 제도·결론 · 자산 방식 발표들을 앞뒤에서 묶는 역할"
+      },
+      {
+        who: "장윤선",
+        parts: [
+          { n: "채권 2-1.", t: "직접 발행형" },
+          { n: "채권 2-2.", t: "증권 권리형" }
+        ],
+        focus: "직접 발행형·증권 권리형 채권의 구조와 대표 사례"
+      },
+      {
+        who: "이성재",
+        parts: [
+          { n: "채권 2-3.", t: "펀드 지분형" },
+          { n: "채권 2-4.", t: "연계 증권형" }
+        ],
+        focus: "펀드 지분형·연계 증권형의 구조 / 앞 두 방식과의 권리 차이"
+      },
+      {
+        who: "박의혁",
+        parts: [
+          { n: "채권 3.", t: "온체인 현금관리 · 디파이 담보 · 마진 담보 · 스테이블코인 준비자산 (3-1 ~ 3-4)" },
+          { n: "대체 3-1.", t: "부동산: 등기와 임대수익을 온체인 지분으로" },
+          { n: "대체 3-2.", t: "원자재: 금고의 실물을 온체인 청구권으로" }
+        ],
+        focus: "토큰화 채권이 현금관리·담보·준비자산으로 쓰이는 방식 / 등기·임대수익의 온체인 지분화 / 실물 보관과 청구권 설계"
+      },
+      {
+        who: "노제희",
+        parts: [{ n: "대체 3-3.", t: "수집품: 보관된 실물자산에 대한 권리의 토큰화" }],
+        focus: "수집품 토큰화의 권리 구조 / 가치평가와 유동성 문제"
+      },
+      {
+        who: "이재환",
+        parts: [{ n: "대체 3-4.", t: "신용: 사모신용과 구조화 신용의 토큰화" }],
+        focus: "사모신용·구조화 신용의 토큰화 구조 / 다른 자산군 대비 리스크 성격"
       }
     ],
     records: []
@@ -593,7 +664,7 @@ export const SESSIONS: Session[] = [
     topic: "솔라나 RWA 주요 플레이어",
     title: { accent: "Solana RWA", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-08",
+    date: "2026-09-15",
     source: {
       label: "Xangle RWA Series · 솔라나 RWA : 주요 플레이어 살펴보기",
       url: "https://xangle.io/research/detail/2494",
@@ -611,7 +682,7 @@ export const SESSIONS: Session[] = [
         focus: "솔라나 위 국채·MMF와 주식 발행 플레이어 / 상품 구조와 규모"
       },
       {
-        who: "신영환",
+        who: "배예림",
         parts: [{ n: "2-3.", t: "사모·구조화 신용" }, { n: "2-4.", t: "대체자산(금, 수집품)" }],
         focus: "사모·구조화 신용과 대체자산 발행 플레이어 / 다른 자산군과의 차이"
       },
@@ -638,7 +709,7 @@ export const SESSIONS: Session[] = [
     topic: "커스터디 / KMS",
     title: { accent: "Custody & KMS", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-15",
+    date: "2026-09-22",
     source: {
       label: "Xangle RWA Series · 커스터디/KMS",
       url: "https://xangle.io/research/detail/2499",
@@ -664,7 +735,7 @@ export const SESSIONS: Session[] = [
         focus: "수탁 인가 두 경로의 요건 비교 / 기관 지위가 실제로 남기는 차이"
       },
       {
-        who: "신영환",
+        who: "배예림",
         parts: [{ n: "3-1.", t: "자산 이전 권한: 키관리와 서명 통제" }],
         focus: "KMS의 핵심: 키 생성·보관·서명 통제 방식과 MPC·HSM 등 구현 차이"
       },
@@ -699,7 +770,7 @@ export const SESSIONS: Session[] = [
     topic: "지갑 인프라",
     title: { accent: "Wallet Infra", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-22",
+    date: "2026-09-29",
     source: {
       label: "Xangle RWA Series · 지갑 인프라",
       url: "https://xangle.io/research/detail/2520",
@@ -707,7 +778,7 @@ export const SESSIONS: Session[] = [
     },
     assign: [
       {
-        who: "신영환",
+        who: "배예림",
         parts: [
           { n: "1.", t: "들어가며" },
           { n: "2-1.", t: "외부지갑 연결형" },
@@ -757,7 +828,7 @@ export const SESSIONS: Session[] = [
     topic: "컴플라이언스",
     title: { accent: "Compliance", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-29",
+    date: "2026-10-06",
     source: {
       label: "Xangle RWA Series · 컴플라이언스",
       url: "https://xangle.io/research/detail/2512",
@@ -779,7 +850,7 @@ export const SESSIONS: Session[] = [
         focus: "미국·EU·싱가포르·ADGM의 발행·판매 규제 비교 / 관할별 핵심 차이"
       },
       {
-        who: "신영환",
+        who: "배예림",
         parts: [{ n: "3-1.", t: "투자자 검증" }],
         focus: "투자자 검증(KYC·KYB·적격성 심사) / 각 플레이어의 역할과 책임 구조"
       },

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>전문 체결자의 호가를 활용하는 방식 — 이성재</title>
+<script>
+try{
+  if(localStorage.getItem('dex-rfq-theme') === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  }
+}catch(e){}
+try{
+  if(/^#s\d+$/.test(location.hash)){
+    history.replaceState(null, document.title, location.href.replace(/#.*$/, ''));
+  }
+}catch(e){}
+</script>
+<style>
+:root{
+  color-scheme:dark;
+  --surface:#161615;
+  --surface-2:#1e1e1d;
+  --ink:#fff;
+  --ink-2:#cbc9c1;
+  --muted:#92908a;
+  --faint:#686761;
+  --hair:rgba(255,255,255,.11);
+  --hair-2:rgba(255,255,255,.20);
+  --blue:#3987e5;
+  --blue-soft:rgba(57,135,229,.14);
+  --blue-border:rgba(57,135,229,.42);
+  --side-line:rgba(255,255,255,.13);
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --surface:#fff;
+  --surface-2:#f2f5f8;
+  --ink:#14151a;
+  --ink-2:#3f414a;
+  --muted:#5a5c62;
+  --faint:#73757b;
+  --hair:rgba(0,0,0,.10);
+  --hair-2:rgba(0,0,0,.18);
+  --blue:#1c5cab;
+  --blue-soft:rgba(28,92,171,.08);
+  --blue-border:rgba(28,92,171,.34);
+  --side-line:rgba(19,38,63,.12);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--surface-2);color:var(--ink);
+  font-family:Pretendard,"Apple SD Gothic Neo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.62;letter-spacing:-.012em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+
+/* 사이드바 */
+.side{
+  position:sticky;top:0;align-self:start;height:100vh;
+  display:flex;align-items:flex-start;padding:28px 20px;
+  background:var(--surface);border-right:1px solid var(--side-line);
+}
+.side nav{width:100%;max-height:calc(100vh - 56px);overflow-y:auto;padding:6px 4px 6px 0;scrollbar-width:thin}
+.toc{list-style:none;margin:0;padding:0}
+.toc .grp{
+  margin:18px 0 7px;padding:15px 10px 0;border-top:1px solid var(--side-line);
+  color:var(--ink);font-size:15px;font-weight:850;letter-spacing:-.015em;
+}
+.toc .grp:first-child{margin-top:0;padding-top:0;border-top:0}
+.toc a{
+  display:flex;align-items:baseline;gap:8px;padding:6px 10px;
+  border-left:2px solid transparent;border-radius:0 7px 7px 0;
+  color:var(--muted);font-size:13.5px;font-weight:650;text-decoration:none;letter-spacing:-.02em;
+}
+.toc a .n{flex:none;width:22px;color:var(--muted);font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.toc a:hover{color:var(--ink)}
+.toc a.on{background:var(--blue-soft);border-left-color:var(--blue);color:var(--ink);font-weight:800}
+.toc a.on .n{color:var(--blue)}
+
+/* 본문 */
+.main{min-width:0;padding:24px 28px 56px}
+.top,.chapter-group{background:var(--surface);border:1px solid var(--side-line);border-radius:12px}
+.top{margin-bottom:18px;padding:34px 38px}
+.top .study,.top .source,.top .presenter{margin:0;font-size:14px;font-weight:750;line-height:1.45}
+.top .study{color:var(--blue)}
+.top .source{margin-top:2px;color:var(--muted)}
+.top h1{margin:18px 0;font-size:clamp(42px,4.6vw,60px);font-weight:850;line-height:1.12;letter-spacing:-.055em}
+.top h1 em{color:var(--blue);font-style:normal}
+.top .presenter{color:var(--ink-2)}
+.top .presenter span{margin:0 9px;color:var(--hair-2)}
+
+.chapter-group{margin-bottom:18px;padding:28px 36px 0}
+.chapter-group:last-child{margin-bottom:0}
+.chapter-title{margin:0;padding:0 0 18px;color:var(--blue);font-size:30px;font-weight:850;letter-spacing:-.04em}
+.chapter-title em{font-style:normal}
+.sec{padding:30px 0 36px;scroll-margin-top:24px}
+.chapter-title + .sec,.chapter-group > .sec:first-child{padding-top:8px}
+.chapter-group .sec:last-child{padding-bottom:30px}
+.section-mark{display:flex;align-items:center;gap:10px;margin:0 0 20px;font-size:22px;font-weight:850;letter-spacing:-.035em}
+.section-mark::before{content:"";width:4px;height:22px;flex:none;background:var(--blue);border-radius:2px}
+.sec-head{margin-bottom:23px}
+.lb{margin:0;font-size:34px;font-weight:850;line-height:1.26;letter-spacing:-.047em}
+.sub{margin:8px 0 0;color:var(--muted);font-size:15px}
+.lead-list{margin:16px 0 0;padding-left:23px;color:var(--ink-2);font-size:17.5px;line-height:1.7}
+.lead-list li{padding-left:3px}
+.lead-list li + li{margin-top:5px}
+.lead-list li::marker,.points li::marker{color:var(--blue)}
+.lead-list b,.points b{color:var(--ink);font-weight:850}
+
+/* 도입 비교 */
+.split-lines{display:grid;grid-template-columns:1fr 1fr}
+.split-col{padding-right:34px}
+.split-col + .split-col{padding:0 0 0 34px;border-left:1px solid var(--hair)}
+.split-title{margin:0;font-size:21px;font-weight:850;letter-spacing:-.03em}
+.split-title span{display:block;margin-top:4px;color:var(--blue);font-size:13px;letter-spacing:0}
+.points{margin:15px 0 0;padding-left:22px;color:var(--ink-2)}
+.points li{padding-left:3px}
+.points li + li{margin-top:8px}
+
+/* 역할 구조 */
+.role-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:6px}
+.role-item{padding:0 28px}
+.role-item:first-child{padding-left:0}
+.role-item + .role-item{border-left:1px solid var(--hair)}
+.role-no{color:var(--blue);font-size:13px;font-weight:850;letter-spacing:.06em}
+.role-item h3{margin:4px 0 3px;font-size:21px;font-weight:850;letter-spacing:-.035em}
+.role-item .role-ko{margin:0;color:var(--blue);font-size:13px;font-weight:800}
+.role-item ul{margin:14px 0 0;padding-left:20px;color:var(--ink-2)}
+.role-item li + li{margin-top:7px}
+.role-item li::marker{color:var(--blue)}
+.role-item b{color:var(--ink)}
+
+/* 흐름 */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr) 28px minmax(0,1fr);align-items:stretch}
+.flow-step{padding:17px 13px;border-top:2px solid var(--hair-2)}
+.flow-step.on{border-top-color:var(--blue);background:var(--blue-soft)}
+.flow-step .num{display:block;margin-bottom:6px;color:var(--blue);font-size:12px;font-weight:850;letter-spacing:.06em}
+.flow-step strong{display:block;font-size:17px;line-height:1.35;letter-spacing:-.025em}
+.flow-step span{display:block;margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45}
+.flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:18px;font-weight:850}
+.flow-note{margin:18px 0 0;text-align:center;color:var(--ink-2);font-size:16px;font-weight:700}
+.flow-note b{color:var(--blue);font-weight:850}
+
+/* 프로토콜 */
+.protocol-core{display:grid;grid-template-columns:190px minmax(0,1fr);gap:30px;align-items:start}
+.protocol-name h3{margin:0;font-size:27px;font-weight:850;letter-spacing:-.045em}
+.protocol-name p{margin:4px 0 0;color:var(--blue);font-size:13.5px;font-weight:800}
+.protocol-copy ul{margin:0;padding-left:21px;color:var(--ink-2);font-size:16.5px}
+.protocol-copy li + li{margin-top:7px}
+.protocol-copy li::marker{color:var(--blue)}
+.protocol-copy b{color:var(--ink);font-weight:850}
+.mini-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:22px;border-top:1px solid var(--hair)}
+.mini-step{position:relative;padding:15px 17px 0;min-width:0}
+.mini-step:first-child{padding-left:0}
+.mini-step + .mini-step::before{content:"→";position:absolute;top:14px;left:-5px;color:var(--blue);font-weight:850}
+.mini-step span{display:block;color:var(--blue);font-size:11.5px;font-weight:850;letter-spacing:.05em}
+.mini-step strong{display:block;margin-top:3px;font-size:15.5px;line-height:1.4}
+.mini-step small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;line-height:1.4}
+
+/* Native */
+.native-line{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;margin-top:4px}
+.native-step{position:relative;padding:18px 22px;border-top:2px solid var(--hair-2)}
+.native-step:first-child{padding-left:0}
+.native-step:last-child{padding-right:0;border-top-color:var(--blue)}
+.native-step + .native-step::before{content:"→";position:absolute;top:17px;left:-6px;color:var(--blue);font-weight:850}
+.native-step .num{display:block;color:var(--blue);font-size:12px;font-weight:850}
+.native-step strong{display:block;margin-top:4px;font-size:17px}
+.native-step span{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.45}
+
+/* 토큰화 자산 */
+.reason-list{display:grid}
+.reason-row{display:grid;grid-template-columns:220px minmax(0,1fr);gap:34px;padding:18px 0;border-top:1px solid var(--hair)}
+.reason-row:first-child{padding-top:0;border-top:0}
+.reason-key{font-size:19px;font-weight:850;letter-spacing:-.03em}
+.reason-copy{color:var(--ink-2)}
+.reason-copy b{color:var(--ink);font-weight:850}
+
+/* 비교 */
+.compare{width:100%;border-collapse:collapse;table-layout:fixed}
+.compare th,.compare td{padding:15px 16px;border-bottom:1px solid var(--hair);text-align:left;vertical-align:top}
+.compare thead th{color:var(--muted);font-size:13px;font-weight:800}
+.compare thead th:first-child{width:150px}
+.compare tbody th{font-size:17px;font-weight:850}
+.compare tbody th span{display:block;margin-top:2px;color:var(--blue);font-size:12.5px;font-weight:800}
+.compare td{color:var(--ink-2);font-size:14.5px}
+.compare td b{color:var(--ink);font-weight:850}
+
+/* 직접 확인한 UI */
+.ui-observation{display:grid}
+.ui-row{display:grid;grid-template-columns:190px 210px minmax(0,1fr);gap:28px;align-items:start;padding:19px 0;border-top:1px solid var(--hair)}
+.ui-row:first-child{padding-top:0;border-top:0}
+.ui-product{font-size:20px;font-weight:850;letter-spacing:-.035em}
+.ui-product span{display:block;margin-top:3px;color:var(--blue);font-size:13px;font-weight:800;letter-spacing:0}
+.ui-focus{color:var(--ink);font-weight:800}
+.ui-copy{color:var(--ink-2)}
+.ui-copy b{color:var(--ink);font-weight:850}
+.insight-line{margin:19px 0 0;padding:15px 18px;background:var(--blue-soft);color:var(--ink-2);font-size:17px;font-weight:700;text-align:center}
+.insight-line b{color:var(--ink);font-weight:850}
+
+/* 용어 · 요약 · 출처 */
+.terms{display:grid}
+.term-row{display:grid;grid-template-columns:250px minmax(0,1fr);gap:34px;padding:19px 0}
+.term-row + .term-row{border-top:1px solid var(--hair)}
+.term-row dt{font-size:19px;font-weight:850;letter-spacing:-.03em}
+.term-row dt span{display:block;margin-top:3px;color:var(--blue);font-size:13.5px;font-weight:800}
+.term-row dd{margin:0;color:var(--ink-2)}
+.term-row ul{margin:0;padding-left:21px}
+.term-row li + li{margin-top:5px}
+.term-row li::marker{color:var(--blue)}
+.term-row b{color:var(--ink)}
+.summary{display:grid}
+.summary-row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:18px;padding:17px 0;border-top:1px solid var(--hair)}
+.summary-row:first-child{padding-top:0;border-top:0}
+.summary-row .n{color:var(--blue);font-size:14px;font-weight:850;letter-spacing:.05em}
+.summary-row p{margin:0;color:var(--ink-2);font-size:17px;font-weight:700}
+.summary-row b{color:var(--ink);font-weight:850}
+.sources{display:grid;grid-template-columns:150px minmax(0,1fr)}
+.source-kind,.source-copy{padding:14px 0;border-top:1px solid var(--hair)}
+.source-kind:first-of-type,.source-kind:first-of-type + .source-copy{border-top:0;padding-top:0}
+.source-kind{color:var(--muted);font-size:14px;font-weight:800}
+.source-copy{color:var(--ink-2)}
+.source-copy ul{margin:0;padding:0;list-style:none}
+.source-copy li + li{margin-top:9px}
+.source-copy a{color:var(--blue);font-weight:750;text-decoration:none;border-bottom:1px solid var(--blue-border)}
+.source-copy small{display:block;margin-top:2px;color:var(--muted);font-size:13.5px}
+
+.theme-toggle{
+  position:fixed;top:18px;right:18px;z-index:30;
+  display:inline-flex;align-items:center;gap:8px;padding:9px 14px;
+  border:1px solid var(--hair-2);border-radius:999px;background:var(--surface);
+  color:var(--ink-2);font:750 12.5px inherit;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+.theme-toggle .ico{color:var(--blue)}
+
+@media(max-width:1050px){
+  .protocol-core{grid-template-columns:150px minmax(0,1fr)}
+  .compare thead th:first-child{width:125px}
+}
+@media(max-width:860px){
+  .wrap{display:block}
+  .side{position:static;height:auto;padding:18px 20px;border-right:0;border-bottom:1px solid var(--side-line)}
+  .side nav{max-height:none}
+  .toc{display:flex;gap:6px;overflow-x:auto}
+  .toc .grp{display:none}
+  .toc li{flex:none}
+  .toc a{border-left:0;border-bottom:2px solid transparent;border-radius:7px;padding:7px 10px}
+  .toc a.on{border-left:0;border-bottom-color:var(--blue)}
+  .main{padding:18px}
+  .top,.chapter-group{border-radius:10px}
+  .chapter-group{padding:25px 26px 0}
+  .role-map{grid-template-columns:1fr}
+  .role-item{padding:18px 0;border-left:0!important;border-top:1px solid var(--hair)}
+  .role-item:first-child{padding-top:0;border-top:0}
+  .flow{grid-template-columns:1fr}
+  .flow-arrow{padding:4px;transform:rotate(90deg)}
+  .protocol-core{grid-template-columns:1fr;gap:10px}
+  .mini-flow{grid-template-columns:1fr 1fr;gap:16px 20px}
+  .mini-step,.mini-step:first-child{padding-left:0}
+  .mini-step + .mini-step::before{display:none}
+  .native-line{grid-template-columns:1fr 1fr}
+  .native-step:nth-child(3){padding-left:0}
+  .native-step + .native-step::before{display:none}
+  .ui-row{grid-template-columns:150px 170px minmax(0,1fr);gap:20px}
+  .compare{display:block;overflow-x:auto}
+  .compare th,.compare td{min-width:170px}
+}
+@media(max-width:620px){
+  .main{padding:10px}
+  .top{padding:28px 24px}
+  .chapter-group{padding:24px 22px 0}
+  .lb{font-size:29px}
+  .split-lines{grid-template-columns:1fr}
+  .split-col{padding:0 0 22px}
+  .split-col + .split-col{padding:22px 0 0;border-left:0;border-top:1px solid var(--hair)}
+  .mini-flow,.native-line{grid-template-columns:1fr}
+  .native-step,.native-step:nth-child(3){padding:15px 0}
+  .reason-row,.term-row,.ui-row{grid-template-columns:1fr;gap:7px}
+  .sources{grid-template-columns:1fr}
+  .source-kind{padding-bottom:3px}
+  .source-copy{padding-top:0;border-top:0}
+}
+</style>
+</head>
+<body>
+<a href="../session.html?s=4" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 4회차 진행안으로</a><button class="theme-toggle" id="themeToggle" type="button" aria-label="테마 전환">
+  <span class="ico">◐</span><span class="tt-label">다크 모드</span>
+</button>
+
+<div class="wrap">
+<aside class="side">
+  <nav aria-label="발표 목차">
+    <ul class="toc">
+      <li class="grp">들어가기</li>
+      <li><a href="#s0"><span class="n">01</span>왜 풀 밖의 호가?</a></li>
+
+      <li class="grp">구조</li>
+      <li><a href="#s1"><span class="n">01</span>전문 체결자</a></li>
+      <li><a href="#s2"><span class="n">02</span>인텐트 · RFQ</a></li>
+      <li><a href="#s3"><span class="n">03</span>체결 흐름</a></li>
+
+      <li class="grp">프로토콜 사례</li>
+      <li><a href="#s4"><span class="n">01</span>UniswapX</a></li>
+      <li><a href="#s5"><span class="n">02</span>PancakeSwapX</a></li>
+      <li><a href="#s6"><span class="n">03</span>Native</a></li>
+
+      <li class="grp">토큰화 자산</li>
+      <li><a href="#s7"><span class="n">01</span>적합성</a></li>
+      <li><a href="#s8"><span class="n">02</span>세 방식 비교</a></li>
+
+      <li class="grp">인사이트</li>
+      <li><a href="#s9"><span class="n">01</span>직접 확인해 본 UI</a></li>
+
+      <li class="grp">마무리</li>
+      <li><a href="#s10"><span class="n">01</span>새로 알게 된 용어</a></li>
+      <li><a href="#s11"><span class="n">02</span>핵심 정리</a></li>
+      <li><a href="#s12"><span class="n">03</span>자료 출처</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main">
+  <header class="top">
+    <p class="study">RWA 스터디 4회차</p>
+    <p class="source">Xangle DeFi · 탈중앙화 거래소</p>
+    <h1>4-3 <em>전문 체결자의 호가</em></h1>
+    <p class="presenter">발표 <span>|</span> 이성재</p>
+  </header>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>들어가기</em></h2>
+    <section class="sec" id="s0">
+      <div class="sec-head">
+        <p class="lb">큰 유동성 풀 없이도 거래할 수 있는가?</p>
+        <ul class="lead-list">
+          <li>AMM은 거래 전에 <b>토큰과 결제자산을 풀에 예치</b></li>
+          <li>전문 체결 방식은 주문이 들어온 뒤 <b>가격과 실행 경로를 제시</b></li>
+        </ul>
+      </div>
+
+      <div class="split-lines">
+        <div class="split-col">
+          <h3 class="split-title">AMM 풀<span>유동성 미리 배치</span></h3>
+          <ul class="points">
+            <li>풀의 잔량과 계산식으로 가격 결정</li>
+            <li>자산마다 초기 유동성 필요</li>
+            <li>한 방향 주문이 커질수록 가격 충격</li>
+          </ul>
+        </div>
+        <div class="split-col">
+          <h3 class="split-title">전문 체결자<span>주문마다 호가 경쟁</span></h3>
+          <ul class="points">
+            <li><b>원하는 결과</b> 먼저 제시</li>
+            <li>보유 자산·AMM·외부 시장까지 활용</li>
+            <li>가장 유리한 실행 조건 선택</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>핵심 구조</em></h2>
+
+    <section class="sec" id="s1">
+      <h3 class="section-mark">전문 체결자</h3>
+      <div class="sec-head">
+        <p class="lb">가장 좋은 가격 제시</p>
+        <ul class="lead-list">
+          <li>단순 중개자가 아닌, <b>가격 제시와 실제 체결</b> 담당</li>
+          <li>자기 재고·온체인 풀·외부 시장 조합해 주문</li>
+        </ul>
+      </div>
+
+      <div class="role-map">
+        <div class="role-item">
+          <span class="role-no">01</span>
+          <h3>가격 제시</h3>
+          <ul><li>자산·수량·시장 상황 반영</li><li>실제로 체결 가능한 조건</li></ul>
+        </div>
+        <div class="role-item">
+          <span class="role-no">02</span>
+          <h3>유동성 조달</h3>
+          <ul><li>보유 물량 또는 AMM 활용</li><li>필요하면 외부 시장에서 확보</li></ul>
+        </div>
+        <div class="role-item">
+          <span class="role-no">03</span>
+          <h3>주문 실행</h3>
+          <ul><li>사용자 조건을 만족할 때 체결</li><li>최종 자산 이전은 온체인</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="s2">
+      <h3 class="section-mark">Intent · RFQ</h3>
+      <div class="sec-head">
+        <p class="lb">사용자는 결과만, 체결자는 가격</p>
+      </div>
+
+      <div class="split-lines">
+        <div class="split-col">
+          <h3 class="split-title">Intent<span>사용자가 원하는 결과</span></h3>
+          <ul class="points">
+            <li>“15,000 USDC로 받을 수 있는 최선의 ETH”</li>
+            <li>어느 풀과 경로 쓸지는 직접 지정하지 않음</li>
+          </ul>
+        </div>
+        <div class="split-col">
+          <h3 class="split-title">RFQ · 호가 요청<span>체결자에게 조건 문의</span></h3>
+          <ul class="points">
+            <li>가격·수량·유효시간 담긴 실행 가능한 호가</li>
+            <li>여러 후보 가운데 <b>가장 유리한 조건</b> 선택</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="s3">
+      <h3 class="section-mark">체결 흐름</h3>
+      <div class="sec-head">
+        <p class="lb">하나의 풀보다 체결자 사이 경쟁</p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step"><span class="num">01</span><strong>조건 제출</strong><span>자산 · 수량 · 최소 수령량</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">02</span><strong>호가 요청</strong><span>여러 전문 체결자에게 RFQ</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">03</span><strong>조건 경쟁</strong><span>가격과 실행 방법 비교</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">04</span><strong>유동성 조달</strong><span>재고 · AMM · 외부 시장</span></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step on"><span class="num">05</span><strong>온체인 체결</strong><span>조건 충족 확인 후 자산 이전</span></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>프로토콜 사례</em></h2>
+
+    <section class="sec" id="s4">
+      <h3 class="section-mark">UniswapX</h3>
+      <div class="sec-head">
+        <p class="lb">하나의 주문에서 경쟁</p>
+      </div>
+
+      <div class="protocol-core">
+        <div class="protocol-name">
+          <h3>UniswapX</h3>
+          <p>Intent 기반</p>
+        </div>
+        <div class="protocol-copy">
+          <ul>
+            <li>전문 체결자에게 RFQ → <b>좋은 조건에 우선권</b></li>
+            <li>처리되지 않으면 <b>더치 옥션</b>으로 다른 체결자까지 참여</li>
+            <li>자기 재고·Uniswap AMM·다른 온체인 시장 활용</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mini-flow">
+        <div class="mini-step"><span>01</span><strong>Intent 제출</strong><small>원하는 결과</small></div>
+        <div class="mini-step"><span>02</span><strong>RFQ</strong><small>전문 체결자 비교</small></div>
+        <div class="mini-step"><span>03</span><strong>우선 기회</strong><small>최선의 호가</small></div>
+        <div class="mini-step"><span>04</span><strong>더치 옥션</strong><small>미체결 시 공개 경쟁</small></div>
+        <div class="mini-step"><span>05</span><strong>온체인 정산</strong><small>조건 충족 후 이전</small></div>
+      </div>
+    </section>
+
+    <section class="sec" id="s5">
+      <h3 class="section-mark">PancakeSwapX</h3>
+      <div class="sec-head">
+        <p class="lb">같은 구조이나 특징은 BNB 생태계 연결</p>
+      </div>
+
+      <div class="protocol-core">
+        <div class="protocol-name">
+          <h3>PancakeSwapX</h3>
+          <p>BNB Chain 거래 경로</p>
+        </div>
+        <div class="protocol-copy">
+          <ul>
+            <li>등록된 전문 시장조성자에게 RFQ → <b>최선의 호가 우선</b></li>
+            <li>미체결 시 <b>공개 경매</b>로 전환</li>
+            <li>Binance Wallet·Binance Alpha 등 사용자와의 접점 활용함</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mini-flow">
+        <div class="mini-step"><span>01</span><strong>주문 제출</strong><small>PancakeSwap 화면</small></div>
+        <div class="mini-step"><span>02</span><strong>등록 MM RFQ</strong><small>호가 우선 비교</small></div>
+        <div class="mini-step"><span>03</span><strong>공개 경매</strong><small>우선 체결 실패 시</small></div>
+        <div class="mini-step"><span>04</span><strong>외부 유동성</strong><small>재고 · AMM 활용</small></div>
+        <div class="mini-step"><span>05</span><strong>BNB Chain 체결</strong><small>리테일 채널 연결</small></div>
+      </div>
+    </section>
+
+    <section class="sec" id="s6">
+      <h3 class="section-mark">Native</h3>
+      <div class="sec-head">
+        <p class="lb">호가 배포까지 연결</p>
+        <ul class="lead-list">
+          <li>외부 유동성만 찾는 구조가 아니라 <b>유동성 공급 자체를 프로토콜 안에 포함</b></li>
+          <li>전문 시장조성자가 풀 자산이나 신용 활용해 호가 생성</li>
+        </ul>
+      </div>
+
+      <div class="native-line">
+        <div class="native-step"><span class="num">01</span><strong>LP · 발행사</strong><span>단일 자산을 Native 풀에 공급</span></div>
+        <div class="native-step"><span class="num">02</span><strong>전문 시장조성자</strong><span>자산·신용을 활용해 가격 제시</span></div>
+        <div class="native-step"><span class="num">03</span><strong>Native 인프라</strong><span>가격발견 · 주문 매칭</span></div>
+        <div class="native-step"><span class="num">04</span><strong>지갑 · Aggregator</strong><span>호가 배포 후 온체인 결제</span></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>토큰화 자산</em></h2>
+
+    <section class="sec" id="s7">
+      <h3 class="section-mark">적합성</h3>
+      <div class="sec-head">
+        <p class="lb">토큰화 자산 <-> 전문 체결 방식</p>
+      </div>
+
+      <div class="reason-list">
+        <div class="reason-row">
+          <div class="reason-key">기초가격 존재</div>
+          <div class="reason-copy">주식·ETF 시세 바탕으로 <b>체결 가능한 가격</b> 산정</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">발행·상환 경로</div>
+          <div class="reason-copy">전문 시장조성자가 발행·상환을 활용해 <b>물량과 가격</b> 관리</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">자산 수가 많음</div>
+          <div class="reason-copy">종목마다 대형 풀 만들기보다 하나의 <b>호가 네트워크</b>로 연결</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">유통 채널 확장</div>
+          <div class="reason-copy">만들어진 호가를 DEX·지갑·Aggregator에 <b>같이 배포</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="s8">
+      <h3 class="section-mark">세 방식 비교</h3>
+      <div class="sec-head">
+        <p class="lb">체결 경쟁 동일하나, 유동성 가져오는 곳 다름</p>
+      </div>
+
+      <table class="compare">
+        <thead>
+          <tr><th>프로토콜</th><th>호가 구조</th><th>유동성 출처</th><th>토큰화 자산 연결</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>UniswapX<span>EVM 인텐트</span></th>
+            <td>RFQ 우선 → 미체결 시 <b>더치 옥션</b></td>
+            <td>체결자 재고 · AMM · 외부 시장</td>
+            <td>Ondo 토큰화 주식·ETF와 EVM 유동성</td>
+          </tr>
+          <tr>
+            <th>PancakeSwapX<span>BNB 생태계</span></th>
+            <td>등록 MM RFQ → 미체결 시 <b>공개 경매</b></td>
+            <td>체결자 재고 · AMM · 외부 시장</td>
+            <td>Ondo · bStocks와 Binance 사용자 채널</td>
+          </tr>
+          <tr>
+            <th>Native<span>유동성 네트워크</span></th>
+            <td>전문 시장조성자의 <b>시장 반응형 호가</b></td>
+            <td>Native 풀 자산 · 신용까지 내부 연결</td>
+            <td>Ondo · xStocks · bStocks 호가 배포</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>인사이트</em></h2>
+
+    <section class="sec" id="s9">
+      <h3 class="section-mark">직접 확인해 본 UI</h3>
+      <div class="sec-head">
+        <p class="lb">화면이 매우 단순</p>
+        <ul class="lead-list">
+          <li><b>사용자 경험</b>을 아주 잘 설계한 어플이라고 생각</li>
+          <li>사용자에게는 <b>토큰 선택과 수량 입력</b>만 노출</li>
+          <li>RFQ·체결자 경쟁·실행 경로는 화면 뒤에서 알아서 처리</li>
+          
+        </ul>
+      </div>
+
+      <div class="ui-observation">
+        <div class="ui-row">
+          <div class="ui-product">UniswapX<span>가장 간결한 거래 화면</span></div>
+          <div class="ui-focus">매도 · 매수에 집중</div>
+          <div class="ui-copy">필요한 입력만 최소한으로 남긴 것 같음</div>
+        </div>
+        <div class="ui-row">
+          <div class="ui-product">PancakeSwapX<span>기능 선택형 거래 화면</span></div>
+          <div class="ui-focus">Swap · TWAP · Limit</div>
+          <div class="ui-copy">Uniswap X에 비하면 덜 직관적</div>
+        </div>
+        <div class="ui-row">
+          <div class="ui-product">Native<span>유동성 공급 화면</span></div>
+          <div class="ui-focus">풀 · APY · 활용률</div>
+          <div class="ui-copy">거래자보다 유동성 공급자 관점</div>
+        </div>
+      </div>
+
+      <p class="insight-line">국내 어플이 <b>참고했으면 하는 UI,UX !!!</b></p>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>마무리</em></h2>
+
+    <section class="sec" id="s10">
+      <h3 class="section-mark">새로 알게 된 용어</h3>
+      <dl class="terms">
+        <div class="term-row">
+          <dt>인텐트<span>Intent</span></dt>
+          <dd><ul><li>거래 경로보다 <b>받고 싶은 결과</b>를 먼저 표현</li><li>실행 방법은 전문 체결자가 구성</li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>상환 경로<span>Redemption Route</span></dt>
+          <dd><ul><li>블록체인상의 토큰을 반납하고 소각</li><li>현실의 <b>주식이나 현금으로 돌려받는 과정</b></li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>리테일 사용자<span>Retail User</span></dt>
+          <dd><ul><li>금융·가상자산 시장의 <b>개인 투자자 또는 일반 사용자</b></li><li>기관 투자자나 전문 트레이더와 반대되는 개념</li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>더치 옥션<span>가격 하락 경매</span></dt>
+          <dd><ul><li>사용자에게 유리한 조건에서 시작해 시간에 따라 완화</li><li>먼저 수익성 있는 조건을 찾은 체결자가 실행</li></ul></dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="sec" id="s11">
+      <h3 class="section-mark">핵심 정리</h3>
+      <div class="summary">
+        <div class="summary-row"><span class="n">01</span><p>사용자는 거래 경로가 아니라 <b>원하는 결과</b>를 제출</p></div>
+        <div class="summary-row"><span class="n">02</span><p>전문 체결자는 재고·AMM·외부 시장을 활용해 <b>호가와 실행 방법</b> 제시</p></div>
+        <div class="summary-row"><span class="n">03</span><p>여러 체결자가 경쟁하고 <b>가장 유리한 조건</b>으로 온체인 체결</p></div>
+        <div class="summary-row"><span class="n">04</span><p>UniswapX·PancakeSwapX는 외부 유동성 경쟁, Native는 <b>유동성 자본까지 연결</b></p></div>
+        <div class="summary-row"><span class="n">05</span><p>종목이 많은 토큰화 자산을 대형 풀 없이 <b>여러 사용자 채널로 유통</b></p></div>
+      </div>
+    </section>
+
+    <section class="sec" id="s12">
+      <h3 class="section-mark">자료 출처</h3>
+      <div class="sources">
+        <div class="source-kind">아티클 원문</div>
+        <div class="source-copy">
+          <a href="https://xangle.io/research/detail/2532" target="_blank" rel="noopener">Xangle · 디파이 : 탈중앙화 거래소</a>
+          <small>4-3 전문 체결자의 호가를 활용하는 방식</small>
+        </div>
+
+      
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var KEY='dex-rfq-theme';
+  function isLight(){return root.getAttribute('data-theme')==='light';}
+  function paint(){
+    var label=document.querySelector('#themeToggle .tt-label');
+    if(label) label.textContent=isLight()?'다크 모드':'라이트 모드';
+  }
+  function toggle(){
+    if(isLight()) root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme','light');
+    try{localStorage.setItem(KEY,isLight()?'light':'dark');}catch(e){}
+    paint();
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    paint();
+    var button=document.getElementById('themeToggle');
+    if(button) button.addEventListener('click',toggle);
+
+    var links={};
+    Array.prototype.forEach.call(document.querySelectorAll('.toc a'),function(a){
+      var id=a.getAttribute('href').slice(1);
+      links[id]=a;
+      a.addEventListener('click',function(e){
+        var target=document.getElementById(id);
+        if(!target) return;
+        e.preventDefault();
+        var rect=target.getBoundingClientRect();
+        var visibleHeight=Math.min(rect.height,window.innerHeight*.82);
+        var top=window.scrollY+rect.top-(window.innerHeight-visibleHeight)/2;
+        var max=document.documentElement.scrollHeight-window.innerHeight;
+        window.scrollTo({top:Math.max(0,Math.min(top,max)),behavior:'smooth'});
+        try{history.replaceState(null,document.title,location.href.replace(/#.*$/,''));}catch(err){}
+      });
+    });
+
+    var sections=document.querySelectorAll('.sec');
+    if(!sections.length) return;
+    var ticking=false;
+    function sync(){
+      var marker=window.innerHeight*.5;
+      var active=sections[0].id;
+      Array.prototype.forEach.call(sections,function(section){
+        if(section.getBoundingClientRect().top<=marker) active=section.id;
+      });
+      if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-2){
+        active=sections[sections.length-1].id;
+      }
+      Object.keys(links).forEach(function(id){
+        links[id].classList.toggle('on',id===active);
+      });
+      ticking=false;
+    }
+    function requestSync(){
+      if(ticking) return;
+      ticking=true;
+      requestAnimationFrame(sync);
+    }
+    sync();
+    window.addEventListener('scroll',requestSync,{passive:true});
+    window.addEventListener('resize',requestSync);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>RWA 스터디 · 토큰화 자산의 거래와 DEX</title><style>
+:root{--bg:#f5f6f7;--paper:#fff;--ink:#202428;--muted:#626970;--line:#d8dde2;--accent:#245f9c;--soft:#eef4fa;--shadow:0 18px 55px rgba(20,28,36,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:17px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word}.progress{position:fixed;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--accent) var(--progress,0%),transparent 0);z-index:100;pointer-events:none}.page-shell{width:min(920px,calc(100% - 48px));margin:70px auto 120px}.detail-intro{margin-bottom:60px;padding:44px;background:#111820;color:white}.detail-intro .kicker{display:block;color:#8db5de;font-size:14px;font-weight:750;letter-spacing:.11em}.detail-intro h1{margin:8px 0 12px;font-size:44px;line-height:1.2;letter-spacing:-.045em}.detail-intro p{margin:0;color:#c5cdd5;font-size:19px}.detail-article{padding:60px 72px;background:var(--paper);box-shadow:var(--shadow)}.detail-article h1{margin:2.5em 0 1em;padding-bottom:.4em;border-bottom:3px solid #202428;font-size:38px;line-height:1.3;letter-spacing:-.04em}.detail-article h1:first-child{margin-top:0}.detail-article h2{margin:2.5em 0 1em;padding-left:14px;border-left:4px solid var(--accent);font-size:28px;line-height:1.4}.detail-article h3{margin:2.1em 0 .8em;font-size:23px;line-height:1.45}.detail-article h4{margin:1.9em 0 .7em;color:#254f7d;font-size:19px}.detail-article h5{font-size:17px}.detail-article h6{margin:1.7em 0 .6em;color:#4a5560;font-size:16px;font-weight:750}.detail-article p{margin:.8em 0}.detail-article blockquote{margin:1.3em 0;padding:15px 20px;border-left:4px solid var(--accent);background:#f3f6f9}.detail-article pre{padding:18px;overflow:auto;background:#1d232a;color:#f8fafc}.detail-article code{padding:.12em .35em;background:#edf1f4}.detail-article pre code{padding:0;background:transparent}.detail-article table{display:block;width:100%;margin:1.5em 0;overflow-x:auto;border-collapse:collapse;font-size:14px}.detail-article th,.detail-article td{min-width:140px;padding:10px;border:1px solid var(--line);text-align:left;vertical-align:top}.detail-article th{background:#eef1f3}.detail-article a{color:#1f5d98}.detail-article strong{font-weight:750}.detail-article ul,.detail-article ol{padding-left:1.4em}.detail-article li{margin:.35em 0}.detail-article li>p{margin:.35em 0}.vertical-process{display:flex;flex-direction:column;align-items:stretch;gap:8px;max-width:720px;margin:1.5em 0 2em}.vertical-process>div{padding:16px 20px;border:1px solid var(--line);border-left:4px solid var(--accent);background:#f7faff}.vertical-process>span{align-self:center;color:var(--accent);font-size:22px;font-weight:800;line-height:1}.detail-toc{position:fixed;left:20px;bottom:20px;z-index:40}.detail-toc details{width:310px;max-height:70vh;border:1px solid var(--line);background:white;box-shadow:0 10px 35px rgba(20,28,36,.14)}.detail-toc summary{padding:11px 14px;background:#111820;color:white;cursor:pointer}.detail-toc nav{max-height:calc(70vh - 42px);padding:8px;overflow:auto}.detail-toc a{display:block;padding:7px 9px;color:#59616a;font-size:13px;line-height:1.4;text-decoration:none}.detail-toc a.level-1{color:#1b1f23;font-weight:800}.detail-toc a.level-2{padding-left:18px;font-weight:650}.detail-toc a.level-3{padding-left:30px}.detail-toc a:hover{background:var(--soft);color:var(--accent)}.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:1.4em 0}.compare-grid>div{padding:18px 20px;border:1px solid var(--line);border-top:4px solid var(--accent);background:#fafbfc}.compare-grid h4{margin:.1em 0 .6em;color:var(--ink)}.key-box{margin:1.4em 0;padding:18px 20px;border-left:5px solid var(--accent);background:#eef4fa}.warning-box{margin:1.4em 0;padding:16px 18px;background:#f7f5ef;border:1px solid #e5dfd2}.formula{margin:1.4em 0;padding:18px;text-align:center;background:#f4f5f6;font-weight:800;font-size:20px}.small{font-size:14px;color:var(--muted)}
+@media(max-width:900px){.page-shell{width:100%;margin:0 0 90px}.detail-intro{margin:0 16px 30px;padding:28px}.detail-intro h1{font-size:34px}.detail-article{padding:36px 20px;box-shadow:none}.detail-toc{left:12px;bottom:12px}.detail-toc details{width:min(310px,calc(100vw - 24px))}.compare-grid{grid-template-columns:1fr}}
+@media print{.progress,.detail-toc{display:none}.page-shell{width:auto;margin:0}.detail-intro{break-after:page}.detail-article{box-shadow:none}}
+</style></head><body><div class="progress" aria-hidden="true"></div><a href="../session.html?s=4" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 4회차 진행안으로</a><main class="page-shell"><header class="detail-intro"><span class="kicker">RWA STUDY · TOKENIZED ASSETS & DEX</span><h1>토큰화 자산의 거래와 DEX</h1><p>Atomic Settlement · DeFi · Perpetual Futures · AMM · CLOB · Intent — 개념과 구조 정리</p></header><article class="detail-article" id="detail-article">
+<h1 id="part1">1. 토큰화 자산의 거래</h1>
+
+<h2 id="why-tokenize">1-1. 토큰화는 끝이 아니라 시작</h2>
+<blockquote><p><strong>실물자산을 토큰화하는 목적은 단순히 디지털 형태로 표현하기 위해서가 아니라, 블록체인 위에서 이전·거래·담보·결제·조합할 수 있게 만들기 위해서다.</strong></p></blockquote>
+<p>토큰화의 가치는 토큰을 발행하는 순간에 끝나지 않는다. 실제로 의미가 커지는 지점은 토큰화된 자산이 다른 금융활동으로 이어질 수 있을 때다.</p>
+<table><thead><tr><th>기능</th><th>의미</th></tr></thead><tbody>
+<tr><td>Transferable</td><td>블록체인상에서 이전 가능</td></tr>
+<tr><td>Tradable</td><td>온체인 시장에서 거래 가능</td></tr>
+<tr><td>Programmable</td><td>조건에 따라 금융행위 실행 가능</td></tr>
+<tr><td>Composable</td><td>다른 프로토콜의 입력값으로 재사용 가능</td></tr>
+</tbody></table>
+<div class="key-box"><strong>핵심:</strong> RWA의 가치는 Tokenization 자체보다 <strong>Tokenization 이후 무엇을 할 수 있는가</strong>에서 커진다.</div>
+
+<h2 id="247">1-2. 24시간 거래가 의미하는 것</h2>
+<div class="compare-grid"><div><h4>기존 시장</h4><ul><li>정해진 거래시간</li><li>휴장일</li><li>브로커·거래소 운영시간</li><li>결제 시스템 운영시간</li></ul></div><div><h4>온체인</h4><ul><li>블록체인은 기본적으로 24/7 작동</li><li>지갑 간 자산 이전 가능</li><li>프로그램이 계속 실행 가능</li></ul></div></div>
+<div class="warning-box"><strong>주의:</strong> 토큰이 24시간 이동할 수 있다는 것과 기초 RWA 시장 자체가 24시간 유동성을 제공한다는 것은 다르다. Tokenized Treasury가 주말에도 이동할 수 있어도 NAV 업데이트, 신규 발행·상환, 기초 국채시장, 은행 결제가 모두 24/7인 것은 아니다.</div>
+
+<h2 id="settlement">1-3. 자산과 돈을 동시에 교환한다는 뜻</h2>
+<p>증권거래에서 우리가 앱에서 보는 <strong>체결</strong>과 금융시장 후방에서 실제로 끝나는 <strong>결제</strong>는 같은 개념이 아니다.</p>
+<div class="vertical-process"><div><strong>주문 체결</strong><br>매수자와 매도자의 거래가 성립</div><span>↓</span><div><strong>청산</strong><br>누가 돈과 자산을 얼마나 주고받을지 계산</div><span>↓</span><div><strong>증권 결제 + 현금 결제</strong><br>자산과 대금의 실제 이전</div><span>↓</span><div><strong>예탁기관·브로커 장부 반영</strong></div><span>↓</span><div><strong>대사(Reconciliation)</strong></div></div>
+
+<h3 id="dvp">DvP란?</h3>
+<p><strong>Delivery versus Payment</strong>는 증권이 인도되는 것과 대금이 지급되는 것을 서로 조건부로 연결하는 결제 구조다.</p>
+<blockquote><p><strong>DvP는 블록체인이 만든 개념이 아니다. 전통 금융에도 이미 존재한다.</strong></p></blockquote>
+
+<h3 id="atomic">온체인 Atomic Settlement에서는 무엇이 달라지나?</h3>
+<div class="compare-grid"><div><h4>기존 구조</h4><p>증권 시스템과 현금 결제 시스템이 서로 다른 인프라에 존재하고, 청산·결제기관을 통해 두 leg가 연결된다.</p></div><div><h4>온체인 구조</h4><p>Tokenized Treasury와 USDC가 같은 실행환경에 있다면 스마트 컨트랙트가 두 상태변화를 하나의 트랜잭션으로 연결할 수 있다.</p></div></div>
+<div class="formula">1000 USDC 지급 <strong>AND</strong> Treasury Token 이전</div>
+<p>둘 다 성공하면 거래가 완료되고, 하나가 실패하면 전체가 취소되는 구조를 <strong>Atomic Settlement</strong>라고 한다.</p>
+
+<h3 id="atomic-meaning">왜 중요한가?</h3>
+<ol><li><strong>Principal Risk 감소</strong> — 돈만 지급하고 자산을 못 받거나, 자산만 넘기고 돈을 못 받는 위험을 줄일 수 있음.</li><li><strong>Settlement 시간 단축 가능</strong> — 거래와 결제 사이의 시차를 줄일 수 있음.</li><li><strong>Reconciliation 감소 가능</strong> — 여러 기관의 장부를 계속 맞춰보는 작업을 일부 줄일 수 있음.</li><li><strong>다음 금융행위로 즉시 연결 가능</strong> — 거래 후 담보·차입·재투자 등으로 연결 가능.</li></ol>
+
+<h3 id="netting">하지만 빠른 결제 = 무조건 좋은 것은 아님</h3>
+<p>예를 들어 하루 동안 A가 B에게 100억을 지급하고, B가 A에게 90억을 지급해야 한다고 하자.</p>
+<table><thead><tr><th>방식</th><th>처리</th><th>필요 유동성</th></tr></thead><tbody><tr><td>Gross Settlement</td><td>각 거래를 그대로 처리</td><td>총 190억의 이동</td></tr><tr><td>Net Settlement</td><td>상계 후 최종 차액만 지급</td><td>A가 B에게 10억 지급</td></tr></tbody></table>
+<div class="warning-box">실시간 atomic settlement는 counterparty risk를 줄일 수 있지만, 기존 netting이 제공하는 <strong>유동성 효율성</strong>을 떨어뜨릴 수도 있다.</div>
+
+<h2 id="programmability">1-4. Programmability — 자동 주문이 핵심은 아니다</h2>
+<h3 id="already-auto">“특정 가격에 도달하면 자동 매수”는 이미 가능함</h3>
+<div class="compare-grid"><div><h4>전통 금융에서도 가능한 기능</h4><ul><li>Limit Order</li><li>Stop Order</li><li>Algorithmic Trading</li><li>조건부 주문</li><li>포트폴리오 자동 리밸런싱</li></ul></div><div><h4>그래서 왜 약한 설명인가?</h4><p>“블록체인은 코드로 자동 주문을 실행할 수 있다”는 말은 사실이지만, 토큰화의 고유한 의미를 충분히 설명하지 못한다.</p></div></div>
+<div class="key-box"><strong>중요한 포인트:</strong> Programmability를 설명할 때 핵심은 <strong>자동 주문</strong>이 아니라 서로 다른 금융 상태변화를 하나의 실행환경에서 연결할 수 있다는 점이다.</div>
+
+<h3 id="programmability-flow">Programmability를 더 정확하게 보면</h3>
+<div class="vertical-process"><div><strong>USDC 보유</strong></div><span>↓</span><div><strong>DEX에서 Tokenized Treasury 매수</strong></div><span>↓</span><div><strong>Lending Protocol에 담보 예치</strong></div><span>↓</span><div><strong>Stablecoin 차입</strong></div><span>↓</span><div><strong>다른 프로토콜에 재투자</strong></div></div>
+<p>한 금융행위의 결과가 다음 스마트 컨트랙트의 입력값이 될 수 있다는 점이 중요하다.</p>
+
+<h2 id="composability">1-5. Composability와 DeFi</h2>
+<h3>Composability란?</h3>
+<p><strong>하나의 금융상품이나 프로토콜의 결과물을 다른 프로토콜이 다시 사용할 수 있는 성질</strong>을 의미한다.</p>
+<blockquote><p>Tokenized Treasury → DEX → Lending → Stablecoin → Vault</p></blockquote>
+<p>각각 별개로 존재하지만 서로 조립할 수 있기 때문에 DeFi를 흔히 <strong>Money Lego</strong>라고 부른다.</p>
+
+<h3 id="defi">DeFi란?</h3>
+<blockquote><p><strong>DeFi는 거래·대출·파생상품·자산운용 등의 금융기능을 중앙화된 금융기관의 내부 시스템에 의존하기보다 블록체인과 스마트 컨트랙트를 통해 실행하는 금융 영역이다.</strong></p></blockquote>
+<div class="warning-box"><strong>DeFi = 중개자가 완전히 없음</strong>은 아니다. Oracle, Frontend, Solver, Governance, Sequencer, RWA Custodian 등이 존재할 수 있다.</div>
+
+<h2 id="why-market">1-6. 토큰화 자산의 거래시장이 중요한 이유</h2>
+<blockquote><p><strong>거래가 그 자체로 끝나지 않고 다른 금융활동으로 이어질 수 있기 때문.</strong></p></blockquote>
+<p>예를 들어 온체인에서 매수한 토큰화 국채를 담보로 맡겨 Stablecoin을 차입하거나, 여러 토큰화 자산을 하나의 상품으로 묶어 운용할 수 있다.</p>
+
+<h3 id="productive-collateral">Tokenized Treasury가 담보가 된다면?</h3>
+<div class="vertical-process"><div><strong>$1M Tokenized Treasury</strong></div><span>↓</span><div><strong>Lending Protocol</strong></div><span>↓</span><div><strong>Collateral</strong></div><span>↓</span><div><strong>LTV 80% 가정</strong></div><span>↓</span><div><strong>$800k Stablecoin Borrow</strong></div></div>
+<p>기존 국채가 주로 “보유 → 이자 수취”였다면, 온체인에서는 <strong>보유 → 이자 수취 + 담보 사용 + 차입 + 재투자</strong>로 확장될 수 있다.</p>
+
+<h3 id="tradfi-defi-rate">TradFi 금리가 DeFi 안으로 들어온다</h3>
+<p>예를 들어 미국 단기 국채 수익률이 4%인데 DeFi Lending 수익률이 2%라면, 투자자는 “상대적으로 낮은 위험의 국채에서 4%를 받을 수 있는데 왜 DeFi에서 2%를 받아야 하지?”라고 생각할 수 있다.</p>
+<div class="key-box">Tokenized Treasury가 충분히 유통되면 <strong>TradFi의 무위험금리</strong>가 DeFi 자본의 <strong>Opportunity Cost</strong>로 작동할 수 있다.</div>
+
+<h3 id="collateral-base">DeFi의 담보 기반이 달라진다</h3>
+<table><thead><tr><th>기존 DeFi 담보</th><th>RWA 확장 이후</th></tr></thead><tbody><tr><td>ETH · BTC · LST · Stablecoin</td><td>Treasury · Money Market Fund · Corporate Bond · Credit · Equity · Fund</td></tr></tbody></table>
+
+<h3 id="rwa-risk">새로운 위험도 생긴다</h3>
+<div class="vertical-process"><div><strong>Tokenized Treasury</strong></div><span>↓</span><div>담보</div><span>↓</span><div>Stablecoin 차입</div><span>↓</span><div>다른 RWA 매수</div><span>↓</span><div>다시 담보</div><span>↓</span><div>추가 차입</div></div>
+<p>가격 하락이 발생하면 LTV 상승 → Liquidation → RWA 매도 → 가격 하락 → 추가 Liquidation으로 이어질 수 있다.</p>
+<div class="warning-box"><strong>TradFi 자산에 DeFi식 레버리지가 얹힐 수 있음.</strong> 자본 효율성은 높아질 수 있지만 시스템 리스크 연결고리도 강해질 수 있다.</div>
+
+<h2 id="rwa-vault">1-7. 여러 토큰화 자산을 하나의 상품으로 묶는 방식</h2>
+<p>스마트 컨트랙트 Vault나 펀드가 여러 토큰화 자산을 보유하고, 그 포트폴리오의 지분을 나타내는 Share Token을 발행할 수 있다.</p>
+<table><thead><tr><th>예시 구성</th><th>비중</th></tr></thead><tbody><tr><td>Tokenized Treasury</td><td>40%</td></tr><tr><td>Tokenized Corporate Bond</td><td>20%</td></tr><tr><td>Tokenized Equity</td><td>20%</td></tr><tr><td>Stablecoin Lending</td><td>20%</td></tr></tbody></table>
+<div class="vertical-process"><div><strong>Investor USDC</strong></div><span>↓</span><div>Vault Deposit</div><span>↓</span><div>여러 Tokenized Asset 매입</div><span>↓</span><div>NAV 계산</div><span>↓</span><div><strong>Vault Share Token 발행</strong></div></div>
+<p>투자자는 기초자산을 각각 사는 대신 Vault의 지분을 나타내는 토큰을 보유하게 된다.</p>
+
+<h3 id="centrifuge">실제 구현 방향 — Centrifuge</h3>
+<p>Centrifuge는 tokenized funds / pools를 만들 수 있는 인프라를 제공하며 Treasury, Credit, Equities, Onchain lending position 등을 조합하는 portfolio 구조를 추진하고 있다.</p>
+<div class="key-box">중요한 점은 특정 프로젝트 자체보다 <strong>서로 다른 tokenized asset을 하나의 vault 안에서 운용하는 구조가 이미 기술적으로 구현 가능한 방향</strong>이라는 것.</div>
+
+<h1 id="part2">2. DEX의 구분 — 현물과 파생상품</h1>
+<h2 id="spot-perp">2-1. Spot DEX와 Perpetual DEX</h2>
+<div class="compare-grid"><div><h4>Spot DEX</h4><p>현재 자산을 직접 교환한다. 예: USDC로 ETH를 즉시 교환.</p></div><div><h4>Perpetual DEX</h4><p>기초자산 자체보다는 가격 변동에 대한 Perpetual Futures Position을 거래한다.</p></div></div>
+<p>Perpetual DEX를 이해하려면 먼저 Spot → Forward → Futures → Perpetual Futures → Option의 흐름을 이해해야 한다.</p>
+
+<h2 id="derivatives-map">2-2. 현물 → 선도 → 선물 → 무기한선물 → 옵션</h2>
+<table><thead><tr><th>구분</th><th>무엇을 거래하나</th><th>만기</th><th>핵심 특징</th></tr></thead><tbody>
+<tr><td>Spot</td><td>현재 자산</td><td>없음</td><td>지금 자산을 직접 교환</td></tr>
+<tr><td>Forward</td><td>미래 거래 약속</td><td>있음</td><td>맞춤형 계약</td></tr>
+<tr><td>Futures</td><td>표준화된 선도계약</td><td>있음</td><td>거래소 · 증거금 · 일일정산</td></tr>
+<tr><td>Perpetual Futures</td><td>가격변동 포지션</td><td>없음</td><td>Funding Rate로 현물과 괴리 관리</td></tr>
+<tr><td>Option</td><td>권리</td><td>있음</td><td>Call은 살 권리, Put은 팔 권리</td></tr>
+</tbody></table>
+
+<h3 id="spot">현물(Spot)</h3>
+<p>지금 이 순간 자산을 바로 사고파는 것. 비트코인 현물을 산다면 지금 즉시 BTC를 보유하게 된다.</p>
+
+<h3 id="forward">선도(Forward)</h3>
+<p>지금 가격을 약속하고 미래의 특정 시점에 거래하는 계약이다. 예를 들어 “3개월 뒤 BTC를 $100,000에 사겠다”는 계약.</p>
+
+<h3 id="futures">선물(Futures)</h3>
+<p>선도와 경제적 목적은 비슷하지만 표준화되고 거래소에서 거래되며 증거금, Mark-to-Market, 청산 구조가 존재한다.</p>
+<table><thead><tr><th>항목</th><th>Forward</th><th>Futures</th></tr></thead><tbody><tr><td>거래장소</td><td>장외(OTC) 계약이 많음</td><td>거래소</td></tr><tr><td>계약내용</td><td>맞춤형</td><td>표준화</td></tr><tr><td>정산</td><td>만기 정산 중심</td><td>증거금·일일정산</td></tr><tr><td>상대방위험</td><td>상대적으로 큼</td><td>청산기관을 통해 완화</td></tr></tbody></table>
+
+<h2 id="perpetual">2-3. 무기한선물은 어떻게 작동할까?</h2>
+<blockquote><p>선물은 원래 “미래의 특정 날짜에 특정 가격으로 거래하는 계약”인데, <strong>만기가 없다면 어떻게 현물 가격과 연결될까?</strong></p></blockquote>
+<p>전통 선물은 만기일이 되면 선물가격이 현물가격으로 강제 수렴한다. 하지만 무기한선물은 만기가 없기 때문에 그 강제 수렴 시점이 없다.</p>
+<p>이 문제를 해결하기 위해 등장한 장치가 <strong>Funding Rate</strong>다.</p>
+
+<h3 id="funding">Funding Rate란?</h3>
+<blockquote><p><strong>롱 포지션과 숏 포지션이 일정 주기마다 서로 돈을 주고받는 제도.</strong></p></blockquote>
+<ul><li>Perp 가격 &gt; Spot 가격 → 펀딩비 양수 → 보통 <strong>롱이 숏에게</strong> 지급</li><li>Perp 가격 &lt; Spot 가격 → 펀딩비 음수 → 보통 <strong>숏이 롱에게</strong> 지급</li></ul>
+
+<h3 id="funding-example">예시로 이해하기</h3>
+<div class="vertical-process"><div><strong>현물 BTC = 100</strong></div><span>↓</span><div><strong>무기한선물 BTC = 110</strong></div><span>↓</span><div>펀딩비 양수 → 롱이 숏에게 지급</div><span>↓</span><div>“비싼 선물을 숏 치고 펀딩비를 받자”는 참여자 증가</div><span>↓</span><div>숏 주문 증가 → Perp 가격 하락</div><span>↓</span><div><strong>Spot 가격 근처로 수렴</strong></div></div>
+<p>펀딩비가 가격 괴리를 줄이도록 경제적 인센티브를 만드는 구조다.</p>
+
+<h3 id="funding-calc">펀딩비 계산</h3>
+<div class="formula">펀딩비 = 포지션 가치 × 펀딩비율<br><span class="small">포지션 가치 = 투입금액 × 레버리지</span></div>
+<p><strong>예시 1:</strong> 1,000 USDT로 20배 롱 → 포지션 가치 20,000 USDT. 펀딩비율 +0.01%라면 한 번에 내는 펀딩비는 2 USDT.</p>
+<p><strong>예시 2:</strong> 500 USDT로 10배 롱 → 포지션 가치 5,000 USDT. 펀딩비율 +0.02%라면 1 USDT 지급.</p>
+<div class="warning-box">펀딩 주기는 거래소마다 다를 수 있다. 8시간마다 한 번 등 일정 주기로 정산하는 구조가 흔하지만, 이를 모든 거래소의 고정 규칙으로 보면 안 된다.</div>
+
+<h3 id="delta-neutral">펀딩비를 활용한 시장중립 전략</h3>
+<blockquote><p><strong>현물 BTC 매수 + 같은 수량의 무기한선물 BTC 숏</strong></p></blockquote>
+<p>펀딩비율이 계속 양수로 높게 유지된다면, 가격 방향 위험을 줄인 상태에서 선물 숏 포지션으로 펀딩비를 수취하는 전략이 가능하다. 이를 <strong>Delta Neutral</strong> 또는 <strong>Funding Rate Farming</strong>이라고 부른다.</p>
+<p>이 전략이 많이 쓰일수록 선물 매도 주문이 늘어나 Perp 가격이 Spot 가격에 가까워지는 효과도 생긴다.</p>
+
+<h3 id="perp-risk">무기한선물 리스크 4가지</h3>
+<ol><li><strong>레버리지 & 청산 리스크</strong> — 현물 롱 + 선물 숏으로 방향을 헤지했더라도 선물 포지션은 청산될 수 있음.</li><li><strong>펀딩비 방향 전환 리스크</strong> — 받을 것을 기대했지만 양수→음수로 전환되면 오히려 지급해야 할 수 있음.</li><li><strong>베이시스 리스크</strong> — 진입·청산 시점의 선물·현물 가격 차이가 달라지면 펀딩 수익보다 손실이 커질 수 있음.</li><li><strong>수수료·비용</strong> — 현물 수수료, 선물 수수료, 출입금 비용을 합치면 순수익이 줄어듦.</li></ol>
+<div class="key-box">실전에서는 <strong>포지션 크기, 레버리지, 청산 가격, 펀딩비 히스토리, 수수료 구조</strong>를 함께 관리해야 한다.</div>
+
+<h2 id="options">2-4. 옵션과 Hedge</h2>
+<p><strong>Call</strong>은 살 권리, <strong>Put</strong>은 팔 권리다. 권리이지 의무가 아니다.</p>
+<p>예를 들어 BTC 현물을 보유하고 있는데 1개월 뒤 가격 하락이 걱정된다면 Put Option을 구매해 손실 일부를 방어할 수 있다.</p>
+
+<h3 id="put-call-parity">Put-Call Parity</h3>
+<p>Put-Call Parity는 대표적인 헤지 전략이라기보다, 동일한 기초자산·행사가격·만기의 Call과 Put 가격 사이에 존재해야 하는 <strong>무차익거래 관계</strong>다.</p>
+<blockquote><p><strong>Stock + Put ↔ Call + Bond</strong></p></blockquote>
+<p>이 관계를 통해 Synthetic Position, Replication, Arbitrage 개념으로 이어갈 수 있다.</p>
+
+<h1 id="part3">3. DEX의 시장구조 — AMM과 CLOB</h1>
+<h2 id="amm-clob">3-1. 거래를 성사시키는 두 가지 구조</h2>
+<table><thead><tr><th>구분</th><th>AMM</th><th>CLOB</th></tr></thead><tbody><tr><td>거래 상대</td><td>Liquidity Pool</td><td>다른 Trader</td></tr><tr><td>가격</td><td>함수</td><td>Bid / Ask</td></tr><tr><td>유동성 제공</td><td>LP</td><td>Market Maker / Trader</td></tr><tr><td>가격 발견</td><td>Arbitrage 의존</td><td>주문 경쟁</td></tr><tr><td>Slippage</td><td>존재</td><td>Depth에 따라</td></tr><tr><td>구현 난이도</td><td>상대적으로 낮음</td><td>높음</td></tr><tr><td>처리량 필요</td><td>낮음</td><td>높음</td></tr></tbody></table>
+
+<h2 id="amm">3-2. AMM에서 기억해야 할 것 2가지</h2>
+<h3>① Constant Product 공식</h3>
+<div class="formula">x × y = k</div>
+<p>단순한 constant-product swap을 설명할 때 reserve의 곱이 invariant를 유지하도록 거래가 이루어진다고 이해하면 된다.</p>
+<div class="warning-box">실제 AMM에서는 LP 추가·제거와 거래 수수료 등으로 k가 변할 수 있으므로 “k가 영원히 고정된다”고 이해하면 안 된다.</div>
+
+<h3 id="amm-price">AMM에서 거래하면 왜 가격이 움직이나?</h3>
+<p>Pool에 10 ETH와 20,000 USDC가 있다면 암묵적인 초기 가격은 약 1 ETH = 2,000 USDC다.</p>
+<p>누군가 ETH를 대량 매수하면 ETH reserve는 줄고 USDC reserve는 늘어난다. 그 결과 다음 ETH의 가격은 더 비싸진다.</p>
+<blockquote><p><strong>AMM 가격은 외부 거래소 가격을 읽어서 정해지는 것이 아니라 Pool 안 자산 비율에 의해 움직인다.</strong></p></blockquote>
+
+<h3 id="arbitrage">② 외부와 틀어진 가격은 차익거래자가 맞춘다</h3>
+<p>예를 들어 Coinbase의 ETH가 $2,100인데 AMM의 ETH가 약 $2,000이라면 차익거래자는 AMM에서 ETH를 싸게 매수하고 외부 시장에서 비싸게 매도한다.</p>
+<div class="vertical-process"><div>외부 시장 ETH = $2,100</div><span>↓</span><div>AMM ETH ≈ $2,000</div><span>↓</span><div>차익거래자가 AMM에서 ETH 매수</div><span>↓</span><div>외부 시장에서 ETH 매도</div><span>↓</span><div>AMM의 ETH reserve ↓ / USDC reserve ↑</div><span>↓</span><div><strong>AMM 가격 상승</strong></div></div>
+<div class="key-box"><strong>핵심:</strong> 기본 constant-product AMM에서 외부시장과의 가격 괴리를 맞추는 것은 Oracle이 아니라 <strong>Arbitrageur의 경제적 인센티브</strong>다.</div>
+
+<h3 id="amm-procon">AMM 장단점</h3>
+<div class="compare-grid"><div><h4>장점</h4><ul><li>구현 상대적으로 단순</li><li>항상 가격 quote 존재</li><li>Permissionless liquidity</li><li>온체인 구현 용이</li></ul></div><div><h4>단점</h4><ul><li>Slippage</li><li>LP capital inefficiency</li><li>Impermanent Loss</li><li>시장가와 직접 동기화하지 않음</li></ul></div></div>
+
+<h2 id="clob">3-3. CLOB는 익숙한 거래소 구조</h2>
+<p>CLOB(Central Limit Order Book)는 매수·매도 주문을 가격과 시간 우선순위에 따라 매칭하는 구조다.</p>
+<table><thead><tr><th>Buy</th><th>Price</th><th>Sell</th></tr></thead><tbody><tr><td></td><td>101</td><td>10</td></tr><tr><td></td><td>100.5</td><td>20</td></tr><tr><td>15</td><td>100</td><td></td></tr><tr><td>30</td><td>99.5</td><td></td></tr></tbody></table>
+
+<h3 id="clob-hard">CLOB를 온체인에 올리기 어려운 이유</h3>
+<p>주문 하나에도 New Order, Cancel, Modify, Matching, Partial Fill, Price Priority, Time Priority가 계속 발생한다.</p>
+<blockquote><p>사용자가 주문을 취소할 때마다 블록체인 Transaction을 날려야 한다면?</p></blockquote>
+<ul><li>느림</li><li>수수료</li><li>Latency</li><li>Block confirmation 대기</li></ul>
+
+<h3 id="clob-two">그래서 CLOB DEX는 보통 두 방향</h3>
+<div class="compare-grid"><div><h4>방법 ① 빠른 블록체인</h4><p><strong>Onchain CLOB</strong>. Order · Matching · Settlement를 매우 빠른 체인 인프라 안에서 처리.</p><p class="small">예: Hyperliquid 계열 접근</p></div><div><h4>방법 ② Hybrid CLOB</h4><p><strong>Offchain Orderbook + Onchain Settlement</strong>. 주문관리와 매칭은 오프체인에서, 최종 자산교환은 온체인에서 처리.</p></div></div>
+
+<h3 id="polymarket">Polymarket 사례</h3>
+<div class="vertical-process"><div>Trader</div><span>↓</span><div>Signed Order</div><span>↓</span><div>Offchain Orderbook</div><span>↓</span><div>Matching</div><span>↓</span><div>Smart Contract</div><span>↓</span><div><strong>Onchain Settlement</strong></div></div>
+<p>주문은 수없이 생성되고 취소되지만 실제 체결되는 주문은 그보다 적기 때문에, 모든 주문 상태를 블록체인에 기록하지 않고 빈번한 주문관리와 매칭은 오프체인에서 처리하는 편이 효율적이다.</p>
+
+<h1 id="part4">4. Aggregator · Solver · Filler · Curator · Intent</h1>
+<h2 id="intent">4-1. 거래를 직접 설계하는 시장에서 목적을 대신 실행하는 시장으로</h2>
+<blockquote><p>사용자는 사실 “Uniswap에 갈까? Curve에 갈까?”보다 <strong>“1 ETH로 최대한 많은 USDC를 받고 싶어”</strong>라고 생각한다.</p></blockquote>
+<p>Intent 기반 거래는 사용자가 구체적인 경로보다 원하는 결과를 표현하고, 전문 실행자나 시스템이 그 결과를 달성할 최적 경로를 찾는 방향이다.</p>
+
+<h2 id="roles">4-2. 네 역할을 가장 깔끔하게 구분하면</h2>
+<table><thead><tr><th>용어</th><th>핵심 질문</th><th>역할</th></tr></thead><tbody>
+<tr><td><strong>Aggregator</strong></td><td>여러 유동성원 중 어디가 제일 좋지?</td><td>여러 DEX/MM/풀의 가격·유동성을 모아 최적 경로 선택</td></tr>
+<tr><td><strong>Solver</strong></td><td>이 사용자의 목적을 어떻게 달성하지?</td><td>최적 실행 방법·경로를 계산하고 제안</td></tr>
+<tr><td><strong>Filler</strong></td><td>이 주문을 실제로 누가 받아서 체결하지?</td><td>주문을 실제로 채움·체결</td></tr>
+<tr><td><strong>Curator</strong></td><td>어떤 시장·프로토콜을 써도 되는가?</td><td>허용 범위·위험 기준·전략을 사전에 정함</td></tr>
+</tbody></table>
+<div class="warning-box">이 구분은 완전히 표준화된 것이 아니다. 프로토콜마다 같은 역할을 다른 이름으로 부르기도 하고, 한 주체가 여러 역할을 동시에 하기도 한다.</div>
+
+<h3 id="solver">Solver</h3>
+<p>Solver는 <strong>사용자가 원하는 결과를 실제 거래 경로로 바꿔서 실행하는 전문 실행자</strong>라고 이해하면 된다.</p>
+<p>사용자가 “Ethereum의 USDC를 사용해서 Arbitrum의 토큰화 국채를 사고 싶어”라고 요청했다고 해보자. 사용자는 어느 DEX를 거칠지, 어떤 Bridge를 쓸지, 어느 체인에서 Swap할지를 직접 정하지 않는다.</p>
+<div class="compare-grid"><div><h4>Solver A</h4><p>Ethereum USDC → Uniswap → Bridge A → Arbitrum → 토큰화 국채 매수</p></div><div><h4>Solver B</h4><p>Ethereum USDC → Bridge B → Arbitrum DEX → 토큰화 국채 매수</p></div></div>
+<p>프로토콜은 가격, 가스비, 속도, 안전성 등을 고려해 더 좋은 경로를 선택할 수 있다.</p>
+
+<h3 id="solver-filler">Solver vs Filler</h3>
+<div class="compare-grid"><div><h4>Solver</h4><p><strong>문제를 푸는 관점의 이름</strong>. “어떤 방법으로 실행할 것인가?”에 초점.</p><p>예: Uniswap 40% + Curve 60%로 보내면 3,005 USDC 가능.</p></div><div><h4>Filler</h4><p><strong>주문을 채우는 관점의 이름</strong>. “그 주문을 실제로 누가 받아 체결할 것인가?”에 초점.</p><p>예: 내가 그 조건으로 실제 주문을 받아서 체결하겠다.</p></div></div>
+<p>현실에서는 한 회사가 해법을 계산하고 그대로 체결까지 하는 경우가 많다. 따라서 Solver = Filler일 수도 있다.</p>
+
+<h3 id="aggregator">Aggregator</h3>
+<p>Aggregator는 보통 사용자의 주문을 자기 자본으로 직접 체결하는 주체가 아니라 <strong>여러 유동성원을 모아서 비교하고 라우팅하는 인프라</strong>에 가깝다.</p>
+<blockquote><p>Uniswap: 2,990<br>Curve: 3,001<br>MM A: 3,004<br><br>→ “MM A + Curve 조합이 제일 좋겠다.”</p></blockquote>
+<p>다만 Aggregator 자체가 내부 최적화 알고리즘으로 경로를 solve하기도 하므로 기술적으로는 Solver와 일부 역할이 겹칠 수 있다.</p>
+
+<h3 id="curator">Curator</h3>
+<p>Curator는 거래 순간의 실행자가 아니라 <strong>사전에 룰을 정하는 관리자·전략 설계자</strong>에 가깝다.</p>
+<ul><li>Aave는 사용 가능</li><li>Protocol X는 위험해서 금지</li><li>국채 담보 시장에는 최대 30%까지만 배분</li><li>KYC 완료된 참여자만 허용</li><li>허용 Solver / Bridge 목록 지정</li></ul>
+<p>따라서 Curator는 Aggregator / Solver / Filler와 같은 축이 아니라, 그 위에서 허용 범위와 리스크 정책을 정하는 역할이다.</p>
+
+<h2 id="roles-flow">4-3. 한 주문으로 네 역할을 모두 넣어보면</h2>
+<div class="vertical-process"><div><strong>Curator</strong><br>허용 Solver·Bridge·시장·리스크 한도 설정</div><span>↓</span><div><strong>Aggregator</strong><br>여러 DEX · MM · Bridge의 가격과 경로 비교</div><span>↓</span><div><strong>Solver</strong><br>“USDC → Bridge X → DEX Y → 국채 토큰”이 최적이라고 계산</div><span>↓</span><div><strong>Filler</strong><br>그 조건대로 실제 주문을 체결</div></div>
+<blockquote><p><strong>Curator는 룰을 정하고 → Aggregator는 후보를 모으고 → Solver는 방법을 찾고 → Filler는 실제로 체결한다.</strong></p></blockquote>
+
+<h1 id="wrap">5. 최종 정리</h1>
+<table><thead><tr><th>주제</th><th>핵심 질문</th><th>핵심 답</th></tr></thead><tbody>
+<tr><td>토큰화 자산 거래</td><td>왜 거래시장이 중요한가?</td><td>거래가 담보·차입·자산운용으로 이어질 수 있기 때문</td></tr>
+<tr><td>Atomic Settlement</td><td>온체인 결제의 의미는?</td><td>자산과 대금의 상태변화를 하나의 트랜잭션으로 묶을 수 있음</td></tr>
+<tr><td>Programmability</td><td>자동 주문이 핵심인가?</td><td>아니라 서로 다른 금융 상태변화를 연결하는 것이 핵심</td></tr>
+<tr><td>Perpetual</td><td>만기 없는 선물은 어떻게 현물과 연결되나?</td><td>Funding Rate가 가격 괴리를 조정</td></tr>
+<tr><td>AMM</td><td>외부가격과 다른 풀 가격은 누가 맞추나?</td><td>차익거래자의 경제적 인센티브</td></tr>
+<tr><td>Intent 구조</td><td>왜 용어가 헷갈리나?</td><td>한 주체가 여러 역할을 동시에 하기도 하기 때문</td></tr>
+</tbody></table>
+<div class="key-box"><strong>최종 메시지:</strong> 토큰화의 의미는 자산을 블록체인에 올리는 것 자체보다, 그 자산이 <strong>거래되고 → 담보가 되고 → 다른 금융상품과 조합되는 시장 구조</strong>가 만들어질 때 커진다.</div>
+</article></main>
+<aside class="detail-toc"><details><summary>목차</summary><nav>
+<a class="level-1" href="#part1">1. 토큰화 자산의 거래</a>
+<a class="level-2" href="#why-tokenize">1-1. 토큰화는 끝이 아니라 시작</a>
+<a class="level-2" href="#247">1-2. 24시간 거래</a>
+<a class="level-2" href="#settlement">1-3. DvP · Atomic Settlement</a>
+<a class="level-2" href="#programmability">1-4. Programmability</a>
+<a class="level-2" href="#composability">1-5. Composability · DeFi</a>
+<a class="level-2" href="#why-market">1-6. 거래시장이 중요한 이유</a>
+<a class="level-2" href="#rwa-vault">1-7. 여러 RWA를 하나의 상품으로</a>
+<a class="level-1" href="#part2">2. DEX의 구분 · 파생상품</a>
+<a class="level-2" href="#spot-perp">2-1. Spot vs Perpetual</a>
+<a class="level-2" href="#derivatives-map">2-2. 현물 → 선도 → 선물 → 옵션</a>
+<a class="level-2" href="#perpetual">2-3. 무기한선물 · Funding Rate</a>
+<a class="level-2" href="#options">2-4. 옵션 · Put-Call Parity</a>
+<a class="level-1" href="#part3">3. DEX 시장구조</a>
+<a class="level-2" href="#amm-clob">3-1. AMM vs CLOB</a>
+<a class="level-2" href="#amm">3-2. AMM</a>
+<a class="level-2" href="#clob">3-3. CLOB</a>
+<a class="level-1" href="#part4">4. Aggregator · Solver · Filler · Curator</a>
+<a class="level-2" href="#intent">4-1. Intent</a>
+<a class="level-2" href="#roles">4-2. 역할 구분</a>
+<a class="level-2" href="#roles-flow">4-3. 한 주문으로 연결</a>
+<a class="level-1" href="#wrap">5. 최종 정리</a>
+</nav></details></aside>
+<script>const update=()=>{const max=document.documentElement.scrollHeight-innerHeight;document.documentElement.style.setProperty('--progress',(max>0?scrollY/max*100:0)+'%')};addEventListener('scroll',update,{passive:true});update();</script></body></html>

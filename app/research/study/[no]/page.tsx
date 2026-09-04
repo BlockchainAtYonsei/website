@@ -130,7 +130,25 @@ export default async function StudySession(
         {/* The source as a line of text, not a button: it is the one thing on
             the sheet the reader is meant to go and read. A faint underline and
             the arrow say "link" without a label saying it. */}
-        {session.source ? (
+        {session.sources && session.sources.length > 0 ? (
+          /* A double-article session lists both originals, one per line. */
+          <div className="mt-8 flex flex-col gap-2">
+            {session.sources.map((s) => (
+              <a
+                key={s.url}
+                href={s.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group font-body inline-flex max-w-2xl items-start gap-2 text-[15px] leading-relaxed font-light break-keep text-slate-300 transition-colors hover:text-white"
+              >
+                <span className="underline decoration-white/20 underline-offset-4 transition-colors group-hover:decoration-bay-300/70">
+                  {s.label}
+                </span>
+                <ArrowUpRight className="mt-1.5 h-3.5 w-3.5 shrink-0 text-white/35 transition-colors group-hover:text-bay-300" />
+              </a>
+            ))}
+          </div>
+        ) : session.source ? (
           <a
             href={session.source.url}
             target="_blank"
