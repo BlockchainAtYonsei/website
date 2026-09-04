@@ -30,7 +30,15 @@ export type Part = { n: string; t: string };
     short intro or outro) — that is still a part, it just has no presenter.
     One person can hold two parts when their sections aren't adjacent in the
     table of contents; the list follows the article, not the roster. */
-export type Assignment = { who: string; parts: Part[]; focus?: string };
+export type Assignment = {
+  who: string;
+  parts: Part[];
+  focus?: string;
+  /* An operator filling a gap outside the six-member rotation. The part still
+     shows in the running order, but `slotCount` skips it so the headcount stays
+     the study's cohort of six rather than counting the operator as a seventh. */
+  extra?: boolean;
+};
 
 export const EVERYONE = "전원";
 
@@ -152,7 +160,9 @@ export const SESSIONS: Session[] = [
       {
         who: "배예림",
         parts: [{ n: "3-1.", t: "전통자산 토큰화 생태계 개요" }],
-        focus: "전통자산 토큰화의 전체 구도: 뒤에 나오는 주식·채권을 읽는 프레임"
+        focus: "전통자산 토큰화의 전체 구도: 뒤에 나오는 주식·채권을 읽는 프레임",
+        /* 운영자가 채운 구간 — 인원수(6명)에는 세지 않습니다. */
+        extra: true
       },
       {
         who: "신영환",
@@ -182,7 +192,8 @@ export const SESSIONS: Session[] = [
       {
         who: "배예림",
         parts: [{ n: "4-5.", t: "사모신용 펀드 지분형" }],
-        focus: "사모신용 펀드 지분형의 구조"
+        focus: "사모신용 펀드 지분형의 구조",
+        extra: true
       },
       {
         who: EVERYONE,
@@ -913,7 +924,12 @@ export function sessionDate(iso: string) {
     and a stretch can belong to the room — the head count and the clock are
     per person, not per part. */
 export function slotCount(s: Session): number {
-  const people = new Set(s.assign.map((a) => a.who).filter((w) => w !== EVERYONE));
+  const people = new Set(
+    s.assign
+      .filter((a) => !a.extra)
+      .map((a) => a.who)
+      .filter((w) => w !== EVERYONE),
+  );
   return people.size || STUDY_DEFAULTS.memberCount;
 }
 
