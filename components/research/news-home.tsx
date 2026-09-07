@@ -27,7 +27,6 @@ import { ArrowUpRight } from "../icons";
 
 const RAIL_SIZE = 4; // stories in The Latest, beside the hero
 const PICK_SIZE = 6; // cards in Editor's Picks — two rows of three
-const TOPIC_CHIPS = 8; // topics shown before 더보기
 const TOPIC_SIZE = 9; // three rows of three, then out to the archive
 
 /* The topic options as they stand in the Notion DB, tinted to echo the colours
@@ -214,8 +213,6 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
   }, [feed]);
 
   const [topic, setTopic] = useState<string | null>(null);
-  const [allTopics, setAllTopics] = useState(false);
-  const shownTopics = allTopics ? topics : topics.slice(0, TOPIC_CHIPS);
   const byTopic = topic ? feed.filter((n) => n.categories.includes(topic)) : feed;
 
   /* Three rows and out. The section is a sampler of what each topic holds, not
@@ -382,7 +379,7 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
             <span className="pl-1.5 opacity-60">{feed.length}</span>
           </button>
 
-          {shownTopics.map(({ topic: name, count }) => {
+          {topics.map(({ topic: name, count }) => {
             const on = topic === name;
             return (
               <button
@@ -401,16 +398,6 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               </button>
             );
           })}
-
-          {topics.length > TOPIC_CHIPS && (
-            <button
-              type="button"
-              onClick={() => setAllTopics((v) => !v)}
-              className="font-body inline-flex cursor-pointer items-center gap-1 px-2 py-2 text-[13px] text-slate-400 transition-colors hover:text-bay-200"
-            >
-              {allTopics ? "접기" : "더보기"}
-            </button>
-          )}
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
