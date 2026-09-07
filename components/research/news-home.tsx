@@ -449,12 +449,6 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               className="liquid-glass-strong font-body inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-medium text-white transition-transform hover:scale-[1.03]"
             >
               전체 보기
-              {byTopic.length > TOPIC_SIZE && (
-                <span className="font-mono text-[10px] tracking-[0.18em] text-white/45">
-                  +{byTopic.length - TOPIC_SIZE}
-                </span>
-              )}
-              <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
         )}
