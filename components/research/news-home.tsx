@@ -409,7 +409,6 @@ export default function NewsHome({ items }: { items: NewsItem[] }) {
               className="font-body inline-flex cursor-pointer items-center gap-1 px-2 py-2 text-[13px] text-slate-400 transition-colors hover:text-bay-200"
             >
               {allTopics ? "접기" : "더보기"}
-              <ArrowUpRight className="h-3 w-3" />
             </button>
           )}
         </div>
