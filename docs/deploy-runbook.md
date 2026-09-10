@@ -36,7 +36,7 @@ Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. �
 `main`에 머지되면 Railway가 두 서비스를 다시 빌드·배포합니다.
 
 - **bay-backend** 부팅 순서: `prisma migrate deploy` → `seed:members`(명부
-  upsert) → (`NOTION_DB_ARTICLES` 비어 있으면) `seed:mock` → 서버. 헬스체크
+  upsert) → 서버. 헬스체크
   `/health`가 200을 줄 때까지 **이전 컨테이너가 계속 서빙**하므로 배포 중
   502가 없습니다(`backend/railway.json`).
 - **website**는 빌드 중 백엔드(`API_URL`)를 호출해 페이지를 프리렌더합니다.
@@ -124,16 +124,14 @@ curl -s $API/health            # {"status":"ok","db":"up","lastSync":{...}}
 
 - **멤버 명단 수정** = `backend/scripts/seed-members.ts` 편집 → 머지. 부팅 시
   자동 upsert.
-- **아티클 목업 갱신** — 부팅 시 자동 시드되지 않음. Railway → bay-backend →
-  우상단 ⋯ → *Shell*(또는 `railway ssh`)에서:
-  `SEED_ALLOW_REMOTE=1 npm run seed:mock`
-- **리서치 Notion DB 붙이기** — DB를 인테그레이션에 공유 → id를
-  `NOTION_DB_ARTICLES`에 → 재배포. 그 순간부터 목업 시드는 자동으로 꺼집니다.
+- **아티클 추가/수정** — Notion "아티클" DB에서 편집 → 뉴스처럼 10분 주기
+  자동 sync(즉시 반영은 `sync/all`). 필수: `Slug`·`작성자`(→`팀원 소개`
+  관계형, 이름이 로스터와 일치)·`상태`=`완료`. mock 시드는 제거됨.
 - **이미지가 안 뜰 때** — `/v1/sync/runs`에 `image re-host failed (The access
   key ID you provided does not exist…)`가 보이면 `S3_ACCESS_KEY_ID`/`SECRET`이
   Bucket Credentials와 다른 것. 값 교체 후 `sync/all?full=1`.
 - **DB 백업** — Railway Postgres는 볼륨 스냅샷을 지원하지만, 이 DB는 전부
-  재생성 가능합니다(명부=레포, 뉴스=Notion, 아티클=목업). 최악의 경우 새
+  재생성 가능합니다(명부=레포, 뉴스=Notion, 아티클=Notion). 최악의 경우 새
   Postgres + 재배포 + `sync/all?full=1`로 복구.
 - **로그** — 서비스 → Deployments → 최신 배포 → Logs. HTTP 로그의 `host`로
   어느 주소로 들어왔는지 보인다.

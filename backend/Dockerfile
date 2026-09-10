@@ -31,11 +31,11 @@ COPY --from=builder /app/dist ./dist
 # roster's edit path is this repo, not an admin UI.
 #
 # The whole of src/ comes with them, not just the generated client. A seed is
-# a tsx entry point that imports the app's own code — reading-time today,
-# reference extraction and the og:image crawl now — so shipping the generated
-# client alone left `npm run seed:mock` dying on MODULE_NOT_FOUND inside the
-# container while working perfectly from a checkout. Sources are text next to
-# a node_modules that already carries the Prisma CLI; the narrower copy buys
+# a tsx entry point that imports the app's own code — the roster seed reaches
+# for the generated Prisma client — so shipping the generated client alone
+# left `npm run seed:members` dying on MODULE_NOT_FOUND inside the container
+# while working perfectly from a checkout. Sources are text next to a
+# node_modules that already carries the Prisma CLI; the narrower copy buys
 # nothing and breaks the next time a script imports something.
 COPY --from=builder /app/src ./src
 COPY scripts ./scripts
@@ -47,28 +47,14 @@ USER nest
 ENV PORT=4000
 EXPOSE 4000
 
-# Boot: migrations, the roster seed, the mock articles while there are no real
-# ones, then the server. Migrations are fatal on purpose — schema and code must
-# land together. Neither seed is: a seed's failure should cost a log line,
-# never the whole API.
+# Boot: migrations, then the roster seed, then the server. Migrations are
+# fatal on purpose — schema and code must land together. The seed is not: a
+# seed's failure should cost a log line, never the whole API. Articles and
+# news both arrive from the Notion sync now, so nothing seeds content here.
 #
-# The articles seed is gated on NOTION_DB_ARTICLES being empty, which is the
-# database's way of saying nothing else owns this table. That is the state
-# today (docs/deploy-runbook.md: research articles are intentionally mock), and
-# the gate retires itself — the day that variable holds a real database id the
-# sync owns articles and this stops running, without anyone remembering to
-# remove it. SEED_ALLOW_REMOTE is spelled out here rather than inherited,
-# because the guard it opens exists to stop an ambient DATABASE_URL from
-# turning a local command into a production wipe; saying it in the image is
-# that decision made once, in review.
-#
-# Editing a member, or the mock articles, is: edit the script, deploy. Which
-# is the point — the only shell that reaches the deployed containers is on a
-# machine nobody is sitting at.
+# Editing the member roster is: edit seed-members.ts, deploy. Which is the
+# point — the only shell that reaches the deployed containers is on a machine
+# nobody is sitting at.
 CMD ["sh", "-c", "npx prisma migrate deploy \
   && (npm run seed:members || echo 'seed:members failed — roster unchanged') \
-  && { [ -n \"$NOTION_DB_ARTICLES\" ] \
-       && echo 'NOTION_DB_ARTICLES set — articles come from the sync, skipping the mock seed' \
-       || SEED_ALLOW_REMOTE=1 npm run seed:mock \
-       || echo 'seed:mock failed — articles unchanged'; } \
   && node dist/main.js"]

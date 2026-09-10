@@ -13,7 +13,6 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "test": "vitest run",
-    "seed:mock": "tsx scripts/seed-mock.ts",
     "seed:members": "tsx scripts/seed-members.ts"
   },
   "dependencies": {
