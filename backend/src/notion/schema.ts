@@ -56,9 +56,12 @@ export const CONTENT_STATUS_MAP: Record<string, "draft" | "published" | "archive
   발행: "published",
   published: "published",
   "홈페이지 게시": "published", // the news DB's own wording for "ship it"
+  완료: "published", // the 아티클 DB's own wording — its board's "done" column is "ship it"
   초안: "draft",
   draft: "draft",
   "작성 중": "draft",
+  "진행 중": "draft", // 아티클 DB — still being written, keep off the site
+  "시작 전": "draft", // 아티클 DB — not started
   "In progress": "draft",
   "Not started": "draft",
   미완성: "draft",
