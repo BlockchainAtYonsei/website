@@ -8,7 +8,6 @@ import ArticleThumb from "@/components/research/article-thumb";
 import Avatar from "@/components/research/avatar";
 import ReadingProgress from "@/components/research/reading-progress";
 import Toc from "@/components/research/toc";
-import ViewPing from "@/components/research/view-ping";
 import { formatDate, getAllArticles, getArticle, getToc } from "@/lib/research";
 
 /* Prerender what the API knows at build time; anything newer renders on
@@ -53,7 +52,6 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
   return (
     <main>
       <ReadingProgress />
-      <ViewPing kind="articles" slug={slug} />
       {/* Article head */}
       <article>
         <header className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">

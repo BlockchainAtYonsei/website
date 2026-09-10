@@ -35,7 +35,6 @@ export type Article = {
   date: string; // ISO
   featured: boolean;
   readingMinutes: number; // precomputed by the API (500 chars/min)
-  views: number;
   /* The piece's own picture — the first image in its body, else the cover
      the sync stored. Null on an article that ships neither, which is most of
      them: the surfaces that show a picture fall back to generated CoverArt. */

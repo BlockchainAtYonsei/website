@@ -3,9 +3,9 @@ import ArticleThumb from "./article-thumb";
 import Avatar from "./avatar";
 import { formatDate, type Article } from "@/lib/research";
 
-/* The card's bottom line, identical on every card: date bottom-left, view
-   count bottom-right. Callers pin it with mt-auto so short and long deks
-   land the meta on the same y across a row. */
+/* The card's bottom line, identical on every card: date bottom-left,
+   reading time bottom-right. Callers pin it with mt-auto so short and long
+   deks land the meta on the same y across a row. */
 export function ArticleMeta({
   article,
   className = "",
@@ -18,9 +18,7 @@ export function ArticleMeta({
       className={`font-mono flex items-center justify-between gap-3 text-[10px] tracking-[0.18em] text-bay-300/70 uppercase ${className}`}
     >
       <span>{formatDate(article.date)}</span>
-      <span className="text-white/40">
-        {article.views.toLocaleString("en-US")} views
-      </span>
+      <span className="text-white/40">{article.readingMinutes} min read</span>
     </div>
   );
 }
