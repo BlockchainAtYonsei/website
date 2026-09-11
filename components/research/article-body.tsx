@@ -135,7 +135,7 @@ export default function ArticleBody({ blocks }: { blocks: Block[] }) {
                 key={i}
                 className="my-12 border-l-2 border-bay-400/60 pl-6 md:pl-8"
               >
-                <p className="font-heading text-2xl leading-[1.35] tracking-[-0.5px] break-keep text-white md:text-3xl">
+                <p className="font-heading text-lg leading-[1.6] tracking-[-0.3px] break-keep text-white md:text-xl">
                   {b.text}
                 </p>
                 {b.cite && (
