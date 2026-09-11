@@ -34,14 +34,15 @@ export function FeaturedCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/research/${article.slug}`}
-      className="group liquid-glass block overflow-hidden rounded-[1.5rem] transition-transform duration-300 hover:scale-[1.006]"
+      className="group liquid-glass mx-auto block overflow-hidden rounded-[1.5rem] transition-transform duration-300 hover:scale-[1.006] md:w-[70%]"
     >
       {/* Image only, for now: the featured slot shows just the piece's cover.
           The card text lived here before, but the cover already carries the
-          title and the tall two-column crop was distorting the picture. */}
+          title and the tall two-column crop was distorting the picture.
+          Capped at 70% width on desktop so the hero does not dominate. */}
       <ArticleThumb
         article={article}
-        sizes="(min-width: 1200px) 1104px, 100vw"
+        sizes="(min-width: 1200px) 773px, 100vw"
         large
         priority
         className="aspect-[16/10] w-full"
