@@ -71,7 +71,9 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
           <h1 className="font-heading mt-6 max-w-4xl text-4xl leading-[1.1] tracking-[-2px] break-keep text-white md:text-6xl lg:text-[4.25rem]">
             {article.title}
           </h1>
-          <p className="font-body mt-7 max-w-2xl text-lg leading-relaxed font-light break-keep text-slate-400">
+          {/* Runs the full header width so a one-sentence dek stays on one
+              line instead of folding at a narrow measure. */}
+          <p className="font-body mt-7 text-lg leading-relaxed font-light break-keep text-slate-400">
             {article.dek}
           </p>
 
