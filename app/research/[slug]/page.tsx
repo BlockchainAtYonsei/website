@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight } from "@/components/icons";
-import ArticleBody, { inline } from "@/components/research/article-body";
+import ArticleBody from "@/components/research/article-body";
 import ArticleCard, { TagChip } from "@/components/research/article-card";
-import ArticleThumb from "@/components/research/article-thumb";
 import Avatar from "@/components/research/avatar";
 import ReadingProgress from "@/components/research/reading-progress";
 import Toc from "@/components/research/toc";
@@ -94,24 +93,6 @@ export default async function ArticlePage(props: PageProps<"/research/[slug]">) 
             </span>
           </div>
         </header>
-
-        <div className="mx-auto max-w-6xl px-6">
-          <ArticleThumb
-            article={article}
-            sizes="(min-width: 1200px) 1104px, 100vw"
-            priority
-            large
-            className="mt-12 aspect-[21/9] w-full rounded-[1.5rem] md:mt-14"
-          />
-          {/* Whose picture that is. Licences that permit reuse ask for the
-              credit to sit with the picture, not on a colophon page, and the
-              body's figures already print theirs the same way. */}
-          {article.imageCaption && (
-            <p className="font-body mt-3 text-xs leading-relaxed font-light break-keep text-slate-500">
-              {inline(article.imageCaption)}
-            </p>
-          )}
-        </div>
 
         {/* Body + contents rail */}
         <div className="mx-auto max-w-6xl px-6 pt-14 pb-24 md:pt-16 md:pb-32">
