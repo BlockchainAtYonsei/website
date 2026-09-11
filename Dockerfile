@@ -19,6 +19,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # at build time (SSG); deploy.sh passes the real value
 ARG API_URL=http://localhost:4000
 ENV API_URL=$API_URL
+# Railway hands the deploying commit to declared ARGs; next.config.ts turns it
+# into the deploymentId that busts browser/CDN caches on every deploy. Empty
+# in a local build, which simply means no deploymentId.
+ARG RAILWAY_GIT_COMMIT_SHA
 RUN npm run build
 
 # 3. Minimal runtime image (output: "standalone")
@@ -40,8 +44,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
+# Railway overrides PORT at runtime (8080 at the time of writing); bay-backend's
+# REVALIDATE_URL has to name that port, not this one — see the deploy runbook.
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+# "::" listens on IPv6 and IPv4 alike. Railway's private network
+# (*.railway.internal) is IPv6-first and its docs ask for this; 0.0.0.0 happened
+# to work there as well, so this is insurance, not the fix for the 2026-09
+# revalidate outage (that was the port).
+ENV HOSTNAME="::"
 EXPOSE 3000
 
 CMD ["node", "server.js"]

@@ -25,7 +25,14 @@ export class RevalidateService {
       });
       if (!res.ok) this.logger.warn(`revalidate ${tags.join(",")}: HTTP ${res.status}`);
     } catch (e) {
-      this.logger.warn(`revalidate ${tags.join(",")}: ${(e as Error).message}`);
+      /* undici says only "fetch failed"; the network reason (ECONNREFUSED,
+         ENOTFOUND, timeout) lives in `cause`, and that is the part that tells
+         you whether REVALIDATE_URL points at the right port and address. */
+      const cause = (e as { cause?: { code?: string; message?: string } }).cause;
+      const why = cause?.code ?? cause?.message;
+      this.logger.warn(
+        `revalidate ${tags.join(",")}: ${(e as Error).message}${why ? ` (${why})` : ""} — ${url}`,
+      );
     }
   }
 }

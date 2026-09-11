@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Avatar from "@/components/research/avatar";
+import { publicAsset } from "@/lib/asset-url";
 import {
   EVERYONE,
   memberOf,
@@ -71,7 +72,7 @@ function Presenter({ name }: { name: string }) {
     <div className="flex items-center gap-3 md:flex-row-reverse">
       <Avatar
         name={name}
-        src={m?.avatar ?? null}
+        src={m ? publicAsset(m.avatar) : null}
         className="h-9 w-9 shrink-0 text-sm transition-[box-shadow] group-hover/who:ring-2 group-hover/who:ring-bay-400/45"
       />
       <p className="font-body text-[15px] leading-tight font-medium whitespace-nowrap text-white transition-colors group-hover/who:text-bay-100">

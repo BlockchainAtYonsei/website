@@ -45,7 +45,14 @@ Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. �
 - 리전은 `railway.json`/`backend/railway.json`의 `multiRegionConfig`로
   싱가포르에 고정돼 있습니다. 대시보드에서 바꿔도 다음 배포에 되돌아오니
   바꾸려면 파일을 고치세요.
-- Notion 동기화 10분마다, 매일 04:00 KST 전체 리컨실.
+- Notion 동기화 10분마다, 매일 04:00 KST 전체 리컨실. 행이 바뀐 sync 뒤
+  bay-backend가 website의 `/api/revalidate`를 찔러(내부망) 해당 페이지 캐시를
+  즉시 버린다 — 이게 실패하면 발행 → 반영이 최대 10분 + ISR 5분이 되고,
+  그 사이 첫 방문은 옛 페이지를 받는다(아래 `REVALIDATE_URL` 참고).
+- 배포마다 커밋 SHA가 `deploymentId`가 된다(Dockerfile `ARG
+  RAILWAY_GIT_COMMIT_SHA` → `next.config.ts`). 정적 에셋·`public/` 이미지
+  URL에 `?dpl=<sha>`가 붙어 브라우저/Cloudflare 캐시가 배포 단위로 갈리고,
+  배포 전에 열어 둔 탭은 다음 이동에서 새 빌드로 전체 새로고침된다.
 
 ## 서비스별 변수 (Railway → 서비스 → Variables)
 
@@ -59,7 +66,7 @@ Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. �
 | `NOTION_TOKEN` · `NOTION_DB_NEWS` | Notion 인테그레이션 토큰 · 뉴스 DB id (**id만**, URL/주석 줄 섞지 않기) |
 | `NOTION_DB_ARTICLES` | 비움 — 리서치 Notion DB가 생기면 채움 (아래) |
 | `SYNC_KEY` | 수동 sync 트리거용 시크릿 |
-| `REVALIDATE_URL` | `http://website.railway.internal:3000/api/revalidate` (내부망) |
+| `REVALIDATE_URL` | `http://website.railway.internal:8080/api/revalidate` (내부망). 포트는 **8080** — Railway가 website 컨테이너의 `PORT`를 런타임에 8080으로 덮어쓰므로 Dockerfile의 3000이 아님. 핑이 실패하면 bay-backend 로그에 `revalidate news: fetch failed (ECONNREFUSED) — <url>`이 남고, 그때부터 Notion 발행이 ISR 창(5분) 뒤 두 번째 방문자에게나 보인다 |
 | `REVALIDATE_SECRET` | website의 같은 변수와 **동일해야** 함 |
 | `S3_ENDPOINT` · `S3_BUCKET` · `S3_ACCESS_KEY_ID` · `S3_SECRET_ACCESS_KEY` · `S3_REGION=auto` | Bucket `bay-media` → Credentials 탭 값 그대로 |
 | `S3_PUBLIC_URL` | `https://bay-backend-production.up.railway.app/v1/media` — 이 값이 DB에 저장되는 이미지 URL의 접두사 |
@@ -71,10 +78,31 @@ Railway 대시보드에 임원 초대: 프로젝트 → Settings → Members. �
 | `API_URL` | `https://bay-backend-production.up.railway.app` (빌드·런타임 모두 사용) |
 | `REVALIDATE_SECRET` | bay-backend와 동일 |
 | `NEXT_TELEMETRY_DISABLED` | `1` |
+| `PORT` | 설정하지 않음 — Railway가 주입(현재 8080). 값을 바꾸면 도메인 타깃 포트와 bay-backend의 `REVALIDATE_URL`도 같이 |
+
+website 컨테이너는 `HOSTNAME="::"`(Dockerfile)로 IPv4·IPv6 둘 다 듣는다.
+Railway 내부망(`*.railway.internal`)은 IPv6 주소를 주므로 Railway 문서가
+권하는 설정이다(2026-09-11 실측으로는 `0.0.0.0`도 내부망에서 닿았고, 당시
+핑이 죽어 있던 원인은 포트 3000이었다). 내부망 도달 확인은 bay-backend에서:
+
+```sh
+# 명령 전체를 인자 하나로 넘겨야 한다 — railway ssh가 따옴표를 풀어 버려서
+# sh -c '…' 형태는 node REPL로 빠진다
+railway ssh --service bay-backend -- 'node -e "fetch(\"http://website.railway.internal:8080/api/revalidate\",{method:\"POST\"}).then(r=>console.log(r.status)).catch(e=>console.log(e.cause&&e.cause.code))"'
+# 401이면 도달한 것(시크릿 없이 보냈으니 정상). ECONNREFUSED면 포트를 의심.
+```
 
 ## 도메인 / DNS
 
-Cloudflare DNS 레코드(모두 **DNS only**):
+Cloudflare DNS 레코드 — apex와 `www`는 **Proxied(주황 구름)** 상태다
+(2026-09-11 확인: `blockchainatyonsei.com`이 Cloudflare IP 104.21.x/172.67.x로
+풀리고 응답에 `cf-cache-status`가 붙음). 따라서 Cloudflare의 캐시 기본값이
+사이트에 적용된다: HTML은 캐시하지 않지만(`DYNAMIC`) 이미지·폰트 같은
+정적 확장자는 엣지에 캐시하고, **Browser Cache TTL 기본값 4시간**이 origin의
+`max-age=0`보다 크면 그 값을 덮어쓴다(`public/` 이미지가 `max-age=14400`으로
+나가는 이유). 코드는 `?dpl=<sha>`로 배포마다 URL을 바꿔 이를 우회하지만,
+Cloudflare 대시보드 → Caching → Configuration → Browser Cache TTL을 **Respect
+Existing Headers**로 두면 근본적으로 사라진다.
 
 | Type | Name | Target |
 |---|---|---|

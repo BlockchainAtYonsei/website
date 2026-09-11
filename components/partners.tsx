@@ -1,4 +1,5 @@
 import BlurText from "./blur-text";
+import { publicAsset } from "@/lib/asset-url";
 
 /* Seeded from the organizations BAY has actually worked with per the History
    section.
@@ -113,7 +114,7 @@ function Item({ partner }: { partner: Partner }) {
            instead. */
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={partner.logo}
+          src={publicAsset(partner.logo)}
           alt=""
           aria-hidden
           width={28}
