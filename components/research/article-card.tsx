@@ -104,9 +104,6 @@ export default function ArticleCard({ article }: { article: Article }) {
         <h3 className="font-heading text-2xl leading-[1.1] tracking-[-0.5px] break-keep text-white transition-colors group-hover:text-bay-100 md:text-[1.75rem]">
           {article.title}
         </h3>
-        <p className="font-body mt-3 line-clamp-3 text-sm leading-relaxed font-light break-keep text-slate-400">
-          {article.dek}
-        </p>
         <ArticleMeta article={article} className="mt-auto pt-6" />
       </div>
     </Link>
