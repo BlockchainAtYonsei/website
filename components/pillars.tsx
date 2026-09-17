@@ -5,7 +5,7 @@ import { teamCopy, type TeamKey } from "@/lib/teams";
 import BlurText from "./blur-text";
 import { useLang } from "./lang-provider";
 import TeamModal from "./team-modal";
-import { ArrowUpRight, CodeIcon, MagnifierIcon } from "./icons";
+import { ArrowUpRight, CodeIcon, MagnifierIcon, PeopleIcon } from "./icons";
 
 /* "The BAY at work" — the two cards under the mission.
 
@@ -22,7 +22,9 @@ import { ArrowUpRight, CodeIcon, MagnifierIcon } from "./icons";
 const PILLARS: {
   title: string;
   team: TeamKey;
-  link: { label: string; href: string };
+  /* Where the card used to go before it opened a dialog instead. Team Activity
+     never was a doorway out, so it carries none. */
+  link?: { label: string; href: string };
   Icon: (props: { className?: string }) => React.ReactElement;
 }[] = [
   {
@@ -36,6 +38,11 @@ const PILLARS: {
     team: "개발팀",
     link: { label: "GitHub", href: "https://github.com/BlockchainAtYonsei" },
     Icon: CodeIcon,
+  },
+  {
+    title: "Team Activity",
+    team: "활동",
+    Icon: PeopleIcon,
   },
 ];
 
@@ -57,7 +64,7 @@ export default function Pillars() {
           text={lang === "KR" ? "BAY 활동" : "The BAY at work"}
           className="font-heading text-5xl leading-[1.0] tracking-[-3px] text-white md:text-6xl"
         />
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
           {PILLARS.map((pillar) => {
             const { title, Icon } = pillar;
             return (

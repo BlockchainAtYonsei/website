@@ -97,6 +97,7 @@ export default function TeamModal({
             </section>
           ))}
 
+          {team.pm && (
           <section className="mt-10 border-t border-white/10 pt-8">
             <h3 className={`${EYEBROW} mb-3.5`}>{team.pm.heading}</h3>
             <p className="font-body mb-4 text-base font-medium break-keep text-white">
@@ -140,6 +141,7 @@ export default function TeamModal({
               </ul>
             )}
           </section>
+          )}
 
           {/* no mailto, no phone number — both PM blocks ended with one in the
               source, and the form is the only inquiry channel this site has */}

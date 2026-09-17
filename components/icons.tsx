@@ -136,6 +136,25 @@ export function CodeIcon({ className }: { className?: string }) {
   );
 }
 
+export function PeopleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19" />
+      <circle cx="10" cy="8" r="3.5" />
+      <path d="M20 19v-1.5a3.5 3.5 0 0 0-2.625-3.387" />
+      <path d="M15.5 4.613a3.5 3.5 0 0 1 0 6.774" />
+    </svg>
+  );
+}
+
 /* ---- brand marks ----
    Solid glyphs (fill, not stroke) so they read correctly at small sizes inside
    the contact section's circular buttons. */

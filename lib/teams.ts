@@ -18,14 +18,16 @@
 
 import type { LangCode } from "@/components/lang-provider";
 
-export type TeamKey = "개발팀" | "리서치팀";
+export type TeamKey = "개발팀" | "리서치팀" | "활동";
 
 export type TeamCopy = {
   title: string;
   /* Opening paragraphs, in the team lead's own voice. */
   intro: string[];
   sections: { heading: string; items: string[] }[];
-  pm: {
+  /* Optional: the two teams close with their lead's introduction, but the
+     Team Activity card has no single lead, so it omits this block. */
+  pm?: {
     heading: string;
     name: string;
     bullets: string[];
@@ -179,6 +181,45 @@ const KR: Record<TeamKey, TeamCopy> = {
     },
     contactNote: "팀 활동이 궁금하시면 메뉴의 Contact로 문의해 주세요.",
   },
+
+  /* Team Activity: a rundown of what BAY has done, not a team with its own
+     lead, so it carries no `pm` block. The items are drawn from the history
+     timeline (lib/history.ts); replace or extend them as the team sees fit. */
+  활동: {
+    title: "학회 활동",
+    intro: [
+      "BAY는 2017년 설립 이후 밋업과 세미나, 해커톤, 리서치를 중심으로 활동해 왔습니다.",
+      "국내외 블록체인 재단·기업과 함께 쌓아 온 대표 활동을 모았습니다.",
+    ],
+    sections: [
+      {
+        heading: "밋업 & 세미나",
+        items: [
+          "이더리움 재단 밋업 · 비탈릭 부테린과 공동 개최 (2018)",
+          "ABF 메인행사 'Blockcamp Seoul' 주최 (2018)",
+          "CODA Protocol(現 MINA Protocol) AMA 개최 (2020)",
+          "칭화대학교 블록체인 학회 THUBA NFT 연합세션 (2021)",
+        ],
+      },
+      {
+        heading: "해커톤 & 수상",
+        items: [
+          "ETHSeoul NEAR Dev Hub Track 1st place (2024)",
+          "XRPL 2025 Korea Hackathon 1st place (2025)",
+          "Blockthon 2025 Sponsored by Sui · 1·2·3위 석권 (2025)",
+          "Consensus 2026 Miami · Base + AWS Track 러너업 (2026)",
+        ],
+      },
+      {
+        heading: "리서치 & 인사이트",
+        items: [
+          "블록체인·Web3 생태계 리서치를 Medium에 정기 발행",
+          "Synfutures, Eigenlayer, Uniswap 등 재단·기업과 협력",
+        ],
+      },
+    ],
+    contactNote: "학회 활동이 궁금하시면 메뉴의 Contact로 문의해 주세요.",
+  },
 };
 
 const EN: Record<TeamKey, TeamCopy> = {
@@ -317,6 +358,43 @@ const EN: Record<TeamKey, TeamCopy> = {
     },
     contactNote:
       "For more about what the team does, reach us through Contact in the menu.",
+  },
+
+  활동: {
+    title: "Team Activity",
+    intro: [
+      "Since its founding in 2017, BAY has centered its work on meetups and seminars, hackathons, and research.",
+      "Here are the highlights built together with blockchain foundations and companies at home and abroad.",
+    ],
+    sections: [
+      {
+        heading: "Meetups & seminars",
+        items: [
+          "Ethereum Foundation meetup, co-hosted with Vitalik Buterin (2018)",
+          "Hosted 'Blockcamp Seoul', the main ABF event (2018)",
+          "Hosted an AMA with CODA Protocol, now MINA Protocol (2020)",
+          "Joint NFT session with THUBA, Tsinghua University's blockchain society (2021)",
+        ],
+      },
+      {
+        heading: "Hackathons & awards",
+        items: [
+          "ETHSeoul NEAR Dev Hub Track · 1st place (2024)",
+          "XRPL 2025 Korea Hackathon · 1st place (2025)",
+          "Blockthon 2025 sponsored by Sui · swept 1st, 2nd & 3rd (2025)",
+          "Consensus 2026 Miami · Base + AWS Track runner-up (2026)",
+        ],
+      },
+      {
+        heading: "Research & insights",
+        items: [
+          "Regularly publishes blockchain and Web3 research on Medium",
+          "Works with foundations and companies including Synfutures, Eigenlayer and Uniswap",
+        ],
+      },
+    ],
+    contactNote:
+      "For more about what the society does, reach us through Contact in the menu.",
   },
 };
 
