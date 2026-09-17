@@ -5,23 +5,27 @@ import { teamCopy, type TeamKey } from "@/lib/teams";
 import BlurText from "./blur-text";
 import { useLang } from "./lang-provider";
 import TeamModal from "./team-modal";
+import ActivityModal from "./activity-modal";
 import { ArrowUpRight, CodeIcon, MagnifierIcon, PeopleIcon } from "./icons";
 
-/* "The BAY at work" — the two cards under the mission.
+/* "The BAY at work": the cards under the mission.
 
-   They used to be links straight out of the page: Research to the research
-   site, Build to the GitHub org. Both destinations were the whole of what the
-   card said. Now each card opens its team's introduction instead, and the link
-   it used to be moves into that dialog's header — so the card answers "what is
-   this team" first and still offers the way out, rather than only being a
-   doorway to somewhere else. */
+   Research and Build used to be links straight out of the page: Research to the
+   research site, Build to the GitHub org. Both destinations were the whole of
+   what the card said. Now each opens its team's introduction instead, and the
+   link it used to be moves into that dialog's header, so the card answers "what
+   is this team" first and still offers the way out, rather than only being a
+   doorway to somewhere else. Team Activity is the third card; it opens a
+   cohort/session/group browser rather than a team introduction. */
 
 /* The team is held as a key, not as resolved copy: the language switch can be
    thrown while the dialog is open, and looking the copy up at render is what
-   lets the open dialog follow it. */
+   lets the open dialog follow it. `activity` cards have no team and open the
+   activity browser instead. */
 const PILLARS: {
   title: string;
-  team: TeamKey;
+  team?: TeamKey;
+  activity?: boolean;
   /* Where the card used to go before it opened a dialog instead. Team Activity
      never was a doorway out, so it carries none. */
   link?: { label: string; href: string };
@@ -41,7 +45,7 @@ const PILLARS: {
   },
   {
     title: "Team Activity",
-    team: "활동",
+    activity: true,
     Icon: PeopleIcon,
   },
 ];
@@ -108,8 +112,13 @@ export default function Pillars() {
       </div>
 
       <TeamModal
-        team={open ? teamCopy(lang, open.team) : null}
+        team={open?.team ? teamCopy(lang, open.team) : null}
         link={open?.link}
+        onClose={() => setOpen(null)}
+      />
+
+      <ActivityModal
+        open={Boolean(open?.activity)}
         onClose={() => setOpen(null)}
       />
     </section>
