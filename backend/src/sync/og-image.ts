@@ -53,6 +53,18 @@ export function ogImageFrom(html: string, pageUrl: string): string | undefined {
 const CRAWLER_UA =
   "Mozilla/5.0 (compatible; BAYNewsBot/1.0; +https://www.blockchainatyonsei.com)";
 
+/* og tags live in <head>, so the page is read up to where the head closes
+   rather than to a fixed byte count. A fixed 500KB used to be the cut, and
+   CoinDesk inlines about 530KB of styles and data ahead of its og:image: every
+   CoinDesk story carded as generated art while declaring a perfectly good
+   picture. The cap only guards a page that never closes its head. */
+const HEAD_CAP = 3_000_000;
+
+export function headOf(html: string): string {
+  const end = html.search(/<\/head\s*>/i);
+  return html.slice(0, end >= 0 ? end : HEAD_CAP);
+}
+
 /* MSN is a redistributor, not a publisher: its ar-<id> article pages are a
    client-rendered shell that declares no og:image to a crawler, so a story a
    curator linked through MSN would only ever card as generated art. MSN's own
@@ -127,26 +139,47 @@ async function fetchMsnImage(apiUrl: string): Promise<string | null> {
   }
 }
 
+/* The identity a link-preview crawler presents. Some publishers (The Block)
+   403 every client except the social unfurlers they want previews from, a
+   plain browser included. og:image is exactly the metadata they publish for
+   those previews, so a story that refused our own crawler is asked once more
+   as one. Only after a refusal: our own name stays the first thing anyone
+   sees, and a site that turns this away too costs nothing but the retry. */
+const PREVIEW_UA =
+  "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)";
+
+/* Statuses that mean "not you", as opposed to "no such page". */
+export function isRefusal(status: number): boolean {
+  return status === 401 || status === 403;
+}
+
+async function readOgImage(
+  pageUrl: string,
+  userAgent: string,
+): Promise<{ status: number; image: string | null }> {
+  const res = await fetch(pageUrl, {
+    redirect: "follow",
+    signal: AbortSignal.timeout(8000),
+    headers: { "user-agent": userAgent, accept: "text/html,application/xhtml+xml" },
+  });
+  if (!res.ok) return { status: res.status, image: null };
+  const type = res.headers.get("content-type") ?? "";
+  if (type && !type.includes("html")) return { status: res.status, image: null };
+  return {
+    status: res.status,
+    image: ogImageFrom(headOf(await res.text()), res.url || pageUrl) ?? null,
+  };
+}
+
 /* Fetch a story page and read its og:image. Networked half, kept apart from
    the pure parser above so tests need no fetch. Any failure — bot-blocked,
    timeout, not HTML — is a null, never a throw: a missing cover costs a
    generated-art card, nothing more. */
 async function fetchOgImageDirect(pageUrl: string): Promise<string | null> {
   try {
-    const res = await fetch(pageUrl, {
-      redirect: "follow",
-      signal: AbortSignal.timeout(8000),
-      headers: {
-        "user-agent": CRAWLER_UA,
-        accept: "text/html,application/xhtml+xml",
-      },
-    });
-    if (!res.ok) return null;
-    const type = res.headers.get("content-type") ?? "";
-    if (type && !type.includes("html")) return null;
-    /* og tags live in <head>; half a megabyte reaches it on any real page */
-    const html = (await res.text()).slice(0, 500_000);
-    return ogImageFrom(html, res.url || pageUrl) ?? null;
+    const first = await readOgImage(pageUrl, CRAWLER_UA);
+    if (first.image || !isRefusal(first.status)) return first.image;
+    return (await readOgImage(pageUrl, PREVIEW_UA)).image;
   } catch {
     return null;
   }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { msnDetailApi, msnPick, ogImageFrom } from "./og-image";
+import { headOf, isRefusal, msnDetailApi, msnPick, ogImageFrom } from "./og-image";
 
 const PAGE = "https://news.example.com/story/123";
 
@@ -52,6 +52,42 @@ describe("ogImageFrom", () => {
     expect(
       ogImageFrom(`<meta property="og:image" content="data:image/png;base64,AAAA">`, PAGE),
     ).toBeUndefined();
+  });
+});
+
+describe("headOf", () => {
+  it("keeps an og:image that sits past 500KB of head, the CoinDesk layout", () => {
+    const html =
+      "<html><head><style>" + "x".repeat(530_000) + "</style>" +
+      '<meta property="og:image" content="https://cdn.example.com/lead.png"/>' +
+      "</head><body>" + "y".repeat(1_000_000) + "</body></html>";
+    expect(ogImageFrom(headOf(html), PAGE)).toBe("https://cdn.example.com/lead.png");
+  });
+
+  it("stops at the head, so a body image is never mistaken for the lead", () => {
+    const html =
+      "<html><head><title>t</title></head><body>" +
+      '<meta property="og:image" content="https://cdn.example.com/body.png"/></body></html>';
+    expect(ogImageFrom(headOf(html), PAGE)).toBeUndefined();
+  });
+
+  it("matches a closing head tag in any case", () => {
+    expect(headOf("<HEAD>a</HEAD><body>b")).toBe("<HEAD>a");
+  });
+
+  it("reads the whole page, capped, when the head never closes", () => {
+    const html = '<meta property="og:image" content="https://cdn.example.com/a.png">';
+    expect(headOf(html)).toBe(html);
+  });
+});
+
+describe("isRefusal", () => {
+  it("retries only when the publisher refused the client, not when the page is missing", () => {
+    expect(isRefusal(403)).toBe(true);
+    expect(isRefusal(401)).toBe(true);
+    expect(isRefusal(404)).toBe(false);
+    expect(isRefusal(500)).toBe(false);
+    expect(isRefusal(200)).toBe(false);
   });
 });
 
