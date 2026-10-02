@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xangle RWA 신용 확장본</title>
+<style>
+:root{
+  --navy:#0b2b5b; --blue:#1f6fd1; --sky:#eaf4ff; --line:#cfe4fb;
+  --text:#162033; --muted:#667085; --bg:#f5f8fc; --card:#ffffff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Pretendard","Noto Sans KR",Arial,sans-serif;background:var(--bg);color:var(--text)}
+.deck{height:100vh;overflow:hidden;position:relative}
+.slide{
+  display:none;height:100vh;padding:48px 64px 72px;background:#fff;
+}
+.slide.active{display:block}
+.kicker{font-size:15px;color:var(--blue);font-weight:800;letter-spacing:.05em;margin-bottom:10px}
+h1{font-size:44px;line-height:1.14;margin:0 0 14px;color:var(--navy)}
+h2{font-size:30px;line-height:1.25;margin:0 0 18px;color:var(--navy)}
+p{font-size:22px;line-height:1.6;margin:10px 0}
+.small{font-size:17px;color:var(--muted)}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(16,44,84,.06)}
+.card h3{margin:0 0 10px;color:var(--navy);font-size:23px}
+.card p,.card li{font-size:18px;line-height:1.55}
+.flow{display:flex;align-items:stretch;gap:10px;margin-top:26px}
+.node{flex:1;background:linear-gradient(180deg,#f8fbff,#edf6ff);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:150px}
+.node b{font-size:20px;color:var(--navy)}
+.node span{font-size:15px;color:var(--muted);margin-top:9px}
+.arrow{display:flex;align-items:center;font-size:34px;color:#63a8ee;font-weight:800}
+.callout{margin-top:24px;background:var(--sky);border-left:6px solid var(--blue);border-radius:14px;padding:18px 22px;font-size:20px;line-height:1.5}
+.quote{font-size:28px;line-height:1.5;font-weight:800;color:var(--navy);padding:24px;border-radius:18px;background:linear-gradient(90deg,#eef6ff,#f7fbff)}
+.table{width:100%;border-collapse:collapse;margin-top:14px;font-size:16px}
+.table th,.table td{border:1px solid #d9e7f5;padding:11px 12px;vertical-align:top}
+.table th{background:#edf6ff;color:var(--navy)}
+ul{margin:8px 0 0;padding-left:22px}
+.footer{position:absolute;left:64px;right:64px;bottom:24px;display:flex;justify-content:space-between;font-size:13px;color:#8a94a6}
+.nav{position:fixed;right:24px;bottom:22px;display:flex;gap:8px;z-index:10}
+.nav button{border:0;background:var(--navy);color:#fff;border-radius:10px;padding:10px 14px;font-size:16px;cursor:pointer}
+.progress{position:fixed;left:0;top:0;height:5px;background:var(--blue);width:0;z-index:20;transition:width .2s}
+.badge{display:inline-block;background:#edf6ff;color:var(--blue);padding:5px 10px;border-radius:999px;font-size:14px;font-weight:800;margin-bottom:9px}
+@media(max-width:900px){
+  .slide{padding:34px 24px 68px;overflow:auto}
+  h1{font-size:34px}.g2,.g3,.g4{grid-template-columns:1fr}.flow{flex-direction:column}.arrow{justify-content:center;transform:rotate(90deg)}
+  p{font-size:18px}.footer{left:24px;right:24px}.table{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a href="../session.html?s=5" style="position:fixed;top:14px;right:24px;z-index:15;background:#fff;border:1px solid #cfe4fb;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;color:#0b2b5b;text-decoration:none;box-shadow:0 4px 14px rgba(16,44,84,.10);font-family:Pretendard,system-ui,sans-serif">&larr; 5회차 진행안으로</a><div class="deck">
+
+<section class="slide active">
+  <div class="kicker">XANGLE RWA · CREDIT</div>
+  <h1>신용 RWA: 전통금융의 현금흐름이 온체인으로 들어오는 방식</h1>
+  <p class="small">Hamilton Lane SCOPE · Apollo ACRED · Janus Henderson Anemoy JAAA · Maple syrupUSDC / syrupUSDT</p>
+  <div class="quote" style="margin-top:48px">“신용자산 토큰화는 대출 자체를 코인으로 바꾸는 것이 아니라,<br>미래 원금·이자 현금흐름에 대한 권리를 온체인에서 표현하는 것이다.”</div>
+  <div class="footer"><span>신용 RWA 확장본</span><span>1 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">01 · CREDIT BASICS</div>
+  <h1>신용자산의 본질</h1>
+  <div class="flow">
+    <div class="node"><b>투자자</b><span>자금을 제공</span></div><div class="arrow">→</div>
+    <div class="node"><b>기업 / 차입자</b><span>대출을 사용</span></div><div class="arrow">→</div>
+    <div class="node"><b>이자 + 원금 상환</b><span>미래 현금흐름</span></div><div class="arrow">→</div>
+    <div class="node"><b>투자수익</b><span>신용위험을 감수한 대가</span></div>
+  </div>
+  <div class="callout"><b>핵심:</b> 신용 RWA에서 토큰이 대표하는 것은 “기업”이 아니라 <b>대출에서 나오는 현금흐름에 대한 경제적 권리</b>다.</div>
+  <div class="footer"><span>Credit Basics</span><span>2 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">02 · PRIVATE CREDIT & STRUCTURED CREDIT</div>
+  <h1>사모신용과 구조화신용</h1>
+  <div class="grid g2">
+    <div class="card"><span class="badge">Private Credit</span><h3>기업과 직접 대출계약</h3><p>공개 회사채 시장이 아니라 사모펀드·운용사가 기업에 직접 대출.</p><ul><li>비공개 계약</li><li>전문투자자 중심</li><li>낮은 유동성</li><li>상대적으로 높은 수익률 추구</li></ul></div>
+    <div class="card"><span class="badge">Structured Credit</span><h3>대출을 묶고 위험을 나눔</h3><p>여러 대출을 하나의 구조로 묶은 뒤 위험·수익 수준에 따라 tranche로 분리.</p><ul><li>CLO가 대표적</li><li>AAA부터 Equity까지 위험순위 존재</li><li>현금흐름 우선순위가 핵심</li></ul></div>
+  </div>
+  <div class="footer"><span>Private / Structured Credit</span><span>3 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">03 · TOKENIZATION MODELS</div>
+  <h1>신용 RWA는 세 가지 방식으로 구현된다</h1>
+  <div class="grid g3">
+    <div class="card"><h3>① Feeder Fund형</h3><p><b>SCOPE / ACRED</b></p><p>기존 전통 펀드는 유지하고 블록체인용 투자 창구를 추가.</p></div>
+    <div class="card"><h3>② Onchain Fund형</h3><p><b>JAAA</b></p><p>펀드 지분·청약·환매·NAV를 온체인 인프라와 직접 연결.</p></div>
+    <div class="card"><h3>③ Vault / Lending형</h3><p><b>Maple</b></p><p>스마트컨트랙트 Vault 자체가 자금집합·대출·회계 기능 수행.</p></div>
+  </div>
+  <div class="callout">같은 “신용 RWA”라도 <b>기존 금융상품에 블록체인을 붙이는 방식</b>부터 <b>대출 운용 자체가 온체인인 방식</b>까지 스펙트럼이 있다.</div>
+  <div class="footer"><span>3 Models</span><span>4 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">04 · HAMILTON LANE SCOPE</div>
+  <h1>SCOPE: 기관용 Private Credit의 투자 입구를 토큰화</h1>
+  <div class="flow">
+    <div class="node"><b>투자자</b><span>디지털 청약</span></div><div class="arrow">→</div>
+    <div class="node"><b>Securitize Feeder</b><span>토큰화된 지분</span></div><div class="arrow">→</div>
+    <div class="node"><b>Hamilton Lane SCOPE</b><span>Senior Credit Opportunities</span></div><div class="arrow">→</div>
+    <div class="node"><b>Senior Private Credit</b><span>기업 대출 이자</span></div>
+  </div>
+  <div class="grid g2" style="margin-top:24px">
+    <div class="card"><h3>무엇이 바뀌었나?</h3><ul><li>기존 펀드 구조는 유지</li><li>최소 투자단위·청약 절차 개선</li><li>블록체인에서 지분 기록</li></ul></div>
+    <div class="card"><h3>무엇은 그대로인가?</h3><ul><li>기초자산은 여전히 오프체인 대출</li><li>운용사는 Hamilton Lane</li><li>투자자 자격·법적 규제는 존재</li></ul></div>
+  </div>
+  <div class="footer"><span>Hamilton Lane SCOPE</span><span>5 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">05 · APOLLO ACRED</div>
+  <h1>ACRED: Apollo 신용전략으로 연결되는 온체인 진입구</h1>
+  <div class="flow">
+    <div class="node"><b>투자자</b></div><div class="arrow">→</div>
+    <div class="node"><b>ACRED</b><span>토큰화 Feeder 지분</span></div><div class="arrow">→</div>
+    <div class="node"><b>Apollo Diversified Credit Fund</b></div><div class="arrow">→</div>
+    <div class="node"><b>기업대출·자산담보대출·구조화신용</b></div><div class="arrow">→</div>
+    <div class="node"><b>이자수익</b></div>
+  </div>
+  <div class="callout"><b>핵심:</b> ACRED 자체가 기업에 직접 대출하는 게 아니라, <b>Apollo의 기존 신용펀드에 투자하는 토큰화된 Feeder 구조</b>다.</div>
+  <div class="footer"><span>Apollo ACRED</span><span>6 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">06 · FEEDER FUND</div>
+  <h1>왜 Feeder Fund를 쓰는가?</h1>
+  <div class="flow">
+    <div class="node"><b>투자자</b><span>온체인 지분 보유</span></div><div class="arrow">→</div>
+    <div class="node"><b>Feeder Fund</b><span>자금을 모아 전달</span></div><div class="arrow">→</div>
+    <div class="node"><b>Main Fund</b><span>기존 대형 펀드</span></div><div class="arrow">→</div>
+    <div class="node"><b>기초 신용자산</b></div>
+  </div>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><h3>기존 상품 유지</h3><p>메인펀드를 다시 설계할 필요가 없다.</p></div>
+    <div class="card"><h3>디지털 창구 추가</h3><p>투자자 입장에서는 온체인 지분으로 접근.</p></div>
+    <div class="card"><h3>규제 부담 완화</h3><p>기존 펀드의 법률·회계 구조를 최대한 유지.</p></div>
+  </div>
+  <div class="footer"><span>Feeder Fund</span><span>7 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">07 · ACRED + DEFI</div>
+  <h1>ACRED의 다음 단계: RWA가 DeFi 담보가 된다</h1>
+  <div class="flow">
+    <div class="node"><b>Apollo Credit</b></div><div class="arrow">→</div>
+    <div class="node"><b>ACRED</b></div><div class="arrow">→</div>
+    <div class="node"><b>sACRED</b><span>DeFi 활용 형태</span></div><div class="arrow">→</div>
+    <div class="node"><b>Morpho 담보</b></div><div class="arrow">→</div>
+    <div class="node"><b>USDC 대출</b></div>
+  </div>
+  <div class="callout">중요한 변화는 “RWA를 보유한다”에서 끝나지 않고, <b>RWA를 담보로 다시 유동성을 만드는 단계</b>로 넘어간다는 점이다.</div>
+  <div class="footer"><span>ACRED → DeFi</span><span>8 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">08 · JAAA & CLO</div>
+  <h1>JAAA를 이해하려면 CLO부터 알아야 한다</h1>
+  <div class="flow">
+    <div class="node"><b>여러 기업 대출</b></div><div class="arrow">→</div>
+    <div class="node"><b>CLO</b><span>대출 포트폴리오</span></div><div class="arrow">→</div>
+    <div class="node"><b>AAA</b><span>우선순위 높음·위험 낮음</span></div><div class="arrow">→</div>
+    <div class="node"><b>AA / A / BBB</b></div><div class="arrow">→</div>
+    <div class="node"><b>Equity</b><span>손실 먼저 부담</span></div>
+  </div>
+  <div class="callout">AAA tranche는 현금흐름을 가장 먼저 배분받고, 손실은 아래 tranche부터 흡수하기 때문에 상대적으로 방어력이 높다.</div>
+  <div class="footer"><span>CLO Structure</span><span>9 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">09 · JANUS HENDERSON ANEMOY JAAA</div>
+  <h1>JAAA: AAA CLO 전략을 온체인 펀드로 구현</h1>
+  <div class="flow">
+    <div class="node"><b>투자자</b><span>Stablecoin 청약</span></div><div class="arrow">→</div>
+    <div class="node"><b>JAAA Onchain Fund</b></div><div class="arrow">→</div>
+    <div class="node"><b>AAA CLO Portfolio</b></div><div class="arrow">→</div>
+    <div class="node"><b>Senior Secured Loans</b></div>
+  </div>
+  <div class="grid g2" style="margin-top:24px">
+    <div class="card"><h3>ACRED / SCOPE와 차이</h3><p>기존 오프체인 펀드의 지분을 단순 wrapper한 구조보다 <b>온체인 펀드 인프라에 더 가까움</b>.</p></div>
+    <div class="card"><h3>온체인 활용</h3><p>청약·환매·NAV·펀드 지분을 디지털 자산 인프라와 연결하고, DeFi 담보 활용으로 확장 가능.</p></div>
+  </div>
+  <div class="footer"><span>JAAA</span><span>10 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">10 · MAPLE FINANCE</div>
+  <h1>syrupUSDC / syrupUSDT: 대출 운용 자체가 온체인</h1>
+  <div class="flow">
+    <div class="node"><b>USDC / USDT</b><span>투자자 예치</span></div><div class="arrow">→</div>
+    <div class="node"><b>ERC-4626 Vault</b></div><div class="arrow">→</div>
+    <div class="node"><b>syrupUSDC / syrupUSDT</b><span>Vault 지분 토큰</span></div><div class="arrow">→</div>
+    <div class="node"><b>기관 대출 전략</b></div><div class="arrow">→</div>
+    <div class="node"><b>이자 수익</b></div>
+  </div>
+  <div class="callout"><b>차이:</b> Maple은 기존 TradFi 펀드를 토큰화한 게 아니라, <b>스마트컨트랙트 Vault가 자금집합·대출·회계·지분관리 기능을 수행</b>한다.</div>
+  <div class="footer"><span>Maple Finance</span><span>11 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">11 · ERC-4626</div>
+  <h1>syrupUSDC의 수익은 어떻게 쌓이는가?</h1>
+  <div class="grid g2">
+    <div class="card"><h3>처음</h3><p>Vault 자산 = 1,000 USDC<br>발행된 syrupUSDC = 1,000</p><p><b>1 syrupUSDC ≈ 1 USDC</b></p></div>
+    <div class="card"><h3>이자 수익 후</h3><p>Vault 자산 = 1,100 USDC<br>발행된 syrupUSDC = 1,000</p><p><b>1 syrupUSDC ≈ 1.1 USDC</b></p></div>
+  </div>
+  <div class="callout">매일 이자를 따로 지급한다기보다, <b>Vault 자산 가치가 늘면서 share 1개당 청구 가능한 자산이 증가</b>하는 구조로 이해하면 쉽다.</div>
+  <div class="footer"><span>ERC-4626 Vault</span><span>12 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">12 · COMPARISON</div>
+  <h1>네 사례를 한 번에 비교하면</h1>
+  <table class="table">
+    <tr><th></th><th>SCOPE</th><th>ACRED</th><th>JAAA</th><th>syrupUSDC/USDT</th></tr>
+    <tr><td><b>운용 주체</b></td><td>Hamilton Lane</td><td>Apollo</td><td>Janus Henderson / Anemoy</td><td>Maple</td></tr>
+    <tr><td><b>기초자산</b></td><td>Senior Private Credit</td><td>Diversified Credit</td><td>AAA CLO</td><td>기관 crypto-secured loans 등</td></tr>
+    <tr><td><b>구조</b></td><td>Feeder Fund</td><td>Feeder Fund</td><td>Onchain Fund</td><td>ERC-4626 Vault</td></tr>
+    <tr><td><b>기존 펀드</b></td><td>있음</td><td>있음</td><td>온체인 전용 구조</td><td>없음</td></tr>
+    <tr><td><b>블록체인의 역할</b></td><td>접근·지분 기록</td><td>접근·지분 기록</td><td>펀드 인프라</td><td>대출·회계·지분관리</td></tr>
+    <tr><td><b>DeFi 확장성</b></td><td>점진적</td><td>sACRED 등</td><td>Aave Horizon 등</td><td>처음부터 강함</td></tr>
+  </table>
+  <div class="footer"><span>Credit RWA Comparison</span><span>13 / 14</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">13 · TAKEAWAY</div>
+  <h1>신용 RWA가 보여주는 방향</h1>
+  <div class="grid g3">
+    <div class="card"><h3>1단계</h3><p><b>SCOPE / ACRED</b></p><p>기존 금융상품의 투자 입구를 온체인화</p></div>
+    <div class="card"><h3>2단계</h3><p><b>JAAA</b></p><p>펀드 자체를 온체인 금융 인프라와 결합</p></div>
+    <div class="card"><h3>3단계</h3><p><b>Maple</b></p><p>대출과 운용 자체가 스마트컨트랙트 기반</p></div>
+  </div>
+  <div class="quote" style="margin-top:34px">Tokenization ≠ Liquidity<br><span style="font-size:20px;font-weight:600;color:#4b5d73">토큰을 만들었다고 기초자산의 유동성·신용위험·법적 리스크가 사라지는 것은 아니다.</span></div>
+  <div class="footer"><span>Key Takeaway</span><span>14 / 14</span></div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <button onclick="next()">→</button>
+</div>
+
+<script>
+let idx=0;
+const slides=[...document.querySelectorAll('.slide')];
+const progress=document.getElementById('progress');
+function show(i){
+  idx=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,n)=>s.classList.toggle('active',n===idx));
+  progress.style.width=((idx+1)/slides.length*100)+'%';
+}
+function next(){show(idx+1)}
+function prev(){show(idx-1)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' ') next();
+  if(e.key==='ArrowLeft'||e.key==='PageUp') prev();
+});
+show(0);
+</script>
+</body>
+</html>

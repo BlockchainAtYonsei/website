@@ -100,8 +100,8 @@ const PART_TOKEN = /\d+-\d+(?:\s*\(\d+\))?|\d+/g;
 /** The real part keys a title token stands for: itself when it names a part
     exactly, or every "(N)" sub-part under it. So a deck titled "3-2." covers
     "3-2(1)" and "3-2(2)" when the section was split between two presenters. */
-function childrenOf(token: string, valid: Set<string>): string[] {
-  const k = partKey(token);
+function childrenOf(ns: string, token: string, valid: Set<string>): string[] {
+  const k = partKey(ns + token);
   return [...valid].filter((v) => v === k || v.startsWith(`${k}(`));
 }
 
@@ -114,22 +114,32 @@ function childrenOf(token: string, valid: Set<string>): string[] {
 function coveredParts(title: string, valid: Set<string>): string[] {
   const cut = title.indexOf(". ");
   const spec = cut >= 0 ? title.slice(0, cut) : "";
-  const first = spec.match(PART_TOKEN)?.[0];
-  if (!first || childrenOf(first, valid).length === 0) return [];
 
   const keys = new Set<string>();
+  /* 회차 5 reads two articles, so its parts are namespaced "채권 …" / "대체 …".
+     The namespace carries across groups until the next one names it, so
+     "채권 3 · 대체 3-1 · 3-2" reads 3-2 under 대체. "" for every other session,
+     which leaves the behaviour identical to the plain numeric form. */
+  let ns = "";
+  let opensOnPart: boolean | null = null;
   for (const group of spec.split(/[·,]/)) {
+    if (group.includes("채권")) ns = "채권";
+    else if (group.includes("대체")) ns = "대체";
     const toks = group.match(PART_TOKEN) ?? [];
+    if (opensOnPart === null && toks[0])
+      opensOnPart = childrenOf(ns, toks[0], valid).length > 0;
     const a = toks[0]?.match(/^(\d+)-(\d+)$/);
     const b = toks[toks.length - 1]?.match(/^(\d+)-(\d+)$/);
     if (group.includes("~") && a && b && a[1] === b[1]) {
       for (let i = Number(a[2]); i <= Number(b[2]); i++)
-        for (const c of childrenOf(`${a[1]}-${i}`, valid)) keys.add(c);
+        for (const c of childrenOf(ns, `${a[1]}-${i}`, valid)) keys.add(c);
     } else {
-      for (const t of toks) for (const c of childrenOf(t, valid)) keys.add(c);
+      for (const t of toks) for (const c of childrenOf(ns, t, valid)) keys.add(c);
     }
   }
-  return [...keys];
+  /* The title has to *open* on a real part. A background doc like "00. …" opens
+     on nothing and stays out of the schedule. */
+  return opensOnPart ? [...keys] : [];
 }
 
 /** Every real part a title mentions, wherever the number sits. Looser than
@@ -138,8 +148,13 @@ function coveredParts(title: string, valid: Set<string>): string[] {
     covers. Used to file extras under a slot, not to draw the primary link. */
 function scanParts(title: string, valid: Set<string>): string[] {
   const keys = new Set<string>();
-  for (const t of title.match(PART_TOKEN) ?? [])
-    for (const c of childrenOf(t, valid)) keys.add(c);
+  let ns = "";
+  for (const group of title.split(/[·,]/)) {
+    if (group.includes("채권")) ns = "채권";
+    else if (group.includes("대체")) ns = "대체";
+    for (const t of group.match(PART_TOKEN) ?? [])
+      for (const c of childrenOf(ns, t, valid)) keys.add(c);
+  }
   return [...keys];
 }
 

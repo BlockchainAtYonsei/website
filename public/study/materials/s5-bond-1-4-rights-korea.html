@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RWA 스터디 · 토큰화 채권 · 배예림</title>
+<style>
+:root{--bg:#f5f6f7;--paper:#fff;--ink:#202428;--muted:#626970;--line:#d8dde2;--accent:#245f9c;--soft:#eef4fa;--shadow:0 18px 55px rgba(20,28,36,.09);--warn:#fff8e8;--warnline:#e0b354;--good:#eef8f3;--goodline:#4e9b72}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:17px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word}.progress{position:fixed;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--accent) var(--progress,0%),transparent 0);z-index:100;pointer-events:none}.page-shell{width:min(920px,calc(100% - 48px));margin:70px auto 120px}.detail-intro{margin-bottom:60px;padding:44px;background:#111820;color:white}.detail-intro .kicker{display:block;color:#8db5de;font-size:14px;font-weight:750;letter-spacing:.11em}.detail-intro h1{margin:8px 0 12px;font-size:44px;line-height:1.2;letter-spacing:-.045em}.detail-intro p{margin:0;color:#c5cdd5;font-size:19px}.detail-article{padding:60px 72px;background:var(--paper);box-shadow:var(--shadow)}.detail-article h1{margin:2.5em 0 1em;padding-bottom:.4em;border-bottom:3px solid #202428;font-size:38px;line-height:1.3;letter-spacing:-.04em}.detail-article h1:first-child{margin-top:0}.detail-article h2{margin:2.5em 0 1em;padding-left:14px;border-left:4px solid var(--accent);font-size:28px;line-height:1.4}.detail-article h3{margin:2.1em 0 .8em;font-size:23px;line-height:1.45}.detail-article h4{margin:1.9em 0 .7em;color:#254f7d;font-size:19px}.detail-article p{margin:.8em 0}.detail-article blockquote{margin:1.3em 0;padding:15px 20px;border-left:4px solid var(--accent);background:#f3f6f9}.detail-article code{padding:.12em .35em;background:#edf1f4}.detail-article table{display:block;width:100%;margin:1.5em 0;overflow-x:auto;border-collapse:collapse;font-size:14px}.detail-article th,.detail-article td{min-width:140px;padding:10px;border:1px solid var(--line);text-align:left;vertical-align:top}.detail-article th{background:#eef1f3}.detail-article a{color:#1f5d98}.detail-article strong{font-weight:750}.vertical-process{display:flex;flex-direction:column;align-items:stretch;gap:8px;max-width:720px;margin:1.5em 0 2em}.vertical-process>div{padding:16px 20px;border:1px solid var(--line);border-left:4px solid var(--accent);background:#f7faff}.vertical-process>span{align-self:center;color:var(--accent);font-size:22px;font-weight:800;line-height:1}.detail-toc{position:fixed;left:20px;bottom:20px;z-index:40}.detail-toc details{width:310px;max-height:70vh;border:1px solid var(--line);background:white;box-shadow:0 10px 35px rgba(20,28,36,.14)}.detail-toc summary{padding:11px 14px;background:#111820;color:white;cursor:pointer}.detail-toc nav{max-height:calc(70vh - 42px);padding:8px;overflow:auto}.detail-toc a{display:block;padding:7px 9px;color:#59616a;font-size:13px;line-height:1.4;text-decoration:none}.detail-toc a.level-1{color:#1b1f23;font-weight:800}.detail-toc a.level-2{padding-left:18px;font-weight:650}.detail-toc a.level-3{padding-left:30px}.detail-toc a:hover{background:var(--soft);color:var(--accent)}
+.study-note{margin:1.4em 0;padding:18px 20px;border:1px solid var(--line);background:#fbfcfd}.study-note .label{display:block;margin-bottom:5px;color:var(--accent);font-weight:800;font-size:13px;letter-spacing:.05em}.correction{margin:1.4em 0;padding:18px 20px;border-left:4px solid var(--warnline);background:var(--warn)}.insight{margin:1.4em 0;padding:20px 22px;border-left:4px solid var(--goodline);background:var(--good)}.keyline{font-size:20px;font-weight:800;letter-spacing:-.02em}.mini{color:var(--muted);font-size:14px}.source-box{margin-top:3em;padding:20px;border-top:1px solid var(--line);background:#fafbfc;font-size:14px}.source-box ol{padding-left:1.3em}.source-box li{margin:.45em 0}
+@media(max-width:900px){.page-shell{width:100%;margin:0 0 90px}.detail-intro{margin:0 16px 30px;padding:28px}.detail-intro h1{font-size:34px}.detail-article{padding:36px 20px;box-shadow:none}.detail-toc{left:12px;bottom:12px}.detail-toc details{width:min(310px,calc(100vw - 24px))}}
+@media print{.progress,.detail-toc{display:none}.page-shell{width:auto;margin:0}.detail-intro{break-after:page}.detail-article{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<a href="../session.html?s=5" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 5회차 진행안으로</a><main class="page-shell">
+<header class="detail-intro"><span class="kicker">RWA STUDY · TOKENIZED BONDS</span><h1>토큰화 채권</h1><p>1-1 · 1-2 · 4-1 · 4-2 — 원문 요지와 보충 정리</p></header>
+<article class="detail-article" id="detail-article">
+
+<h1 id="1-1">1-1. 채권 시장의 규모: 전통 금융과 온체인</h1>
+<h2>원문 요지</h2>
+<p>채권은 정부와 기업의 핵심 자금조달 수단이며, 국채 금리는 다른 금융자산의 가격을 평가하는 기준점으로 작동한다. 쟁글 리서치가 인용한 데이터에 따르면 2025년 말 글로벌 채권시장은 약 109조 달러 규모이며, 온체인 RWA 시장에서도 정부채권형 자산이 가장 큰 비중을 차지한다.</p>
+<p>온체인에서 국채형 상품이 먼저 성장한 이유는 비교적 명확하다. 단기 국채는 상대적으로 신용위험이 낮고 이자를 발생시키며, 특히 달러 표시 국채는 스테이블코인 유동성과 자연스럽게 연결된다. 따라서 유휴 스테이블코인을 운용하는 현금관리 상품이면서 동시에 기관의 담보자산으로 활용될 수 있다.</p>
+<div class="insight"><span class="label"><strong>핵심 포인트</strong></span><p class="keyline">토큰화 채권의 초기 성장은 채권을 단순히 디지털화했다는 점보다, 이미 온체인에 존재하던 스테이블코인을 활용해 국채 수익에 접근하고, 해당 토큰을 다시 담보 등 온체인 금융에 활용할 수 있게 했다는 점에서 이해하는 편이 쉽다.</p></div>
+
+<h1 id="1-2">1-2. 채권 토큰화의 출발점: 토큰이 나타내는 권리</h1>
+<h2>먼저: 채권은 어떻게 보유하는가?</h2>
+<p>채권 토큰화를 이해하려면 <strong>기초자산이 무엇인지보다 먼저 “내 토큰이 누구에 대한 어떤 권리를 나타내는가”</strong>를 봐야 한다. 같은 국채 기반 토큰이라도 투자자가 국채 자체에 대한 권리를 갖는지, 펀드 지분을 갖는지, 별도 발행자의 노트에 대한 상환청구권을 갖는지에 따라 법적·경제적 구조가 달라진다.</p>
+
+<h3>① 개별 채권 직접 보유</h3>
+<div class="vertical-process"><div>투자자</div><span>↓</span><div>증권사·은행 계좌<br><span class="mini">고객별 채권 보유내역 기록</span></div><span>↓</span><div>예탁·수탁·결제 인프라</div><span>↓</span><div>정부 또는 기업<br><span class="mini">이자·원금 지급 의무</span></div></div>
+<p>국채를 보유하면 경제적 권리의 최종 상대방은 정부이고, 회사채라면 기업이나 금융기관이다. 다만 실제 권리 행사는 증권사·수탁기관·예탁기관·지급대리인 등 여러 중개기관의 장부를 통해 처리되는 경우가 일반적이다.</p>
+
+<h3>② 펀드·노트를 통한 간접 보유</h3>
+<p>투자자가 개별 채권 대신 채권을 담은 펀드나 별도 노트를 보유하는 방식이다. 이때 투자자의 직접적인 권리 상대방은 기초 채권 발행자가 아니라 <strong>펀드 또는 노트 발행자</strong>가 된다.</p>
+<table><thead><tr><th>구조</th><th>투자자가 보유하는 것</th><th>직접적인 권리 상대방</th><th>수익 반영 방식 예시</th></tr></thead><tbody>
+<tr><td>개별 국채</td><td>국채에 대한 권리</td><td>정부</td><td>이자·원금 상환</td></tr>
+<tr><td>채권형 펀드</td><td>펀드 지분</td><td>펀드</td><td>배당·NAV 상승</td></tr>
+<tr><td>토큰화 노트</td><td>채무증권·상환청구권</td><td>노트 발행자/SPV</td><td>기준가격 상승·상환금 지급</td></tr>
+</tbody></table>
+
+<h2>Note가 애초에 뭐야?</h2>
+<div class="study-note"><span class="label">보충 정리</span><p><strong>금융에서 note는 기본적으로 “정해진 조건에 따라 돈을 갚겠다는 약속이 담긴 채무증권”</strong>이다. 채권(bond)과 같은 채무상품 계열이지만, 실무에서는 중단기 채무증권이나 특정 기초자산의 성과에 연동되는 구조화 상품을 note라고 부르는 경우가 많다.</p></div>
+<p>예를 들어 어떤 SPV가 미국 단기국채를 매입해 보관한 뒤 투자자에게 Treasury-linked Note를 발행한다고 하자. 투자자는 미국 국채 자체를 직접 보유하는 것이 아니라 <strong>SPV가 발행한 note를 보유하고, SPV에 상환을 청구하는 구조</strong>가 된다.</p>
+<div class="vertical-process"><div>투자자<br><strong>Note 보유</strong></div><span>↓ 상환청구권</span><div>SPV / Note 발행자</div><span>↓ 기초자산 매입·보유</span><div>국채·현금성 자산</div></div>
+<blockquote><strong>중요:</strong> “기초자산이 국채다”와 “투자자가 국채를 직접 소유한다”는 같은 말이 아니다.</blockquote>
+
+<h2>토큰화 채권을 볼 때 체크할 질문</h2>
+<ol>
+<li>토큰이 개별 채권 자체를 나타내는가?</li>
+<li>예탁·수탁 장부상의 채권 권리를 나타내는가?</li>
+<li>채권을 담은 펀드 지분을 나타내는가?</li>
+<li>제3자 발행자의 노트 또는 상환청구권을 나타내는가?</li>
+</ol>
+<p>이 질문이 직접 발행형, 증권 권리형, 펀드 지분형, 연계 증권형을 구분하는 출발점이다.</p>
+
+<h1 id="4-1">4-1. 한국에서도 시작되는 토큰화 채권 실험</h1>
+<h2 id="kyobo">교보생명 · Ripple</h2>
+<p>교보생명과 Ripple은 한국 국채 거래를 블록체인 기반 인프라에서 처리할 수 있는지를 시험하는 PoC를 추진하고 있다. Ripple의 2026년 4월 발표에 따르면 Ripple Custody를 활용해 토큰화 국채의 이전·결제·관리 구조를 시험하며, 스테이블코인 결제 등 디지털 결제수단과의 결합 가능성도 검토한다.</p>
+
+<h3>“거래 체결”과 “결제”가 왜 다른가?</h3>
+<p>전통 금융에서는 오늘 가격과 수량에 합의해 거래가 체결되더라도, <strong>채권과 현금이 실제로 서로에게 이전되는 결제는 뒤의 별도 과정</strong>으로 처리될 수 있다.</p>
+<div class="vertical-process"><div><strong>T일: 거래 체결</strong><br>가격·수량 확정</div><span>↓</span><div><strong>청산</strong><br>누가 얼마의 현금과 채권을 주고받아야 하는지 계산</div><span>↓</span><div><strong>결제</strong><br>현금 이전 + 국채 계좌대체</div><span>↓</span><div><strong>결제 완료</strong></div></div>
+<p>한국거래소 국채전문유통시장에서는 대금은 한국은행 BOK-Wire를 통해, 국채는 한국예탁결제원의 예탁자 계좌 간 대체를 통해 이동한다. 즉 현금과 증권이 서로 다른 인프라 위에서 움직인다.</p>
+<div class="correction"><strong>정확성 메모</strong><br>Ripple 보도자료와 쟁글 원문은 기존 국채 거래에 “이틀 이상”이 걸린다고 설명하지만, <strong>한국거래소 국채전문유통시장(KRX KTB)의 현행 결제주기는 원칙적으로 T+1</strong>이며 지준일 전일 매매는 T+2다. 따라서 한국 국채 거래 전체를 “보통 T+2 이상”이라고 일반화하기보다는, <strong>“거래 체결과 결제가 분리되어 있으며, 장내 국채시장은 원칙 T+1 결제”</strong>라고 적는 편이 정확하다.</div>
+
+<h3>블록체인에서 무엇을 줄이려는가?</h3>
+<p>토큰화 국채와 온체인 결제수단을 같은 환경에서 연결하면 증권 인도와 대금 지급을 동시에 처리하는 DvP(Delivery versus Payment)를 더 직접적으로 구현할 수 있다.</p>
+<div class="vertical-process"><div>토큰화 국채</div><span>↕ 동시에 교환</span><div>스테이블코인·토큰화 현금</div></div>
+<p>여기서 핵심 장점은 <strong>국가의 신용위험을 줄이는 것</strong>이 아니다. 국채는 원래 발행자 신용위험이 낮고, 장내시장은 CCP·DvP 등 기존 장치로 결제위험도 상당 부분 통제하고 있다. 오히려 토큰화의 포인트는 <strong>거래 이후 결제 인프라와 운영 절차를 압축하고, 24시간 이용 가능한 디지털 자금과 국채를 연결하는 것</strong>에 가깝다.</p>
+
+<h2 id="shinhan">신한투자증권 · Etherfuse</h2>
+<p>신한투자증권은 Etherfuse와 한국 국채를 기초로 한 Stablebond 발행 구조에 협력했다. Etherfuse는 Stablebond를 <strong>규제된 수탁기관이 보유하는 국채 풀의 NAV에 기반해 비례적 경제적 권리를 나타내는 토큰</strong>으로 설명한다. 즉 스테이블코인처럼 항상 1토큰=1법정화폐에 고정되는 상품은 아니며, 기초 국채의 가치와 수익이 토큰 가치에 반영될 수 있다.</p>
+
+<h3>Stablebond를 가장 쉽게 보면</h3>
+<div class="vertical-process"><div>해외 투자자·기관<br>USDC 등 온체인 자금</div><span>↓</span><div>Etherfuse<br><strong>KTB Stablebond 발행·운영</strong></div><span>↕</span><div>신한투자증권 등 전통 금융 인프라<br><strong>실제 한국 국채의 취득·보관 지원</strong></div><span>↓</span><div>한국 국채</div></div>
+<p>따라서 투자자 지갑에 들어오는 것은 한국 정부가 직접 발행한 국채 원장기록 자체라기보다, <strong>전통 금융시장에서 보유된 한국 국채에 대한 온체인 경제적 노출을 제공하는 Stablebond</strong>라고 이해하는 편이 안전하다.</p>
+
+<h3>왜 한국 내에서 판매하지 않는가?</h3>
+<p>이 구조는 기술보다 규제의 영향을 크게 받는다. 증권성이 있는 토큰을 국내 일반 투자자에게 발행·유통하려면 국내 자본시장법·전자증권법 체계에 맞춘 발행·중개·공시·투자자 보호 구조가 필요하다. 한국은 2026년 1월 토큰증권 관련 법 개정을 통과시켰고 관련 제도는 2027년 2월 시행될 예정이다. 따라서 현재 협업은 <strong>국내 리테일 판매보다 해외 온체인 투자자를 한국 국채시장에 연결하는 구조</strong>에 초점이 맞춰져 있다.</p>
+
+<h3>수요자는 누구인가?</h3>
+<table><thead><tr><th>수요자</th><th>왜 필요할 수 있나?</th></tr></thead><tbody>
+<tr><td>크립토 기업·기관 Treasury</td><td>유휴 USDC 등 온체인 자금을 국채 수익형 자산으로 운용</td></tr>
+<tr><td>핀테크·네오뱅크</td><td>자체 서비스 안에 국채 기반 수익상품을 연결</td></tr>
+<tr><td>DeFi·유동성 사업자</td><td>국채형 토큰을 담보·AMM·결제 유동성으로 활용</td></tr>
+<tr><td>글로벌 투자자</td><td>기존 해외 브로커리지 계좌를 거치지 않고 한국 국채 수익과 KRW 노출에 접근</td></tr>
+</tbody></table>
+<p>다만 해외 투자자에게는 한국 정부 신용위험과 별개로 <strong>KRW/USD 환율위험</strong>이 존재할 수 있다.</p>
+
+<h3>신한투자증권은 어떻게 돈을 벌까?</h3>
+<p>공개자료에서 신한투자증권의 역할로 확인되는 것은 실제 한국 국채의 브로커리지와 기초자산 취득·보관 인프라 제공이다. 따라서 직접적으로 예상 가능한 경제적 수익은 <strong>국채 거래 중개 과정의 수수료·스프레드 등 전통 금융 수익</strong>이다. Stablebond 발행잔액이 커질수록 실제로 매입·관리해야 하는 한국 국채 물량도 증가할 수 있다.</p>
+<div class="correction"><strong>공개자료 한계</strong><br>신한투자증권이 정확히 얼마의 브로커리지 수수료나 수탁수수료를 받는지, Etherfuse와 별도의 수익배분 계약이 있는지는 공개자료에서 확인되지 않는다. 따라서 구체적인 fee 구조는 추정으로 단정하면 안 된다.</div>
+<p>전략적으로는 해외 RWA 플랫폼이 한국 금융자산을 토큰화할 때 필요한 <strong>전통 금융시장 진입·취득·수탁 인프라</strong>를 선점하려는 의미도 있다고 볼 수 있다.</p>
+
+<h1 id="4-2">4-2. 앞으로의 관전 포인트: 투자상품에서 담보 인프라로</h1>
+<h2>국채 토큰화의 경쟁축이 바뀌고 있다</h2>
+<p>토큰화 국채는 처음에는 “스테이블코인을 들고 있는 동안 국채 금리를 받을 수 있는 상품”으로 주목받았다. 그러나 BUIDL, USYC, USTB, VBILL 등 다양한 토큰화 국채·머니마켓형 자산이 디파이 담보, 거래소 마진 담보, 스테이블코인 준비자산으로 편입되면서 경쟁축이 달라지고 있다.</p>
+
+<div class="insight"><p class="keyline">따라서 앞으로 토큰화 채권을 평가할 때 핵심 질문은 바뀌어야 한다.</p><p>지금까지 토큰화 국채 상품을 볼 때 흔히 던지던 질문이 <strong>“얼마나 높은 이자를 주는가”, 즉 얼마나 높은 APY인가</strong>였다면, 이제는 <strong>“이 토큰이 어디에서 담보로 인정받는가”</strong>가 더 중요한 기준이 된다.</p><p>어떤 토큰화 채권이 더 많은 디파이 프로토콜과 거래소, 스테이블코인 발행사에서 담보로 받아들여질수록, 그 토큰은 단순한 수익 상품을 넘어 온체인 금융의 기반 자산으로 자리 잡는다. 채권 토큰의 가치를 결정하는 무게중심이 수익률에서 담보로서의 활용성, 즉 <strong>어디에서 인정받는가</strong>로 옮겨 가고 있는 것이다.</p></div>
+
+<h2>왜 “담보로 인정받는 곳”이 중요할까?</h2>
+<table><thead><tr><th>토큰화 채권 A</th><th>토큰화 채권 B</th></tr></thead><tbody>
+<tr><td>APY 4.5%</td><td>APY 4.3%</td></tr>
+<tr><td>보유·환매만 가능</td><td>Aave·Euler 담보 사용 가능</td></tr>
+<tr><td>거래소 마진 담보 불가</td><td>거래소 외부 담보 사용 가능</td></tr>
+<tr><td>스테이블코인 준비자산 미편입</td><td>스테이블코인 준비자산 편입</td></tr>
+</tbody></table>
+<p>수익률만 보면 A가 높더라도, B가 여러 금융활동의 담보로 사용될 수 있다면 <strong>같은 자본으로 수익을 얻으면서 추가적인 유동성·거래 기능까지 확보</strong>할 수 있다. 결국 자산의 네트워크 효과가 붙기 시작한다.</p>
+
+<h2>다만 회사채는 더 어렵다</h2>
+<p>국채는 비교적 표준화되어 있고 신용위험과 가격발견 구조가 명확한 편이지만, 회사채는 발행자별 신용위험·유동성·약정 조건이 다르다. 온체인에서 담보로 활용하려면 <strong>가격 오라클, 신용위험 평가, 디폴트 처리, 청산 절차, 투자자 적격성</strong>을 모두 설계해야 한다. 따라서 회사채 토큰화가 국채 토큰화와 같은 속도로 담보 인프라화되기는 더 어렵다.</p>
+
+<h2>최종 체크리스트</h2>
+<ol>
+<li><strong>권리:</strong> 내가 가진 토큰은 누구에 대한 어떤 청구권인가?</li>
+<li><strong>기초자산:</strong> 실제 어떤 국채·회사채·펀드·예금이 뒤에 있는가?</li>
+<li><strong>수탁:</strong> 실제 기초자산은 누가 보관하고 검증하는가?</li>
+<li><strong>환매:</strong> 언제, 어떤 자산으로, 어떤 조건에서 현금화할 수 있는가?</li>
+<li><strong>규제:</strong> 누가 살 수 있고 어느 국가에서 제공되는가?</li>
+<li><strong>활용성:</strong> 어떤 DeFi·거래소·스테이블코인 시스템에서 담보나 준비자산으로 인정되는가?</li>
+</ol>
+<blockquote><strong>한 문장 결론:</strong> 토큰화 채권의 다음 경쟁은 “몇 %를 주는가”뿐 아니라, <strong>그 토큰이 온체인 금융 시스템 안에서 얼마나 넓게 신뢰받고 재사용될 수 있는가</strong>에 달려 있다.</blockquote>
+
+<div class="source-box"><strong>주요 출처 및 검증 메모</strong><ol>
+<li><a href="https://xangle.io/research/detail/2508">Xangle — [Xangle RWA Series] 토큰화 채권</a> (2026-07-08)</li>
+<li><a href="https://regulation.krx.co.kr/contents/RGL/03/03040300/RGL03040300T3.jsp">한국거래소 — 국채전문유통시장 매매체결 및 결제</a> (T+1, 지준일 전일 T+2 / BOK-Wire·KSD 계좌대체)</li>
+<li><a href="https://ripple.com/ripple-press/ripple-and-kyobo-life-insurance-partner-to-pioneer-korea-s-first-tokenised-government-bond-settlement-on-blockchain-kr/">Ripple — 교보생명과 토큰화 국채 거래 구조 검증</a> (2026-04-15)</li>
+<li><a href="https://etherfuse.com/products/stablebonds">Etherfuse — Stablebonds</a></li>
+<li><a href="https://etherfuse.com/articles/buidl-for-the-rest-of-the-world">Etherfuse — 한국 시장 및 KTB Stablebond 관련 업데이트</a></li>
+</ol><p class="mini">이 문서는 쟁글 원문 전체를 재수록하지 않고, 담당 파트의 핵심 구조를 요약·재구성하고 별도 학습 내용을 보충한 스터디 노트다.</p></div>
+
+</article>
+</main>
+<aside class="detail-toc" aria-label="상세 목차"><details><summary>상세 목차</summary><nav id="detail-nav"></nav></details></aside>
+<script>
+const article=document.getElementById('detail-article');const nav=document.getElementById('detail-nav');[...article.querySelectorAll('h1,h2,h3')].forEach((h,i)=>{if(!h.id)h.id='detail-heading-'+i;const a=document.createElement('a');a.href='#'+h.id;a.textContent=h.textContent;a.className='level-'+h.tagName.slice(1);nav.appendChild(a)});const updateProgress=()=>{const max=document.documentElement.scrollHeight-innerHeight;const p=max>0?scrollY/max*100:0;document.documentElement.style.setProperty('--progress',p+'%')};addEventListener('scroll',updateProgress,{passive:true});updateProgress();
+</script>
+</body></html>

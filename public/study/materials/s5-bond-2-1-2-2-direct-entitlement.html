@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>토큰화 채권 — 직접발행형 · 증권권리형</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: #f5f6f8;
+    color: #1c1f26;
+    line-height: 1.7;
+  }
+  .page { max-width: 900px; margin: 0 auto; padding: 40px 24px 100px; }
+  .hero {
+    background: linear-gradient(135deg, #1a2b4c, #2d4a7a);
+    color: #fff;
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin-bottom: 32px;
+  }
+  .hero .tag { font-size: 13px; opacity: 0.75; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+  .hero p { font-size: 15px; opacity: 0.9; }
+  section { margin-bottom: 36px; }
+  .sec-num {
+    display: inline-block;
+    background: #1a2b4c;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  h2 { font-size: 21px; font-weight: 800; margin-bottom: 14px; color: #1a2b4c; }
+  h3 { font-size: 16px; font-weight: 700; margin: 18px 0 8px; color: #1a2b4c; }
+  p.lead { font-size: 15px; color: #333; margin-bottom: 10px; }
+  .card {
+    background: #fff;
+    border: 1px solid #e3e6ec;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .box {
+    background: #fff;
+    border-left: 4px solid #2d4a7a;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .box.term { border-left-color: #b98900; background: #fffaf0; }
+  .box.example { border-left-color: #0a7d4f; background: #f2faf6; }
+  .box.compare { border-left-color: #7a2d8c; background: #faf2fc; }
+  .box.warn { border-left-color: #b3261e; background: #fdf3f2; }
+  .box h4 { font-size: 14.5px; font-weight: 700; margin-bottom: 8px; color: #1a2b4c; }
+  .box p, .box li { font-size: 14.5px; color: #333; }
+  .box ul, ol.steps { margin-left: 18px; margin-top: 6px; }
+  .box li { margin-bottom: 5px; }
+  .term-def {
+    display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start;
+  }
+  .term-def .t {
+    flex: 0 0 110px; font-weight: 700; font-size: 14px; color: #7a5a00;
+    background: #fff2d1; padding: 3px 8px; border-radius: 6px; text-align: center; height: fit-content;
+  }
+  .term-def .d { font-size: 14px; color: #333; }
+  .flow {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0;
+  }
+  .flow .step {
+    background: #eef1f7; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 600;
+    color: #1a2b4c; flex: 1 1 140px; text-align: center;
+  }
+  .flow .arrow { color: #9aa3b5; font-size: 16px; }
+  .compare-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0;
+  }
+  .compare-grid .col {
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .compare-grid .before { background: #fdf3f2; border: 1px solid #f0d5d2; }
+  .compare-grid .after { background: #f2faf6; border: 1px solid #cdeadb; }
+  .compare-grid h4 { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+  .compare-grid .before h4 { color: #b3261e; }
+  .compare-grid .after h4 { color: #0a7d4f; }
+  .compare-grid ol { margin-left: 16px; font-size: 13.5px; }
+  .compare-grid li { margin-bottom: 6px; }
+  .big-num { font-size: 26px; font-weight: 800; color: #1a2b4c; }
+  .result-banner {
+    background: #1a2b4c; color: #fff; border-radius: 10px; padding: 16px 20px; margin-top: 10px;
+    font-size: 14.5px; text-align: center;
+  }
+  .result-banner b { font-size: 17px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+  th, td { border: 1px solid #e3e6ec; padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: #eef1f7; color: #1a2b4c; font-weight: 700; }
+  .case-card {
+    background: #fff; border: 1px solid #e3e6ec; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px;
+  }
+  .case-card .name { font-size: 15.5px; font-weight: 800; color: #1a2b4c; margin-bottom: 4px; }
+  .case-card .meta { font-size: 12.5px; color: #7a8296; margin-bottom: 8px; }
+  .case-card p { font-size: 14px; color: #333; }
+  .footnote { font-size: 12px; color: #8b93a3; margin-top: 4px; }
+  .divider { height: 1px; background: #e3e6ec; margin: 30px 0; }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge { background: #eef1f7; color: #1a2b4c; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+  .summary-table td:first-child { font-weight: 700; color: #1a2b4c; white-space: nowrap; }
+  .sources { font-size: 12.5px; color: #7a8296; }
+  .sources li { margin-bottom: 4px; list-style: none; }
+  ol.plain-list { margin-left: 0; list-style: none; counter-reset: item; }
+  ol.plain-list li { counter-increment: item; margin-bottom: 10px; padding-left: 28px; position: relative; font-size: 14.5px; }
+  ol.plain-list li::before { content: counter(item) "."; position: absolute; left: 0; font-weight: 800; color: #2d4a7a; }
+
+  .tree { background: #fff; border: 1px solid #e3e6ec; border-radius: 14px; padding: 26px 20px; }
+  .tree .root {
+    background: #1a2b4c; color: #fff; font-weight: 800; font-size: 15px;
+    text-align: center; padding: 10px; border-radius: 8px; max-width: 220px; margin: 0 auto 18px;
+  }
+  .tree .branches { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .tree .branch {
+    flex: 1 1 200px; background: #f5f6f8; border-radius: 10px; padding: 12px; min-width: 200px;
+  }
+  .tree .node.l1 {
+    background: #2d4a7a; color: #fff; font-weight: 700; font-size: 13.5px;
+    text-align: center; padding: 8px; border-radius: 6px; margin-bottom: 8px;
+  }
+  .tree .node.l2 {
+    background: #eef1f7; color: #1a2b4c; font-weight: 600; font-size: 12.5px;
+    padding: 6px 8px; border-radius: 6px; margin-bottom: 6px;
+  }
+  .tree .leafs { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .tree .leaf {
+    background: #fff; border: 1px solid #dbe0ea; color: #4a5470; font-size: 11.5px;
+    padding: 5px 8px; border-radius: 5px; margin-left: 10px;
+  }
+  .tree .leaf.highlight {
+    background: #fff2d1; border: 1px solid #e0b64a; color: #7a5a00; font-weight: 700;
+  }
+  .legend { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 12.5px; color: #7a8296; }
+  .legend .dot { width: 12px; height: 12px; border-radius: 3px; background: #fff2d1; border: 1px solid #e0b64a; }
+</style>
+</head>
+<body>
+<a href="../session.html?s=5" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 5회차 진행안으로</a><div class="page">
+
+  <div class="hero">
+    <div class="tag">블록체인 스터디 · RWA 토큰화 채권</div>
+    <h1>토큰화 채권 — 직접 발행형 · 증권 권리형</h1>
+    <p>발표자: 장윤선</p>
+  </div>
+
+  <section>
+    <div class="sec-num">01</div>
+    <h2>먼저, 유가증권이 뭔지부터</h2>
+    <div class="box term">
+      <h4>유가증권(有價證券)이란?</h4>
+      <p style="color:#8b8060;font-size:12.5px;margin-bottom:8px">有(있을 유) · 價(값 가) · 證券(증서 증 + 문서 권) — 풀어보면 "값어치가 있다는 것을 증명하는 문서"라는 뜻임</p>
+      <p>회사나 정부가 돈이 필요할 때 "나중에 갚겠다" 또는 "이 회사 지분을 나눠주겠다"고 약속하며 발행하는 증서임. 주식, 채권이 대표적인 유가증권임. 채권은 그중에서도 "정해진 기간 후 원금 + 이자를 갚겠다"는 차용증 같은 것임.</p>
+      <p style="margin-top:8px">원래는 종이 증서 형태였으나, 지금은 대부분 전자 형태(전자증권)로 관리됨. 이번에 다룰 "토큰화 채권"은 이 전자 기록을 블록체인 위에 올리는 방식임.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">02</div>
+    <h2>RWA 토큰화 자산 전체 지도</h2>
+    <p class="lead">지난번에 봤던 RWA 토큰화 전체 구조임. 오늘 볼 내용은 이 중 채권 안에 있는 두 갈래임.</p>
+    <div class="tree">
+      <div class="root">RWA 토큰화 자산</div>
+      <div class="branches">
+        <div class="branch">
+          <div class="node l1">스테이블코인</div>
+          <div class="leafs">
+            <div class="leaf">법정화폐 담보형 (USDT, USDC)</div>
+            <div class="leaf">가상자산 담보형 (DAI, GHO)</div>
+            <div class="leaf">커머디티 담보형</div>
+            <div class="leaf">알고리즘형</div>
+          </div>
+        </div>
+        <div class="branch">
+          <div class="node l1">전통자산</div>
+          <div class="node l2">주식</div>
+          <div class="leafs">
+            <div class="leaf">직접 발행형</div>
+            <div class="leaf">증권 권리형</div>
+            <div class="leaf">연계 증권형</div>
+            <div class="leaf">파생 계약형</div>
+            <div class="leaf">무기한 선물형</div>
+          </div>
+          <div class="node l2" style="margin-top:8px">채권</div>
+          <div class="leafs">
+            <div class="leaf highlight">직접 발행형</div>
+            <div class="leaf highlight">증권 권리형</div>
+            <div class="leaf">펀드 지분형</div>
+            <div class="leaf">연계 증권형</div>
+          </div>
+          <div class="node l2" style="margin-top:8px">펀드 지분</div>
+        </div>
+        <div class="branch">
+          <div class="node l1">대체자산</div>
+          <div class="node l2">부동산 (2종)</div>
+          <div class="node l2">원자재</div>
+          <div class="node l2">사모신용</div>
+          <div class="node l2">수집품</div>
+        </div>
+      </div>
+      <div class="legend"><div class="dot"></div>오늘 살펴볼 부분</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="sec-num">03</div>
+    <h2>2-1. 직접 발행형이 뭔지 이해하기 전에 — 원래 채권은 어떻게 발행·거래됐나</h2>
+    <p class="lead">토큰화가 뭘 줄여줬는지 알려면, 먼저 원래 절차에 어떤 단계들이 있었는지, 그 단계마다 나오는 어려운 용어가 뭔지부터 풀어야 함.</p>
+
+    <div class="flow">
+      <div class="step">① 실사·서류작업</div><div class="arrow">→</div>
+      <div class="step">② 매매 체결</div><div class="arrow">→</div>
+      <div class="step">③ 상계(넷팅)</div><div class="arrow">→</div>
+      <div class="step">④ 예탁·계좌 갱신</div><div class="arrow">→</div>
+      <div class="step">⑤ 명의개서(명부 갱신)</div>
+    </div>
+
+    <div class="term-def"><div class="t">① 실사</div><div class="d">채권을 발행하기 전에, "이 회사가 정말 돈을 갚을 능력이 있는지" 재무상태를 꼼꼼히 조사하는 절차임. 은행이 대출해줄 때 소득이랑 재산을 확인하는 것과 같음. 이 단계를 도와주는 증권사를 "주관사"라고 부름 — 부동산 거래의 중개사와 비슷한 역할임.</div></div>
+
+    <div class="term-def"><div class="t">② 매매 체결</div><div class="d">투자자가 "이 채권 살게요"라고 주문을 넣으면, 브로커(증권사)가 그 주문을 거래소로 보내서 실제 거래가 성사되는 단계임.</div></div>
+
+    <div class="term-def"><div class="t">③ 상계(넷팅)</div><div class="d">하루 동안 수천 명이 서로 사고팔면, 그걸 한 건 한 건 다 따로 주고받기엔 너무 복잡함. 그래서 "결국 누가 누구한테 얼마를 최종적으로 줘야 하는지"만 계산해서, 딱 그 차액만 주고받음. 여러 명이서 밥을 나눠 먹고 각자 계산하는 대신, 마지막에 "누가 누구한테 얼마만 보내면 끝"이라고 한 번에 정리하는 것과 같음. 이 계산을 해주는 곳이 "청산기관"임.</div></div>
+
+    <div class="term-def"><div class="t">④ 예탁</div><div class="d">실제 채권(증서/전자기록)을 안전하게 보관하고, "지금 누가 몇 개를 갖고 있는지" 계좌 형태로 관리해주는 기관임. 은행이 우리 돈을 보관하고 잔액을 관리해주는 것처럼, 예탁기관은 증권을 보관하고 잔액(보유수량)을 관리함.</div></div>
+
+    <div class="term-def"><div class="t">⑤ 명의개서</div><div class="d">"지금 이 채권의 진짜 주인이 누구인지" 공식 명부를 최종적으로 갱신하는 절차임. 아파트를 사고팔면 등기부에 새 주인 이름을 올리는 것과 같은 개념임. 이 일을 대신해주는 회사가 "명의개서대리인"임.</div></div>
+
+    <div class="box warn">
+      <h4>왜 이렇게 단계가 많고 오래 걸릴까?</h4>
+      <p>주관사, 거래소, 청산기관, 예탁기관, 명의개서대리인 — 이 모든 곳이 각자 자기만의 장부를 따로 갖고 있음. 그래서 한 건의 거래가 끝나려면 이 장부들이 서로 "우리 기록이 맞다"고 확인하고 맞춰보는 과정이 필요함. 이 확인 과정 때문에 미국 주식시장 기준으로 거래가 체결된 뒤 최종 결제까지 최소 T+1(1영업일)이 걸림.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">04</div>
+    <h2>토큰화하면 이 절차가 어떻게 바뀌나</h2>
+    <p class="lead">토큰화된 채권은 "하나의 공용 장부(블록체인)"를 여러 기관이 같이 보는 구조임. 그래서 서로 다른 장부를 맞춰보는 과정 자체가 필요 없어짐.</p>
+
+    <div class="compare-grid">
+      <div class="col before">
+        <h4>기존 방식 (5단계)</h4>
+        <ol>
+          <li>실사·서류작업</li>
+          <li>매매 체결</li>
+          <li>상계(넷팅) 계산</li>
+          <li>예탁기관 계좌 갱신</li>
+          <li>명의개서대리인 명부 갱신</li>
+        </ol>
+        <p style="margin-top:10px;font-size:13px;color:#b3261e">각 기관이 따로 확인·대사 → 최소 T+1(1영업일↑) 소요</p>
+      </div>
+      <div class="col after">
+        <h4>토큰화(직접발행형) 방식</h4>
+        <ol>
+          <li>발행사가 스마트컨트랙트로 채권 발행</li>
+          <li>승인된(화이트리스트) 투자자 지갑으로 토큰 즉시 전송</li>
+          <li>대금 지급도 같은 원장 위에서 동시에 처리 (동시결제)</li>
+        </ol>
+        <p style="margin-top:10px;font-size:13px;color:#0a7d4f">별도 대사 절차 없이 원장 자체가 곧 최종 기록</p>
+      </div>
+    </div>
+
+    <div class="box example">
+      <h4>실제로 얼마나 줄었나 — EIB 사례</h4>
+      <p>2021년 유럽투자은행(EIB)이 이더리움 위에서 1억유로(약 1,440억원) 규모, 2년 만기 채권을 발행함. 결제는 프랑스 중앙은행이 실험 중이던 디지털화폐(CBDC)로 처리했는데, 그 결과 원래 여러 날 걸리던 결제가 하루로 줄어듦.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="sec-num">05</div>
+    <h2>직접 발행형 안에서도 두 가지 방식이 있음</h2>
+
+    <div class="box">
+      <h4>네이티브 디지털본드</h4>
+      <p>채권이 태어날 때부터 온라인(블록체인) 위에만 존재함. 종이 증서나 기존 전자증권 단계를 아예 거치지 않고, 처음부터 "블록체인 기록 = 공식 채권"인 것임. 태어날 때부터 디지털인 셈임. (EIB, 홍콩정부 채권이 이 방식)</p>
+    </div>
+    <div class="box">
+      <h4>토큰화 전통채권</h4>
+      <p>원래 있던(또는 같이 발행되는) 전통 방식 채권을 예탁기관 계좌에 "묶어서" 다시 유통 못 하게 잠가둠. 그리고 그 잠긴 채권 1개당 토큰 1개를 새로 만들어서 그 토큰만 시중에서 거래되게 함. 나중에 상환할 땐 토큰을 없애고(소각) 잠금을 풀어서 정산함. 원래 채권은 그대로 두고 그 위에 "거래 가능한 디지털 껍데기"를 하나 씌우는 방식임.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">06</div>
+    <h2>직접 발행형, 실제로 누가 어떻게 했나</h2>
+
+    <div class="case-card">
+      <div class="name">EIB Digital Bond</div>
+      <div class="meta">2021 · 이더리움 · 1억유로(약 1,440억원) · 2년물</div>
+      <p>유럽투자은행(EIB)이 세계 최초 수준의 공공기관 디지털 채권을 발행. 프랑스 중앙은행이 시험 중이던 CBDC(중앙은행 디지털화폐)로 결제를 처리해서, 결제 기간을 여러 날에서 하루로 단축시킴. 이후 2022년엔 유로화, 2023년엔 영국 파운드화 채권도 추가로 발행하며 실험을 이어감.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">홍콩정부 디지털 그린본드</div>
+      <div class="meta">2023~2025 · 그린본드 · 홍콩 통화당국(HKMA) 청산</div>
+      <p>그린본드란 친환경 사업(재생에너지, 대중교통 등)에 쓸 자금을 모으려고 발행하는 채권임. 2023년엔 골드만삭스가 만든 블록체인 플랫폼(GS DAP)으로 발행했고, 2024~2025년엔 HSBC가 만든 플랫폼(Orion)으로 발행함. 실제 결제·청산은 홍콩 통화당국 산하 청산소(CMU)가 처리하고, HSBC가 "누가 채권 주인인지" 관리하는 등록기관 역할을 함.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">지멘스(Siemens) Digital Bond</div>
+      <div class="meta">2023.2 6천만유로(약 864억원) · 2024.9 3억유로(약 4,320억원)</div>
+      <p>독일 대표 전자·산업기업. 2023년 2월, 새로 생긴 독일 전자증권법(eWpG)을 활용해 6천만유로(1년물) 규모 채권을 누구나 접근 가능한 퍼블릭 블록체인에 직접 발행함. 2024년 9월엔 규모를 3억유로로 키워서, 이번엔 여러 은행이 함께 운영하는 프라이빗 블록체인(SWIAT)에 발행함. "같은 회사가 공개형·비공개형 블록체인을 둘 다 실험해본 사례"라는 점이 특징.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">소시에테제네랄(SG) US Digital Bond</div>
+      <div class="meta">2025.11 · SOFR 연동 변동금리 · Canton Network</div>
+      <p>프랑스 대형 은행 SG가 미국 시장을 겨냥해 발행. 금리가 미국 기준금리 지표(SOFR)에 따라 움직이는 변동금리 채권이고, 미국의 트레이딩회사 DRW가 매입함. Canton Network라는 블록체인 위에서 Broadridge라는 회사의 토큰화 인프라를 이용해 발행하고, 은행 BNY가 이자·원금 지급을 대행함.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">World Bank bond-i</div>
+      <div class="meta">2018 · 최초 사례</div>
+      <p>세계은행이 발행한 최초의 블록체인 채권으로 꼽힘. 다만 기관투자자만 살 수 있었고, 발행 이후 활발하게 사고파는 유통시장은 만들어지지 않음 — "가능성은 보여줬지만 아직 실용 단계는 아니었던" 초기 실험으로 평가됨.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">07</div>
+    <h2>세계 각국의 법 제도 변화</h2>
+    <p class="lead">원래 대부분 나라 법에는 "유가증권이 성립하려면 종이 증서나 중앙기관 장부가 있어야 한다"는 전제가 깔려 있었음. 이 전제를 각국이 다르게 풀어서 블록체인 발행 자체를 합법으로 만듦.</p>
+
+    <div class="box">
+      <h4>독일 — 전자증권법(eWpG), 2021년 6월 시행</h4>
+      <p>원래는 증권이 성립하려면 반드시 종이 증서가 있어야 한다는 요건이 있었음. eWpG가 이 요건을 없애서, 발행사가 종이 증서형 또는 전자증권형 중 골라서 발행할 수 있게 됨. 전자증권은 다시 "중앙등록부 전자증권"과 "크립토증권(블록체인 기반)"으로 나뉘는데, 이 크립토증권 조항 덕분에 지멘스 같은 회사가 블록체인에 채권을 직접 발행할 수 있게 됨.</p>
+    </div>
+    <div class="box">
+      <h4>스위스 — DLT법, 2021년 2월 시행</h4>
+      <p>스위스 채무법에 "원장기반증권"이라는 새 권리 개념을 추가함. 핵심은 "안전하게 관리되는 디지털 등록부에만 기록돼 있어도, 법적으로 완전한 소유권 이전으로 인정한다"는 걸 법으로 못 박은 것임. 원래는 소유권이 인정되려면 종이 증서나 중앙 중개기관의 장부가 필요했으나, 이제 블록체인 등록부 자체가 그 역할을 대신할 수 있게 됨.</p>
+    </div>
+    <div class="box">
+      <h4>룩셈부르크 — 블록체인법 1·2·3차 (2019 / 2021 / 2023)</h4>
+      <p>3단계로 나눠서 점점 범위를 넓힘. 1차법(2019)은 "예탁기관이 블록체인으로 증권계좌를 관리해도 법적으로 유효하다"고 인정. 2차법(2021)은 한 걸음 더 나가서 "아예 처음부터 블록체인에 증권을 직접 발행"하는 것과, 블록체인 증권을 담보로 잡는 것까지 허용. 3차법(2023)은 발행을 검증하는 기관의 자격 범위를 넓혀서 더 많은 기관이 참여할 수 있게 함.</p>
+    </div>
+    <p class="footnote">공통점: "증권 = 종이 증서 또는 중앙기관 장부"라는 기존 전제를, 세 나라가 각자 방식으로 "블록체인 원장도 법적으로 유효한 증권 기록"이라고 인정해주는 방향으로 풀었음.</p>
+  </section>
+
+  <section>
+    <div class="sec-num">08</div>
+    <h2>적격투자자란?</h2>
+    <p class="lead">직접 발행형 채권은 대부분 적격투자자, 승인된(화이트리스트) 지갑, 특정 국가 투자자로만 참여가 제한됨.</p>
+
+    <div class="box">
+      <h4>기준은 나라마다 다름</h4>
+      <div class="term-def"><div class="t">EU/독일</div><div class="d">은행·증권사·보험사·연기금 같은 금융기관, 정부·중앙은행, 또는 일정 규모 이상 기업(자산 2천만유로↑·매출 4천만유로↑·자기자본 2백만유로↑ 중 2개 이상 충족)이 해당됨. 개인도 일정 자산(약 50만유로 이상 투자 포트폴리오)과 관련 경력이 있으면 신청 가능함.</div></div>
+      <div class="term-def"><div class="t">미국</div><div class="d">순자산 100만달러(약 14억4천만원) 이상(사는 집 제외) 또는 최근 2년간 소득 20만달러(약 2억8,800만원, 부부합산 30만달러) 이상이면 "적격투자자"임. 기관 규모가 더 크면 더 엄격한 "적격매수자" 기준이 적용됨.</div></div>
+    </div>
+
+    <div class="box example">
+      <h4>실제로 어떻게 걸러내나</h4>
+      <p>발행사나 대행기관(Securitize, SG-FORGE 같은 곳)이 투자자한테 소득·자산 증빙서류나 기관 등록증을 받아서 이 기준을 충족하는지 KYC(본인·자격 확인) 절차로 확인함. 통과한 투자자의 지갑 주소만 화이트리스트(허용 명단)에 올려두고, 토큰을 전송하거나 거래할 때마다 "이 지갑이 명단에 있나"를 스마트컨트랙트(훅)가 자동으로 검사함. DEX 파트에서 다뤘던 "훅" 구조가 여기서도 똑같이 쓰이는 것임.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">09</div>
+    <h2>한국은 지금 어떻게 움직이고 있나</h2>
+
+    <div class="box">
+      <h4>법 제도 — 2027년 2월 4일부터 시행</h4>
+      <p>2026년 2월, 전자증권법·자본시장법 개정안이 공포됨. "분산원장등록주식등"이라는 새로운 법적 범주를 만들었고, 시행일은 2027년 2월 4일임. 일정 자기자본·인력·이해상충방지체계를 갖춘 발행사는 "발행인계좌관리기관"으로 등록해서 직접 블록체인 기반 등록 업무를 할 수 있게 됨.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">교보생명 × 리플(Ripple)</div>
+      <div class="meta">2025.9 협업 개시 → 2026.4 테스트넷 검증 시작</div>
+      <p>교보생명이 리플의 기관용 블록체인 인프라(XRPL)를 활용해 "토큰화 국채" 실시간 거래·결제 기술을 검증하는 프로젝트임. 원래 국채 거래는 대금 지급과 채권 인도가 따로 처리돼서 최소 T+2(2영업일)가 걸리는데, 이 프로젝트는 그 결제를 실시간(온체인 동시결제)으로 단축하는 게 목표임. 2025년 9월 파트너십을 맺은 뒤, 규제 환경 분석·스테이블코인 결제·토큰화 채권 등 여러 기술 모델을 검토했고, 2026년 4월부터는 실제 테스트넷 환경에서 국채 거래 구조의 기술적 타당성을 검증하는 단계임.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">신한투자증권 × Etherfuse</div>
+      <div class="meta">2026.1 MOU</div>
+      <p>한국 국채를 기초자산 삼아 "스테이블본드"를 만들어서 Solana·Stellar·Canton·Monad 등 여러 블록체인에 발행하는 프로젝트임. 국내가 아닌 해외투자자를 대상으로 하고, 신한투자증권은 중개·보관 업무만 담당함.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">신한투자증권 × KIP (Yield5)</div>
+      <div class="meta">2026.7 공개 목표</div>
+      <p>Kaia Investment Partners와 함께 약 5% 목표수익률을 내세운 토큰화 채권 상품을 준비 중임. 이전에 나온 "Yield8" 상품의 후속작임.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="sec-num">10</div>
+    <h2>2-2. 증권 권리형 — 새로 발행하지 않고 "권리"만 옮기는 방식</h2>
+
+    <div class="box term">
+      <h4>먼저, 청구권이 뭔지부터</h4>
+      <p>청구권 = "이거 나한테 줘"라고 요구할 수 있는 권리임. 채권을 갖고 있으면 "만기가 되면 발행사한테 원금과 이자를 달라"고 요구할 수 있는데, 이 요구할 수 있는 자격 자체가 청구권임. 채권을 실제로 손에 들고 있냐 아니냐보다, "내가 이걸 받을 자격이 있다"는 기록이 핵심임.</p>
+    </div>
+
+    <div class="box compare">
+      <h4>핵심 정의 — 예를 들어 설명하면</h4>
+      <p>미국 국채는 원래부터 DTC(미국 예탁기관)라는 곳의 전산 장부에 "A가 국채 100개에 대한 청구권을 갖고 있다"고 기록돼 있음. 종이 증서가 아니라 이미 예전부터 전자 장부였음.</p>
+      <p style="margin-top:8px">DTCC가 하는 일은, 이 기록을 새로 만드는 게 아니라 블록체인 위에도 "A가 국채 100개에 대한 청구권을 갖고 있다"는 같은 내용을 한 번 더 기록해두는 것임. 이게 "권리만 별도로 표시한다"는 말의 뜻임 — 채권 자체를 다시 찍어내는 게 아니라, "누가 무슨 권리를 갖고 있는지"라는 정보만 블록체인에도 옮겨 적어두는 것임.</p>
+    </div>
+
+    <div class="box example">
+      <h4>그래서 뭐가 편해지나</h4>
+      <p>은행 앱을 생각하면 이해하기 쉬움. 앱에서 이체 버튼을 누르면 화면에만 표시되는 게 아니라 실제로 은행 서버의 잔액도 바뀜. 마찬가지로, A가 블록체인 위에서 "이 청구권을 B한테 넘긴다"고 실행하면, 그 결과가 DTC의 공식 기록에도 그대로 반영됨.</p>
+      <p style="margin-top:8px">원래는 A→B로 국채를 넘기려면 예탁기관·청산기관 등 여러 곳을 거쳐 확인받아야 했는데, 블록체인이라는 하나의 공용 장부를 여러 기관이 같이 보고 있으면 이 확인 과정이 훨씬 빨라짐. 즉 "원본 기록이 어디 있느냐"는 그대로 DTC에 두면서, "권리를 옮기고 확인하는 작업 속도"만 블록체인으로 훨씬 빠르게 만드는 방식임.</p>
+    </div>
+
+    <div class="case-card">
+      <div class="name">DTCC</div>
+      <div class="meta">2025.12 SEC 무조치서한 이후 · Digital Asset · Stellar Development Foundation</div>
+      <p>미국 예탁기관 DTC가 보관 중인 미국 국채를 Canton Network 위에서 토큰화하는 사업임. 2025년 12월 SEC(미국 증권거래위원회)의 무조치서한(제재하지 않겠다는 확인) 이후 Digital Asset과 파트너십을 발표했고, 이후 여러 블록체인으로 확장하기 위해 Stellar Development Foundation과도 손잡음. 2026년 7월 제한적 실거래, 10월 전면 서비스 출시를 목표로 함.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-num">11</div>
+    <h2>직접발행형과 비교하면 — 뭐가 이해가 안 됐는지 다시 짚어보면</h2>
+
+    <div class="box term">
+      <h4>비유로 이해하기 — 부동산 등기</h4>
+      <p><b>직접발행형</b> = 애초에 등기부 자체를 전자문서로 새로 만들어서, 그 전자문서가 곧 공식 등기가 되는 것. 어딘가에 "진짜 원본"이 따로 없음, 블록체인 기록 자체가 원본임.</p>
+      <p style="margin-top:8px"><b>증권권리형</b> = 등기부는 원래대로 구청(=예탁기관)에 그대로 두되, 구청 시스템과 실시간으로 연결된 온라인 창구(블록체인)를 하나 더 만들어서 "이 집은 지금 A씨 소유"라는 걸 거기서도 확인하고 이전할 수 있게 하는 것. 진짜 법적 원본은 여전히 구청 등기부에 있지만, 온라인 창구에서 이전 처리를 하면 그 결과가 구청 기록에도 그대로 반영됨. 그래서 단순히 "보여주기만 하는 창문"이 아니라 "실제 거래를 더 빠르게 처리하는 통로"라고 이해하면 됨.</p>
+    </div>
+
+    <div class="box example">
+      <h4>그래서 증권권리형이 실제로 뭐가 편해지나</h4>
+      <p>증권권리형은 채권을 새로 발행하지 않고 기존 예탁·청산 인프라(DTC 등)를 그대로 두기 때문에, <b>새로운 법을 따로 만들지 않아도 기존 법 체계 안에서 빠르게 도입</b> 가능함. 반면 직접발행형은 아예 발행 자체를 블록체인으로 대체하는 방식이라, 앞서 본 독일 eWpG·스위스 DLT법 같은 새 법이 있어야만 가능했음.</p>
+      <p style="margin-top:8px">즉, <b>직접발행형 = 처음부터 다시 만들어야 해서 시간이 걸리지만 근본적으로 절차가 짧아짐</b> / <b>증권권리형 = 기존 시스템은 안 건드리고 그 위에 "빠르게 거래할 수 있는 층"만 얹어서 도입 속도가 빠름</b>이라는 차이임.</p>
+    </div>
+
+    <table>
+      <tr><th></th><th>직접발행형</th><th>증권권리형</th></tr>
+      <tr><td>법적 원본</td><td>블록체인 기록 자체가 원본</td><td>기존 예탁기관 장부가 원본, 블록체인은 미러</td></tr>
+      <tr><td>기존 인프라</td><td>대체함</td><td>그대로 유지</td></tr>
+      <tr><td>필요한 법</td><td>새 법 필요 (eWpG 등)</td><td>기존 법 틀 안에서 가능</td></tr>
+      <tr><td>도입 속도</td><td>느림 (제도 정비 필요)</td><td>빠름 (기존 인프라 활용)</td></tr>
+      <tr><td>대표 사례</td><td>EIB, 홍콩정부, 지멘스</td><td>DTCC</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="sec-num">12</div>
+    <h2>한국의 증권권리형 — KSD 동향</h2>
+    <div class="box">
+      <h4>한국예탁결제원(KSD) — 한국판 DTCC</h4>
+      <p>2026년 9월 4일, KSD가 '토큰증권 분산원장 표준 가이드라인'을 발표함. 내용은 두 가지임: ① 블록체인 운영에 최소 3개 이상의 서로 다른 기관이 같이 참여해야 함, ② 한 기관 혼자서 그 블록체인의 절반(50%) 이상을 좌지우지하지 못하게 막음. 한 곳이 마음대로 기록을 바꾸지 못하게 하려는 안전장치임.</p>
+      <p style="margin-top:8px">한국은 미국(DTCC)이랑 방식이 좀 다름. 미국은 "진짜 원본 기록은 기존 예탁기관에 그대로 두고, 블록체인은 그걸 빠르게 옮기는 통로로만 쓰는" 방식임. 반면 한국은 <b>블록체인 장부 자체를 법적으로 인정된 공식 계좌부로 만들어버림</b>. 쉽게 말해, 한국에서는 블록체인 기록 자체가 곧 법적 원본이 될 수 있다는 뜻임. 그래서 한국 제도에서는 "이게 직접발행형이냐 증권권리형이냐"의 구분이 미국만큼 뚜렷하지 않음.</p>
+      <p style="margin-top:8px">2027년 2월 시행에 맞춰 국채부터 시작해서 단계적으로 다른 증권으로 넓혀갈 계획임.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <div class="sec-num">13</div>
+    <h2>전체 요약</h2>
+    <table class="summary-table">
+      <tr><td>직접발행형</td><td>발행사가 채권을 처음부터 토큰으로 직접 발행. 새 법(독일 eWpG 등)이 필요했지만 근본적으로 절차가 짧아짐. 참여는 적격투자자로 제한.</td></tr>
+      <tr><td>증권권리형</td><td>기존 보관 중이던 채권의 "권리"만 온체인에 표시. 기존 인프라를 그대로 써서 도입이 빠름.</td></tr>
+      <tr><td>공통 효과</td><td>여러 기관이 각자 장부를 대사하던 절차가 사라지고, 하나의 공용 원장에서 동시결제가 이뤄져 결제 시간이 크게 단축됨.</td></tr>
+      <tr><td>한국</td><td>2027년 2월 전자증권법 개정 시행 예정. KSD·교보생명·신한투자증권 등이 시행 전부터 민간 실험 진행 중.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="sec-num">SOURCES</div>
+    <ul class="sources">
+      <li>Xangle RWA Series, "토큰화 채권" — https://xangle.io/research/detail/2508</li>
+      <li>Xangle, "RWA 토큰화 생태계 분류와 주요 사례" — https://xangle.io/research/detail/2479</li>
+      <li>Ripple, "리플-교보생명 토큰화 국채 실험 착수" — ripple.com</li>
+      <li>한국경제, "리플과 손잡은 교보생명, 토큰화 국채 거래 시스템 기술검증 돌입" (2026.4)</li>
+      <li>이비엔뉴스, "[토큰증권 로드맵] 핵심 IT 인프라 '분산원장' 구축 표준요건도 마련"</li>
+      <li>뉴스프리존, "금융위, 주식·채권·펀드도 토큰화한다···내년 2월부터 단계 도입"</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>

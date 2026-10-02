@@ -668,14 +668,57 @@ export const SESSIONS: Session[] = [
         focus: "사모신용·구조화 신용의 토큰화 구조 / 다른 자산군 대비 리스크 성격"
       }
     ],
-    records: []
+    records: [
+      {
+        kind: "발표자료",
+        title: "채권 1 · 4. 토큰이 나타내는 권리와 한국의 토큰화 채권 실험",
+        who: "배예림",
+        part: "채권 시장 규모 · Note와 상환청구권 · 교보생명×Ripple · 신한투자증권×Etherfuse · 수익률에서 담보 활용성으로",
+        url: "/study/materials/s5-bond-1-4-rights-korea.html"
+      },
+      {
+        kind: "발표자료",
+        title: "채권 2-1 · 2-2. 직접 발행형 · 증권 권리형",
+        who: "장윤선",
+        part: "EIB · 홍콩정부 · 지멘스 · SG 사례 · 독일·스위스·룩셈부르크 법 제도 · DTCC · KSD 가이드라인",
+        url: "/study/materials/s5-bond-2-1-2-2-direct-entitlement.html"
+      },
+      {
+        kind: "발표자료",
+        title: "채권 2-3 · 2-4. 펀드 지분형과 연계 증권형",
+        who: "이성재",
+        part: "BUIDL · BENJI · USYC · OUSG 등 대표 상품 · USDY · 권리 상대방과 수익 반영 방식 비교",
+        url: "/study/materials/s5-bond-2-3-2-4-fund-linked.html"
+      },
+      {
+        kind: "발표자료",
+        title: "채권 3 · 대체 3-1 · 3-2. 토큰화 채권의 쓰임새와 부동산·금 토큰화",
+        who: "박의혁",
+        part: "슬라이드 27장 · 현금관리 · 디파이 담보 · 마진 담보 · 준비자산 · LLC 지분 토큰 · 금 토큰 · Curve StableSwap",
+        url: "/study/materials/s5-bond-3-alt-3-1-3-2-collateral-realestate-gold.html"
+      },
+      {
+        kind: "PDF",
+        title: "대체 3-3. 수집품 토큰화",
+        who: "노제희",
+        part: "슬라이드 16장 · Courtyard · Collector Crypt · Freeport · 실물 상환과 유동성 경로",
+        url: "/study/materials/s5-alt-3-3-collectibles.pdf"
+      },
+      {
+        kind: "발표자료",
+        title: "대체 3-4. 신용 RWA",
+        who: "이재환",
+        part: "슬라이드 14장 · SCOPE · ACRED · JAAA · Maple syrupUSDC · Feeder Fund · CLO · ERC-4626",
+        url: "/study/materials/s5-alt-3-4-credit.html"
+      }
+    ]
   },
   {
     no: 6,
     topic: "솔라나 RWA 주요 플레이어",
     title: { accent: "Solana RWA", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-15",
+    date: "2026-10-06",
     source: {
       label: "Xangle RWA Series · 솔라나 RWA : 주요 플레이어 살펴보기",
       url: "https://xangle.io/research/detail/2494",
@@ -720,7 +763,7 @@ export const SESSIONS: Session[] = [
     topic: "커스터디 / KMS",
     title: { accent: "Custody & KMS", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-22",
+    date: "2026-10-13",
     source: {
       label: "Xangle RWA Series · 커스터디/KMS",
       url: "https://xangle.io/research/detail/2499",
@@ -781,7 +824,7 @@ export const SESSIONS: Session[] = [
     topic: "지갑 인프라",
     title: { accent: "Wallet Infra", rest: "Study Guide" },
     status: "ready",
-    date: "2026-09-29",
+    date: "2026-10-20",
     source: {
       label: "Xangle RWA Series · 지갑 인프라",
       url: "https://xangle.io/research/detail/2520",
@@ -839,7 +882,7 @@ export const SESSIONS: Session[] = [
     topic: "컴플라이언스",
     title: { accent: "Compliance", rest: "Study Guide" },
     status: "ready",
-    date: "2026-10-06",
+    date: "2026-10-27",
     source: {
       label: "Xangle RWA Series · 컴플라이언스",
       url: "https://xangle.io/research/detail/2512",

@@ -1,0 +1,873 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<title>BAY RWA 스터디 5회차 · Part 4 · 박의혁</title>
+<style>@font-face{font-family:"Pretendard";font-weight:400;src:url("fonts/s5-pretendard-400.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:500;src:url("fonts/s5-pretendard-500.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:600;src:url("fonts/s5-pretendard-600.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:700;src:url("fonts/s5-pretendard-700.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:800;src:url("fonts/s5-pretendard-800.woff2") format("woff2")}
+@font-face{font-family:"Pretendard";font-weight:900;src:url("fonts/s5-pretendard-900.woff2") format("woff2")}
+@font-face{font-family:"Outfit";font-weight:400 900;src:url("fonts/s5-outfit-400-900.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --ink:#111827; --ink2:#374151; --grey:#6B7280; --grey2:#9CA3AF;
+  --navy:#14213D; --navy2:#22345F; --navy-soft:#E9EDF6;
+  --amber:#F2A93B; --amber-d:#C27A0E; --amber-soft:#FCEFD9;
+  --teal:#2E8B84; --teal-soft:#E3F1EF;
+  --card:#F8F9FA; --line:#E5E7EB; --line2:#D1D5DB;
+  --cream:#F1EAE0; --paper:#FFFFFF;
+  --hl:rgba(255,222,64,.55);
+}
+@page{size:1920px 1080px;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+body{font-family:"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.slide{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;break-after:page;padding:64px 88px 0 88px;display:flex;flex-direction:column}
+.slide:last-child{page-break-after:auto;break-after:auto}
+.num,.en{font-family:"Outfit","Pretendard",sans-serif}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;height:44px;flex:none}
+.kick{display:flex;align-items:center;gap:14px}
+.chip{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;border-radius:999px;padding:8px 18px 8px 14px;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.chip::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber)}
+.chip.amber{background:var(--amber);color:var(--navy)}
+.chip.amber::before{background:var(--navy)}
+.chip.teal{background:var(--teal)}
+.chip.teal::before{background:#fff}
+.chip.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.hdr .sec{font-size:19px;font-weight:600;color:var(--grey)}
+.hdr .pg{font-family:"Outfit";font-weight:600;font-size:20px;color:var(--grey2);letter-spacing:.04em}
+.hdr .pg b{color:var(--navy);font-weight:800}
+
+/* headline */
+.h1{font-size:52px;line-height:1.2;font-weight:900;letter-spacing:-.025em;color:var(--navy);margin:34px 0 0 0;max-width:1640px;word-break:keep-all}
+.h1 .a{color:var(--amber-d)}
+.h1 .u{background:linear-gradient(transparent 58%,var(--hl) 58%)}
+.h1.sm{font-size:48px}
+.sub{font-size:26px;line-height:1.5;color:var(--ink2);margin:18px 0 0 0;max-width:1560px;word-break:keep-all;font-weight:500}
+.hl{background:linear-gradient(transparent 55%,var(--hl) 55%);font-weight:800;color:var(--ink)}
+b,strong{font-weight:800;color:var(--ink)}
+
+/* verdict strip */
+.strip{display:flex;align-items:center;gap:28px;margin-top:22px;padding:0 0 0 0;flex:none}
+.strip .big{font-family:"Outfit";font-weight:800;font-size:76px;line-height:1;color:var(--amber);letter-spacing:-.03em;white-space:nowrap}
+.strip .big small{font-size:34px;font-weight:700;color:var(--amber-d);margin-left:4px;letter-spacing:0}
+.strip .txt{font-size:27px;line-height:1.4;font-weight:600;color:var(--ink);word-break:keep-all;max-width:1200px}
+.strip .txt .k{color:var(--grey);font-weight:600;display:block;font-size:20px;margin-bottom:6px;letter-spacing:.02em}
+.strip .vline{width:2px;height:70px;background:var(--line2)}
+
+/* body */
+.body{flex:1;display:flex;gap:40px;margin-top:30px;min-height:0;overflow:hidden}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.grow{flex:1}
+.cards{display:grid;gap:18px}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.cards.c2{grid-template-columns:repeat(2,1fr)}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 26px 20px 26px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.card.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.card.navy h4,.card.navy p,.card.navy b,.card.navy strong{color:#fff}
+.card.navy .hl{color:#fff;background:linear-gradient(transparent 55%,rgba(242,169,59,.6) 55%)}
+.card.amber{background:var(--amber-soft);border-color:#F3D9A6}
+.card.teal{background:var(--teal-soft);border-color:#BFE0DB}
+.card .tag{font-family:"Outfit";font-weight:700;font-size:17px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-d)}
+.card.navy .tag{color:var(--amber)}
+.card h4{margin:0;font-size:27px;line-height:1.3;font-weight:800;color:var(--navy);letter-spacing:-.02em;word-break:keep-all}
+.card p{margin:0;font-size:22px;line-height:1.44;color:var(--ink2);word-break:keep-all;font-weight:500}
+.card p+p{margin-top:2px}
+.card .big{font-family:"Outfit";font-weight:800;font-size:60px;line-height:1;color:var(--navy);letter-spacing:-.03em}
+.card .big small{font-size:24px;font-weight:700;color:var(--grey);margin-left:6px;font-family:"Pretendard"}
+.card ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.card li{font-size:22px;line-height:1.45;color:var(--ink2);padding-left:22px;position:relative;word-break:keep-all;font-weight:500}
+.card li::before{content:"";position:absolute;left:0;top:14px;width:9px;height:9px;border-radius:50%;background:var(--amber)}
+.card.navy li{color:#E5E9F2}
+.card.navy li::before{background:var(--amber)}
+.step{display:flex;gap:16px;align-items:flex-start}
+.step .n{flex:none;width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;font-family:"Outfit";font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
+.step.amber .n{background:var(--amber);color:var(--navy)}
+
+/* figure */
+.fig{border-radius:22px;overflow:hidden;background:var(--cream);position:relative;flex:none}
+.fig img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04)}
+.fig .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 22px;font-size:17px;color:var(--grey);background:linear-gradient(transparent,rgba(241,234,224,.95) 40%)}
+.fig.contain img{object-fit:contain;transform:none}
+
+/* table */
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:22px;line-height:1.4}
+table.t th{background:var(--navy);color:#fff;font-weight:800;text-align:left;padding:16px 20px;font-size:21px;letter-spacing:-.01em;word-break:keep-all}
+table.t th:first-child{border-radius:14px 0 0 0}
+table.t th:last-child{border-radius:0 14px 0 0}
+table.t td{padding:15px 20px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2);word-break:keep-all;font-weight:500;background:#fff}
+table.t tr:nth-child(even) td{background:var(--card)}
+table.t td.rh{font-weight:800;color:var(--navy);background:var(--navy-soft) !important;width:200px}
+table.t td b{color:var(--ink)}
+table.t .dot{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--amber);vertical-align:middle}
+table.t .dot.n{background:var(--navy)}
+table.t .dot.e{background:transparent;border:2px solid var(--line2)}
+table.t.cmp td{font-size:22px;padding:17px 20px}
+table.t.dense td{font-size:19px;padding:11px 14px;line-height:1.35}
+table.t.dense th{font-size:19px;padding:13px 14px}
+table.t td .note{font-size:16px;display:block;margin-top:2px}
+table.t.big td{font-size:23px;padding:18px 22px}
+
+/* footer */
+.ft{flex:none;display:flex;align-items:stretch;gap:0;margin:auto 0 0 0;height:118px}
+.kt{flex:1;display:flex;align-items:center;gap:26px;border-top:2px solid var(--navy);padding:18px 0 22px 0}
+.kt .lab{flex:none;font-family:"Outfit";font-weight:800;font-size:17px;letter-spacing:.18em;color:var(--amber-d);text-transform:uppercase;width:150px;line-height:1.3}
+.kt .lab::after{content:"";display:block;width:36px;height:4px;background:var(--amber);margin-top:8px;border-radius:2px}
+.kt .txt{font-size:26px;line-height:1.4;font-weight:700;color:var(--ink);word-break:keep-all;max-width:1330px}
+.kt .src{flex:none;margin-left:auto;font-size:17px;color:var(--grey);text-align:right;line-height:1.4;padding-left:30px;font-weight:500;align-self:center}
+.kt .src b{color:var(--navy);font-weight:700}
+
+/* link chips (톡방 연결) */
+.links{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.links .l{font-size:18px;font-weight:600;color:var(--navy);background:var(--navy-soft);border-radius:999px;padding:7px 16px;white-space:nowrap}
+.links .l.a{background:var(--amber-soft);color:var(--amber-d)}
+.links .lab{font-family:"Outfit";font-weight:700;font-size:15px;letter-spacing:.14em;color:var(--grey);text-transform:uppercase;margin-right:6px}
+
+/* generic */
+.row{display:flex;gap:22px;align-items:stretch}
+.note{font-size:19px;color:var(--grey);line-height:1.45;font-weight:500;word-break:keep-all}
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+svg text{font-family:"Pretendard",sans-serif}
+svg .en{font-family:"Outfit","Pretendard",sans-serif}
+
+/* cover */
+.cover{padding:0;display:block}
+.cover .left{position:absolute;left:0;top:0;bottom:0;width:1040px;padding:96px 0 84px 100px;display:flex;flex-direction:column}
+.cover .right{position:absolute;right:0;top:0;bottom:0;width:880px;background:var(--cream)}
+.cover .right img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.cover .brand{display:flex;align-items:center;gap:16px;font-size:21px;font-weight:700;color:var(--navy)}
+.cover .brand .sq{width:16px;height:16px;background:var(--amber);border-radius:3px}
+.cover .brand .sep{color:var(--grey2);font-weight:400}
+.cover .ses{margin-top:60px;font-family:"Outfit";font-weight:800;font-size:22px;letter-spacing:.2em;color:var(--amber-d)}
+.cover h1{margin:22px 0 0 0;font-size:70px;line-height:1.15;font-weight:900;letter-spacing:-.03em;color:var(--navy);word-break:keep-all}
+.cover h1 .a{color:var(--amber-d)}
+.cover .scope{margin-top:36px;display:flex;flex-direction:column;gap:12px}
+.cover .scope div{font-size:24px;font-weight:600;color:var(--ink2);display:flex;gap:14px;align-items:center}
+.cover .scope div::before{content:"";width:28px;height:3px;background:var(--amber);border-radius:2px;flex:none}
+.cover .meta{margin-top:auto;font-size:21px;color:var(--grey);line-height:1.7;font-weight:500}
+.cover .meta b{color:var(--navy);font-weight:800;font-size:24px}
+
+/* divider */
+.div{padding:0;display:block;background:var(--navy);color:#fff}
+.div .l{position:absolute;left:0;top:0;bottom:0;width:1000px;padding:110px 0 90px 100px;display:flex;flex-direction:column}
+.div .r{position:absolute;right:0;top:0;bottom:0;width:920px;background:var(--cream)}
+.div .r img{width:100%;height:100%;object-fit:contain;display:block}
+.div .ch{font-family:"Outfit";font-weight:800;font-size:22px;letter-spacing:.22em;color:var(--amber)}
+.div .ttl{margin-top:26px;font-size:30px;font-weight:700;color:#C9D2E6;letter-spacing:-.01em}
+.div h1{margin:18px 0 0 0;font-size:60px;line-height:1.18;font-weight:900;letter-spacing:-.03em;color:#fff;word-break:keep-all}
+.div h1 .a{color:var(--amber)}
+.div .stats{margin-top:auto;display:flex;gap:44px}
+.div .stats .s .v{font-family:"Outfit";font-weight:800;font-size:64px;line-height:1;color:var(--amber);letter-spacing:-.03em}
+.div .stats .s .v small{font-size:26px;color:#E8CFA0;margin-left:4px;font-family:"Pretendard";font-weight:700}
+.div .stats .s .k{margin-top:10px;font-size:19px;color:#B7C1D8;font-weight:500;line-height:1.4;word-break:keep-all}
+.div .stats .s{flex:1;min-width:0}
+.div .qa{margin-top:34px;display:flex;flex-direction:column;gap:10px}
+.div .qa div{font-size:23px;color:#E5E9F2;font-weight:500;display:block;position:relative;padding-left:26px;word-break:keep-all;line-height:1.45}
+.div .qa div::before{content:"";position:absolute;left:0;top:12px;width:10px;height:10px;border-radius:50%;background:var(--amber)}
+.div .qa b{color:#fff}
+
+.cards.big .card p{font-size:25px;line-height:1.55}
+.cards.big .card h4{font-size:30px}
+
+@media screen{ body{background:#E9EAEE;padding:24px 0} .slide{margin:0 auto 24px auto;box-shadow:0 6px 30px rgba(0,0,0,.12);transform-origin:top center} }
+</style>
+<script>
+(function(){function fit(){var w=Math.min(1,(window.innerWidth-32)/1920);document.querySelectorAll('.slide').forEach(function(s){s.style.transform='scale('+w+')';s.style.marginBottom=(24-(1-w)*1080)+'px';});}
+if(window.matchMedia&&!window.matchMedia('print').matches){window.addEventListener('resize',fit);window.addEventListener('load',fit);}
+window.addEventListener('beforeprint',function(){document.querySelectorAll('.slide').forEach(function(s){s.style.transform='';s.style.marginBottom='0';});});
+window.addEventListener('afterprint',fit);})();
+</script></head><body><a href="../session.html?s=5" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 5회차 진행안으로</a>
+<section class="slide cover">
+  <div class="left">
+    <div class="brand"><span class="sq"></span>BAY 리서치팀 <span class="sep">·</span> Blockchain at Yonsei <span class="sep">·</span> RWA 스터디</div>
+    <div class="ses">SESSION 05 · PART 4 · 2026. 09. 08</div>
+    <h1>토큰화 채권은 <span class="a">어디에 쓰이고</span>,<br>부동산과 금은 <span class="a">어떻게 토큰이 되는가</span></h1>
+    <div class="scope">
+      <div>채권 3. 온체인 현금관리 · 디파이 담보 · 마진 담보 · 스테이블코인 준비자산 (3-1 ~ 3-4)</div>
+      <div>대체자산 3-1. 부동산: 등기와 임대수익을 온체인 지분으로</div>
+      <div>대체자산 3-2. 원자재: 금고의 실물을 온체인 청구권으로</div>
+    </div>
+    <div class="meta">
+      <b>발표 박의혁</b><br>
+      원문 Xangle RWA Series 2편 · 토큰화 채권(2026.07) · 토큰화 대체자산<br>
+      담당 설명 10분 · 막혔던 부분과 추가 설명 10분 · 즉석 질문 5분
+    </div>
+  </div>
+  <div class="right"><img src="img/s5-4-01.jpg" alt=""></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">이 발표의 한 문장</span><span class="sec">Part 4 전체를 관통하는 대전제</span></div><div class="pg"><b>02</b> / 27</div></div>
+  <h1 class="h1">토큰의 가치는 <span class="u">무엇을 담았느냐</span>가 아니라<br><span class="a">어떤 권리를 담았고, 어디에서 인정받느냐</span>가 결정한다</h1>
+  <p class="sub">세 파트는 서로 다른 자산을 다루지만 같은 질문을 던집니다. 채권에서는 <b>인정받는 곳(활용처)</b>을, 부동산에서는 <b>권리가 닿는 깊이(등기)</b>를, 원자재에서는 <b>청구권의 실체(어느 금괴인가)</b>를 봅니다.</p>
+  <div class="body">
+    <div class="cards c3 grow big">
+      <div class="card navy">
+        <div class="tag">채권 3 · 활용처</div>
+        <h4>이자 상품에서 담보 인프라로</h4>
+        <p>토큰화 국채는 <b>현금관리 → 디파이 담보 → 마진 담보 → 준비자산</b>으로 쓰임새를 넓혀 왔습니다.</p>
+        <p>판정 기준이 바뀝니다. <span class="hl">APY가 아니라 어디에서 담보로 받아주는가</span>.</p>
+      </div>
+      <div class="card">
+        <div class="tag">부동산 3-1 · 권리의 깊이</div>
+        <h4>토큰이 등기까지 닿는가</h4>
+        <p><b>직접 발행형</b>은 토큰 이전이 곧 공식 등기 변경(두바이 DLD).</p>
+        <p><b>간접 지분형</b>은 토큰이 LLC 지분에서 멈추고, 등기는 LLC 명의로 남습니다(RealT · Lofty · Reental · RedSwan).</p>
+      </div>
+      <div class="card">
+        <div class="tag">원자재 3-2 · 청구권의 실체</div>
+        <h4>어느 금괴인지 말할 수 있는가</h4>
+        <p>1 PAXG = LGD 금괴 순금 1온스, <b>개별 배정(allocated)</b> 보관, 일련번호 조회.</p>
+        <p>보관 장소 · 감사 · 실물 인출 조건 · 최소 수량이 상품의 성격을 정합니다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">오늘 25분은 이 한 문장을 세 자산에 대입하는 시간입니다. <span class="hl">채권은 "어디에서", 부동산은 "어디까지", 금은 "무엇에 대한" 권리인가.</span></div><div class="src">진행 <b>담당 설명 10분</b> · 막혔던 부분 10분(Curve 구조) · 질문 5분</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">오늘 파트의 위치</span><span class="sec">두 아티클 안에서 Part 4가 받는 것과 넘기는 것</span></div><div class="pg"><b>03</b> / 27</div></div>
+  <h1 class="h1">앞 순서가 만든 <span class="u">상품</span>을 받아 <span class="a">쓰임새</span>를 이야기하고,<br>뒤 순서에 <span class="a">권리 구조의 두 원형</span>을 넘깁니다</h1>
+  <div class="body">
+    <div class="col grow">
+      <svg viewBox="0 0 1744 520" width="1744" height="520" xmlns="http://www.w3.org/2000/svg">
+        <!-- article 1 track -->
+        <text x="0" y="30" font-size="20" font-weight="800" fill="#6B7280" letter-spacing="2" class="en">ARTICLE 1 · 토큰화 채권</text>
+        <line x1="0" y1="90" x2="1744" y2="90" stroke="#D1D5DB" stroke-width="2"/>
+        <g font-size="21" font-weight="600" fill="#374151">
+          <circle cx="120" cy="90" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="120" y="140" text-anchor="middle">1. 시장 규모 · 출발점</text><text x="120" y="170" text-anchor="middle" fill="#9CA3AF" font-size="19">배예림</text>
+          <circle cx="500" cy="90" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="500" y="140" text-anchor="middle">2-1 · 2-2 직접 발행형 · 증권 권리형</text><text x="500" y="170" text-anchor="middle" fill="#9CA3AF" font-size="19">장윤선</text>
+          <circle cx="880" cy="90" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="880" y="140" text-anchor="middle">2-3 · 2-4 펀드 지분형 · 연계 증권형</text><text x="880" y="170" text-anchor="middle" fill="#9CA3AF" font-size="19">이성재</text>
+          <rect x="1150" y="52" width="290" height="76" rx="38" fill="#F2A93B"/><text x="1295" y="99" text-anchor="middle" font-size="24" font-weight="900" fill="#14213D">3. 온체인 활용 (3-1 ~ 3-4)</text><text x="1295" y="170" text-anchor="middle" fill="#C27A0E" font-size="19" font-weight="800">박의혁</text>
+          <circle cx="1600" cy="90" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="1600" y="140" text-anchor="middle">4. 한국 실험 · 관전 포인트</text><text x="1600" y="170" text-anchor="middle" fill="#9CA3AF" font-size="19">배예림</text>
+        </g>
+        <!-- article 2 track -->
+        <text x="0" y="270" font-size="20" font-weight="800" fill="#6B7280" letter-spacing="2" class="en">ARTICLE 2 · 토큰화 대체자산</text>
+        <line x1="0" y1="330" x2="1744" y2="330" stroke="#D1D5DB" stroke-width="2"/>
+        <g font-size="21" font-weight="600" fill="#374151">
+          <circle cx="120" cy="330" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="120" y="380" text-anchor="middle">1 ~ 2-2 종류 · 겨냥하는 문제</text><text x="120" y="410" text-anchor="middle" fill="#9CA3AF" font-size="19">배예림</text>
+          <rect x="360" y="292" width="360" height="76" rx="38" fill="#F2A93B"/><text x="540" y="339" text-anchor="middle" font-size="24" font-weight="900" fill="#14213D">3-1 부동산 · 3-2 원자재</text><text x="540" y="410" text-anchor="middle" fill="#C27A0E" font-size="19" font-weight="800">박의혁</text>
+          <circle cx="920" cy="330" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="920" y="380" text-anchor="middle">3-3 수집품</text><text x="920" y="410" text-anchor="middle" fill="#9CA3AF" font-size="19">노제희</text>
+          <circle cx="1220" cy="330" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="1220" y="380" text-anchor="middle">3-4 신용</text><text x="1220" y="410" text-anchor="middle" fill="#9CA3AF" font-size="19">이재환</text>
+          <circle cx="1560" cy="330" r="11" fill="#fff" stroke="#14213D" stroke-width="3"/><text x="1560" y="380" text-anchor="middle">4 ~ 5 조각투자 · 제도화 · 마무리</text><text x="1560" y="410" text-anchor="middle" fill="#9CA3AF" font-size="19">배예림</text>
+        </g>
+        <!-- hand-off arrows -->
+        <g stroke="#14213D" stroke-width="2.5" fill="none" stroke-dasharray="7 7">
+          <path d="M880 200 C 880 240, 1150 200, 1200 235"/>
+        </g>
+        <text x="1010" y="248" font-size="19" fill="#14213D" font-weight="700">받는 것: 앞에서 본 상품들이 "어디에 쓰이나"</text>
+        <g stroke="#2E8B84" stroke-width="2.5" fill="none" stroke-dasharray="7 7">
+          <path d="M700 430 C 760 470, 860 470, 905 432"/>
+        </g>
+        <text x="640" y="505" font-size="19" fill="#2E8B84" font-weight="700">넘기는 것: 실물 보관형(금) · SPV 지분형(부동산)의 원형</text>
+      </svg>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">윤선님·성재님이 설명한 BUIDL · USYC · USTB · VBILL · USDY를 <span class="hl">오늘은 "상품"이 아니라 "담보"로 다시 봅니다.</span> 제희님(수집품)·재환님(신용) 파트는 오늘의 금 · 부동산 구조와 짝을 이룹니다.</div><div class="src">진행표 <b>75 ~ 100분</b> · Part 4</div></div></div>
+</section>
+<section class="slide div">
+  <div class="l">
+    <div class="ch">CHAPTER 1 · 채권 3. 온체인에서의 활용</div>
+    <div class="ttl">3-1 현금관리 · 3-2 디파이 담보 · 3-3 마진 담보 · 3-4 준비자산</div>
+    <h1>국채 토큰은 왜 <span class="a">투자상품</span>에서<br><span class="a">담보 인프라</span>가 되었나</h1>
+    <div class="qa">
+      <div>신용위험이 낮고, 이자가 붙고, 달러로 표시된다. 그래서 스테이블코인 유동성과 자연스럽게 이어진다</div>
+      <div>펀드 지분형 구조라 기존 운용 · 수탁 · 환매 절차를 그대로 쓰면서 온체인 원장에만 연결하면 된다</div>
+      <div>쓰임새는 사다리처럼 올라간다. 현금관리에서 출발해 담보와 준비자산까지</div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="v">50.7<small>%</small></div><div class="k">온체인 RWA 313.6억 달러 중<br>정부채권형 비중 (2026.6.28)</div></div>
+      <div class="s"><div class="v">148.5<small>억 달러</small></div><div class="k">토큰화 국채형 상품 시장<br>상위 5개 상품군이 71.8% (2026.7.1)</div></div>
+      <div class="s"><div class="v">0.05<small>% 미만</small></div><div class="k">미국 시장성 국채(약 31조 달러)<br>대비 토큰화 미국채 침투율</div></div>
+    </div>
+  </div>
+  <div class="r"><img src="img/s5-4-02.jpg" alt=""></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">채권 3-1</span><span class="sec">온체인 현금관리 · 사다리의 첫 칸</span></div><div class="pg"><b>05</b> / 27</div></div>
+  <h1 class="h1">놀고 있는 스테이블코인을 <span class="a">이자가 붙는 국채 토큰</span>으로 바꿔 두고,<br>필요하면 <span class="u">24시간 안에 다시 스테이블코인으로</span> 되돌린다</h1>
+  <div class="strip"><div class="big">24<small>시간</small></div><div class="vline"></div><div class="txt"><span class="k">한 줄 판정</span>대기자금이 수익자산이 되는데, <b>유동성은 그대로 남는다.</b> 그래서 뒤에 나올 담보 · 준비자산 활용의 토대가 된다</div></div>
+  <div class="body">
+    <div class="fig" style="width:660px;height:500px"><img src="img/s5-4-03.jpg" alt=""></div>
+    <div class="col grow">
+      <div class="card">
+        <div class="tag">Problem</div>
+        <h4>스테이블코인은 이자가 거의 없는 대기성 자금이다</h4>
+        <p>은행 계좌나 전통 머니마켓펀드에 넣으면 <b>온체인 밖으로 나가고 영업시간에 묶인다.</b> "안전하게 굴리면서 바로 꺼내 쓰는" 자리가 없었다.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Solution</div>
+        <h4>단기국채형 토큰으로 옮겨 두고 24시간 발행 · 환매</h4>
+        <p><b>BUIDL · OUSG · USYC · USDY</b>는 USDC 중심으로 24시간 발행 · 환매가 되도록 설계됐다. BUIDL은 리플 <b>RLUSD로 24시간 교환</b>하는 기능도 발표했다.</p>
+      </div>
+      <div class="card amber">
+        <div class="tag">Why it matters</div>
+        <h4>현금관리는 사다리의 첫 칸이다</h4>
+        <p>디파이 담보(3-2)와 준비자산(3-4)은 <span class="hl">"언제든 스테이블코인으로 돌아올 수 있다"</span>는 기능 위에 얹힌 확장이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">현금관리 상품의 성패는 수익률보다 <span class="hl">환매 설계(무엇으로, 몇 시간 안에, 얼마까지)</span>가 가른다. 국채 이자는 어느 상품이나 비슷하기 때문이다.</div><div class="src">원문 <b>쟁글 토큰화 채권 3-1</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">채권 3-2</span><span class="sec">디파이 담보 · 전통금융의 채권 담보대출이 온체인으로</span></div><div class="pg"><b>06</b> / 27</div></div>
+  <h1 class="h1">국채 토큰을 맡기고 스테이블코인을 빌린다.<br><span class="u">팔지 않고 유동성을 만드는 담보대출</span>이 온체인에서 구현되는 중이다</h1>
+  <div class="strip"><div class="big">4<small>가지 난제</small></div><div class="vline"></div><div class="txt"><span class="k">한 줄 판정</span>RWA 담보의 어려움은 가격이 아니라 <b>"규제된 자산을 열린 시장에 어떻게 꽂느냐"</b>다. 자산마다 조건이 전부 다르다</div></div>
+  <div class="body">
+    <div class="fig" style="width:680px;height:520px"><img src="img/s5-4-04.jpg" alt="" style="object-position:center 40%"></div>
+    <div class="col grow">
+      <div class="cards c2 grow">
+        <div class="card"><div class="tag">01 · 거래 시간</div><h4>기초 펀드는 영업일, 토큰은 24시간</h4><p>기초 국채와 펀드 환매는 시장이 열려야 움직이는데 담보 계약은 주말에도 돌아간다. 시간의 어긋남을 누가 감당하나.</p></div>
+        <div class="card"><div class="tag">02 · 가격 정보</div><h4>NAV는 하루 한 번, 담보 평가는 실시간</h4><p>펀드 순자산가치는 하루 단위로 나온다. 온체인에서는 <b>오라클</b>이 이 값을 받아 담보 가치를 매긴다. 오라클이 틀리면 청산도 틀린다.</p></div>
+        <div class="card"><div class="tag">03 · 투자자 적격성</div><h4>아무나 보유할 수 없는 담보</h4><p>Reg D · Reg S 상품은 <b>확인된 투자자만 보유</b>할 수 있다. 담보를 맡기는 사람도, 넘겨받는 사람도 자격이 필요하다.</p></div>
+        <div class="card"><div class="tag">04 · 청산 절차</div><h4>담보를 아무나 살 수 없다면 청산은 누가</h4><p>일반 디파이의 청산은 봇이 담보를 싸게 사 가며 끝난다. 적격성이 붙은 담보는 <b>청산자도 자격을 갖춰야</b> 한다.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">Aave Horizon · Euler · Morpho는 이 네 문제를 <span class="hl">서로 다른 설계로 푼다.</span> 다음 장에서 셋을 나란히 놓고 비교합니다.</div><div class="src">원문 <b>쟁글 토큰화 채권 3-2</b> · 톡방 연결: 예림님 24/5 vs 24/7 정리(8/23) · Aave v3 정리(8/26)</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">채권 3-2</span><span class="sec">세 프로토콜의 해법 비교</span></div><div class="pg"><b>07</b> / 27</div></div>
+  <h1 class="h1 sm">같은 질문, 다른 답. <span class="a">허가형 자산</span>을 <span class="a">비허가형 유동성</span>에 어떻게 연결할까</h1>
+  <div class="body" style="margin-top:26px">
+    <div class="col grow">
+      <table class="t cmp">
+        <thead><tr><th style="width:190px"></th><th>Aave Horizon</th><th>Euler</th><th>Morpho</th></tr></thead>
+        <tbody>
+          <tr><td class="rh">무엇인가</td><td>최대 대출 프로토콜 Aave가 <b>2025년 8월</b> 이더리움에 별도로 연 <b>기관용 RWA 대출 시장</b></td><td>자산별로 <b>독립된 금고</b>를 만들고 금고마다 담보비율 · 오라클 · 청산 조건을 따로 두는 <b>모듈형</b> 대출 프로토콜</td><td><b>시장 단위</b>로 위험을 분리하는 대출 프로토콜. 한 시장 = 담보자산 1개 + 차입자산 1개</td></tr>
+          <tr><td class="rh">핵심 아이디어</td><td><span class="hl">담보는 허가형, 차입은 비허가형.</span> 규제가 필요한 쪽만 잠그고 유동성 공급은 연다</td><td><span class="hl">담보 전용 볼트(ERC-4626).</span> Securitize와 협업해 적격성 · 이전 제한이 붙은 자산을 담보로 편입</td><td><span class="hl">시장별 오라클 · 청산 LTV · 이자율 모델.</span> 조건이 제각각인 RWA를 각각 독립 시장으로 다룬다</td></tr>
+          <tr><td class="rh">인정 담보</td><td>Superstate <b>USTB</b> · Circle <b>USYC</b> · VanEck <b>VBILL</b> 등 규제된 토큰화 국채 · 펀드</td><td><b>VBILL</b> 등 Securitize 발행 자산 (KPK가 큐레이션하는 Securitize 마켓)</td><td><b>mTBILL · mF-ONE · sACRED</b> 등 토큰화 채권 · 사모신용 · 펀드 지분</td></tr>
+          <tr><td class="rh">가격과 통제 장치</td><td>체인링크 <b>온체인 NAV 오라클</b>로 담보 가치 반영. 담보 예치 증표 토큰은 <b>전송 불가</b>로 설계해 적격 기관 밖으로 새지 않게 함</td><td>영수증 토큰은 같은 소유자 안에서만 자유롭게 이동. <b>소유자 변경 · 청산 시</b> Securitize DS Protocol 이전 검증 + 수령자 적격성 확인</td><td>한 시장의 가격 산정 오류 · 환매 지연 · 청산 리스크가 <b>다른 시장으로 번지지 않는다.</b> 담보 공급자는 KYC · 적격성 요건 충족 필요</td></tr>
+          <tr><td class="rh">한 줄 평</td><td>"열어도 되는 곳만 연다"</td><td>"규제 자산의 틀을 깨지 않고 편입한다"</td><td>"위험을 방마다 가둔다"</td></tr>
+        </tbody>
+      </table>
+      <div class="links"><span class="lab">톡방 연결</span><span class="l">2회차 · 윤선님 Aave Horizon 발표</span><span class="l">2회차 · 영환님 Morpho 발표</span><span class="l">2회차 · 성재님 Loopscale(카드 NFT 담보 대출)</span><span class="l a">8/26 · 예림님 Aave v3 USDC 풀 정리 (LTV 75% · 청산 임계 78% · 페널티 4.5%)</span></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">셋 다 <span class="hl">"청산 때 담보를 누가 받을 수 있나"</span>에 답을 준비해 두었다. 예림님이 정리한 Aave의 "구멍 나면 누구 주머니에서 나오나" 질문이 RWA 담보에서는 청산자의 자격 문제로 바뀐다.</div><div class="src">원문 <b>쟁글 토큰화 채권 3-2</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">채권 3-3</span><span class="sec">거래소 · 기관 마진 담보</span></div><div class="pg"><b>08</b> / 27</div></div>
+  <h1 class="h1">국채 토큰을 담보로 선물 · 옵션을 거래한다.<br>자산은 <span class="u">거래소 밖 수탁기관에 두고 한도만 가져오는 방식</span>이 커지고 있다</h1>
+  <div class="strip"><div class="big">2<small>가지 방식</small></div><div class="vline"></div><div class="txt"><span class="k">한 줄 판정</span>담보를 "거래소 안에 넣느냐, 밖에 두느냐"가 갈림길. <b>밖에 두는 방식(Off-Exchange)</b>은 거래상대방 위험을 줄이려는 기관 수요와 맞물린다</div></div>
+  <div class="body">
+    <div class="fig" style="width:660px;height:500px"><img src="img/s5-4-05.jpg" alt=""></div>
+    <div class="col grow">
+      <div class="card">
+        <div class="tag">방식 1 · 거래소 안에 예치</div>
+        <h4>토큰화 국채를 거래소 계정에 넣고 담보 가치로 인정</h4>
+        <p><b>Crypto.com · Deribit</b>이 BUIDL을 거래 담보로 인정, Deribit은 <b>교차담보 자산</b>으로 편입. 현금 대신 <span class="hl">이자가 붙는 담보</span>를 맡기고 거래한다.</p>
+      </div>
+      <div class="card navy">
+        <div class="tag">방식 2 · 거래소 외부 담보 (Off-Exchange Collateral / OES)</div>
+        <h4>자산은 외부 수탁기관 · 제휴 은행에, 거래소는 가치를 확인해 한도만 부여</h4>
+        <p>손익과 부족분은 <b>필요한 금액만 사후 정산.</b> <b>Binance</b>는 BUIDL · USYC · cUSDO를 외부 담보로 지원, <b>BENJI 계열</b>은 Binance · Ceffu 기관 프로그램에 편입됐다.</p>
+      </div>
+      <div class="card amber">
+        <div class="tag">확장 · 온체인 파생상품</div>
+        <p><b>Drift</b>는 USDY를 마진 · 무기한 선물 담보로 도입, <b>Ondo Perps</b>는 토큰화 자산 담보로 무기한 선물 포지션을 연다. 국채 수익을 받으며 파생상품을 거래하는 셈이다.</p>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">전통 파생상품 시장에서 국채를 증거금으로 받는 관행이 그대로 옮겨 왔다. 차이는 <span class="hl">담보가 이자를 낳는 토큰이고, 보관 장소를 거래소 밖으로 뺄 수 있다는 점</span>이다.</div><div class="src">원문 <b>쟁글 토큰화 채권 3-3</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">채권 3-4</span><span class="sec">스테이블코인 준비자산 · 사다리의 마지막 칸</span></div><div class="pg"><b>09</b> / 27</div></div>
+  <h1 class="h1">스테이블코인 1달러를 떠받치는 <span class="a">준비자산 자리</span>에<br><span class="u">토큰화 국채 펀드 자체</span>가 들어오기 시작했다</h1>
+  <div class="body" style="margin-top:28px">
+    <div class="fig" style="width:560px;height:600px"><img src="img/s5-4-06.jpg" alt=""></div>
+    <div class="col grow">
+      <svg viewBox="0 0 1080 300" width="1080" height="300" xmlns="http://www.w3.org/2000/svg">
+        <!-- layer 1: stablecoins -->
+        <rect x="40" y="10" width="1000" height="78" rx="14" fill="#14213D"/>
+        <text x="70" y="42" font-size="17" font-weight="800" fill="#F2A93B" letter-spacing="2" class="en">LAYER 3 · 스테이블코인 (1달러 유지)</text>
+        <text x="70" y="72" font-size="23" font-weight="800" fill="#fff">USDtb (Ethena) · frxUSD (Frax) · USD0 (Usual) · USDO (OpenEden)</text>
+        <!-- arrows -->
+        <g stroke="#9CA3AF" stroke-width="2.5" fill="none"><path d="M540 88 L540 112"/><path d="M540 190 L540 214"/></g>
+        <g fill="#9CA3AF"><path d="M534 108 L546 108 L540 118 Z"/><path d="M534 210 L546 210 L540 220 Z"/></g>
+        <text x="560" y="106" font-size="17" fill="#6B7280" font-weight="600">뒷받침한다 (준비자산)</text>
+        <text x="560" y="208" font-size="17" fill="#6B7280" font-weight="600">펀드가 보유한다</text>
+        <!-- layer 2: tokenized treasury funds -->
+        <rect x="40" y="112" width="1000" height="78" rx="14" fill="#F2A93B"/>
+        <text x="70" y="144" font-size="17" font-weight="800" fill="#14213D" letter-spacing="2" class="en">LAYER 2 · 토큰화 국채 펀드 (온체인에서 투명하게 관리 · 빠른 정산)</text>
+        <text x="70" y="174" font-size="23" font-weight="900" fill="#14213D">BUIDL · USTB · USYC · TBILL</text>
+        <!-- layer 1: treasuries -->
+        <rect x="40" y="214" width="1000" height="78" rx="14" fill="#F8F9FA" stroke="#D1D5DB" stroke-width="2"/>
+        <text x="70" y="246" font-size="17" font-weight="800" fill="#6B7280" letter-spacing="2" class="en">LAYER 1 · 기초자산</text>
+        <text x="70" y="276" font-size="23" font-weight="800" fill="#374151">미국 단기국채 · 환매조건부채권(repo) · 현금 (국채 이자가 여기서 발생)</text>
+      </svg>
+      <div class="cards c4">
+        <div class="card"><div class="tag">USDtb</div><p><b>Ethena, 2024.12 출시.</b> BUIDL을 주요 준비자산으로 삼아 토큰화 국채 펀드가 스테이블코인을 뒷받침하는 구조의 대표 사례</p></div>
+        <div class="card"><div class="tag">frxUSD</div><p><b>Frax.</b> 커뮤니티 거버넌스 제안으로 BUIDL을 담보로 인정, 이후 <b>USTB</b>까지 준비자산 범위 확대</p></div>
+        <div class="card"><div class="tag">USD0</div><p><b>Usual.</b> 토큰화 미국 국채 · repo 기초. Circle의 <b>USYC</b> 같은 토큰화 머니마켓형 자산을 담보로 활용</p></div>
+        <div class="card"><div class="tag">USDO</div><p><b>OpenEden.</b> 자사 <b>TBILL</b> 등 토큰화 국채 상품을 준비자산으로 편입하는 수익형 스테이블코인</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">2회차에 나눈 "스테이블코인 성장 배경 = 미국 단기채 수요" 이야기의 온체인 버전. <span class="hl">스테이블코인이 국채를 사고, 그 국채 펀드가 다시 스테이블코인을 만든다.</span> 발행사는 이자를 얻고, 준비자산은 온체인에서 투명해진다.</div><div class="src">원문 <b>쟁글 토큰화 채권 3-4</b> · 톡방 연결: 8/8 예림님 미국 적자 · 단기채 수요 자료</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip amber">챕터 1 정리</span><span class="sec">담보 인정처 매트릭스 · 원문에 명시된 활용처만 표시</span></div><div class="pg"><b>10</b> / 27</div></div>
+  <h1 class="h1 sm">판정 기준이 바뀐다. <span class="u">"이자를 얼마나 주나"</span>에서 <span class="a">"어디에서 담보로 인정받나"</span>로</h1>
+  <div class="body" style="margin-top:24px">
+    <div class="col grow">
+      <table class="t dense">
+        <thead><tr><th style="width:200px">상품</th><th style="width:300px">구조 · 투자자</th><th style="width:230px">규모 (2026.7.1)</th><th style="width:240px">① 현금관리</th><th style="width:230px">② 디파이 담보</th><th style="width:300px">③ 거래소 · 마진 담보</th><th>④ 준비자산</th></tr></thead>
+        <tbody>
+          <tr><td><b>USYC</b> <span class="note">Circle · Hashnote</span></td><td>펀드 지분형 · Reg S 비미국인</td><td><b>31.0억 달러</b> (20.9%)</td><td><span class="dot"></span> USDC 환매</td><td><span class="dot"></span> Aave Horizon</td><td><span class="dot"></span> Binance 외부 담보</td><td><span class="dot"></span> USD0</td></tr>
+          <tr><td><b>BENJI 계열</b> <span class="note">Franklin Templeton</span></td><td>BENJI 미국 등록 MMF · iBENJI BVI 기관용(Reg D)</td><td><b>24.4억 달러</b> (iBENJI 15.9 + BENJI 7.5)</td><td><span class="dot"></span> 등록 MMF 지분</td><td><span class="dot e"></span></td><td><span class="dot"></span> Binance · Ceffu 기관 프로그램</td><td><span class="dot e"></span></td></tr>
+          <tr><td><b>BUIDL</b> <span class="note">BlackRock · Securitize</span></td><td>펀드 지분형 · Reg D 적격매수자</td><td><b>22.3억 달러</b> (15.0%)</td><td><span class="dot"></span> USDC 24h · RLUSD 교환</td><td><span class="dot e"></span></td><td><span class="dot"></span> Crypto.com · Deribit · Binance 외부 담보</td><td><span class="dot"></span> USDtb · frxUSD</td></tr>
+          <tr><td><b>USTB</b> <span class="note">Superstate · Invesco</span></td><td>펀드 지분형 · Delaware Statutory Trust</td><td><b>7.3억 달러</b> (4.9%)</td><td><span class="dot"></span> USDC 청약 · 환매</td><td><span class="dot"></span> Aave Horizon</td><td><span class="dot e"></span></td><td><span class="dot"></span> frxUSD</td></tr>
+          <tr><td><b>OUSG</b> <span class="note">Ondo</span></td><td>펀드오브펀드 · Reg D 506(c) 적격매수자</td><td><b>4.8억 달러</b> (3.2%)</td><td><span class="dot"></span> USDC · PYUSD 24h</td><td><span class="dot e"></span></td><td><span class="dot e"></span></td><td><span class="dot e"></span></td></tr>
+          <tr><td><b>TBILL</b> <span class="note">OpenEden</span></td><td>펀드 지분형 · BVI · Reg D 506(c)</td><td><b>2.1억 달러</b></td><td><span class="dot"></span> USDC 발행 · 환매</td><td><span class="dot e"></span></td><td><span class="dot e"></span></td><td><span class="dot"></span> USDO</td></tr>
+          <tr><td><b>USDY</b> <span class="note">Ondo</span></td><td>연계 증권형 노트 · Reg S 비미국인</td><td>상위 5개 상품군 포함 (개별 수치 미기재)</td><td><span class="dot"></span> USDC 24h</td><td><span class="dot e"></span></td><td><span class="dot"></span> Drift 마진 · 무기한 선물</td><td><span class="dot e"></span></td></tr>
+          <tr><td><b>VBILL</b> <span class="note">VanEck · Securitize</span></td><td>펀드 지분형 · BVI · Reg D 506(c)</td><td><b>0.55억 달러</b> (0.4%)</td><td><span class="dot e"></span></td><td><span class="dot"></span> Aave Horizon · Euler</td><td><span class="dot e"></span></td><td><span class="dot e"></span></td></tr>
+        </tbody>
+      </table>
+      <div class="note">● 원문에 활용 사례가 명시된 칸 · 빈 원은 "없음"이 아니라 "원문 미기재". 규모와 비중은 RWA.xyz 2026.7.1 기준, 토큰화 국채형 시장 148.5억 달러 대비.</div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">규모가 가장 작은 <b>VBILL(0.55억 달러)</b>이 디파이 담보 인정처는 가장 많다. <span class="hl">규모와 쓰임새는 다른 축이고, 인프라가 되는 쪽은 쓰임새다.</span> 원문의 결론 그대로, 무게중심은 수익률에서 담보 활용성으로 옮겨 간다.</div><div class="src">원문 <b>쟁글 토큰화 채권 2-3 · 3 · 4-2</b></div></div></div>
+</section>
+<section class="slide div">
+  <div class="l">
+    <div class="ch">CHAPTER 2 · 대체자산 3-1. 부동산</div>
+    <div class="ttl">등기와 임대수익을 온체인 지분으로</div>
+    <h1>부동산 토큰을 사면<br>등기부에 <span class="a">내 이름</span>이 올라갈까</h1>
+    <div class="qa">
+      <div>대부분은 아니다. 토큰은 그 부동산을 소유한 <b>회사(LLC)의 지분</b>이고, 등기는 회사 명의로 남는다 (간접 지분형)</div>
+      <div>토큰 이전이 곧 공식 등기 변경이 되는 구조는 정부가 등기 시스템을 열어 준 두바이 사례가 거의 유일하다 (직접 발행형)</div>
+      <div>그래서 부동산 토큰의 질문은 "얼마나 쪼갰나"가 아니라 <b>"권리가 어디까지 닿나"</b>다</div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="v">2.03<small>억 달러</small></div><div class="k">토큰화 부동산 Distributed Value<br>외부 지갑으로 이전 가능한 자산 (RWA.xyz)</div></div>
+      <div class="s"><div class="v">2.80<small>억 달러</small></div><div class="k">Represented Value<br>발행 플랫폼 내부에서 보유 · 관리되는 자산</div></div>
+      <div class="s"><div class="v">50<small>달러</small></div><div class="k">RealT · Lofty의 최소 투자 단위<br>수억 원짜리 집을 이 단위로 쪼갠다</div></div>
+    </div>
+  </div>
+  <div class="r"><img src="img/s5-4-07.jpg" alt=""></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">대체 3-1 · 직접 발행형</span><span class="sec">Ctrl Alt × 두바이 토지청(DLD) · PRYPCO Mint</span></div><div class="pg"><b>12</b> / 27</div></div>
+  <h1 class="h1 sm">정부가 등기 시스템을 열어 준 사례. <span class="u">토큰 이전이 곧 공식 등록 기록의 변경</span>이 되도록 설계했다</h1>
+  <div class="strip"><div class="big">1,850<small>만 디르함</small></div><div class="vline"></div><div class="txt"><span class="k">한 줄 판정</span>약 500만 달러, 부동산 10건, 소유권 토큰 약 780만 개. <b>규모보다 "등기기관이 직접 참여했다"는 사실</b>이 이 사례의 가치다</div></div>
+  <div class="body">
+    <div class="col" style="width:1010px">
+      <div class="card navy">
+        <div class="tag">1단계 · 2025년 5월 시작</div>
+        <h4>분할 소유권 토큰 발행 + 공식 등기 시스템 연동</h4>
+        <ul>
+          <li>부동산 <b>10건, 1,850만 디르함</b> 토큰화. 소유권 토큰 약 780만 개를 <b>XRP Ledger</b>에서 발행</li>
+          <li>에미리트 ID를 가진 UAE 거주자가 <b>최소 2,000디르함(약 545달러)</b>부터 참여</li>
+          <li>발행 결과를 DLD 시스템과 동기화해 <b>온체인 기록과 공식 등록 기록의 정합성</b>을 관리</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag">2단계 · 2026년 2월 시작</div>
+        <h4>규제된 환경 안에서의 2차 거래(재판매)</h4>
+        <ul>
+          <li>승인된 플랫폼 안에서만 거래, <b>토큰 이전 결과가 DLD 공식 등록 기록에 반영</b></li>
+          <li>외부 지갑 · 임의 거래소로 자유 이전은 불가. <b>투자자 확인과 이전 승인</b> 절차를 거친다</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col grow">
+      <div class="card"><div class="tag">역할 1 · DLD (두바이 토지청)</div><p>공식 등록 기록의 주인. 토큰 발행 · 이전 결과를 <b>등기 기록에 반영</b></p></div>
+      <div class="card"><div class="tag">역할 2 · Ctrl Alt</div><p>구조 설계 · 발행 · <b>등기 연동 인프라.</b> VARA의 <b>가상자산 발행 + 브로커-딜러</b> 인가 보유</p></div>
+      <div class="card"><div class="tag">역할 3 · PRYPCO Mint</div><p>투자자가 실제로 청약하고 거래하는 <b>플랫폼</b></p></div>
+      <div class="card amber"><div class="tag">왜 정부 주도 파일럿인가</div><p>발행 · 이전과 소유권 기록을 <b>하나의 체계</b>로 처리하려면 등기기관 · 규제기관 · 플랫폼이 <span class="hl">기준을 함께 설계</span>해야 한다</p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">직접 발행형의 조건은 기술이 아니라 <span class="hl">"등기 권한을 가진 기관이 테이블에 앉느냐"</span>다. 그래서 민간 플랫폼이 아니라 정부 파일럿에서 먼저 나왔다.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-1 · 1) 직접 발행형</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">대체 3-1 · 간접 지분형</span><span class="sec">SPV(LLC) 구조 해부 · 현재 가장 널리 쓰이는 방식</span></div><div class="pg"><b>13</b> / 27</div></div>
+  <h1 class="h1">토큰 한 장은 부동산이 아니라<br><span class="a">그 부동산을 소유한 LLC의 멤버십 지분</span>이다</h1>
+  <div class="body" style="margin-top:26px">
+    <div class="col" style="width:1060px">
+      <svg viewBox="0 0 1060 560" width="1060" height="560" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#14213D"/></marker><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#C27A0E"/></marker></defs>
+        <text x="0" y="24" font-size="17" font-weight="800" fill="#6B7280" letter-spacing="2" class="en">OWNERSHIP CHAIN · 권리의 사슬</text>
+        <!-- boxes -->
+        <g font-weight="800" text-anchor="middle">
+          <rect x="0" y="52" width="230" height="110" rx="14" fill="#fff" stroke="#14213D" stroke-width="2.5"/>
+          <text x="115" y="96" font-size="24" fill="#14213D">부동산</text><text x="115" y="130" font-size="18" fill="#6B7280" font-weight="600">등기상 소유자 = LLC</text>
+          <rect x="290" y="52" width="230" height="110" rx="14" fill="#14213D"/>
+          <text x="405" y="96" font-size="24" fill="#fff">SPV (LLC)</text><text x="405" y="130" font-size="18" fill="#C9D2E6" font-weight="600">부동산 1건 = LLC 1개</text>
+          <rect x="580" y="52" width="230" height="110" rx="14" fill="#F2A93B"/>
+          <text x="695" y="96" font-size="24" fill="#14213D">지분 토큰</text><text x="695" y="130" font-size="18" fill="#7A4E05" font-weight="600">LLC 멤버십 지분을 표시</text>
+          <rect x="870" y="52" width="190" height="110" rx="14" fill="#fff" stroke="#14213D" stroke-width="2.5"/>
+          <text x="965" y="96" font-size="24" fill="#14213D">투자자</text><text x="965" y="130" font-size="18" fill="#6B7280" font-weight="600">약 50달러부터</text>
+        </g>
+        <g stroke="#14213D" stroke-width="2.5" fill="none" marker-end="url(#ar)"><path d="M230 107 L286 107"/><path d="M520 107 L576 107"/><path d="M810 107 L866 107"/></g>
+        <text x="258" y="92" font-size="16" fill="#14213D" font-weight="700" text-anchor="middle">소유</text>
+        <text x="548" y="92" font-size="16" fill="#14213D" font-weight="700" text-anchor="middle">발행</text>
+        <text x="838" y="92" font-size="16" fill="#14213D" font-weight="700" text-anchor="middle">보유</text>
+        <!-- offchain / onchain labels -->
+        <line x1="0" y1="190" x2="1060" y2="190" stroke="#D1D5DB" stroke-width="2" stroke-dasharray="6 6"/>
+        <text x="0" y="216" font-size="16" fill="#9CA3AF" font-weight="700">오프체인: 등기 · 임대차 · 관리 · 세금은 여기서 처리</text>
+        <text x="1060" y="216" font-size="16" fill="#C27A0E" font-weight="700" text-anchor="end">온체인: 지분의 발행 · 이전 · 분배 기록</text>
+        <!-- cash flow -->
+        <text x="0" y="272" font-size="17" font-weight="800" fill="#6B7280" letter-spacing="2" class="en">CASH FLOW · 돈의 흐름</text>
+        <g font-weight="700" text-anchor="middle">
+          <rect x="0" y="300" width="200" height="86" rx="12" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="2"/><text x="100" y="336" font-size="21" fill="#111827">임대료</text><text x="100" y="364" font-size="16" fill="#6B7280" font-weight="600">세입자 → LLC</text>
+          <rect x="260" y="300" width="240" height="86" rx="12" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="2"/><text x="380" y="336" font-size="21" fill="#111827">비용 차감</text><text x="380" y="364" font-size="16" fill="#6B7280" font-weight="600">세금 · 보험 · 관리비 · 수선비</text>
+          <rect x="560" y="300" width="200" height="86" rx="12" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="2"/><text x="660" y="336" font-size="21" fill="#111827">순수익</text><text x="660" y="364" font-size="16" fill="#6B7280" font-weight="600">지분 비율대로</text>
+          <rect x="820" y="300" width="240" height="86" rx="12" fill="#FCEFD9" stroke="#F3D9A6" stroke-width="2"/><text x="940" y="336" font-size="21" fill="#7A4E05">스테이블코인 지급</text><text x="940" y="364" font-size="16" fill="#C27A0E" font-weight="600">RealT 스테이블코인 · Lofty 일 단위 정산</text>
+        </g>
+        <g stroke="#C27A0E" stroke-width="2.5" fill="none" marker-end="url(#ar2)"><path d="M200 343 L256 343"/><path d="M500 343 L556 343"/><path d="M760 343 L816 343"/></g>
+        <!-- sale -->
+        <rect x="0" y="420" width="1060" height="70" rx="12" fill="#fff" stroke="#D1D5DB" stroke-width="2"/>
+        <text x="24" y="463" font-size="20" font-weight="700" fill="#374151">매각 시: 매각대금에서 비용을 뺀 금액을 지분 비율대로 분배 → 그 LLC와 토큰은 역할을 마친다</text>
+        <text x="0" y="540" font-size="17" fill="#6B7280" font-weight="600">배당 · 의결 · 청산 권리와 이전 제한은 코드가 아니라 LLC 운영계약 · 펀드 규약 · 개별 발행 문서가 정한다</text>
+      </svg>
+    </div>
+    <div class="col grow">
+      <div class="card"><div class="tag">용어 1 · SPV</div><h4>특정 자산 · 사업만 수행하는 특수목적기구</h4><p>역할을 가리키는 말이고, 법적 형태는 <b>LLC · 주식회사 · 조합 · 신탁</b> 무엇이든 될 수 있다. 부동산 토큰화에서는 주로 LLC를 쓴다.</p></div>
+      <div class="card"><div class="tag">용어 2 · LLC</div><h4>미국 주법상 유한책임회사</h4><p>자기 명의로 부동산을 소유하고 계약을 맺는 <b>독립 법인.</b> 투자자는 멤버십 지분을 보유하고, 책임은 <b>출자한 금액 범위</b>로 제한된다.</p></div>
+      <div class="card amber"><div class="tag">왜 부동산마다 LLC를 따로 두나</div><p>한 건물의 수익과 부채를 <span class="hl">다른 프로젝트와 분리</span>하기 위해서다. 옆 건물의 소송이나 부채가 내 토큰으로 번지지 않는다.</p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">간접 지분형이 널리 쓰이는 이유는 단순하다. <span class="hl">등기를 건드리지 않고 지분의 발행 · 이전 · 분배만 디지털화하면 되기 때문</span>이다. 대신 내 권리는 등기부가 아니라 LLC 문서에 적혀 있다.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-1 · 2) 간접 지분형</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">대체 3-1 · 간접 지분형</span><span class="sec">네 플레이어 비교 · 뼈대는 같고 자산 범위 · 자격 · 거버넌스 · 유동성 장치가 다르다</span></div><div class="pg"><b>14</b> / 27</div></div>
+  <h1 class="h1 sm">네 곳 모두 <span class="u">"LLC 지분 토큰"</span>이라는 같은 뼈대 위에 서 있다. 다른 것은 <span class="a">누구에게, 무엇을, 어떻게 팔 수 있게 했느냐</span>다</h1>
+  <div class="body" style="margin-top:24px">
+    <div class="col grow">
+      <table class="t cmp">
+        <thead><tr><th style="width:170px"></th><th>RealT</th><th>Lofty</th><th>Reental</th><th>RedSwan CRE</th></tr></thead>
+        <tbody>
+          <tr><td class="rh">대상 자산</td><td>미국 <b>주거용</b> 부동산</td><td>미국 <b>주거용</b> 부동산</td><td>미국 · 스페인 · 멕시코 · 도미니카공화국 · UAE 등 <b>다국가</b>. 주거 · 관광 · 개발 · 리모델링 · 단기 매입매각</td><td><b>기관급 상업용</b>. 호텔 · 물류시설 같은 개별 자산부터 포트폴리오 · 폐쇄형 펀드까지</td></tr>
+          <tr><td class="rh">구조</td><td>부동산별 LLC + 토큰. 등기상 소유자는 LLC</td><td>단일 자산 LLC 모델</td><td>프로젝트별 LLC. LLC가 직접 보유하거나 현지 법인 · 개발사에 투자하거나 <b>대출</b>을 제공</td><td>상품에 따라 프로젝트 SPV 또는 부동산 펀드 지분</td></tr>
+          <tr><td class="rh">체인 · 최소 투자</td><td>Ethereum · Gnosis Chain · <b>약 50달러</b></td><td>Algorand · <b>약 50달러</b></td><td>Polygon · <b>약 100달러 · 유로</b></td><td>미국 투자자 <b>Reg D 공인투자자</b>, 미국 외 <b>Reg S</b> 역외 발행</td></tr>
+          <tr><td class="rh">수익 배분</td><td>임대료에서 세금 · 보험 · 관리비 · 수선비를 뺀 <b>순수익을 스테이블코인</b>으로</td><td>임대수익을 지분에 따라 <b>일 단위 정산</b></td><td>임대형은 임대 · 매각수익, 개발형은 종료 후 매각대금에서 비용 차감 후 분배</td><td>상품별 상이. RedSwan Markets(FINRA 브로커딜러 · SIPC)가 판매, RedSwan PC(SEC 등록 투자자문)가 자문</td></tr>
+          <tr><td class="rh">눈여겨볼 점</td><td>각 부동산의 수익과 비용을 <b>LLC별로 분리</b> 관리</td><td><span class="hl">토큰 비례 투표</span>로 임대 조건 · 수선 · 관리사 교체 · 매각 결정. 마켓플레이스는 24시간 주문 가능하지만 <b>체결은 수요에 달림</b></td><td>108개국 약 4.2만 명, 119개 프로젝트 누적 1억 달러 이상. 프로젝트 토큰(SPV 지분)과 <b>RNT 유틸리티 토큰</b>은 별개</td><td>자체 집계 <b>약 40억 달러</b> 토큰화 + 약 52억 달러 파이프라인. 파이프라인은 발행 완료 실적이 아니며 집계 기준 미공개</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">Lofty의 "24시간 주문은 되지만 체결은 수요에 달렸다"는 문장이 핵심이다. <span class="hl">토큰화는 거래 가능성을 만들지, 거래 상대를 만들어 주지는 않는다.</span> 부동산별 거래량이 적으면 원하는 때 팔기 어렵다.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-1</b> · 수치는 각사 공식 페이지 · 자체 집계</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip amber">챕터 2 정리</span><span class="sec">토큰이 바꾼 것과 여전히 오프체인에 남는 것</span></div><div class="pg"><b>15</b> / 27</div></div>
+  <h1 class="h1">토큰이 바꾸는 것은 <span class="a">지분의 발행 · 이전 · 분배</span>이지<br><span class="u">부동산 그 자체</span>가 아니다</h1>
+  <div class="body" style="margin-top:28px">
+    <div class="cards c2" style="width:1100px;align-content:start">
+      <div class="card navy">
+        <div class="tag">토큰이 바꾼 것 · 온체인</div>
+        <ul>
+          <li><b>투자 단위</b>: 수억 원짜리 건물을 50 ~ 100달러 단위로</li>
+          <li><b>지분 발행 · 이전</b>: 종이 계약 대신 토큰 이전으로 기록</li>
+          <li><b>수익 분배</b>: 순수익을 스테이블코인으로 자동 배분, 일 단위 정산까지</li>
+          <li><b>거버넌스</b>: 토큰 비례 투표로 운영 안건 결정 (Lofty)</li>
+          <li><b>주문 접수</b>: 마켓플레이스에서 24시간 매수 · 매도 주문</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tag">여전히 오프체인 · 현지 법률과 사람의 일</div>
+        <ul>
+          <li><b>등기</b>: 직접 발행형(DLD)을 빼면 등기부는 LLC 명의로 오프체인에 남는다</li>
+          <li><b>감정평가</b>: 실시간 시장가격이 없어 가치평가는 주기적 · 수작업</li>
+          <li><b>세금 · 임대차 · 시설 관리</b>: 세입자 관리, 수선, 보험은 현지 운영 체계</li>
+          <li><b>매각</b>: 건물을 파는 절차와 시점은 오프체인 시장이 정한다</li>
+          <li><b>체결</b>: 주문은 24시간이지만 상대방이 있어야 거래가 된다</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col grow">
+      <div class="card"><div class="tag">두 방식 한 줄 비교</div><p><b>직접 발행형</b>은 토큰 이전과 공식 소유권 변경을 하나의 절차로 잇는다. 등기기관 · 규제기관 참여가 필요해 정부 파일럿 중심.</p><p><b>간접 지분형</b>은 기존 등기를 유지한 채 SPV · 펀드 지분을 토큰화한다. 여러 국가 · 자산 유형에 적용하기 쉬워 시장의 주류.</p></div>
+      <div class="card teal"><div class="tag">한국과의 연결 · 예림님 파트(대체 4)로</div><p>카사 · 루센트블록(소유) · 펀블은 부동산을 <b>수익증권</b> 구조로 조각투자했다. 미국의 LLC 지분 토큰과 법적 껍데기는 다르지만, <span class="hl">고가 · 비유동 자산의 단위를 낮추고 분배를 디지털화</span>한다는 목표는 같다.</p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">부동산 토큰을 볼 때 확인할 순서: <span class="hl">① 토큰이 나타내는 권리(등기 연동인가, LLC 지분인가) ② 분배 규칙(무엇을 빼고 언제 주나) ③ 유동성 장치(누가 사 주나)</span>. 수익률은 그 다음이다.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-1 · 4-1</b></div></div></div>
+</section>
+<section class="slide div">
+  <div class="l">
+    <div class="ch">CHAPTER 3 · 대체자산 3-2. 원자재</div>
+    <div class="ttl">금고의 실물을 온체인 청구권으로</div>
+    <h1>원자재 토큰화는 왜<br><span class="a">금</span>에서 시작했나</h1>
+    <div class="qa">
+      <div><b>시장이 크다.</b> 글로벌 거래 시장이 있어 가격을 매기고 되팔기 쉽다</div>
+      <div><b>품질이 표준화돼 있다.</b> London Good Delivery 같은 규격이 있어 "어떤 금인가"를 다투지 않아도 된다</div>
+      <div><b>오래 보관해도 변하지 않는다.</b> 원유 · 농산물처럼 품질 · 운송 · 만기를 걱정할 필요가 없다</div>
+      <div>그래서 금 토큰의 질문은 하나로 모인다. <b>"내 토큰은 어느 금고의 어느 금괴에 대한 권리인가"</b></div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="v">74.6<small>억 달러</small></div><div class="k">토큰화 원자재 시가총액<br>(RWA.xyz, 2026.7.22)</div></div>
+      <div class="s"><div class="v">127.6<small>억 달러</small></div><div class="k">월간 전송액<br>시가총액보다 크다. 거래 · 이전이 활발</div></div>
+      <div class="s"><div class="v">20.3<small>만 명</small></div><div class="k">보유자 수<br>Tether · Paxos 금 토큰이 큰 비중</div></div>
+    </div>
+  </div>
+  <div class="r"><img src="img/s5-4-08.jpg" alt=""></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">대체 3-2 · 원자재</span><span class="sec">세 플레이어 비교 · PAXG · XAUT · KAU / KAG</span></div><div class="pg"><b>17</b> / 27</div></div>
+  <h1 class="h1 sm">셋 다 <span class="u">"개별 배정(allocated)된 실물 금에 대한 권리"</span>를 판다. 다른 것은 <span class="a">발행사의 성격, 보관 장소, 인출 규칙</span>이다</h1>
+  <div class="body" style="margin-top:24px">
+    <div class="col grow">
+      <table class="t cmp">
+        <thead><tr><th style="width:190px"></th><th>PAX Gold (PAXG)</th><th>Tether Gold (XAUT)</th><th>Kinesis (KAU · KAG)</th></tr></thead>
+        <tbody>
+          <tr><td class="rh">발행사 · 감독</td><td><b>Paxos Trust Company, N.A.</b> 미국 연방 인가 신탁은행. 미국 통화감독청(<b>OCC</b>) 감독</td><td><b>TG Commodities, S.A. de C.V.</b> 엘살바도르 법인. 엘살바도르 디지털자산국가위원회(<b>CNAD</b>) 감독</td><td><b>Kinesis.</b> 금 · 은 실물 담보 토큰에 결제 · 수익 공유 시스템을 결합한 플랫폼</td></tr>
+          <tr><td class="rh">1 토큰 = </td><td>London Good Delivery 금괴의 <b>순금 1트로이온스</b> 소유권</td><td>특정 금괴에 배정된 <b>순금 1트로이온스</b>에 대한 비분할 소유권</td><td><b>1 KAU = 금 1그램</b> · <b>1 KAG = 은 1온스</b></td></tr>
+          <tr><td class="rh">보관 · 투명성</td><td>런던 <b>LBMA 인증 금고</b>, 개별 배정. 보유자가 <span class="hl">금괴 일련번호 · 중량 · 보관 금고를 조회</span> 가능</td><td><b>스위스 수탁기관</b>, 개별 배정 방식</td><td>보험과 외부 감사를 적용하는 <b>ABX 제휴 금고 네트워크</b>, 개별 배정</td></tr>
+          <tr><td class="rh">체인</td><td>Ethereum 등</td><td>Ethereum 발행. 다중 체인 이전용 <b>XAUT0</b>가 TON · Solana 등 지원</td><td>자체 네트워크 (네이티브 KAU · KAG)</td></tr>
+          <tr><td class="rh">인출 · 특징</td><td>실물 상환은 보통 <b>LGD 금괴 단위</b>가 필요. 소액 보유자는 <b>USD 상환</b>이나 승인 딜러를 통한 <b>부분 상환</b></td><td>특정 금괴에 대한 비분할 소유권 구조</td><td>네이티브 보유자는 공동 보관된 금 · 은 풀에 <b>보유량 비례 소유권</b>. 거래 수수료 수익 일부를 <b>월별로 배분</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">핵심 단어는 <span class="hl">allocated(개별 배정)</span>. 어느 금괴가 내 것인지 지목할 수 있어야 "가격 노출"이 아니라 "청구권"이다. PAXG 1개를 들고 금괴를 찾으러 가면 LGD 단위(약 400온스 규격)의 벽을 만난다는 점도 기억해 두자.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-2</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip amber">챕터 3 정리</span><span class="sec">금 토큰 체크리스트 5 · 금 밖으로 갈수록 어려워지는 이유</span></div><div class="pg"><b>18</b> / 27</div></div>
+  <h1 class="h1">구조는 직관적이다. 금고에 금을 넣고 권리를 토큰으로 발행한다.<br>어려운 것은 <span class="u">그 권리가 진짜인지 확인하는 다섯 가지</span>다</h1>
+  <div class="body" style="margin-top:28px">
+    <div class="col" style="width:900px">
+      <div class="card"><div class="step"><div class="n">1</div><div><h4>어떤 금에 대한 권리인가</h4><p>특정 금괴에 개별 배정됐나, 아니면 풀에 대한 비례 지분인가</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">2</div><div><h4>어디에 보관되나</h4><p>런던 LBMA 금고, 스위스 수탁기관, 제휴 금고 네트워크. 관할과 보험이 달라진다</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">3</div><div><h4>감사는 어떻게 이루어지나</h4><p>누가, 얼마나 자주, 무엇을 확인하나. 일련번호 조회가 가능한가</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">4</div><div><h4>실물 인출이 가능한가</h4><p>가능하다면 어느 단위로. LGD 금괴 단위라면 사실상 기관만 인출한다</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">5</div><div><h4>최소 수량과 비용은</h4><p>부분 상환 · USD 상환 · 승인 딜러 경로의 조건과 수수료</p></div></div></div>
+    </div>
+    <div class="col grow">
+      <div class="card navy" style="flex:1">
+        <div class="tag">금 밖으로 확장할수록 복잡해지는 이유</div>
+        <h4>같은 "실물 보관형"이라도 원자재마다 물리적 성질과 시장 구조가 다르다</h4>
+        <svg viewBox="0 0 760 300" width="744" height="294" style="margin-top:14px" xmlns="http://www.w3.org/2000/svg">
+          <line x1="40" y1="250" x2="720" y2="250" stroke="#3B4A6B" stroke-width="2"/>
+          <g text-anchor="middle">
+            <rect x="40" y="170" width="190" height="80" rx="10" fill="#F2A93B"/><text x="135" y="204" font-size="24" font-weight="900" fill="#14213D">금</text><text x="135" y="232" font-size="17" fill="#5A3A05" font-weight="700">표준화 · 장기 보관 · 큰 시장</text>
+            <rect x="285" y="120" width="190" height="130" rx="10" fill="#8A97B5"/><text x="380" y="164" font-size="24" font-weight="900" fill="#fff">은</text><text x="380" y="194" font-size="17" fill="#fff" font-weight="700">가치 대비 부피가 커서</text><text x="380" y="216" font-size="17" fill="#fff" font-weight="700">보관 효율이 낮다</text>
+            <rect x="530" y="40" width="190" height="210" rx="10" fill="#4C5C82"/><text x="625" y="84" font-size="24" font-weight="900" fill="#fff">원유 · 농산물</text><text x="625" y="118" font-size="17" fill="#E5E9F2" font-weight="700">품질 등급</text><text x="625" y="142" font-size="17" fill="#E5E9F2" font-weight="700">운송 · 보관 기간</text><text x="625" y="166" font-size="17" fill="#E5E9F2" font-weight="700">재고 회전</text><text x="625" y="190" font-size="17" fill="#E5E9F2" font-weight="700">선물 만기 관리</text>
+          </g>
+          <text x="40" y="288" font-size="16" fill="#B7C1D8" font-weight="600">→ 오른쪽으로 갈수록 "보관 중인 실물 = 토큰 1개"라는 단순한 관계를 유지하기 어렵다</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">금 토큰은 <span class="hl">"실물 보관형 토큰"의 가장 단순한 원형</span>이다. 다음 순서 제희님의 수집품(카드 · 시계 · 예술품)은 같은 원형에 "진품성 · 등급 · 개별 편차"라는 변수가 더해진 버전으로 보면 이어진다.</div><div class="src">원문 <b>쟁글 토큰화 대체자산 3-2 · 3-3</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip amber">Part 4 종합</span><span class="sec">세 자산, 세 개의 연결 고리</span></div><div class="pg"><b>19</b> / 27</div></div>
+  <h1 class="h1">세 자산 모두 <span class="u">오프체인 실체와 온체인 토큰을 잇는 다리</span>를 놓는 일이다.<br>다리의 <span class="a">재료</span>가 다를 뿐이다</h1>
+  <div class="body" style="margin-top:26px">
+    <div class="col" style="width:640px">
+      <div class="fig contain" style="width:640px;height:400px"><img src="img/s5-4-09.jpg" alt=""></div>
+      <div class="card amber"><p>세 다리의 공통 약점도 같다. <b>다리 건너편(오프체인)에서 일어나는 일</b>인 펀드 환매 지연, 등기 분쟁, 금고 감사 실패는 토큰 코드가 막아 주지 못한다. 그래서 두 아티클 모두 <b>"수탁 · 감사 · 공시 · 환매 조건을 확인하라"</b>로 끝난다.</p></div>
+    </div>
+    <div class="col grow">
+      <table class="t big">
+        <thead><tr><th style="width:120px">자산</th><th>오프체인에 남는 실체</th><th>법적 껍데기</th><th>토큰이 나타내는 권리</th><th>가치를 정하는 질문</th></tr></thead>
+        <tbody>
+          <tr><td class="rh" style="width:120px">국채</td><td>국채 · repo를 보유한 펀드 장부와 수탁(BNY Mellon · State Street 등)</td><td>펀드(BVI · 케이맨 · 델라웨어) 또는 노트 발행 SPV · Reg D / Reg S</td><td><b>펀드 지분</b> 또는 발행사에 대한 <b>상환청구권</b></td><td><span class="hl">어디에서 담보로 인정받나</span></td></tr>
+          <tr><td class="rh">부동산</td><td>등기부 · 임대차 · 시설 관리 · 세금 · 매각 절차</td><td>부동산별 <b>SPV(LLC)</b>. 예외적으로 등기 시스템 직접 연동(DLD)</td><td><b>LLC 멤버십 지분</b> (직접 발행형은 등기 연동 소유권)</td><td><span class="hl">권리가 등기까지 닿나, 분배 · 유동성 장치는</span></td></tr>
+          <tr><td class="rh">금</td><td>금고 속 금괴 · 감사 · 보험 · 인출 절차</td><td>신탁은행(Paxos) · 발행 법인(TG Commodities) · 플랫폼(Kinesis)</td><td>개별 배정된 <b>특정 금괴에 대한 소유권</b></td><td><span class="hl">어느 금괴인지 말할 수 있나, 인출 조건은</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">첫 장의 문장으로 돌아오면, <span class="hl">"어떤 권리를 담았고(다리의 재료), 어디에서 인정받는가(다리가 닿는 곳)"</span>가 세 자산 모두의 가치를 정한다. 담긴 자산의 종류는 그 다음이다.</div><div class="src">원문 <b>쟁글 토큰화 채권 4-2 · 토큰화 대체자산 5</b></div></div></div>
+</section>
+<section class="slide div">
+  <div class="l">
+    <div class="ch">PART B · 막혔던 부분 · 추가 설명 10분</div>
+    <div class="ttl">Curve StableSwap 구조를 직관으로 다시 보기</div>
+    <h1>1달러짜리끼리 바꾸는 시장이 없으면<br><span class="a">24시간 환매</span>도 <span class="a">준비자산 스테이블코인</span>도 굴러가지 않는다</h1>
+    <div class="qa">
+      <div>3-1의 현금관리는 "언제든 스테이블코인으로 되돌린다"는 시장을 전제로 한다. 그 시장이 얇으면 24시간 환매는 숫자로만 남는다</div>
+      <div>3-4의 USD0 · frxUSD · USDtb는 준비자산이 아무리 좋아도 <b>1달러 근처 자산끼리 바꾸는 풀</b> 위에서 페그가 지켜진다</div>
+      <div>4회차에 예림님이 정리한 StableSwap과 재환님의 Curve War 노트를 이어받아, <b>"왜 그렇게 생겼나"</b>부터 다시 봅니다</div>
+    </div>
+    <div class="stats">
+      <div class="s"><div class="v">2<small>개의 극단</small></div><div class="k">Constant Product와 Constant Sum<br>Curve는 둘 사이를 다이얼로 조절한다</div></div>
+      <div class="s"><div class="v">A</div><div class="k">증폭계수 · "두 자산이 같은 값"이라는<br>믿음의 크기</div></div>
+      <div class="s"><div class="v">0.915<small>달러</small></div><div class="k">2025.1 USD0++가 미끄러진 자리<br>풀의 쏠림이 경보등이 된 사례</div></div>
+    </div>
+  </div>
+  <div class="r"><img src="img/s5-4-10.jpg" alt=""></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip teal">Curve 1 / 4</span><span class="sec">두 극단 · Constant Product와 Constant Sum</span></div><div class="pg"><b>21</b> / 27</div></div>
+  <h1 class="h1">하나는 <span class="u">안전하지만 비싸고</span>, 하나는 <span class="u">싸지만 위험하다</span>.<br>Curve의 질문은 <span class="a">"둘을 어떻게 섞을까"</span>였다</h1>
+  <div class="body" style="margin-top:20px">
+    <div style="flex:none"><svg viewBox="-60 -20 800 760" width="760" height="722" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#D1D5DB" stroke-width="2"><line x1="0" y1="700" x2="700" y2="700"/><line x1="0" y1="0" x2="0" y2="700"/></g>
+<g font-size="17" fill="#6B7280" font-weight="600"><text x="700" y="730" text-anchor="end">풀 안의 USDC 수량 →</text><text x="-700" y="-14" transform="rotate(-90)" text-anchor="start">↑ 풀 안의 USDT 수량</text></g>
+<g font-size="15" fill="#9CA3AF" class="en"><text x="350" y="722" text-anchor="middle">1,000</text><text x="-12" y="355" text-anchor="end">1,000</text><text x="700" y="722" text-anchor="middle">2,000</text><text x="-12" y="8" text-anchor="end">2,000</text></g>
+<path d="M0 700 L700 0" stroke="#F2A93B" stroke-width="5" fill="none"/>
+<path d="M182.0 26.9 L185.5 39.6 L189.0 51.9 L192.5 63.6 L196.0 75.0 L199.5 86.0 L203.0 96.6 L206.5 106.8 L210.0 116.7 L213.5 126.2 L217.0 135.5 L220.5 144.4 L224.0 153.1 L227.5 161.5 L231.0 169.7 L234.5 177.6 L238.0 185.3 L241.5 192.8 L245.0 200.0 L248.5 207.0 L252.0 213.9 L255.5 220.5 L259.0 227.0 L262.5 233.3 L266.0 239.5 L269.5 245.5 L273.0 251.3 L276.5 257.0 L280.0 262.5 L283.5 267.9 L287.0 273.2 L290.5 278.3 L294.0 283.3 L297.5 288.2 L301.0 293.0 L304.5 297.7 L308.0 302.3 L311.5 306.7 L315.0 311.1 L318.5 315.4 L322.0 319.6 L325.5 323.7 L329.0 327.7 L332.5 331.6 L336.0 335.4 L339.5 339.2 L343.0 342.9 L346.5 346.5 L350.0 350.0 L353.5 353.5 L357.0 356.9 L360.5 360.2 L364.0 363.5 L367.5 366.7 L371.0 369.8 L374.5 372.9 L378.0 375.9 L381.5 378.9 L385.0 381.8 L388.5 384.7 L392.0 387.5 L395.5 390.3 L399.0 393.0 L402.5 395.7 L406.0 398.3 L409.5 400.9 L413.0 403.4 L416.5 405.9 L420.0 408.3 L423.5 410.7 L427.0 413.1 L430.5 415.4 L434.0 417.7 L437.5 420.0 L441.0 422.2 L444.5 424.4 L448.0 426.6 L451.5 428.7 L455.0 430.8 L458.5 432.8 L462.0 434.8 L465.5 436.8 L469.0 438.8 L472.5 440.7 L476.0 442.6 L479.5 444.5 L483.0 446.4 L486.5 448.2 L490.0 450.0 L493.5 451.8 L497.0 453.5 L500.5 455.2 L504.0 456.9 L507.5 458.6 L511.0 460.3 L514.5 461.9 L518.0 463.5 L521.5 465.1 L525.0 466.7 L528.5 468.2 L532.0 469.7 L535.5 471.2 L539.0 472.7 L542.5 474.2 L546.0 475.6 L549.5 477.1 L553.0 478.5 L556.5 479.9 L560.0 481.2 L563.5 482.6 L567.0 484.0 L570.5 485.3 L574.0 486.6 L577.5 487.9 L581.0 489.2 L584.5 490.4 L588.0 491.7 L591.5 492.9 L595.0 494.1 L598.5 495.3 L602.0 496.5 L605.5 497.7 L609.0 498.9 L612.5 500.0 L616.0 501.1 L619.5 502.3 L623.0 503.4 L626.5 504.5 L630.0 505.6 L633.5 506.6 L637.0 507.7 L640.5 508.7 L644.0 509.8 L647.5 510.8 L651.0 511.8 L654.5 512.8 L658.0 513.8 L661.5 514.8 L665.0 515.8 L668.5 516.8 L672.0 517.7 L675.5 518.7 L679.0 519.6 L682.5 520.5" stroke="#14213D" stroke-width="5" fill="none"/>
+<circle cx="350" cy="350" r="9" fill="#fff" stroke="#111827" stroke-width="3"/>
+<text x="366" y="340" font-size="17" font-weight="800" fill="#111827">출발 1,000 : 1,000</text>
+<!-- after adding 100 USDC -->
+<line x1="385" y1="350" x2="385" y2="700" stroke="#9CA3AF" stroke-width="1.5" stroke-dasharray="4 5"/>
+<circle cx="385" cy="381.8" r="7" fill="#14213D"/>
+<circle cx="385" cy="385.0" r="7" fill="#F2A93B"/>
+<text x="400" y="375.8" font-size="16" font-weight="700" fill="#14213D">곱: USDT 90.9개 받음</text>
+<text x="400" y="407.0" font-size="16" font-weight="700" fill="#C27A0E">합: USDT 100개 받음</text>
+<text x="40" y="60" font-size="20" font-weight="900" fill="#14213D">Constant Product · x × y = k</text>
+<text x="40" y="86" font-size="16" fill="#374151" font-weight="600">거래할수록 가격이 움직인다. 끝으로 갈수록 급격히</text>
+<text x="330" y="640" font-size="20" font-weight="900" fill="#C27A0E">Constant Sum · x + y = k</text>
+<text x="330" y="666" font-size="16" fill="#374151" font-weight="600">언제나 1 : 1. 그러나 한쪽이 바닥날 수 있다</text>
+</svg></div>
+    <div class="col grow">
+      <div class="card"><div class="tag">Constant Product · 유니스왑 방식</div><h4>거래할 때마다 가격이 움직인다</h4><p>1,000 : 1,000 풀에 USDC 100개를 넣으면 USDT <b>90.9개</b>만 받는다. 한쪽이 줄수록 값이 빠르게 뛰어 <b>고갈을 스스로 막는다.</b> ETH/USDC처럼 상대가격이 움직이는 쌍에 맞다.</p></div>
+      <div class="card"><div class="tag">Constant Sum · 고정 환율</div><h4>언제나 1 : 1, 그러나 바닥이 날 수 있다</h4><p>같은 풀에서 USDC 100개를 넣으면 USDT <b>100개</b>를 받는다. 가격 충격이 없다. 문제는 USDT가 밖에서 0.8달러가 되어도 풀은 계속 1 : 1로 바꿔 준다는 것. <b>차익거래자가 풀의 USDC를 전부 빼 간다</b> (예림님이 든 예시 그대로).</p></div>
+      <div class="card amber"><div class="tag">그래서 필요한 것</div><p>스테이블코인끼리는 <span class="hl">평소엔 직선처럼(1 : 1), 위험할 땐 곡선처럼(가격이 움직여 고갈 방지)</span> 행동하는 규칙. 이 요구에서 StableSwap이 나왔다.</p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">두 극단은 각각 <span class="hl">"가격을 지킬 것인가, 재고를 지킬 것인가"</span>를 택한 설계다. Curve는 "언제 무엇을 지킬지"를 풀의 상태에 따라 자동으로 바꾸는 쪽을 택했다.</div><div class="src">4회차 · 예림님 StableSwap 정리(9/1) · Curve StableSwap 백서(2019)</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip teal">Curve 2 / 4</span><span class="sec">StableSwap = 두 곡선을 섞는 다이얼(A)</span></div><div class="pg"><b>22</b> / 27</div></div>
+  <h1 class="h1">균형 근처에서는 <span class="a">직선처럼</span>, 한쪽이 마르면 <span class="a">곡선처럼</span>.<br>다이얼 <span class="u">A</span>는 "두 자산이 같은 값"이라는 믿음의 크기다</h1>
+  <div class="body" style="margin-top:20px">
+    <div style="flex:none"><svg viewBox="-60 -20 800 760" width="760" height="722" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#D1D5DB" stroke-width="2"><line x1="0" y1="700" x2="700" y2="700"/><line x1="0" y1="0" x2="0" y2="700"/></g>
+<g font-size="17" fill="#6B7280" font-weight="600"><text x="700" y="730" text-anchor="end">풀 안의 USDC 수량 →</text><text x="-700" y="-14" transform="rotate(-90)" text-anchor="start">↑ 풀 안의 USDT 수량</text></g>
+<g font-size="15" fill="#9CA3AF" class="en"><text x="350" y="722" text-anchor="middle">1,000</text><text x="-12" y="355" text-anchor="end">1,000</text><text x="700" y="722" text-anchor="middle">2,000</text><text x="-12" y="8" text-anchor="end">2,000</text></g>
+<path d="M0 700 L700 0" stroke="#F2A93B" stroke-width="3" fill="none" stroke-dasharray="8 8"/>
+<path d="M182.0 26.9 L185.5 39.6 L189.0 51.9 L192.5 63.6 L196.0 75.0 L199.5 86.0 L203.0 96.6 L206.5 106.8 L210.0 116.7 L213.5 126.2 L217.0 135.5 L220.5 144.4 L224.0 153.1 L227.5 161.5 L231.0 169.7 L234.5 177.6 L238.0 185.3 L241.5 192.8 L245.0 200.0 L248.5 207.0 L252.0 213.9 L255.5 220.5 L259.0 227.0 L262.5 233.3 L266.0 239.5 L269.5 245.5 L273.0 251.3 L276.5 257.0 L280.0 262.5 L283.5 267.9 L287.0 273.2 L290.5 278.3 L294.0 283.3 L297.5 288.2 L301.0 293.0 L304.5 297.7 L308.0 302.3 L311.5 306.7 L315.0 311.1 L318.5 315.4 L322.0 319.6 L325.5 323.7 L329.0 327.7 L332.5 331.6 L336.0 335.4 L339.5 339.2 L343.0 342.9 L346.5 346.5 L350.0 350.0 L353.5 353.5 L357.0 356.9 L360.5 360.2 L364.0 363.5 L367.5 366.7 L371.0 369.8 L374.5 372.9 L378.0 375.9 L381.5 378.9 L385.0 381.8 L388.5 384.7 L392.0 387.5 L395.5 390.3 L399.0 393.0 L402.5 395.7 L406.0 398.3 L409.5 400.9 L413.0 403.4 L416.5 405.9 L420.0 408.3 L423.5 410.7 L427.0 413.1 L430.5 415.4 L434.0 417.7 L437.5 420.0 L441.0 422.2 L444.5 424.4 L448.0 426.6 L451.5 428.7 L455.0 430.8 L458.5 432.8 L462.0 434.8 L465.5 436.8 L469.0 438.8 L472.5 440.7 L476.0 442.6 L479.5 444.5 L483.0 446.4 L486.5 448.2 L490.0 450.0 L493.5 451.8 L497.0 453.5 L500.5 455.2 L504.0 456.9 L507.5 458.6 L511.0 460.3 L514.5 461.9 L518.0 463.5 L521.5 465.1 L525.0 466.7 L528.5 468.2 L532.0 469.7 L535.5 471.2 L539.0 472.7 L542.5 474.2 L546.0 475.6 L549.5 477.1 L553.0 478.5 L556.5 479.9 L560.0 481.2 L563.5 482.6 L567.0 484.0 L570.5 485.3 L574.0 486.6 L577.5 487.9 L581.0 489.2 L584.5 490.4 L588.0 491.7 L591.5 492.9 L595.0 494.1 L598.5 495.3 L602.0 496.5 L605.5 497.7 L609.0 498.9 L612.5 500.0 L616.0 501.1 L619.5 502.3 L623.0 503.4 L626.5 504.5 L630.0 505.6 L633.5 506.6 L637.0 507.7 L640.5 508.7 L644.0 509.8 L647.5 510.8 L651.0 511.8 L654.5 512.8 L658.0 513.8 L661.5 514.8 L665.0 515.8 L668.5 516.8 L672.0 517.7 L675.5 518.7 L679.0 519.6 L682.5 520.5" stroke="#9CA3AF" stroke-width="3" fill="none" stroke-dasharray="8 8"/>
+<path d="M49.0 3.7 L52.5 10.8 L56.0 17.4 L59.5 23.7 L63.0 29.7 L66.5 35.5 L70.0 41.0 L73.5 46.4 L77.0 51.6 L80.5 56.6 L84.0 61.5 L87.5 66.3 L91.0 71.0 L94.5 75.7 L98.0 80.2 L101.5 84.7 L105.0 89.1 L108.5 93.4 L112.0 97.7 L115.5 102.0 L119.0 106.2 L122.5 110.3 L126.0 114.4 L129.5 118.5 L133.0 122.6 L136.5 126.6 L140.0 130.6 L143.5 134.6 L147.0 138.5 L150.5 142.5 L154.0 146.4 L157.5 150.2 L161.0 154.1 L164.5 158.0 L168.0 161.8 L171.5 165.6 L175.0 169.4 L178.5 173.2 L182.0 177.0 L185.5 180.7 L189.0 184.5 L192.5 188.2 L196.0 192.0 L199.5 195.7 L203.0 199.4 L206.5 203.1 L210.0 206.8 L213.5 210.5 L217.0 214.2 L220.5 217.8 L224.0 221.5 L227.5 225.2 L231.0 228.8 L234.5 232.4 L238.0 236.1 L241.5 239.7 L245.0 243.3 L248.5 247.0 L252.0 250.6 L255.5 254.2 L259.0 257.8 L262.5 261.4 L266.0 265.0 L269.5 268.6 L273.0 272.1 L276.5 275.7 L280.0 279.3 L283.5 282.9 L287.0 286.4 L290.5 290.0 L294.0 293.6 L297.5 297.1 L301.0 300.7 L304.5 304.2 L308.0 307.8 L311.5 311.3 L315.0 314.8 L318.5 318.4 L322.0 321.9 L325.5 325.4 L329.0 328.9 L332.5 332.5 L336.0 336.0 L339.5 339.5 L343.0 343.0 L346.5 346.5 L350.0 350.0 L353.5 353.5 L357.0 357.0 L360.5 360.5 L364.0 364.0 L367.5 367.5 L371.0 370.9 L374.5 374.4 L378.0 377.9 L381.5 381.4 L385.0 384.8 L388.5 388.3 L392.0 391.8 L395.5 395.2 L399.0 398.7 L402.5 402.1 L406.0 405.6 L409.5 409.0 L413.0 412.4 L416.5 415.9 L420.0 419.3 L423.5 422.7 L427.0 426.2 L430.5 429.6 L434.0 433.0 L437.5 436.4 L441.0 439.8 L444.5 443.2 L448.0 446.6 L451.5 450.0 L455.0 453.4 L458.5 456.8 L462.0 460.2 L465.5 463.5 L469.0 466.9 L472.5 470.3 L476.0 473.6 L479.5 477.0 L483.0 480.3 L486.5 483.6 L490.0 487.0 L493.5 490.3 L497.0 493.6 L500.5 496.9 L504.0 500.2 L507.5 503.5 L511.0 506.8 L514.5 510.1 L518.0 513.3 L521.5 516.6 L525.0 519.8 L528.5 523.1 L532.0 526.3 L535.5 529.5 L539.0 532.7 L542.5 535.9 L546.0 539.1 L549.5 542.3 L553.0 545.4 L556.5 548.6 L560.0 551.7 L563.5 554.8 L567.0 557.9 L570.5 561.0 L574.0 564.0 L577.5 567.1 L581.0 570.1 L584.5 573.1 L588.0 576.1 L591.5 579.0 L595.0 582.0 L598.5 584.9 L602.0 587.8 L605.5 590.6 L609.0 593.5 L612.5 596.3 L616.0 599.0 L619.5 601.8 L623.0 604.5 L626.5 607.1 L630.0 609.8 L633.5 612.4 L637.0 614.9 L640.5 617.5 L644.0 619.9 L647.5 622.4 L651.0 624.7 L654.5 627.1 L658.0 629.4 L661.5 631.6 L665.0 633.8 L668.5 635.9 L672.0 638.0 L675.5 640.1 L679.0 642.0 L682.5 644.0" stroke="#2E8B84" stroke-width="5" fill="none"/>
+<path d="M21.0 8.0 L24.5 13.5 L28.0 18.5 L31.5 23.2 L35.0 27.6 L38.5 31.9 L42.0 36.1 L45.5 40.1 L49.0 44.1 L52.5 48.0 L56.0 51.8 L59.5 55.7 L63.0 59.4 L66.5 63.2 L70.0 66.9 L73.5 70.6 L77.0 74.3 L80.5 78.0 L84.0 81.6 L87.5 85.3 L91.0 88.9 L94.5 92.5 L98.0 96.1 L101.5 99.7 L105.0 103.3 L108.5 106.9 L112.0 110.5 L115.5 114.1 L119.0 117.7 L122.5 121.2 L126.0 124.8 L129.5 128.4 L133.0 131.9 L136.5 135.5 L140.0 139.0 L143.5 142.6 L147.0 146.1 L150.5 149.7 L154.0 153.2 L157.5 156.7 L161.0 160.3 L164.5 163.8 L168.0 167.4 L171.5 170.9 L175.0 174.4 L178.5 177.9 L182.0 181.5 L185.5 185.0 L189.0 188.5 L192.5 192.1 L196.0 195.6 L199.5 199.1 L203.0 202.6 L206.5 206.1 L210.0 209.7 L213.5 213.2 L217.0 216.7 L220.5 220.2 L224.0 223.7 L227.5 227.3 L231.0 230.8 L234.5 234.3 L238.0 237.8 L241.5 241.3 L245.0 244.8 L248.5 248.3 L252.0 251.9 L255.5 255.4 L259.0 258.9 L262.5 262.4 L266.0 265.9 L269.5 269.4 L273.0 272.9 L276.5 276.4 L280.0 279.9 L283.5 283.4 L287.0 286.9 L290.5 290.4 L294.0 294.0 L297.5 297.5 L301.0 301.0 L304.5 304.5 L308.0 308.0 L311.5 311.5 L315.0 315.0 L318.5 318.5 L322.0 322.0 L325.5 325.5 L329.0 329.0 L332.5 332.5 L336.0 336.0 L339.5 339.5 L343.0 343.0 L346.5 346.5 L350.0 350.0 L353.5 353.5 L357.0 357.0 L360.5 360.5 L364.0 364.0 L367.5 367.5 L371.0 371.0 L374.5 374.5 L378.0 378.0 L381.5 381.5 L385.0 385.0 L388.5 388.5 L392.0 392.0 L395.5 395.5 L399.0 399.0 L402.5 402.5 L406.0 406.0 L409.5 409.4 L413.0 412.9 L416.5 416.4 L420.0 419.9 L423.5 423.4 L427.0 426.9 L430.5 430.4 L434.0 433.9 L437.5 437.4 L441.0 440.9 L444.5 444.4 L448.0 447.9 L451.5 451.3 L455.0 454.8 L458.5 458.3 L462.0 461.8 L465.5 465.3 L469.0 468.8 L472.5 472.3 L476.0 475.7 L479.5 479.2 L483.0 482.7 L486.5 486.2 L490.0 489.7 L493.5 493.1 L497.0 496.6 L500.5 500.1 L504.0 503.6 L507.5 507.1 L511.0 510.5 L514.5 514.0 L518.0 517.5 L521.5 521.0 L525.0 524.4 L528.5 527.9 L532.0 531.4 L535.5 534.8 L539.0 538.3 L542.5 541.8 L546.0 545.2 L549.5 548.7 L553.0 552.1 L556.5 555.6 L560.0 559.0 L563.5 562.5 L567.0 565.9 L570.5 569.4 L574.0 572.8 L577.5 576.3 L581.0 579.7 L584.5 583.1 L588.0 586.5 L591.5 590.0 L595.0 593.4 L598.5 596.8 L602.0 600.2 L605.5 603.6 L609.0 607.0 L612.5 610.3 L616.0 613.7 L619.5 617.1 L623.0 620.4 L626.5 623.8 L630.0 627.1 L633.5 630.4 L637.0 633.7 L640.5 636.9 L644.0 640.2 L647.5 643.4 L651.0 646.6 L654.5 649.7 L658.0 652.8 L661.5 655.9 L665.0 658.9 L668.5 661.8 L672.0 664.7 L675.5 667.5 L679.0 670.2 L682.5 672.7" stroke="#14213D" stroke-width="5" fill="none"/>
+<circle cx="350" cy="350" r="9" fill="#fff" stroke="#111827" stroke-width="3"/>
+<!-- annotations -->
+<rect x="250" y="250" width="200" height="200" rx="14" fill="none" stroke="#14213D" stroke-width="2" stroke-dasharray="5 6"/>
+<text x="462" y="300" text-anchor="start" font-size="17" font-weight="800" fill="#14213D">균형 근처: 거의 직선</text><text x="462" y="324" text-anchor="start" font-size="17" font-weight="800" fill="#14213D">= 가격 1에 고정</text>
+<text x="560" y="150" font-size="17" font-weight="800" fill="#14213D" text-anchor="middle">한쪽이 마르면</text>
+<text x="560" y="174" font-size="17" font-weight="800" fill="#14213D" text-anchor="middle">곡선으로 휘어 고갈을 막음</text>
+<g font-size="17" font-weight="800"><text x="40" y="470" fill="#14213D">━ StableSwap A = 100</text><text x="40" y="498" fill="#2E8B84">━ StableSwap A = 10</text><text x="40" y="526" fill="#C27A0E">┅ Constant Sum</text><text x="40" y="554" fill="#9CA3AF">┅ Constant Product</text></g>
+<text x="40" y="640" font-size="16" fill="#374151" font-weight="600">1,000 : 1,000 풀에 USDC 100개를 넣으면 받는 USDT</text>
+<text x="40" y="666" font-size="16" fill="#374151" font-weight="700">곱 90.9 · A=10 99.5 · A=100 99.95 · 합 100</text>
+</svg></div>
+    <div class="col grow">
+      <div class="card"><div class="tag">직관 1 · 고무줄로 묶은 직선</div><p>StableSwap 곡선은 <b>직선(합)에 고무줄을 걸어 곡선(곱) 쪽으로 당겨 놓은 모양</b>이다. 풀이 균형일 때는 고무줄이 팽팽해 직선을 유지하고, 한쪽 재고가 빠질수록 고무줄이 풀리며 곡선으로 휜다.</p></div>
+      <div class="card"><div class="tag">직관 2 · A가 하는 일</div><p><b>A가 클수록 직선 구간이 넓다.</b> "이 둘은 정말 같은 값"이라고 강하게 믿는 설정이다. 그 믿음은 고정이 아니라 <span class="hl">균형에서 멀어질수록 자동으로 약해진다</span>. 균형점에서는 A만큼 믿고, 한쪽이 바닥나면 믿음이 0에 가까워져 곱 곡선처럼 행동한다.</p></div>
+      <div class="card"><div class="tag">직관 3 · 숫자로 확인</div><p>1,000 : 1,000 풀에 USDC 100개: 곱은 90.9, <b>A=10은 99.5, A=100은 99.95</b>, 합은 100. 스테이블코인 풀은 A를 크게 잡아 <b>평소 슬리피지를 거의 0으로</b> 만든다.</p></div>
+      <div class="note">궁금한 분을 위한 식 한 줄: A·nⁿ·Σxᵢ + D = A·D·nⁿ + Dⁿ⁺¹ / (nⁿ·Πxᵢ). 왼쪽은 합 항, 오른쪽 끝은 곱 항이고 A가 둘의 비중을 정한다.</div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">StableSwap은 <span class="hl">"같은 값이라는 믿음(A)"과 "믿음이 깨질 때의 안전장치(곡선 구간)"</span>를 한 식에 담았다. 그래서 정상일 땐 고정 환율처럼 싸고, 위기일 땐 유니스왑처럼 스스로를 지킨다.</div><div class="src">Curve StableSwap 백서 · 예림님 Medium(AMM에서 가격과 유동성은 어떻게 결정될까)</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip teal">Curve 3 / 4</span><span class="sec">풀의 쏠림은 경보등이다 · 2025.1 USD0++ 사례</span></div><div class="pg"><b>23</b> / 27</div></div>
+  <h1 class="h1">신뢰를 잃은 자산은 <span class="u">풀에 쌓이고</span>, 믿는 자산은 <span class="u">풀에서 빠져나간다</span>.<br>그래서 <span class="a">풀의 구성비</span>를 보면 시장이 무엇을 의심하는지 보인다</h1>
+  <div class="body" style="margin-top:22px">
+    <div class="fig" style="width:600px;height:540px"><img src="img/s5-4-11.jpg" alt=""><div class="cap">한쪽 탱크가 차오르면 시소가 기운다. 곡선 구간에 들어선 풀의 모습</div></div>
+    <div class="col grow">
+      <div class="card navy">
+        <div class="tag">사례 · Usual USD0++ (2025년 1월 10일)</div>
+        <h4>상환 규칙이 바뀌자 가격이 1달러에서 미끄러졌다</h4>
+        <ul>
+          <li>USD0++는 USD0(토큰화 국채 · repo 기반 스테이블코인)를 <b>4년 락업</b>한 채권형 토큰. 그전까지는 사실상 1 : 1로 되돌릴 수 있었다</li>
+          <li>Usual이 규칙을 바꿨다. <b>하한가 0.87 USD0</b>(4년에 걸쳐 1로 상승)로 상환하거나, 쌓인 USUAL 보상을 포기하는 조건부 1 : 1 중 택일</li>
+          <li>USD0++는 DEX에서 <b>0.915달러</b>까지 하락(약 8.5% 이탈). 가장 큰 Curve USD0 / USD0++ 풀은 보유자들이 USD0++를 밀어 넣으며 <b>심하게 쏠렸다</b></li>
+          <li>Morpho의 일부 볼트는 USD0++ 가격을 <b>1 : 1로 고정</b>해 두었던 탓에 큐레이터(Gauntlet 등)가 급히 유동성을 빼야 했다</li>
+        </ul>
+      </div>
+      <div class="cards c2">
+        <div class="card amber"><div class="tag">3-4와의 연결</div><p>준비자산이 국채여도 <span class="hl">상환 규칙과 풀의 유동성</span>이 흔들리면 페그는 흔들린다. 준비자산은 필요조건이지 충분조건이 아니다.</p></div>
+        <div class="card amber"><div class="tag">3-2와의 연결 · 예림님 질문</div><p>"구멍 나면 누구 주머니에서 나오나." 1 : 1 고정 오라클을 쓴 대출 시장에서는 <b>담보 가격이 늦게 반영</b>되어 그 시장의 공급자가 위험을 떠안는다.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">StableSwap의 곡선 구간은 풀을 지키지만 가격은 지켜 주지 않는다. <span class="hl">풀 비율이 한쪽으로 기울기 시작하면 그것이 첫 번째 경보</span>이고, 준비자산 보고서보다 먼저 온다.</div><div class="src">The Block · Blockworks (2025.1.10) · 톡방 연결: 8/26 예림님 Aave 정리의 "손실 순서" 질문</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip teal">Curve 4 / 4</span><span class="sec">Curve War · 유동성에는 값이 붙어 있다</span></div><div class="pg"><b>24</b> / 27</div></div>
+  <h1 class="h1">직선 구간이 넓어도 <span class="u">풀에 돈이 없으면</span> 소용없다.<br>그래서 발행사들은 <span class="a">유동성을 산다</span>. 그 시장이 Curve War다</h1>
+  <div class="body" style="margin-top:24px">
+    <div class="col" style="width:1080px">
+      <svg viewBox="0 0 1080 470" width="1080" height="470" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#14213D"/></marker></defs>
+        <g font-weight="800" text-anchor="middle">
+          <rect x="0" y="40" width="240" height="120" rx="14" fill="#14213D"/><text x="120" y="88" font-size="23" fill="#fff">CRV 배출</text><text x="120" y="120" font-size="17" fill="#C9D2E6" font-weight="600">Curve가 유동성 공급자에게</text><text x="120" y="142" font-size="17" fill="#C9D2E6" font-weight="600">보상으로 나눠 주는 토큰</text>
+          <rect x="300" y="40" width="240" height="120" rx="14" fill="#fff" stroke="#14213D" stroke-width="2.5"/><text x="420" y="88" font-size="23" fill="#14213D">게이지 투표</text><text x="420" y="120" font-size="17" fill="#374151" font-weight="600">어느 풀에 CRV를 얼마나</text><text x="420" y="142" font-size="17" fill="#374151" font-weight="600">보낼지 투표로 결정</text>
+          <rect x="600" y="40" width="240" height="120" rx="14" fill="#fff" stroke="#14213D" stroke-width="2.5"/><text x="720" y="88" font-size="23" fill="#14213D">veCRV</text><text x="720" y="120" font-size="17" fill="#374151" font-weight="600">CRV를 최대 4년 잠그면</text><text x="720" y="142" font-size="17" fill="#374151" font-weight="600">투표권 + 보상 부스트</text>
+          <rect x="900" y="40" width="180" height="120" rx="14" fill="#F2A93B"/><text x="990" y="88" font-size="23" fill="#14213D">투표권 집약</text><text x="990" y="120" font-size="17" fill="#5A3A05" font-weight="600">Convex 같은</text><text x="990" y="142" font-size="17" fill="#5A3A05" font-weight="600">투표권 모으기 층</text>
+        </g>
+        <g stroke="#14213D" stroke-width="2.5" fill="none" marker-end="url(#ar3)"><path d="M240 100 L296 100"/><path d="M540 100 L596 100"/><path d="M840 100 L896 100"/></g>
+        <!-- bottom: who pays -->
+        <path d="M990 160 L990 220 L120 220 L120 268" stroke="#C27A0E" stroke-width="2.5" fill="none" stroke-dasharray="7 6" marker-end="url(#ar3)"/>
+        <g font-weight="800" text-anchor="middle">
+          <rect x="0" y="270" width="340" height="120" rx="14" fill="#FCEFD9" stroke="#F3D9A6" stroke-width="2"/><text x="170" y="316" font-size="23" fill="#7A4E05">스테이블코인 발행사</text><text x="170" y="348" font-size="17" fill="#7A4E05" font-weight="600">투표권 보유자에게 보상(브라이브)을 주고</text><text x="170" y="370" font-size="17" fill="#7A4E05" font-weight="600">자기 풀로 CRV 배출을 유도</text>
+          <rect x="400" y="270" width="340" height="120" rx="14" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="2"/><text x="570" y="316" font-size="23" fill="#14213D">풀에 유동성이 모인다</text><text x="570" y="348" font-size="17" fill="#374151" font-weight="600">CRV 보상을 노린 공급자가 들어와</text><text x="570" y="370" font-size="17" fill="#374151" font-weight="600">직선 구간이 실제로 두꺼워진다</text>
+          <rect x="800" y="270" width="280" height="120" rx="14" fill="#F8F9FA" stroke="#E5E7EB" stroke-width="2"/><text x="940" y="316" font-size="23" fill="#14213D">페그가 지켜진다</text><text x="940" y="348" font-size="17" fill="#374151" font-weight="600">큰 매도도 1달러 근처에서</text><text x="940" y="370" font-size="17" fill="#374151" font-weight="600">소화된다</text>
+        </g>
+        <g stroke="#14213D" stroke-width="2.5" fill="none" marker-end="url(#ar3)"><path d="M340 330 L396 330"/><path d="M740 330 L796 330"/></g>
+        <text x="0" y="440" font-size="17" fill="#6B7280" font-weight="600">유동성은 공짜가 아니다. 보상이 끊기면 공급자가 떠나고, 직선 구간은 이름만 남는다. 그래서 인센티브의 지속성이 곧 페그의 수명이다.</text>
+      </svg>
+    </div>
+    <div class="col grow">
+      <div class="card"><div class="tag">RWA와 무슨 상관인가</div><p>3-4의 새 스테이블코인들(USD0 · frxUSD 등)과 국채 토큰 페어는 <b>보상으로 유동성을 확보</b>한다. 인센티브가 끊기면 풀이 얇아지고, <span class="hl">3-1의 "24시간 환매"도 실질이 약해진다.</span></p></div>
+      <div class="card navy"><div class="tag">Curve를 볼 때 확인할 세 가지</div><ul><li><b>풀 비율</b>: 쏠림이 시작됐나 (경보등)</li><li><b>A 값</b>: 같은 값이라는 믿음이 얼마나 강하게 설정됐나</li><li><b>인센티브의 지속성</b>: 이 유동성은 몇 달짜리인가</li></ul></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">Curve 구조를 한 문장으로 줄이면 <span class="hl">"수학(StableSwap)이 슬리피지를 없애고, 정치(Curve War)가 유동성을 채운다."</span> 둘 중 하나만 있으면 1달러 시장은 서지 않는다.</div><div class="src">4회차 · 재환님 StableSwap · Curve War 정리(9/1) · Curve 공식 문서(veCRV · 게이지)</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip amber">즉석 질문 5분 대비</span><span class="sec">톡방에서 나오던 질문 스타일로 미리 답을 준비했습니다</span></div><div class="pg"><b>25</b> / 27</div></div>
+  <h1 class="h1 sm">나올 법한 질문 여섯 개와 <span class="a">한 호흡 답변</span></h1>
+  <div class="body" style="margin-top:22px">
+    <div class="cards c3 grow">
+      <div class="card"><div class="tag">Q1 · 예림님 자체과제 4번</div><h4>"국채 토큰인데 왜 미국인은 자꾸 배제되나요?"</h4><p>상품이 <b>증권</b>이라 공모 등록 대신 면제 조항을 쓰기 때문. <b>Reg D</b>(BUIDL · OUSG · TBILL · VBILL)는 미국 내 적격매수자 사모, <b>Reg S</b>(USYC · USDY)는 미국 밖 투자자 대상 역외 발행. 그래서 같은 국채 토큰인데 살 수 있는 사람이 갈린다.</p></div>
+      <div class="card"><div class="tag">Q2</div><h4>"BUIDL 이자는 어떻게 받나요?"</h4><p>토큰당 1달러 근처를 유지하고, 수익은 <b>일일 적립 후 매월 신규 BUIDL 토큰</b>으로 지갑에 분배. 반면 USYC · USDY · TBILL은 <b>토큰 가격이 올라가는 방식</b>으로 수익을 반영한다. 담보로 쓸 때 이 차이가 평가 방식 차이로 이어진다.</p></div>
+      <div class="card"><div class="tag">Q3 · 예림님 Aave 질문의 RWA 버전</div><h4>"담보로 맡긴 VBILL이 청산되면 아무나 사 가나요?"</h4><p>아니다. <b>Euler</b>는 청산 때도 Securitize DS Protocol 이전 검증과 수령자 적격성 확인을 거치고, <b>Aave Horizon</b>은 담보 예치 증표 자체를 전송 불가로 만들었다. 청산자도 자격이 필요하다.</p></div>
+      <div class="card"><div class="tag">Q4</div><h4>"RealT 토큰을 사면 등기부에 제 이름이 올라가나요?"</h4><p>아니다. 등기상 소유자는 <b>LLC</b>이고 나는 그 LLC의 멤버십 지분을 가진다. 토큰 이전이 등기에 반영되는 구조는 <b>두바이 DLD 파일럿</b>이 거의 유일하고, 그것도 승인 플랫폼 안에서만 거래된다.</p></div>
+      <div class="card"><div class="tag">Q5</div><h4>"PAXG 1개면 금 1온스를 찾아올 수 있나요?"</h4><p>소유권은 1온스지만 실물 상환은 보통 <b>LGD 금괴 단위</b>. 소액 보유자는 <b>USD 상환</b>이나 승인 딜러를 통한 <b>부분 상환</b>을 쓴다. 대신 내 토큰이 어느 금괴에 배정됐는지 일련번호 · 금고를 조회할 수는 있다.</p></div>
+      <div class="card navy"><div class="tag">Q6 · 성재님이 물을 법한 질문</div><h4>"준비자산이 토큰화 펀드면 위험이 두 겹 아닌가요?"</h4><p>맞다. <b>펀드 층</b>(운용 · 수탁 · 환매 지연)과 <b>스테이블코인 층</b>(상환 규칙 · 풀 유동성)의 위험이 겹친다. USD0++ 사례처럼 준비자산이 멀쩡해도 상환 규칙 변경 하나로 페그가 흔들릴 수 있다. 대신 준비자산이 온체인에 있어 <span class="hl">무엇이 들어 있는지는 더 잘 보인다.</span></p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">여섯 답의 공통 뼈대는 하나다. <span class="hl">"이 토큰은 누구에 대한 어떤 권리이고, 누가 보유 · 인수할 수 있는가."</span> 이 두 질문에 답하면 대부분의 RWA 질문이 풀린다.</div><div class="src">원문 <b>쟁글 토큰화 채권 2 · 3</b> · <b>토큰화 대체자산 3-1 · 3-2</b></div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip">마무리</span><span class="sec">Key Takeaways 5 · 다음 회차로</span></div><div class="pg"><b>26</b> / 27</div></div>
+  <h1 class="h1">오늘 가져갈 다섯 문장</h1>
+  <div class="body" style="margin-top:26px">
+    <div class="col grow">
+      <div class="card"><div class="step"><div class="n">1</div><div><h4>토큰화 국채의 판정 기준은 APY가 아니라 <span class="hl">담보 인정처의 수</span>다</h4><p>규모 7위 VBILL이 디파이 담보 인정처는 가장 많다. 인프라가 되는 쪽은 규모가 아니라 쓰임새다.</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">2</div><div><h4>활용은 사다리다. <span class="hl">현금관리 → 디파이 담보 → 마진 담보 → 준비자산</span></h4><p>네 칸 모두 "언제든 스테이블코인으로 되돌린다"는 24시간 환매 위에 서 있다.</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">3</div><div><h4>부동산 토큰은 대부분 <span class="hl">LLC 지분</span>이고 등기는 오프체인에 남는다</h4><p>등기까지 닿는 것은 정부가 등기 시스템을 연 두바이 DLD 파일럿뿐. 그마저 승인 플랫폼 안에서만 거래된다.</p></div></div></div>
+      <div class="card"><div class="step"><div class="n">4</div><div><h4>금 토큰의 핵심어는 <span class="hl">allocated</span>. 어느 금괴인지 말할 수 있어야 청구권이다</h4><p>보관 장소 · 감사 · 인출 단위 · 비용, 이 넷을 묻는 순간 "가격 노출"과 "청구권"이 갈린다.</p></div></div></div>
+      <div class="card"><div class="step amber"><div class="n">5</div><div><h4>1달러끼리 바꾸는 시장(StableSwap)이 이 모든 것의 배관이고, <span class="hl">풀의 쏠림은 경보등</span>이다</h4><p>수학이 슬리피지를 없애고, 인센티브가 유동성을 채운다. 둘 중 하나가 빠지면 준비자산 보고서보다 풀이 먼저 말해 준다.</p></div></div></div>
+    </div>
+    <div class="col" style="width:600px">
+      <div class="fig" style="width:600px;height:340px"><img src="img/s5-4-12.jpg" alt=""></div>
+      <div class="card teal"><div class="tag">다음 회차 · 06 솔라나 RWA 주요 플레이어</div><p>오늘 본 담보 인정처 관점으로 솔라나 위의 플레이어들을 보면 질문이 하나로 모인다. <b>"이 자산은 솔라나의 어느 대출 · 파생 프로토콜에서 담보로 받아 주나."</b> 성재님 Loopscale, 제희님 Kamino 발표와 바로 이어진다.</p></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">Key<br>Takeaway</div><div class="txt">첫 장의 문장으로 마무리합니다. <span class="hl">토큰의 가치는 무엇을 담았느냐가 아니라, 어떤 권리를 담았고 어디에서 인정받느냐가 결정한다.</span></div><div class="src">질문은 지금 바로, 남은 질문은 톡방에서 이어 갑시다</div></div></div>
+</section>
+<section class="slide">
+  <div class="hdr"><div class="kick"><span class="chip ghost">출처 · 참고</span><span class="sec">수치는 원문 기준일(2026.6 ~ 7)의 RWA.xyz · 각사 공식 자료 · 자체 집계</span></div><div class="pg"><b>27</b> / 27</div></div>
+  <h1 class="h1 sm">출처와 참고 자료</h1>
+  <div class="body" style="margin-top:24px">
+    <div class="cards c2 grow" style="align-content:start">
+      <div class="card"><div class="tag">원문 (스터디 지정 아티클)</div><ul>
+        <li>Xangle RWA Series · <b>토큰화 채권</b> · 김준성 · 2026.07.08 · xangle.io/research/detail/2508</li>
+        <li>Xangle RWA Series · <b>토큰화 대체자산</b> · xangle.io/research/detail/2517</li>
+        <li>두 글이 인용한 데이터: RWA.xyz (2026.6.23 ~ 7.22 시점별), OECD · WFE · BIS/FRED, Preqin, FSB, 각사 공식 페이지</li>
+      </ul></div>
+      <div class="card"><div class="tag">Part B · Curve</div><ul>
+        <li>Michael Egorov, <b>StableSwap: efficient mechanism for Stablecoin liquidity</b> (Curve 백서, 2019)</li>
+        <li>Curve 공식 문서 · veCRV, 게이지 가중치 투표</li>
+        <li>The Block · <b>Usual Money's protocol update sparks community concern as USD0++ drops below 92 cents</b> (2025.1.10)</li>
+        <li>Blockworks · <b>Usual protocol's depeg spurs instability in DeFi markets</b> (2025.1.10)</li>
+      </ul></div>
+      <div class="card"><div class="tag">스터디 안에서 이어받은 자료</div><ul>
+        <li>배예림 · StableSwap 정리(9/1) · Medium "AMM에서 가격과 유동성은 어떻게 결정될까"(9/2) · Aave v3 USDC 풀 정리(8/26) · 24/5 vs 24/7 정리(8/23)</li>
+        <li>이재환 · StableSwap · Curve War 정리(9/1) · DeFi 진화와 RWA 렌딩 자료(8/11)</li>
+        <li>장윤선 Aave Horizon · 신영환 Morpho · 노제희 Kamino · 이성재 Jupiter Lend · Loopscale (2회차)</li>
+      </ul></div>
+      <div class="card"><div class="tag">표기 원칙</div><ul>
+        <li>원문에 없는 해석(사다리 · 다리 비유, 손실 순서 적용, 국채와 스테이블코인의 순환 구조)은 발표자 의견입니다</li>
+        <li>담보 인정처 매트릭스의 빈칸은 "없음"이 아니라 "원문 미기재"</li>
+        <li>시각 자료의 클레이 디오라마 이미지는 발표 이해를 돕는 개념 이미지</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="ft"><div class="kt"><div class="lab">BAY<br>Research</div><div class="txt">BAY 리서치팀 · RWA 스터디 05회차 · Part 4 · 박의혁 · 2026. 09. 08</div><div class="src">bay-rwa-study.vercel.app/session.html?s=5</div></div></div>
+</section>
+
+</body></html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>펀드 지분형과 연계 증권형 — 이성재</title>
+<script>
+try{
+  if(localStorage.getItem('bond-structure-theme') === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  }
+}catch(e){}
+try{
+  if(/^#s\d+$/.test(location.hash)){
+    history.replaceState(null, document.title, location.href.replace(/#.*$/, ''));
+  }
+}catch(e){}
+</script>
+<style>
+:root{
+  color-scheme:dark;
+  --surface:#161615;
+  --surface-2:#1e1e1d;
+  --ink:#fff;
+  --ink-2:#cbc9c1;
+  --muted:#92908a;
+  --faint:#686761;
+  --hair:rgba(255,255,255,.11);
+  --hair-2:rgba(255,255,255,.20);
+  --blue:#3987e5;
+  --blue-soft:rgba(57,135,229,.14);
+  --blue-border:rgba(57,135,229,.42);
+  --side-line:rgba(255,255,255,.13);
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --surface:#fff;
+  --surface-2:#f2f5f8;
+  --ink:#14151a;
+  --ink-2:#3f414a;
+  --muted:#5a5c62;
+  --faint:#73757b;
+  --hair:rgba(0,0,0,.10);
+  --hair-2:rgba(0,0,0,.18);
+  --blue:#1c5cab;
+  --blue-soft:rgba(28,92,171,.08);
+  --blue-border:rgba(28,92,171,.34);
+  --side-line:rgba(19,38,63,.12);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--surface-2);color:var(--ink);
+  font-family:Pretendard,"Apple SD Gothic Neo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px;line-height:1.62;letter-spacing:-.012em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{display:grid;grid-template-columns:268px minmax(0,1fr);min-height:100vh}
+
+/* 사이드바 */
+.side{
+  position:sticky;top:0;align-self:start;height:100vh;
+  display:flex;align-items:flex-start;padding:28px 20px;
+  background:var(--surface);border-right:1px solid var(--side-line);
+}
+.side nav{width:100%;max-height:calc(100vh - 56px);overflow-y:auto;padding:6px 4px 6px 0;scrollbar-width:thin}
+.toc{list-style:none;margin:0;padding:0}
+.toc .grp{
+  margin:18px 0 7px;padding:15px 10px 0;border-top:1px solid var(--side-line);
+  color:var(--ink);font-size:15px;font-weight:850;letter-spacing:-.015em;
+}
+.toc .grp:first-child{margin-top:0;padding-top:0;border-top:0}
+.toc a{
+  display:flex;align-items:baseline;gap:8px;padding:6px 10px;
+  border-left:2px solid transparent;border-radius:0 7px 7px 0;
+  color:var(--muted);font-size:13.5px;font-weight:650;text-decoration:none;letter-spacing:-.02em;
+}
+.toc a .n{flex:none;width:22px;color:var(--muted);font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.toc a:hover{color:var(--ink)}
+.toc a.on{background:var(--blue-soft);border-left-color:var(--blue);color:var(--ink);font-weight:800}
+.toc a.on .n{color:var(--blue)}
+
+/* 본문 */
+.main{min-width:0;padding:24px 28px 56px}
+.top,.chapter-group{background:var(--surface);border:1px solid var(--side-line);border-radius:12px}
+.top{margin-bottom:18px;padding:34px 38px}
+.top .study,.top .source,.top .presenter{margin:0;font-size:14px;font-weight:750;line-height:1.45}
+.top .study{color:var(--blue)}
+.top .source{margin-top:2px;color:var(--muted)}
+.top h1{margin:18px 0;font-size:clamp(40px,4.3vw,58px);font-weight:850;line-height:1.12;letter-spacing:-.055em}
+.top h1 em{color:var(--blue);font-style:normal}
+.top .presenter{color:var(--ink-2)}
+.top .presenter span{margin:0 9px;color:var(--hair-2)}
+
+.chapter-group{margin-bottom:18px;padding:28px 36px 0}
+.chapter-group:last-child{margin-bottom:0}
+.chapter-title{margin:0;padding:0 0 18px;color:var(--blue);font-size:30px;font-weight:850;letter-spacing:-.04em}
+.chapter-title em{font-style:normal}
+.sec{padding:30px 0 36px;scroll-margin-top:24px}
+.chapter-title + .sec,.chapter-group > .sec:first-child{padding-top:8px}
+.chapter-group .sec:last-child{padding-bottom:30px}
+.section-mark{display:flex;align-items:center;gap:10px;margin:0 0 20px;font-size:22px;font-weight:850;letter-spacing:-.035em}
+.section-mark::before{content:"";width:4px;height:22px;flex:none;background:var(--blue);border-radius:2px}
+.sec-head{margin-bottom:23px}
+.lb{margin:0;font-size:34px;font-weight:850;line-height:1.26;letter-spacing:-.047em}
+.sub{margin:8px 0 0;color:var(--muted);font-size:15px}
+.lead-list{margin:16px 0 0;padding-left:23px;color:var(--ink-2);font-size:17.5px;line-height:1.7}
+.lead-list li{padding-left:3px}
+.lead-list li + li{margin-top:5px}
+.lead-list li::marker,.points li::marker{color:var(--blue)}
+.lead-list b,.points b{color:var(--ink);font-weight:850}
+
+/* 도입 */
+.rights-fork{display:grid;grid-template-columns:1fr 70px 1fr;align-items:stretch;margin-top:5px}
+.rights-side{padding:21px 24px;border-top:2px solid var(--hair-2)}
+.rights-side.on{border-top-color:var(--blue)}
+.rights-side .tag{display:block;color:var(--blue);font-size:13px;font-weight:850;letter-spacing:.04em}
+.rights-side h3{margin:5px 0 13px;font-size:23px;font-weight:850;letter-spacing:-.035em}
+.rights-side ul{margin:0;padding-left:21px;color:var(--ink-2)}
+.rights-side li + li{margin-top:7px}
+.rights-side li::marker{color:var(--blue)}
+.rights-side b{color:var(--ink)}
+.fork-center{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px;font-weight:850}
+
+/* 판별 기준 */
+.question-list{display:grid}
+.question-row{display:grid;grid-template-columns:52px 260px minmax(0,1fr);gap:20px;align-items:start;padding:17px 0;border-top:1px solid var(--hair)}
+.question-row:first-child{padding-top:0;border-top:0}
+.question-row .no{color:var(--blue);font-size:13px;font-weight:850;letter-spacing:.06em}
+.question-row strong{font-size:18px;line-height:1.45;letter-spacing:-.025em}
+.question-row p{margin:0;color:var(--ink-2)}
+.question-row p b{color:var(--ink);font-weight:850}
+
+/* 구조 흐름 */
+.process{display:grid;grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr) 32px minmax(0,1fr) 32px minmax(0,1fr);align-items:stretch}
+.process-step{padding:18px 14px;border-top:2px solid var(--hair-2)}
+.process-step.on{border-top-color:var(--blue);background:var(--blue-soft)}
+.process-step .num{display:block;margin-bottom:6px;color:var(--blue);font-size:12px;font-weight:850;letter-spacing:.06em}
+.process-step strong{display:block;font-size:17px;line-height:1.4;letter-spacing:-.025em}
+.process-step span{display:block;margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45}
+.process-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:18px;font-weight:850}
+.claim-line{margin:18px 0 0;padding:15px 18px;background:var(--blue-soft);color:var(--ink-2);font-size:17px;font-weight:700;text-align:center}
+.claim-line b{color:var(--ink);font-weight:850}
+
+/* 확산 이유 */
+.reason-list{display:grid}
+.reason-row{display:grid;grid-template-columns:220px minmax(0,1fr);gap:34px;padding:18px 0;border-top:1px solid var(--hair)}
+.reason-row:first-child{padding-top:0;border-top:0}
+.reason-key{font-size:19px;font-weight:850;letter-spacing:-.03em}
+.reason-copy{color:var(--ink-2)}
+.reason-copy b{color:var(--ink);font-weight:850}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);margin-top:22px;border-top:1px solid var(--hair)}
+.stat{padding:17px 24px 0;text-align:center}
+.stat + .stat{border-left:1px solid var(--hair)}
+.stat strong{display:block;color:var(--blue);font-size:27px;font-weight:850;letter-spacing:-.04em}
+.stat span{display:block;margin-top:3px;color:var(--muted);font-size:13px}
+.stat-note{margin:11px 0 0;text-align:center;color:var(--faint);font-size:12.5px}
+
+/* 수익 반영 */
+.yield-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.yield-item{padding:0 27px}
+.yield-item:first-child{padding-left:0}
+.yield-item + .yield-item{border-left:1px solid var(--hair)}
+.yield-item .num{color:var(--blue);font-size:12px;font-weight:850;letter-spacing:.06em}
+.yield-item h3{margin:5px 0 3px;font-size:20px;font-weight:850;letter-spacing:-.03em}
+.yield-item .example{margin:0 0 12px;color:var(--blue);font-size:13px;font-weight:800}
+.yield-item ul{margin:0;padding-left:20px;color:var(--ink-2)}
+.yield-item li + li{margin-top:7px}
+.yield-item li::marker{color:var(--blue)}
+.yield-item b{color:var(--ink)}
+
+/* 상품 목록 */
+.product-list{display:grid}
+.product-row{display:grid;grid-template-columns:190px 190px minmax(0,1fr);gap:26px;align-items:start;padding:17px 0;border-top:1px solid var(--hair)}
+.product-row:first-child{padding-top:0;border-top:0}
+.product-name{font-size:18px;font-weight:850;letter-spacing:-.025em}
+.product-name span{display:block;margin-top:2px;color:var(--muted);font-size:12.5px;font-weight:650}
+.product-type{color:var(--blue);font-size:14px;font-weight:800}
+.product-copy{color:var(--ink-2)}
+.product-copy b{color:var(--ink);font-weight:850}
+
+/* 비교 */
+.compare{width:100%;border-collapse:collapse;table-layout:fixed}
+.compare th,.compare td{padding:15px 16px;border-bottom:1px solid var(--hair);text-align:left;vertical-align:top}
+.compare thead th{color:var(--muted);font-size:13px;font-weight:800}
+.compare thead th:first-child{width:170px}
+.compare tbody th{color:var(--ink);font-size:15.5px;font-weight:850}
+.compare td{color:var(--ink-2);font-size:15px}
+.compare td b{color:var(--ink);font-weight:850}
+
+/* 체크리스트 */
+.check-list{display:grid;grid-template-columns:1fr 1fr;column-gap:42px}
+.check-row{display:grid;grid-template-columns:42px minmax(0,1fr);gap:13px;padding:18px 0;border-top:1px solid var(--hair)}
+.check-row:nth-child(-n+2){padding-top:0;border-top:0}
+.check-no{color:var(--blue);font-size:13px;font-weight:850;letter-spacing:.05em}
+.check-copy strong{display:block;font-size:18px;line-height:1.4}
+.check-copy span{display:block;margin-top:4px;color:var(--muted);font-size:14px;line-height:1.5}
+
+/* 용어 · 요약 · 출처 */
+.terms{display:grid}
+.term-row{display:grid;grid-template-columns:250px minmax(0,1fr);gap:34px;padding:19px 0}
+.term-row + .term-row{border-top:1px solid var(--hair)}
+.term-row dt{font-size:19px;font-weight:850;letter-spacing:-.03em}
+.term-row dt span{display:block;margin-top:3px;color:var(--blue);font-size:13.5px;font-weight:800}
+.term-row dd{margin:0;color:var(--ink-2)}
+.term-row ul{margin:0;padding-left:21px}
+.term-row li + li{margin-top:5px}
+.term-row li::marker{color:var(--blue)}
+.term-row b{color:var(--ink)}
+.summary{display:grid}
+.summary-row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:18px;padding:17px 0;border-top:1px solid var(--hair)}
+.summary-row:first-child{padding-top:0;border-top:0}
+.summary-row .n{color:var(--blue);font-size:14px;font-weight:850;letter-spacing:.05em}
+.summary-row p{margin:0;color:var(--ink-2);font-size:17px;font-weight:700}
+.summary-row b{color:var(--ink);font-weight:850}
+.sources{display:grid;grid-template-columns:150px minmax(0,1fr)}
+.source-kind,.source-copy{padding:14px 0;border-top:1px solid var(--hair)}
+.source-kind:first-of-type,.source-kind:first-of-type + .source-copy{border-top:0;padding-top:0}
+.source-kind{color:var(--muted);font-size:14px;font-weight:800}
+.source-copy{color:var(--ink-2)}
+.source-copy ul{margin:0;padding:0;list-style:none}
+.source-copy li + li{margin-top:9px}
+.source-copy a{color:var(--blue);font-weight:750;text-decoration:none;border-bottom:1px solid var(--blue-border)}
+.source-copy small{display:block;margin-top:2px;color:var(--muted);font-size:13.5px}
+
+.theme-toggle{
+  position:fixed;top:18px;right:18px;z-index:30;
+  display:inline-flex;align-items:center;gap:8px;padding:9px 14px;
+  border:1px solid var(--hair-2);border-radius:999px;background:var(--surface);
+  color:var(--ink-2);font:750 12.5px inherit;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+.theme-toggle .ico{color:var(--blue)}
+
+@media(max-width:1000px){
+  .product-row{grid-template-columns:160px 170px minmax(0,1fr)}
+  .question-row{grid-template-columns:45px 220px minmax(0,1fr)}
+}
+@media(max-width:860px){
+  .wrap{display:block}
+  .side{position:static;height:auto;padding:18px 20px;border-right:0;border-bottom:1px solid var(--side-line)}
+  .side nav{max-height:none}
+  .toc{display:flex;gap:6px;overflow-x:auto}
+  .toc .grp{display:none}
+  .toc li{flex:none}
+  .toc a{border-left:0;border-bottom:2px solid transparent;border-radius:7px;padding:7px 10px}
+  .toc a.on{border-left:0;border-bottom-color:var(--blue)}
+  .main{padding:18px}
+  .top,.chapter-group{border-radius:10px}
+  .chapter-group{padding:25px 26px 0}
+  .rights-fork{grid-template-columns:1fr}
+  .fork-center{padding:5px;transform:rotate(90deg)}
+  .process{grid-template-columns:1fr}
+  .process-arrow{padding:4px;transform:rotate(90deg)}
+  .yield-grid{grid-template-columns:1fr}
+  .yield-item{padding:18px 0;border-left:0!important;border-top:1px solid var(--hair)}
+  .yield-item:first-child{padding-top:0;border-top:0}
+  .product-row{grid-template-columns:150px 160px minmax(0,1fr);gap:18px}
+  .compare{display:block;overflow-x:auto}
+  .compare th,.compare td{min-width:190px}
+}
+@media(max-width:620px){
+  .main{padding:10px}
+  .top{padding:28px 24px}
+  .top h1{font-size:34px;line-height:1.16;overflow-wrap:anywhere}
+  .chapter-group{padding:24px 22px 0}
+  .chapter-title{font-size:28px}
+  .lb{font-size:28px;word-break:keep-all;overflow-wrap:anywhere}
+  .lead-list{font-size:16px}
+  .question-row,.reason-row,.product-row,.term-row{grid-template-columns:1fr;gap:7px}
+  .question-row .no{margin-bottom:2px}
+  .stat-strip,.check-list{grid-template-columns:1fr}
+  .stat{padding:14px 0;border-left:0!important;border-top:1px solid var(--hair)}
+  .check-row:nth-child(2){padding-top:18px;border-top:1px solid var(--hair)}
+  .sources{grid-template-columns:1fr}
+  .source-kind{padding-bottom:3px}
+  .source-copy{padding-top:0;border-top:0}
+}
+</style>
+</head>
+<body>
+<a href="../session.html?s=5" style="display:block;background:#fff;border-bottom:1px solid #dce6ef;padding:13px 24px;font-size:14px;font-weight:700;color:#17619c;text-decoration:none;font-family:Pretendard,system-ui,sans-serif">&larr; BAY RWA 스터디 · 5회차 진행안으로</a><button class="theme-toggle" id="themeToggle" type="button" aria-label="테마 전환">
+  <span class="ico">◐</span><span class="tt-label">다크 모드</span>
+</button>
+
+<div class="wrap">
+<aside class="side">
+  <nav aria-label="발표 목차">
+    <ul class="toc">
+      <li class="grp">들어가기</li>
+      <li><a href="#s0"><span class="n">01</span>같은 국채, 다른 권리</a></li>
+
+      <li class="grp">판별 기준</li>
+      <li><a href="#s1"><span class="n">01</span>누구에게 청구?</a></li>
+
+      <li class="grp">펀드 지분형</li>
+      <li><a href="#s2"><span class="n">01</span>구조</a></li>
+      <li><a href="#s3"><span class="n">02</span>확산 이유</a></li>
+      <li><a href="#s4"><span class="n">03</span>수익 반영</a></li>
+      <li><a href="#s5"><span class="n">04</span>대표 상품</a></li>
+
+      <li class="grp">연계 증권형</li>
+      <li><a href="#s6"><span class="n">01</span>구조</a></li>
+      <li><a href="#s7"><span class="n">02</span>USDY</a></li>
+
+      <li class="grp">비교</li>
+      <li><a href="#s8"><span class="n">01</span>두 구조의 차이</a></li>
+      <li><a href="#s9"><span class="n">02</span>무엇을 확인?</a></li>
+
+      <li class="grp">마무리</li>
+      <li><a href="#s10"><span class="n">01</span>새로 알게 된 용어</a></li>
+      <li><a href="#s11"><span class="n">02</span>핵심 정리</a></li>
+      <li><a href="#s12"><span class="n">03</span>자료 출처</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<main class="main">
+  <header class="top">
+    <p class="study">RWA 스터디 5회차</p>
+    <p class="source">Xangle · 토큰화 채권</p>
+    <h1>2-3 · 2-4 <em>펀드 지분형과 연계 증권형</em></h1>
+    <p class="presenter">발표 <span>|</span> 이성재</p>
+  </header>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>들어가기</em></h2>
+    <section class="sec" id="s0">
+      <div class="sec-head">
+        <p class="lb">같은 미국 국채를 담아도 같은 상품일까?</p>
+        <ul class="lead-list">
+          <li>둘 다 국채 수익을 제공하지만 <b>투자자가 가진 권리</b>는 다름</li>
+          <li>구분의 출발점은 기초자산보다 <b>토큰이 나타내는 것</b></li>
+        </ul>
+      </div>
+
+      <div class="rights-fork">
+        <div class="rights-side on">
+          <span class="tag">FUND SHARE</span>
+          <h3>펀드 지분형</h3>
+          <ul>
+            <li>펀드가 국채·repo·현금성 자산 보유</li>
+            <li>토큰은 <b>펀드의 지분</b></li>
+            <li>권리 상대방은 펀드</li>
+          </ul>
+        </div>
+        <div class="fork-center">↔</div>
+        <div class="rights-side">
+          <span class="tag">LINKED SECURITY</span>
+          <h3>연계 증권형</h3>
+          <ul>
+            <li>제3자 발행사·SPV가 기초자산 보유</li>
+            <li>토큰은 <b>노트·증서</b></li>
+            <li>권리 상대방은 발행사</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>판별 기준</em></h2>
+    <section class="sec" id="s1">
+      <h3 class="section-mark">누구에게 청구?</h3>
+      <div class="sec-head">
+        <p class="lb">“무엇을 담았나”보다 “누구에게 권리를 요구하나”</p>
+      </div>
+
+      <div class="question-list">
+        <div class="question-row">
+          <span class="no">01</span>
+          <strong>토큰은 무엇을 나타내나?</strong>
+          <p>개별 채권이 아니라 <b>펀드 지분 또는 발행사의 채무증서</b></p>
+        </div>
+        <div class="question-row">
+          <span class="no">02</span>
+          <strong>기초자산은 누가 보유하나?</strong>
+          <p>펀드가 보유하는지, 제3자 발행사·SPV가 보유하는지 확인</p>
+        </div>
+        <div class="question-row">
+          <span class="no">03</span>
+          <strong>이자·원금은 누구에게 청구하나?</strong>
+          <p>정부가 아닌 <b>펀드 또는 노트 발행사</b>를 향하는 권리</p>
+        </div>
+        <div class="question-row">
+          <span class="no">04</span>
+          <strong>수익과 환매는 어떻게 처리되나?</strong>
+          <p>펀드 규정 또는 노트 약관에 따른 수익 반영·환매</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>펀드 지분형</em></h2>
+
+    <section class="sec" id="s2">
+      <h3 class="section-mark">구조</h3>
+      <div class="sec-head">
+        <p class="lb">국채를 담은 펀드의 지분을 토큰으로 보유</p>
+        <ul class="lead-list">
+          <li>토큰 보유는 곧 <b>해당 펀드 지분 보유</b></li>
+          <li>개별 국채 발행자가 아니라 <b>펀드에 대한 권리</b></li>
+        </ul>
+      </div>
+
+      <div class="process">
+        <div class="process-step"><span class="num">01</span><strong>투자자</strong><span>달러·USDC로 청약</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step on"><span class="num">02</span><strong>펀드 지분 토큰</strong><span>BUIDL · BENJI · USYC 등</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step"><span class="num">03</span><strong>펀드</strong><span>운용·평가·환매</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step"><span class="num">04</span><strong>기초 포트폴리오</strong><span>국채 · repo · 현금</span></div>
+      </div>
+      <p class="claim-line">투자자가 가진 것은 미국 국채 한 장이 아니라 <b>국채를 보유한 펀드의 지분</b></p>
+    </section>
+
+    <section class="sec" id="s3">
+      <h3 class="section-mark">확산 이유</h3>
+      <div class="sec-head">
+        <p class="lb">기존 펀드 구조는 유지하고 지분 기록만 온체인으로</p>
+      </div>
+
+      <div class="reason-list">
+        <div class="reason-row">
+          <div class="reason-key">기존 인프라 활용</div>
+          <div class="reason-copy">채권 운용·수탁·평가·환매는 <b>기존 펀드 체계</b> 안에서 처리</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">구조 변경 최소화</div>
+          <div class="reason-copy">개별 채권의 발행·결제 구조를 새로 만들 필요 축소</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">현금관리</div>
+          <div class="reason-copy">유휴 스테이블코인을 국채 수익이 붙는 <b>온체인 자산</b>으로 전환</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">담보 활용</div>
+          <div class="reason-copy">디파이·거래소·기관 거래에서 <b>수익형 담보</b>로 재사용</div>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat"><strong>148.5억 달러</strong><span>토큰화 국채형 상품 시장</span></div>
+        <div class="stat"><strong>71.8%</strong><span>상위 5개 상품군 비중</span></div>
+        <div class="stat"><strong>펀드 중심</strong><span>USYC · BENJI · BUIDL · USTB</span></div>
+      </div>
+      <p class="stat-note">Xangle 아티클 · RWA.xyz, 2026년 7월 1일 당시 스냅샷</p>
+    </section>
+
+    <section class="sec" id="s4">
+      <h3 class="section-mark">수익 반영</h3>
+      <div class="sec-head">
+        <p class="lb">국채 이자는 토큰에 어떻게 보일까?</p>
+        <ul class="lead-list">
+          <li>같은 펀드 지분형이라도 <b>수익을 보여주는 방식</b>은 다름</li>
+        </ul>
+      </div>
+
+      <div class="yield-grid">
+        <div class="yield-item">
+          <span class="num">01</span>
+          <h3>토큰 수량 증가</h3>
+          <p class="example">BUIDL · BENJI</p>
+          <ul><li>수익을 새 토큰으로 지갑에 반영</li><li>기준가격은 <b>1달러 근처</b></li></ul>
+        </div>
+        <div class="yield-item">
+          <span class="num">02</span>
+          <h3>토큰 가치 상승</h3>
+          <p class="example">USYC · TBILL</p>
+          <ul><li>수익이 펀드 NAV에 누적</li><li>보유 수량보다 <b>토큰 가격</b> 상승</li></ul>
+        </div>
+        <div class="yield-item">
+          <span class="num">03</span>
+          <h3>청약·환매 연결</h3>
+          <p class="example">OUSG · USTB 등</p>
+          <ul><li>달러·USDC로 지분 발행·환매</li><li>조건과 시간은 <b>상품별 규정</b></li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="s5">
+      <h3 class="section-mark">대표 상품</h3>
+      <div class="sec-head">
+        <p class="lb">모두 펀드 지분이지만 설계와 활용처는 다름</p>
+      </div>
+
+      <div class="product-list">
+        <div class="product-row">
+          <div class="product-name">BUIDL<span>BlackRock · Securitize</span></div>
+          <div class="product-type">기관용 유동성 펀드</div>
+          <div class="product-copy">현금·단기 국채·repo 투자 · 매월 신규 토큰으로 수익 분배 · <b>거래 담보 활용</b></div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">BENJI · iBENJI<span>Franklin Templeton</span></div>
+          <div class="product-type">머니마켓펀드 지분</div>
+          <div class="product-copy">BENJI는 미국 등록 FOBXX · iBENJI는 BVI 기관용 펀드 · <b>관할과 투자자 대상 차이</b></div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">USYC<span>Circle · Hashnote</span></div>
+          <div class="product-type">단기 국채형 펀드</div>
+          <div class="product-copy">단기 국채·repo 중심 · 수익은 토큰 가치 상승 · <b>기관 현금관리·외부 담보</b></div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">USTB<span>Invesco · Superstate</span></div>
+          <div class="product-type">이중 기록 선택</div>
+          <div class="product-copy">온체인 토큰 또는 전통 장부로 보유 · 달러·USDC 청약과 환매</div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">OUSG<span>Ondo Finance</span></div>
+          <div class="product-type">펀드오브펀드</div>
+          <div class="product-copy">여러 운용사의 국채·머니마켓펀드 편입 · <b>24시간 USDC·PYUSD 발행·환매</b></div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">TBILL<span>OpenEden</span></div>
+          <div class="product-type">단기국채 펀드 지분</div>
+          <div class="product-copy">국채·역repo·USD 운용 · NAV 기반 가격 상승 · 여러 네트워크에 발행</div>
+        </div>
+        <div class="product-row">
+          <div class="product-name">VBILL<span>VanEck · Securitize</span></div>
+          <div class="product-type">사모형 국채 펀드</div>
+          <div class="product-copy">국채·repo 투자 · Aave Horizon·Euler 등에서 <b>디파이 담보</b>로 확장</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>연계 증권형</em></h2>
+
+    <section class="sec" id="s6">
+      <h3 class="section-mark">구조</h3>
+      <div class="sec-head">
+        <p class="lb">기초 채권을 담보로 제3자가 별도 노트를 발행</p>
+        <ul class="lead-list">
+          <li>토큰은 펀드 지분이 아닌 <b>발행사의 채무증서</b></li>
+          <li>이자·상환 권리는 기초 채권이 아니라 <b>노트 약관</b>에서 발생</li>
+        </ul>
+      </div>
+
+      <div class="process">
+        <div class="process-step"><span class="num">01</span><strong>투자자</strong><span>발행사에 자금 제공</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step on"><span class="num">02</span><strong>토큰화 노트</strong><span>발행사에 대한 청구권</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step"><span class="num">03</span><strong>발행사 · SPV</strong><span>노트 발행·상환 관리</span></div>
+        <div class="process-arrow">→</div>
+        <div class="process-step"><span class="num">04</span><strong>담보자산</strong><span>국채 · ETF · 은행예금</span></div>
+      </div>
+      <p class="claim-line">투자자의 직접 상대방은 미국 정부가 아니라 <b>노트를 발행한 제3자</b></p>
+    </section>
+
+    <section class="sec" id="s7">
+      <h3 class="section-mark">USDY</h3>
+      <div class="sec-head">
+        <p class="lb">국채 수익을 담은 토큰화 노트</p>
+      </div>
+
+      <div class="reason-list">
+        <div class="reason-row">
+          <div class="reason-key">법적 성격</div>
+          <div class="reason-copy">펀드 지분이 아닌 발행사의 <b>토큰화 노트</b></div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">담보자산</div>
+          <div class="reason-copy">단기 미국 국채·단기국채 ETF·은행 요구불예금 등</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">수익 반영</div>
+          <div class="reason-copy">시간이 지나며 <b>USDY 기준가격·상환가치</b> 상승</div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">투자자 대상</div>
+          <div class="reason-copy">Reg S 기준 <b>미국인이 아닌 적격 해외 투자자</b></div>
+        </div>
+        <div class="reason-row">
+          <div class="reason-key">권리 행사</div>
+          <div class="reason-copy">담보 국채가 아니라 <b>발행사 약관에 따라 상환</b></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>비교</em></h2>
+
+    <section class="sec" id="s8">
+      <h3 class="section-mark">두 구조의 차이</h3>
+      <div class="sec-head">
+        <p class="lb">국채 노출은 같아도 법적 권리는 다름</p>
+      </div>
+
+      <table class="compare">
+        <thead>
+          <tr><th>구분</th><th>펀드 지분형</th><th>연계 증권형</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>토큰의 의미</th><td><b>펀드 지분</b></td><td><b>노트·증서</b></td></tr>
+          <tr><th>기초자산 보유</th><td>펀드</td><td>제3자 발행사·SPV</td></tr>
+          <tr><th>권리 상대방</th><td>펀드</td><td>노트 발행사</td></tr>
+          <tr><th>수익의 근거</th><td>펀드 운용성과·배당</td><td>발행사가 정한 노트 약관</td></tr>
+          <tr><th>환매</th><td>펀드 규정에 따라 지분 환매</td><td>발행사 약관에 따라 노트 상환</td></tr>
+          <tr><th>대표 사례</th><td>BUIDL · BENJI · USYC 등</td><td>USDY</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="sec" id="s9">
+      <h3 class="section-mark">무엇을 확인?</h3>
+      <div class="sec-head">
+        <p class="lb">이름보다 권리 구조를 먼저 확인</p>
+      </div>
+
+      <div class="check-list">
+        <div class="check-row">
+          <span class="check-no">01</span>
+          <div class="check-copy"><strong>내가 보유한 것은 무엇인가?</strong><span>개별 채권 · 펀드 지분 · 발행사 노트</span></div>
+        </div>
+        <div class="check-row">
+          <span class="check-no">02</span>
+          <div class="check-copy"><strong>누가 기초자산을 보관하나?</strong><span>펀드·SPV·수탁기관과 자산 분리 구조</span></div>
+        </div>
+        <div class="check-row">
+          <span class="check-no">03</span>
+          <div class="check-copy"><strong>수익은 어떻게 반영되나?</strong><span>토큰 수량 증가 · NAV·상환가치 상승</span></div>
+        </div>
+        <div class="check-row">
+          <span class="check-no">04</span>
+          <div class="check-copy"><strong>누구에게 환매를 요구하나?</strong><span>펀드 또는 노트 발행사와 실제 환매 조건</span></div>
+        </div>
+        <div class="check-row">
+          <span class="check-no">05</span>
+          <div class="check-copy"><strong>누가 투자할 수 있나?</strong><span>Reg D · Reg S · 적격투자자 · 지역 제한</span></div>
+        </div>
+        <div class="check-row">
+          <span class="check-no">06</span>
+          <div class="check-copy"><strong>어디에서 다시 활용되나?</strong><span>현금관리 · 디파이 담보 · 거래소 마진 담보</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="chapter-group">
+    <h2 class="chapter-title"><em>마무리</em></h2>
+
+    <section class="sec" id="s10">
+      <h3 class="section-mark">새로 알게 된 용어</h3>
+      <dl class="terms">
+        <div class="term-row">
+          <dt>Repo<span>환매조건부채권</span></dt>
+          <dd><ul><li>채권을 팔고 정해진 시점에 다시 사기로 약속</li><li>단기 자금 운용과 <b>현금성 자산 관리</b>에 활용</li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>NAV<span>순자산가치</span></dt>
+          <dd><ul><li>펀드 자산에서 부채를 뺀 순가치</li><li>토큰 가격과 환매가를 계산하는 <b>기준</b></li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>SPV<span>특수목적기구</span></dt>
+          <dd><ul><li>특정 자산이나 거래만을 위해 만든 별도 법인</li><li>노트 발행과 담보자산 관리를 <b>일반 사업과 분리</b></li></ul></dd>
+        </div>
+        <div class="term-row">
+          <dt>Fund of Funds<span>펀드오브펀드</span></dt>
+          <dd><ul><li>개별 채권보다 다른 펀드들을 편입하는 펀드</li><li>OUSG는 여러 운용사의 <b>국채·머니마켓펀드</b> 활용</li></ul></dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="sec" id="s11">
+      <h3 class="section-mark">핵심 정리</h3>
+      <div class="summary">
+        <div class="summary-row"><span class="n">01</span><p>채권 토큰은 기초자산보다 <b>토큰이 나타내는 권리</b>를 먼저 확인</p></div>
+        <div class="summary-row"><span class="n">02</span><p>펀드 지분형은 국채를 보유한 <b>펀드의 지분</b></p></div>
+        <div class="summary-row"><span class="n">03</span><p>연계 증권형은 제3자 발행사에 대한 <b>노트·증서 청구권</b></p></div>
+        <div class="summary-row"><span class="n">04</span><p>펀드 지분형은 기존 금융 인프라를 활용해 <b>가장 빠르게 확산</b></p></div>
+        <div class="summary-row"><span class="n">05</span><p>상품 판단의 핵심은 권리 상대방·수익 반영·환매 조건</p></div>
+      </div>
+    </section>
+
+    <section class="sec" id="s12">
+      <h3 class="section-mark">자료 출처</h3>
+      <div class="sources">
+        <div class="source-kind">아티클 원문</div>
+        <div class="source-copy">
+          <a href="https://xangle.io/research/detail/2508" target="_blank" rel="noopener">Xangle · 토큰화 채권</a>
+          <small>2-3 펀드 지분형 · 2-4 연계 증권형</small>
+        </div>
+
+        <div class="source-kind">추가 조사</div>
+        <div class="source-copy">
+          <ul>
+            <li><a href="https://investors.securitize.io/news/news-details/2024/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network-03-20-2024/default.aspx" target="_blank" rel="noopener">Securitize · BlackRock BUIDL</a></li>
+            <li><a href="https://www.franklintempleton.com/investments/options/money-market-funds/products/29386/SINGLCLASS/franklin-on-chain-u-s-government-money-fund/FOBXX" target="_blank" rel="noopener">Franklin Templeton · BENJI / FOBXX</a></li>
+            <li><a href="https://docs.ondo.finance/general-access-products/usdy/basics" target="_blank" rel="noopener">Ondo Finance Docs · USDY Basics</a></li>
+            <li><a href="https://docs.ondo.finance/trust-and-security" target="_blank" rel="noopener">Ondo Finance Docs · Trust &amp; Security</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var KEY='bond-structure-theme';
+  function isLight(){return root.getAttribute('data-theme')==='light';}
+  function paint(){
+    var label=document.querySelector('#themeToggle .tt-label');
+    if(label) label.textContent=isLight()?'다크 모드':'라이트 모드';
+  }
+  function toggle(){
+    if(isLight()) root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme','light');
+    try{localStorage.setItem(KEY,isLight()?'light':'dark');}catch(e){}
+    paint();
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    paint();
+    var button=document.getElementById('themeToggle');
+    if(button) button.addEventListener('click',toggle);
+
+    var links={};
+    Array.prototype.forEach.call(document.querySelectorAll('.toc a'),function(a){
+      var id=a.getAttribute('href').slice(1);
+      links[id]=a;
+      a.addEventListener('click',function(e){
+        var target=document.getElementById(id);
+        if(!target) return;
+        e.preventDefault();
+        var rect=target.getBoundingClientRect();
+        var visibleHeight=Math.min(rect.height,window.innerHeight*.82);
+        var top=window.scrollY+rect.top-(window.innerHeight-visibleHeight)/2;
+        var max=document.documentElement.scrollHeight-window.innerHeight;
+        window.scrollTo({top:Math.max(0,Math.min(top,max)),behavior:'smooth'});
+        try{history.replaceState(null,document.title,location.href.replace(/#.*$/,''));}catch(err){}
+      });
+    });
+
+    var sections=document.querySelectorAll('.sec');
+    if(!sections.length) return;
+    var ticking=false;
+    function sync(){
+      var marker=window.innerHeight*.5;
+      var active=sections[0].id;
+      Array.prototype.forEach.call(sections,function(section){
+        if(section.getBoundingClientRect().top<=marker) active=section.id;
+      });
+      if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-2){
+        active=sections[sections.length-1].id;
+      }
+      Object.keys(links).forEach(function(id){
+        links[id].classList.toggle('on',id===active);
+      });
+      ticking=false;
+    }
+    function requestSync(){
+      if(ticking) return;
+      ticking=true;
+      requestAnimationFrame(sync);
+    }
+    sync();
+    window.addEventListener('scroll',requestSync,{passive:true});
+    window.addEventListener('resize',requestSync);
+  });
+})();
+</script>
+</body>
+</html>
